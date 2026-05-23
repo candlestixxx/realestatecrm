@@ -1,86 +1,29 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useChat } from '@ai-sdk/react';
+import { ToolInvocation } from 'ai';
 
 export default function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState<
-    { id: string; role: 'user' | 'assistant'; content: string }[]
-  >([
-    {
-      id: '1',
-      role: 'assistant',
-      content: 'Hello! I am your real estate AI assistant. How can I help you today?',
-    },
-  ]);
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    api: '/api/chat',
+    initialMessages: [
+      {
+        id: '1',
+        role: 'assistant',
+        content: 'Hello! I am Jules, your real estate AI assistant. How can I help you today?',
+      },
+    ],
+  });
 
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMsg = { id: Date.now().toString(), role: 'user' as const, content: input };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMsg] }),
-      });
-
-      if (!response.ok) throw new Error('Network response was not ok');
-      if (!response.body) throw new Error('No body');
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-      let text = '';
-
-      setMessages((prev) => [
-        ...prev,
-        { id: (Date.now() + 1).toString(), role: 'assistant', content: '' },
-      ]);
-
-      while (!done) {
-        const { value, done: readerDone } = await reader.read();
-        done = readerDone;
-        if (value) {
-          text += decoder.decode(value, { stream: !done });
-          setMessages((prev) => {
-            const newMessages = [...prev];
-            newMessages[newMessages.length - 1].content = text
-              .replace(/0:"/g, '')
-              .replace(/"/g, '')
-              .replace(/\\n/g, '\n'); // naive parse for now
-            return newMessages;
-          });
-        }
-      }
-    } catch (error) {
-      console.error(error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          role: 'assistant',
-          content: 'Sorry, I encountered an error communicating with the server.',
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <>
@@ -127,16 +70,38 @@ export default function AIChat() {
             {messages.map((m) => (
               <div
                 key={m.id}
-                className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div
                   className={`max-w-[80%] rounded-lg p-3 text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-muted/50 border border-border rounded-bl-none'}`}
                 >
                   {m.content}
+
+                  {m.toolInvocations?.map((toolInvocation: ToolInvocation) => {
+                    const toolCallId = toolInvocation.toolCallId;
+
+                    if (toolInvocation.state === 'result') {
+                      return (
+                        <div key={toolCallId} className="mt-2 text-xs opacity-75 border border-border rounded p-2 bg-background/50">
+                          <span className="font-semibold block mb-1">Used CRM Tool: {toolInvocation.toolName}</span>
+                          <span className="text-muted-foreground">Successfully queried the database.</span>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div key={toolCallId} className="mt-2 text-xs opacity-75 border border-border rounded p-2 bg-background/50">
+                          <span className="font-semibold block mb-1 items-center flex gap-2">
+                             <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
+                             Calling Tool: {toolInvocation.toolName}...
+                          </span>
+                        </div>
+                      );
+                    }
+                  })}
                 </div>
               </div>
             ))}
-            {isLoading && (
+            {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
               <div className="flex justify-start">
                 <div className="bg-muted/50 border border-border rounded-lg rounded-bl-none p-3 text-sm flex gap-1 items-center">
                   <div className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce"></div>
@@ -159,7 +124,7 @@ export default function AIChat() {
               <input
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={handleInputChange}
                 placeholder="Ask me anything..."
                 className="flex-1 bg-muted/30 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 disabled={isLoading}
