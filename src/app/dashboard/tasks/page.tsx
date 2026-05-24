@@ -1,3 +1,6 @@
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 import AddTaskModal from '@/components/AddTaskModal';
@@ -15,6 +18,13 @@ async function addTask(formData: FormData) {
     dueDate: formData.get('dueDate'),
     assignedToId: formData.get('assignedToId'),
   };
+
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (rawData.workspaceId !== access.workspaceId) {
+    return { error: 'Workspace access denied.' };
+  }
 
   const validatedData = taskSchema.safeParse(rawData);
 
@@ -48,9 +58,13 @@ export default async function TasksPage(props: {
   const query = searchParams?.q || '';
   const statusFilter = searchParams?.status || 'ALL';
   const currentPage = Math.max(1, Number(searchParams?.page) || 1);
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+  const workspaceId = access.workspaceId;
+
   const pageSize = 10;
 
-  const whereClause: Prisma.TaskWhereInput = {};
+  const whereClause: Prisma.TaskWhereInput = { workspaceId };
 
   if (query) {
     whereClause.title = { contains: query };

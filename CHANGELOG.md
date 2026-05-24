@@ -1,4 +1,12 @@
 # CHANGELOG.md
+## [0.41.0] - Auth Hardening & Regression Guard
+
+- Audited and hardened workspace isolation across API routes and Server Actions.
+- Ensured `src/app/api/workflows/[workflowId]/route.ts` correctly resolves session before operating on workflows.
+- Hardened `saveWorkflowSession` and `submitWorkflowSession` to strictly enforce `workspaceId` matching.
+- Added rigorous explicit Prisma `where: { workspaceId }` filtering into dashboard page read operations.
+
+
 
 ## [0.40.0] - AI Assistant Refinement & Dashboard Consolidation
 

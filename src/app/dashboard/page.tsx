@@ -1,12 +1,19 @@
 import Link from 'next/link';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
 
 export default async function DashboardHome() {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+  const workspaceId = access.workspaceId;
+
   const [leadCount, contactCount, taskCount, deals] = await Promise.all([
-    prisma.lead.count(),
-    prisma.contact.count(),
-    prisma.task.count({ where: { status: { not: 'DONE' } } }),
-    prisma.deal.findMany({ where: { stage: { not: 'CLOSED_WON' } } }),
+    prisma.lead.count({ where: { workspaceId } }),
+    prisma.contact.count({ where: { workspaceId } }),
+    prisma.task.count({ where: { workspaceId, status: { not: 'DONE' } } }),
+    prisma.deal.findMany({ where: { workspaceId, stage: { not: 'CLOSED_WON' } } }),
   ]);
 
   const activePipelineValue = deals.reduce((sum, deal) => sum + (deal.value || 0), 0);
