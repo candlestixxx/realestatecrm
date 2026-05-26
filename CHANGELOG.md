@@ -1,4 +1,21 @@
 # CHANGELOG.md
+## [0.41.0] - Auth Hardening & Regression Guard
+
+- Audited and hardened workspace isolation across API routes and Server Actions.
+- Ensured `src/app/api/workflows/[workflowId]/route.ts` correctly resolves session before operating on workflows.
+- Hardened `saveWorkflowSession` and `submitWorkflowSession` to strictly enforce `workspaceId` matching.
+- Added rigorous explicit Prisma `where: { workspaceId }` filtering into dashboard page read operations.
+
+
+
+## [0.40.0] - AI Assistant Refinement & Dashboard Consolidation
+
+- Added Vercel AI SDK tool calling functionality (`getLeadCount`, `getRecentDeals`) to `/api/chat` route.
+- Updated `AIChat` frontend component to use `@ai-sdk/react` `useChat` and display database tool invocation states dynamically.
+- Fixed NextAuth credential login bug by correcting the expected payload from `username` to `email`.
+- Consolidated duplicate `/dashboard` routes and layouts to ensure the AI assistant mounts globally across the main CRM application.
+- Resolved `ai` and `zod` module resolution conflicts to pass all TypeScript and ESLint checks.
+
 
 ## [0.39.0] - RAG Consolidation & Code Clean-up
 
