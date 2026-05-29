@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import SignOutButton from '@/components/SignOutButton';
 import { getProjectVersion } from '@/lib/version';
 import { CommandPalette } from '@/components/CommandPalette';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -85,9 +86,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <CommandPalette />
           </div>
           <div className="flex items-center gap-4">
-            <button className="text-sm font-medium px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
-              + New Deal
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="text-sm font-medium px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+                  + New Deal
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Create a new deal pipeline</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </header>
         <div className="flex-1 overflow-auto p-6">{children}</div>

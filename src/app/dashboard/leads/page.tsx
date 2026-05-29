@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { leadSchema } from '@/lib/validations/lead';
-import { syncContactToVectorStore, syncLeadToVectorStore } from '@/lib/rag-sync';
+import { syncContactToVectorStore, syncLeadToVectorStore } from '@/lib/rag';
 
 async function addLead(formData: FormData) {
   'use server';

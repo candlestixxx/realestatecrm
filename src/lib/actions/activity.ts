@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth/next';
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { syncActivityToVectorStore } from '@/lib/rag-sync';
+import { syncActivityToVectorStore } from '@/lib/rag';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { activitySchema } from '@/lib/validations/activity';
 
@@ -47,20 +47,18 @@ export async function createActivityAction(formData: FormData) {
     const [lead, deal, contact] = await Promise.all([
       data.leadId
         ? prisma.lead.findUnique({
-            where: { id: data.leadId },
+            where: { id: data.leadId, workspaceId: access.workspaceId },
             select: {
               id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
               source: true,
               status: true,
+              score: true,
             },
           })
         : Promise.resolve(null),
       data.dealId
         ? prisma.deal.findUnique({
-            where: { id: data.dealId },
+            where: { id: data.dealId, workspaceId: access.workspaceId },
             select: {
               id: true,
               title: true,
@@ -71,7 +69,7 @@ export async function createActivityAction(formData: FormData) {
         : Promise.resolve(null),
       data.contactId
         ? prisma.contact.findUnique({
-            where: { id: data.contactId },
+            where: { id: data.contactId, workspaceId: access.workspaceId },
             select: {
               id: true,
               firstName: true,

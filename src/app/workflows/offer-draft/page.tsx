@@ -123,7 +123,7 @@ export default async function OfferDraftPage({ searchParams }: OfferDraftPagePro
       workflowId={workflowId}
       storageKey={`workflow-offer-draft${recordId ? `:${recordId}` : ''}`}
       summaryItems={buildOfferSummaryItems(displayRecord)}
-      workspaceId={workspaceSlug}
+      workspaceId={access.workspaceSlug}
       existingSessionId={recordId ?? undefined}
       sections={offerSections as unknown as Parameters<typeof WorkflowStudio>[0]['sections']}
       actions={offerActions as unknown as Parameters<typeof WorkflowStudio>[0]['actions']}

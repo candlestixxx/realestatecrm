@@ -18,7 +18,7 @@
 
 ## Phase 3 — AI and voice [IN PROGRESS]
 - [x] AI Assistant UI and Backend (AIChat)
-- [x] RAG (Retrieval-Augmented Generation) foundation and vector sync
+- [x] RAG (Retrieval-Augmented Generation) foundation, vector sync, and unification
 - [ ] AI lead qualification
 - [ ] Voice assistant
 - [ ] Speech provider selection
@@ -79,3 +79,7 @@
 - [ ] Other approved property-data sources
 - [ ] Offer and listing draft prefill
 - [ ] Source provenance and review controls
+
+
+## 0.39.0 Update
+- Progress made on Activity logging (Phase 2), expanding communication features with specific Activity Types in forms.

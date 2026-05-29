@@ -121,7 +121,7 @@ export default async function ListingEntryPage({ searchParams }: ListingEntryPag
       workflowId={workflowId}
       storageKey={`workflow-listing-entry${recordId ? `:${recordId}` : ''}`}
       summaryItems={buildListingSummaryItems(displayRecord)}
-      workspaceId={workspaceSlug}
+      workspaceId={access.workspaceSlug}
       existingSessionId={recordId ?? undefined}
       sections={listingSections as unknown as Parameters<typeof WorkflowStudio>[0]['sections']}
       actions={listingActions as unknown as Parameters<typeof WorkflowStudio>[0]['actions']}

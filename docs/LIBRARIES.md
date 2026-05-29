@@ -48,3 +48,7 @@ This document lists the major libraries, frameworks, and submodules used in the 
 | :--- | :--- | :--- |
 | **ESLint** | `^9` | Pluggable linting utility. |
 | **Prettier** | `^3.8.3` | Opinionated code formatter. |
+
+
+## 0.39.0 Audit
+- Confirmed versions for major dependencies: Next.js (16.2.6), React (19.0.0), Tailwind CSS (3.4.1), Prisma (6.19.3), NextAuth.js (4.24.11).

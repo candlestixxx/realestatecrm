@@ -5,7 +5,7 @@ import AddContactModal from '@/components/AddContactModal';
 import { authOptions } from '@/lib/auth';
 import { contactSchema } from '@/lib/validations/contact';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
-import { syncContactToVectorStore } from '@/lib/rag-sync';
+import { syncContactToVectorStore } from '@/lib/rag';
 import Link from 'next/link';
 
 async function addContact(formData: FormData) {

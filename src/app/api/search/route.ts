@@ -1,94 +1,128 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
+import { getWorkspaceScope, DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 
-export async function GET(req: Request) {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    const access = await requireWorkspaceAccess(session);
-    const { searchParams } = new URL(req.url);
+    const { workspaceSlug: workspaceId, actorId } = getWorkspaceScope(session);
+
+    // Enforce authentication context existance
+    if (!actorId || !workspaceId || workspaceId === DEFAULT_WORKSPACE_SLUG) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+
     const query = searchParams.get('q');
 
     if (!query || query.length < 2) {
-      return NextResponse.json([]);
+      return NextResponse.json({ results: [] });
     }
 
+    const searchTerms = query.split(' ').filter(Boolean).map(term => term.trim());
+
+
+    // Search Leads
+    const leadsPromise = prisma.lead.findMany({
+      where: {
+        workspaceId,
+        contact: {
+          OR: searchTerms.map(term => ({
+            OR: [
+              { firstName: { contains: term } },
+              { lastName: { contains: term } },
+              { email: { contains: term } },
+            ]
+          }))
+        }
+      },
+      take: 5,
+      include: { contact: true },
+    });
+
+
+    // Search Contacts
+    const contactsPromise = prisma.contact.findMany({
+      where: {
+        workspaceId,
+        OR: searchTerms.map(term => ({
+          OR: [
+            { firstName: { contains: term } },
+            { lastName: { contains: term } },
+            { email: { contains: term } },
+          ]
+        }))
+      },
+      take: 5,
+      select: { id: true, firstName: true, lastName: true, email: true },
+    });
+
+    // Search Deals
+    const dealsPromise = prisma.deal.findMany({
+      where: {
+        workspaceId,
+        title: { contains: query },
+      },
+      take: 5,
+      select: { id: true, title: true, stage: true },
+    });
+
+    // Search Tasks
+    const tasksPromise = prisma.task.findMany({
+      where: {
+        workspaceId,
+        title: { contains: query },
+      },
+      take: 5,
+      select: { id: true, title: true, status: true },
+    });
+
     const [leads, contacts, deals, tasks] = await Promise.all([
-      prisma.lead.findMany({
-        where: {
-          workspaceId: access.workspaceId,
-          OR: [
-            { contact: { firstName: { contains: query } } },
-            { contact: { lastName: { contains: query } } },
-            { contact: { email: { contains: query } } },
-          ],
-        },
-        include: { contact: true },
-        take: 5,
-      }),
-      prisma.contact.findMany({
-        where: {
-          workspaceId: access.workspaceId,
-          OR: [
-            { firstName: { contains: query } },
-            { lastName: { contains: query } },
-            { email: { contains: query } },
-          ],
-        },
-        take: 5,
-      }),
-      prisma.deal.findMany({
-        where: {
-          workspaceId: access.workspaceId,
-          title: { contains: query },
-        },
-        take: 5,
-      }),
-      prisma.task.findMany({
-        where: {
-          workspaceId: access.workspaceId,
-          title: { contains: query },
-        },
-        take: 5,
-      }),
+      leadsPromise,
+      contactsPromise,
+      dealsPromise,
+      tasksPromise,
     ]);
+
 
     const results = [
       ...leads.map((l) => ({
-        id: `lead-${l.id}`,
-        title: `${l.contact.firstName} ${l.contact.lastName || ''}`.trim(),
-        type: 'lead' as const,
-        subtitle: `Status: ${l.status} | ${l.contact.email || 'No email'}`,
+        id: l.id,
+        type: 'lead',
+        title: [l.contact?.firstName, l.contact?.lastName].filter(Boolean).join(' '),
+        subtitle: l.contact?.email || 'No email',
         url: `/leads/${l.id}`,
       })),
+
       ...contacts.map((c) => ({
-        id: `contact-${c.id}`,
-        title: `${c.firstName} ${c.lastName || ''}`.trim(),
-        type: 'contact' as const,
-        subtitle: c.email || 'No email',
+        id: c.id,
+        type: 'contact',
+        title: [c.firstName, c.lastName].filter(Boolean).join(' '),
+        subtitle: c.email || '',
         url: `/contacts/${c.id}`,
       })),
       ...deals.map((d) => ({
-        id: `deal-${d.id}`,
+        id: d.id,
+        type: 'deal',
         title: d.title,
-        type: 'deal' as const,
-        subtitle: `Stage: ${d.stage} | ${d.value ? `$${d.value.toLocaleString()}` : 'No value'}`,
+        subtitle: `Stage: ${d.stage}`,
         url: `/deals/${d.id}`,
       })),
       ...tasks.map((t) => ({
-        id: `task-${t.id}`,
+        id: t.id,
+        type: 'task',
         title: t.title,
-        type: 'task' as const,
         subtitle: `Status: ${t.status}`,
-        url: `/tasks?q=${encodeURIComponent(t.title)}`,
+        url: `/tasks`,
       })),
     ];
 
-    return NextResponse.json(results);
+    return NextResponse.json({ results });
   } catch (error) {
-    console.error('Search API error:', error);
-    return NextResponse.json({ error: 'Search failed' }, { status: 500 });
+    console.error('Search error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -31,7 +31,7 @@ export async function saveWorkflowSession(
   try {
     if (payload.existingSessionId) {
       await prisma.workflowSession.update({
-        where: { id: payload.existingSessionId },
+        where: { id: payload.existingSessionId, workspaceId: access.workspaceId },
         data: {
           data: payload.data,
           status: 'DRAFT',
@@ -61,7 +61,7 @@ export async function submitWorkflowSession(sessionId: string) {
   if (!sessionId) return { error: 'Session ID required' };
   try {
     await prisma.workflowSession.update({
-      where: { id: sessionId },
+      where: { id: sessionId, workspaceId: (await requireWorkspaceAccess(session)).workspaceId },
       data: {
         status: 'SUBMITTED',
       },

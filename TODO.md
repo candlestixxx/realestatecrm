@@ -23,8 +23,8 @@
 - [x] UI Polish: Add loading states and Toast notifications.
 - [x] Feature Expansion: Filtering, sorting, and pagination across all data tables.
 - [x] Feature Expansion: Task deadlines and assignment.
-- [ ] UI Polish: Add comprehensive tooltips, labels, and descriptions to all CRM views and forms.
-- [ ] Global Search: Implement a Command Palette (`cmdk`) for cross-entity searching.
+- [x] UI Polish: Add comprehensive tooltips, labels, and descriptions to all CRM views and forms.
+- [x] Global Search: Implement a Command Palette (`cmdk`) for cross-entity searching.
 
 ### Workflow Engine
 - [x] Workflow Session model and backend persistence.
@@ -42,9 +42,13 @@
 - [x] Vector Sync Wiring (Prisma -> Vector DB).
 - [x] Semantic Retrieval (RAG context injection).
 - [x] Workspace-aware RAG sync.
-- [ ] RAG Consolidation: Refactor overlapping logic in `src/lib/rag.ts` and `src/lib/rag-sync.ts`.
+- [x] RAG Consolidation: Refactor overlapping logic in `src/lib/rag.ts` and `src/lib/rag-sync.ts`.
 
 ## Tech Debt & Improvements
 - [ ] Evaluate Drizzle ORM for edge compatibility.
-- [ ] Robust port conflict handling for Playwright tests.
+- [x] Robust port conflict handling for Playwright tests.
 - [ ] Implement WebSocket/WebRTC for real-time chat and voice.
+
+## 0.39.0 Backlog Adjustments
+- [x] Fix Next.js 15 `searchParams` unwrap issue on the signin page.
+- [x] Implement Activity Type selector (`NOTE`, `CALL`, `EMAIL`, `SMS`, `MEETING`) in `AddActivityForm`.

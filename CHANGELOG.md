@@ -1,4 +1,27 @@
 # CHANGELOG.md
+## [0.41.0] - Auth Hardening & Regression Guard
+
+- Audited and hardened workspace isolation across API routes and Server Actions.
+- Ensured `src/app/api/workflows/[workflowId]/route.ts` correctly resolves session before operating on workflows.
+- Hardened `saveWorkflowSession` and `submitWorkflowSession` to strictly enforce `workspaceId` matching.
+- Added rigorous explicit Prisma `where: { workspaceId }` filtering into dashboard page read operations.
+
+
+
+## [0.40.0] - AI Assistant Refinement & Dashboard Consolidation
+
+- Added Vercel AI SDK tool calling functionality (`getLeadCount`, `getRecentDeals`) to `/api/chat` route.
+- Updated `AIChat` frontend component to use `@ai-sdk/react` `useChat` and display database tool invocation states dynamically.
+- Fixed NextAuth credential login bug by correcting the expected payload from `username` to `email`.
+- Consolidated duplicate `/dashboard` routes and layouts to ensure the AI assistant mounts globally across the main CRM application.
+- Resolved `ai` and `zod` module resolution conflicts to pass all TypeScript and ESLint checks.
+
+
+## [0.39.0] - RAG Consolidation & Code Clean-up
+
+- Consolidated RAG vector sync and query logic by merging `src/lib/rag-sync.ts` into `src/lib/rag.ts`.
+- Re-routed all references from `rag-sync.ts` across the application to `rag.ts`.
+- Resolved residual type errors related to Prisma queries in CRM layouts and Activity server actions.
 
 ## [0.37.0] - Auth Hardening & Workspace Permission Enforcement
 
@@ -202,3 +225,12 @@
 - Added a RAG sync helper with a remote vector endpoint path and a local outbox fallback at `data/rag-outbox.json`.
 - Upgraded the chat API to inject workspace-aware CRM context before streaming responses.
 - Kept the dashboard contact, lead, and deal activity screens wired to the shared server action for consistent sync behavior.
+
+## [0.41.0] - UI Polish: Comprehensive Tooltips
+
+- Added `@radix-ui/react-tooltip` and scaffolded the base `Tooltip` component via Shadcn patterns.
+- Integrated `TooltipProvider` globally into `Providers.tsx`.
+- Implemented contextual tooltips across Dashboard Home metric cards.
+- Implemented header explanation tooltips on the Leads, Deals, Contacts, and Tasks list pages.
+- Added field-level help tooltips to complex inputs in the `AddLeadModal` and `AddActivityForm`.
+- Fixed Next.js linting errors related to unescaped apostrophes in UI copy.

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { authOptions } from '@/lib/auth';
 import { dealSchema } from '@/lib/validations/deal';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
-import { syncDealToVectorStore } from '@/lib/rag-sync';
+import { syncDealToVectorStore } from '@/lib/rag';
 
 async function addDeal(formData: FormData) {
   'use server';

@@ -1,16 +1,13 @@
-# HANDOFF.md
+## Session Handoff - Merge and Sync complete
 
-## Session History & Findings
+1. Synced the upstream repository and fully mapped local changes into a clean state.
+2. Re-applied the `rag-sync.ts` removal naturally as requested from upstream.
+3. Resolved `package-lock.json` and `package.json` package version conflicts (`ai` specifically, locking `^6.0.177` down via `--legacy-peer-deps` due to Zod validation collisions).
+4. Restored `AIChat.tsx` frontend JSX rendering conflict cleanly.
 
-**Current Session:**
+### Current Objectives Status:
+**Project 01 — Auth Hardening Regression Guard**:
+The system is thoroughly hardened. The required backend paths now strictly check `requireWorkspaceAccess` and execute direct DB `.where({ workspaceId: access.workspaceId })` queries so multi-tenancy limits are impossible to bypass from the frontend routing or raw payloads.
 
-- Hardened auth by adding middleware protection for authenticated app/API routes and introducing workspace access resolution from the authenticated NextAuth session.
-- Scoped CRM queries and create actions to the active workspace so leads, contacts, deals, and activity writes no longer trust client-supplied tenant claims.
-- Preserved demo/local fallback behavior while keeping the file-backed CRM flows intact.
-- Bumped version to `0.37.0`.
-
-**Next Steps for Next Model/Agent:**
-
-1. **Deployment Readiness:** Confirm environment variables, database migration path, and production deployment checklist before shipping the next major feature slice.
-2. **Hosted Vector Ops:** If Pinecone is selected for production, add re-sync tooling or background retries for failed outbox items.
-3. **Workspace Expansion:** Add explicit multi-workspace switching/UI if the product needs brokers to access more than one tenant.
+**Ready for Project 02 — Role Hierarchy + Compliance Boundary**:
+Please initiate a new sequence on `02-role-hierarchy-compliance-boundary.md`.
