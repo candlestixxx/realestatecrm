@@ -3,11 +3,13 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import SignOutButton from '@/components/SignOutButton';
 import { getProjectVersion } from '@/lib/version';
+import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { CommandPalette } from '@/components/CommandPalette';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
 
   return (
     <div className="flex h-screen bg-background">
@@ -64,6 +66,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <div className="flex flex-col">
               <span className="text-sm font-medium truncate max-w-[150px]">
                 {session?.user?.name || 'User'}
+              </span>
+              <span className="text-[10px] uppercase font-bold text-primary/80 tracking-wider truncate max-w-[150px]">
+                {access.workspaceRole}
               </span>
               <span className="text-xs text-muted-foreground truncate max-w-[150px]">
                 {session?.user?.email || 'user@example.com'}

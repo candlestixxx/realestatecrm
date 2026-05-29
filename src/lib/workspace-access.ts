@@ -1,3 +1,4 @@
+import { hasPermission, type UserRole } from './roles';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import type { Session } from 'next-auth';
 
@@ -89,6 +90,16 @@ export async function requireWorkspaceAccess(session?: Session | null) {
 
   if (!access) {
     throw new WorkspaceAccessError('Authentication and workspace membership are required.', 401);
+  }
+
+  return access;
+}
+
+export async function requireWorkspaceRole(session: Session | null | undefined, requiredRole: UserRole) {
+  const access = await requireWorkspaceAccess(session);
+
+  if (!hasPermission(access.workspaceRole, requiredRole)) {
+    throw new WorkspaceAccessError('Insufficient permissions for this action.', 403);
   }
 
   return access;

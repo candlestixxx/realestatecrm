@@ -1,4 +1,11 @@
 # CHANGELOG.md
+## [0.42.0] - Role Hierarchy + Compliance Boundary
+
+- Formalized role hierarchy into `OWNER`, `BROKER`, `ASSOCIATE_BROKER`, `REALTOR_AGENT`, `OFFICE_MANAGER`, `ADMIN` enum mapping.
+- Introduced `hasPermission` and `requireWorkspaceRole` in `src/lib/workspace-access.ts` to strictly enforce role constraints dynamically.
+- Applied strict `BROKER` role checks to the `submitWorkflowSession` endpoint to enforce compliance boundaries preventing unauthorized deal publish/submit actions.
+- Surfaced the active workspace role inside the global dashboard UI for visual clarity.
+
 ## [0.41.0] - Auth Hardening & Regression Guard
 
 - Audited and hardened workspace isolation across API routes and Server Actions.
