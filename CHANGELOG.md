@@ -1,3 +1,9 @@
+## [0.44.0] - Deployment Checklist  Environment Formalization
+
+- Expanded `.env.example` with fully documented placeholders mapping to all required application scopes (Database, NextAuth, Mail, Vectors).
+- Overhauled `DEPLOY.md` to establish a robust pre-flight checklist enforcing staging build checks, DB migration sequences, and compliance verification.
+- Validated workspace demo fallback mechanisms to ensure they automatically seal when local bypass keys are omitted from the production environment.
+
 # CHANGELOG.md
 ## [0.43.0] - Marketing Media Pipeline
 
