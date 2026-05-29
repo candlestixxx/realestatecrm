@@ -1,4 +1,12 @@
 # CHANGELOG.md
+## [0.43.0] - Marketing Media Pipeline
+
+- Scaffolded the Marketing Media Pipeline state model for handling image generation, video assembly, and social distribution tracking.
+- Built the Image Workflow UI component handling Day/Night variant logic, Magnific AI prompt previewing, and stage review states.
+- Built the Video Workflow UI component featuring timeline selection placeholders, 9:16/16:9 format switching, and enhancement toggles.
+- Added the Integration shell to handle syncing finished marketing materials to Lofty Landing Pages and formatting captions for cross-platform Social Posts.
+- Registered new server routes to serve the compiled Media Pipeline under `/workflows/marketing-media`.
+
 ## [0.42.0] - Role Hierarchy + Compliance Boundary
 
 - Formalized role hierarchy into `OWNER`, `BROKER`, `ASSOCIATE_BROKER`, `REALTOR_AGENT`, `OFFICE_MANAGER`, `ADMIN` enum mapping.
