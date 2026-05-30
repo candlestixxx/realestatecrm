@@ -6,11 +6,14 @@ import AddActivityForm from '@/components/AddActivityForm';
 import { authOptions } from '@/lib/auth';
 import { createActivityAction as addActivity } from '@/lib/actions/activity';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
+import { AppRole, isAtLeastRole } from '@/lib/permissions';
 
 export default async function DealDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
+  const userRole = access.workspaceRole;
+
   const deal = await prisma.deal.findFirst({
     where: { id: resolvedParams.id, workspaceId: access.workspaceId },
     include: {
@@ -20,7 +23,7 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
         orderBy: { createdAt: 'desc' },
       },
       WorkflowSession: {
-        orderBy: { createdAt: 'desc' },
+        orderBy: { updatedAt: 'desc' },
       },
     },
   });
@@ -29,45 +32,51 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
     notFound();
   }
 
+  const activeWorkflows = deal.WorkflowSession.filter((w) => w.status !== 'APPROVED');
+
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between gap-4">
         <Link
-          href="/deals"
+          href="/dashboard/deals"
           className="text-muted-foreground hover:text-foreground text-sm flex items-center gap-1"
         >
-          &larr; Back to Deals
+          &larr; Back to Pipeline
         </Link>
+        <span className="px-2 py-0.5 bg-secondary/10 text-secondary-foreground text-[10px] font-bold rounded border border-secondary/20 uppercase tracking-tighter">
+          {userRole.replace('_', ' ')}
+        </span>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{deal.title}</h1>
-          <p className="text-muted-foreground">Deal Profile</p>
+          <p className="text-muted-foreground">Deal Detail & Transactions</p>
         </div>
         <div className="flex gap-2">
           <button className="px-4 py-2 bg-muted text-foreground font-medium rounded-md hover:bg-muted/80 transition-colors">
-            Edit
+            Edit Deal
           </button>
+          <Link
+            href={`/workflows/offer-draft?recordId=${deal.id}`}
+            className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors"
+          >
+            New Offer Draft
+          </Link>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Left Column: Deal Info */}
         <div className="md:col-span-1 space-y-6">
           <div className="bg-background border border-border rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold mb-4">Deal Info</h2>
+            <h2 className="text-lg font-bold mb-4">Deal Overview</h2>
             <div className="space-y-4">
-              <div>
-                <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Stage
-                </span>
-                <p className="font-medium mt-1">{deal.stage}</p>
-              </div>
               <div>
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
                   Value
                 </span>
-                <p className="font-medium mt-1">
+                <p className="text-2xl font-bold mt-1 text-primary">
                   {deal.value
                     ? new Intl.NumberFormat('en-US', {
                         style: 'currency',
@@ -79,62 +88,48 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
               </div>
               <div>
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Contact
+                  Stage
+                </span>
+                <p className="font-medium mt-1">{deal.stage.replace('_', ' ')}</p>
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                  Client
                 </span>
                 <p className="font-medium mt-1">
                   {deal.contact.firstName} {deal.contact.lastName}
                 </p>
+                <p className="text-xs text-muted-foreground">{deal.contact.email}</p>
               </div>
             </div>
           </div>
 
           <div className="bg-background border border-border rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold mb-4">Workflows</h2>
-            <div className="space-y-4">
-              <Link
-                href={`/workflows/offer-draft`}
-                className="block w-full text-center px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-md hover:bg-muted/80 transition-colors"
-              >
-                + New Offer Draft
-              </Link>
-              <Link
-                href={`/workflows/listing-entry`}
-                className="block w-full text-center px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-md hover:bg-muted/80 transition-colors"
-              >
-                + New Listing Entry
-              </Link>
-
-              <div className="mt-6 space-y-3 pt-4 border-t border-border">
-                {deal.WorkflowSession.length === 0 ? (
-                  <p className="text-xs text-muted-foreground text-center">No active workflows</p>
-                ) : (
-                  deal.WorkflowSession.map((wf) => (
-                    <Link
-                      href={`/workflows/${wf.type === 'OFFER_DRAFT' ? 'offer-draft' : 'listing-entry'}?sessionId=${wf.id}`}
-                      key={wf.id}
-                      className="block p-3 rounded-lg border border-border hover:border-primary/50 transition-colors group"
-                    >
-                      <div className="flex justify-between items-center">
-                        <p className="text-sm font-medium group-hover:text-primary transition-colors">
-                          {wf.type === 'OFFER_DRAFT' ? 'Offer Draft' : 'Listing Entry'}
-                        </p>
-                        <span
-                          className={`text-[10px] uppercase px-2 py-0.5 rounded-full ${wf.status === 'SUBMITTED' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}
-                        >
-                          {wf.status}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Updated {new Date(wf.updatedAt).toLocaleDateString()}
-                      </p>
-                    </Link>
-                  ))
-                )}
-              </div>
+            <h2 className="text-lg font-bold mb-4">Active Workflows</h2>
+            <div className="space-y-3">
+              {activeWorkflows.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No active drafts found.</p>
+              ) : (
+                activeWorkflows.map((wf) => (
+                  <Link
+                    key={wf.id}
+                    href={`/workflows/${wf.type === 'OFFER_DRAFT' ? 'offer-draft' : 'listing-entry'}?sessionId=${wf.id}`}
+                    className="block p-3 border border-primary/20 bg-primary/5 rounded-lg hover:border-primary/40 transition-colors"
+                  >
+                    <div className="font-medium text-sm text-primary">
+                      {wf.type.replace('_', ' ')}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground mt-1">
+                      Last saved {new Date(wf.updatedAt).toLocaleString()}
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
         </div>
 
+        {/* Right Column: Timeline / Activity */}
         <div className="md:col-span-2 space-y-6">
           <div className="bg-background border border-border rounded-xl shadow-sm p-6 min-h-[400px]">
             <h2 className="text-lg font-bold mb-4">Activity Timeline</h2>
@@ -165,12 +160,14 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
               )}
             </div>
 
-            <AddActivityForm
-              addActivityAction={addActivity}
-              workspaceId={deal.workspaceId}
-              entityType="dealId"
-              entityId={deal.id}
-            />
+            {isAtLeastRole(userRole, AppRole.REALTOR_AGENT) && (
+              <AddActivityForm
+                addActivityAction={addActivity}
+                workspaceId={deal.workspaceId}
+                entityType="dealId"
+                entityId={deal.id}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -16,7 +17,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  role          String    @default("AGENT")
+  role          String    @default("REALTOR_AGENT") // OWNER, BROKER, ASSOCIATE_BROKER, REALTOR_AGENT, OFFICE_MANAGER, ADMIN
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -47,7 +48,7 @@ model WorkspaceMember {
   id          String @id @default(cuid())
   userId      String
   workspaceId String
-  role        String @default("AGENT")
+  role        String @default("REALTOR_AGENT") // OWNER, BROKER, ASSOCIATE_BROKER, REALTOR_AGENT, OFFICE_MANAGER, ADMIN
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)

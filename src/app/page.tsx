@@ -23,6 +23,13 @@ const workflowCards = [
     href: '/workflows/listing-entry',
     accent: 'from-secondary/20 to-primary/10',
   },
+  {
+    title: 'Foreclosure Intake Screen',
+    description:
+      'Capture Legal News foreclosure notices, preserve the raw public record, and prep Lofty sync.',
+    href: '/workflows/foreclosure-intake',
+    accent: 'from-primary/15 to-secondary/20',
+  },
 ];
 
 export default function Home() {
@@ -74,6 +81,12 @@ export default function Home() {
                   className="rounded-lg border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
                 >
                   Open Listing Entry Screen
+                </Link>
+                <Link
+                  href="/workflows/foreclosure-intake"
+                  className="rounded-lg border border-secondary/30 bg-secondary/10 px-5 py-3 text-sm font-semibold text-secondary transition-colors hover:bg-secondary/15"
+                >
+                  Open Foreclosure Intake Screen
                 </Link>
               </div>
             </div>

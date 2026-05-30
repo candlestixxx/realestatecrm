@@ -41,3 +41,7 @@ android/.gradle/
 ios/Pods/
 
 /src/generated/prisma
+.hypercode/
+data/
+metamcp.db
+audit*.jsonl

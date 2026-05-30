@@ -31,6 +31,18 @@
 
 ## Recent Architectural Decisions & Workarounds
 
+- **Role Hierarchy & Compliance Boundary (Project 02):** Established a formal role-based access control (RBAC) system.
+    - **Canonical Roles:** Defined `AppRole` enum (OWNER, BROKER, ASSOCIATE_BROKER, REALTOR_AGENT, OFFICE_MANAGER, ADMIN) in `src/lib/permissions.ts`.
+    - **Permission Matrix:** Created a mapping of roles to specific app permissions (e.g., `approve:listings`, `view:financials`), enforced via `hasPermission` and `isAtLeastRole` helpers.
+    - **Enforcement:** Applied role checks to server actions (`createActivityAction`, `addLead`, etc.) and filtered UI elements (dashboard metrics, team management list, activity forms) based on the user's active workspace role.
+    - **UI Identity:** Added role badges to all primary dashboard and detail views to provide clear feedback on the user's current authority level.
+
+- **Auth Hardening & Workspace Scoping (Project 01):** Rigorously enforced workspace isolation across all primary app surfaces. 
+    - **Server Actions:** Hardened `saveWorkflowSession`, `createActivityAction`, `addLead`, `addContact`, `addDeal`, and `addTask` to derive `workspaceId` directly from the authenticated session (`requireWorkspaceAccess`) rather than trusting client-supplied form values.
+    - **API Routes:** Restored session protection to `api/workflows/[workflowId]/route.ts` which was identified as a security regression.
+    - **UI Lists:** Scoped the `workspaces`, `users`, and `contacts` lists in the Dashboard and Modal components to only show data relevant to the authenticated user's active workspace.
+    - **Data Integrity:** Ensured entity lookups (Leads, Deals, Contacts) in detail views and linking actions use `findFirst` with both `id` and `workspaceId` to prevent cross-tenant data leakage.
+
 - **Workflow Engine Implementation:** Migrated upstream static workflow shells away from Local Storage. They are now deeply wired to the SQLite backend via the `WorkflowSession` model. Server actions parse `?sessionId` parameters from the URL to rehydrate drafts dynamically.
 - **Deal-Workflow Integration:** The `deals/[id]` detail view was expanded to query and list active `WorkflowSessions` associated with the deal. Users can launch new drafts (passing `?dealId=...` in the URL) directly from the Deal screen, successfully bridging the CRM core with the Workflow engine.
 - **Client Portal Scaffolding & Security:** Scaffolded the `(portal)` route group as a distinct environment. The Portal verifies the NextAuth session, matches the user's email against the `Contact` table, and exclusively renders their related Deals and Action Items.

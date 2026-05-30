@@ -6,11 +6,14 @@ import AddActivityForm from '@/components/AddActivityForm';
 import { authOptions } from '@/lib/auth';
 import { createActivityAction as addActivity } from '@/lib/actions/activity';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
+import { AppRole, isAtLeastRole } from '@/lib/permissions';
 
 export default async function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
+  const userRole = access.workspaceRole;
+
   const lead = await prisma.lead.findFirst({
     where: { id: resolvedParams.id, workspaceId: access.workspaceId },
     include: {
@@ -28,13 +31,16 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between gap-4">
         <Link
-          href="/leads"
+          href="/dashboard/leads"
           className="text-muted-foreground hover:text-foreground text-sm flex items-center gap-1"
         >
           &larr; Back to Leads
         </Link>
+        <span className="px-2 py-0.5 bg-secondary/10 text-secondary-foreground text-[10px] font-bold rounded border border-secondary/20 uppercase tracking-tighter">
+          {userRole.replace('_', ' ')}
+        </span>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -150,12 +156,14 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
               )}
             </div>
 
-            <AddActivityForm
-              addActivityAction={addActivity}
-              workspaceId={lead.workspaceId}
-              entityType="leadId"
-              entityId={lead.id}
-            />
+            {isAtLeastRole(userRole, AppRole.REALTOR_AGENT) && (
+              <AddActivityForm
+                addActivityAction={addActivity}
+                workspaceId={lead.workspaceId}
+                entityType="leadId"
+                entityId={lead.id}
+              />
+            )}
           </div>
         </div>
       </div>

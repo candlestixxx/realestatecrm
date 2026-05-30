@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
 
+import { authOptions } from '@/lib/auth';
+import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { createEmptyWorkflowSnapshot, type WorkflowSnapshot } from '@/lib/workflow-state';
 import { getWorkflowRecord, saveWorkflowRecord } from '@/lib/workflow-store';
 
@@ -25,20 +28,34 @@ function normalizeSnapshot(body: unknown): WorkflowSnapshot {
 
 export async function GET(_request: Request, context: RouteContext) {
   const { workflowId } = await Promise.resolve(context.params);
-  const record = await getWorkflowRecord(workflowId);
+  const session = await getServerSession(authOptions);
+  
+  try {
+    await requireWorkspaceAccess(session);
+    const record = await getWorkflowRecord(workflowId);
 
-  if (!record) {
-    return NextResponse.json({ workflowId, snapshot: createEmptyWorkflowSnapshot(), found: false });
+    if (!record) {
+      return NextResponse.json({ workflowId, snapshot: createEmptyWorkflowSnapshot(), found: false });
+    }
+
+    return NextResponse.json({ ...record, found: true });
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  return NextResponse.json({ ...record, found: true });
 }
 
 export async function PUT(request: Request, context: RouteContext) {
   const { workflowId } = await Promise.resolve(context.params);
-  const body = await request.json().catch(() => ({}));
-  const snapshot = normalizeSnapshot((body as { snapshot?: unknown }).snapshot ?? body);
-  const record = await saveWorkflowRecord(workflowId, snapshot);
+  const session = await getServerSession(authOptions);
 
-  return NextResponse.json({ ...record, found: true });
+  try {
+    await requireWorkspaceAccess(session);
+    const body = await request.json().catch(() => ({}));
+    const snapshot = normalizeSnapshot((body as { snapshot?: unknown }).snapshot ?? body);
+    const record = await saveWorkflowRecord(workflowId, snapshot);
+
+    return NextResponse.json({ ...record, found: true });
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 }

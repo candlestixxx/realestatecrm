@@ -8,15 +8,25 @@ import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { syncContactToVectorStore } from '@/lib/rag';
 import Link from 'next/link';
 
+import { AppRole, isAtLeastRole } from '@/lib/permissions';
+
 async function addContact(formData: FormData) {
   'use server';
+
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+  const workspaceId = access.workspaceId;
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions to add contacts.' };
+  }
 
   const rawData = {
     firstName: formData.get('firstName'),
     lastName: formData.get('lastName'),
     email: formData.get('email'),
     phone: formData.get('phone'),
-    workspaceId: formData.get('workspaceId'),
+    workspaceId, // Override client value with session value
   };
 
   const validatedData = contactSchema.safeParse(rawData);
@@ -25,14 +35,7 @@ async function addContact(formData: FormData) {
     return { error: validatedData.error.issues[0].message };
   }
 
-  const { firstName, lastName, email, phone, workspaceId } = validatedData.data;
-
-  const session = await getServerSession(authOptions);
-  const access = await requireWorkspaceAccess(session);
-
-  if (workspaceId !== access.workspaceId) {
-    return { error: 'Workspace access denied.' };
-  }
+  const { firstName, lastName, email, phone } = validatedData.data;
 
   try {
     const contact = await prisma.contact.create({
@@ -83,7 +86,13 @@ export default async function ContactsPage(props: {
     prisma.contact.count({ where: whereClause }),
   ]);
 
-  const workspaces = await prisma.workspace.findMany();
+  const workspaces = await prisma.workspace.findMany({
+    where: {
+      members: {
+        some: { userId: access.userId },
+      },
+    },
+  });
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
@@ -134,7 +143,7 @@ export default async function ContactsPage(props: {
               {contacts.map((contact) => (
                 <tr key={contact.id} className="hover:bg-muted/10 transition-colors">
                   <td className="px-6 py-4 font-medium">
-                    <Link href={`/contacts/${contact.id}`} className="hover:underline">
+                    <Link href={`/dashboard/contacts/${contact.id}`} className="hover:underline">
                       {contact.firstName} {contact.lastName}
                     </Link>
                   </td>
@@ -144,9 +153,12 @@ export default async function ContactsPage(props: {
                     {new Date(contact.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-primary hover:underline text-sm font-medium">
-                      Edit
-                    </button>
+                    <Link
+                      href={`/dashboard/contacts/${contact.id}`}
+                      className="text-primary hover:underline text-sm font-medium"
+                    >
+                      View
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -168,13 +180,13 @@ export default async function ContactsPage(props: {
           </span>
           <div className="flex gap-2">
             <Link
-              href={`/contacts?q=${query}&page=${currentPage - 1}`}
+              href={`/dashboard/contacts?q=${query}&page=${currentPage - 1}`}
               className={`px-3 py-1 border border-border rounded hover:bg-muted transition-colors ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
             >
               Prev
             </Link>
             <Link
-              href={`/contacts?q=${query}&page=${currentPage + 1}`}
+              href={`/dashboard/contacts?q=${query}&page=${currentPage + 1}`}
               className={`px-3 py-1 border border-border rounded hover:bg-muted transition-colors ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
             >
               Next

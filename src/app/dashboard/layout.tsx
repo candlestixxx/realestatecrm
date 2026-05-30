@@ -4,10 +4,28 @@ import { authOptions } from '@/lib/auth';
 import SignOutButton from '@/components/SignOutButton';
 import { getProjectVersion } from '@/lib/version';
 import { CommandPalette } from '@/components/CommandPalette';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { DashboardHeaderActions } from '@/components/DashboardHeaderActions';
+import prisma from '@/lib/prisma';
+import { requireWorkspaceAccess } from '@/lib/workspace-access';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+  const workspaceId = access.workspaceId;
+
+  const [workspaces, contacts] = await Promise.all([
+    prisma.workspace.findMany({
+      where: {
+        members: {
+          some: { userId: access.userId },
+        },
+      },
+    }),
+    prisma.contact.findMany({
+      where: { workspaceId },
+      orderBy: { firstName: 'asc' },
+    }),
+  ]);
 
   return (
     <div className="flex h-screen bg-background">
@@ -23,31 +41,37 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           <a
-            href="#"
-            className="flex items-center gap-3 px-3 py-2 rounded-md bg-primary/10 text-primary font-medium"
+            href="/dashboard"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Dashboard
           </a>
           <a
-            href="#"
+            href="/dashboard/leads"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Leads
           </a>
           <a
-            href="#"
+            href="/dashboard/contacts"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Contacts
           </a>
           <a
-            href="#"
+            href="/dashboard/deals"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Deals
           </a>
           <a
-            href="#"
+            href="/dashboard/tasks"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Tasks
+          </a>
+          <a
+            href="/dashboard/workflows"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Workflows
@@ -86,16 +110,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <CommandPalette />
           </div>
           <div className="flex items-center gap-4">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button className="text-sm font-medium px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
-                  + New Deal
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Create a new deal pipeline</p>
-              </TooltipContent>
-            </Tooltip>
+            <DashboardHeaderActions workspaces={workspaces} contacts={contacts} />
           </div>
         </header>
         <div className="flex-1 overflow-auto p-6">{children}</div>

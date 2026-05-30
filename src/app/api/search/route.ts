@@ -9,13 +9,12 @@ export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
     const { workspaceSlug: workspaceId, actorId } = getWorkspaceScope(session);
 
-    // Enforce authentication context existance
-    if (!actorId || !workspaceId || workspaceId === DEFAULT_WORKSPACE_SLUG) {
+    // Enforce authentication context existence
+    if (!actorId || !workspaceId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-
     const query = searchParams.get('q');
 
     if (!query || query.length < 2) {
@@ -23,7 +22,6 @@ export async function GET(request: Request) {
     }
 
     const searchTerms = query.split(' ').filter(Boolean).map(term => term.trim());
-
 
     // Search Leads
     const leadsPromise = prisma.lead.findMany({
@@ -91,32 +89,32 @@ export async function GET(request: Request) {
     const results = [
       ...leads.map((l) => ({
         id: l.id,
-        type: 'lead',
+        type: 'lead' as const,
         title: [l.contact?.firstName, l.contact?.lastName].filter(Boolean).join(' '),
         subtitle: l.contact?.email || 'No email',
-        url: `/leads/${l.id}`,
+        url: `/dashboard/leads/${l.id}`,
       })),
 
       ...contacts.map((c) => ({
         id: c.id,
-        type: 'contact',
+        type: 'contact' as const,
         title: [c.firstName, c.lastName].filter(Boolean).join(' '),
         subtitle: c.email || '',
-        url: `/contacts/${c.id}`,
+        url: `/dashboard/contacts/${c.id}`,
       })),
       ...deals.map((d) => ({
         id: d.id,
-        type: 'deal',
+        type: 'deal' as const,
         title: d.title,
         subtitle: `Stage: ${d.stage}`,
-        url: `/deals/${d.id}`,
+        url: `/dashboard/deals/${d.id}`,
       })),
       ...tasks.map((t) => ({
         id: t.id,
-        type: 'task',
+        type: 'task' as const,
         title: t.title,
         subtitle: `Status: ${t.status}`,
-        url: `/tasks`,
+        url: `/dashboard/tasks`,
       })),
     ];
 
