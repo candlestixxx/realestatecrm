@@ -1,6 +1,6 @@
 import { WorkflowStudio } from '@/components/workflows/workflow-studio';
 import { getServerSession } from 'next-auth/next';
-
+import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 
@@ -124,7 +124,7 @@ const foreclosureSections = [
         key: 'assignedAgent',
         label: 'Assigned agent',
         type: 'select',
-        options: ['Unassigned', 'Hank Mendez', 'Harry Kourlos'],
+        options: ['Unassigned', 'Hank Mendez', 'Harry'],
         source: 'Workflow',
       },
       {
@@ -153,76 +153,117 @@ const foreclosureActions = [
   { id: 'submit', label: 'Sync to Lofty', tone: 'primary' },
 ] as const;
 
-const foreclosureSummaryItems = [
-  { label: 'County', value: 'Macomb', source: 'Legal News' },
-  { label: 'Pipeline', value: 'Foreclosure intake', source: 'Workflow' },
-  { label: 'Status', value: 'Preforeclosure review', source: 'CRM' },
-  { label: 'Sync gate', value: 'Human review before Lofty', source: 'Compliance', accent: true },
-];
-
-const foreclosureDefaults = {
-  county: 'Macomb',
-  noticeType: 'Foreclosure by Advertisement',
-  publishedDate: '2026-05-29',
-  saleDate: '2026-06-26',
-  mortgagorName: 'Enter mortgagor name',
-  propertyAddress: 'Enter property address',
-  city: '',
-  zip: '',
-  amountDueText: 'Enter amount due text',
-  attorneyName: '',
-  lawFirm: '',
-  attorneyPhone: '',
-  fileNumber: '',
-  parcelId: '',
-  redemptionPeriod: '6 months',
-  sourceUrl: 'https://www.legalnews.com/County/Notices?location=macomb',
-  rawNoticeText: '',
-  confidence: 'review',
-  leadStatus: 'PREFORECLOSURE',
-  assignedAgent: 'Unassigned',
-  tags: '#PreForeclosure, county:macomb, source:legalnews',
-  notes: 'Review the notice body and confirm the source-to-CRM mapping before sync.',
-};
-
-const foreclosureActivitySeed = [
-  {
-    title: 'Loaded from Legal News source',
-    detail:
-      'The workflow opens with the Macomb County Foreclosures bucket and a manual review gate before sync.',
-    timestamp: 'Now',
-  },
-  {
-    title: 'Source text preserved',
-    detail: 'The raw notice body is kept intact for compliance, auditability, and future enrichment.',
-    timestamp: 'Earlier',
-  },
-  {
-    title: 'Lofty sync is optional until review passes',
-    detail: 'Only validated records should move into the CRM sync queue or outbound campaign flow.',
-    timestamp: 'Earlier',
-  },
-];
-
 type ForeclosureIntakePageProps = {
-  searchParams?: unknown;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function ForeclosureIntakePage({ searchParams }: ForeclosureIntakePageProps) {
-  void searchParams;
+export default async function ForeclosureIntakePage(props: ForeclosureIntakePageProps) {
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
+  
+  const leadId = typeof searchParams?.leadId === 'string' ? searchParams.leadId : null;
+  const dealId = typeof searchParams?.dealId === 'string' ? searchParams.dealId : null;
+  const sessionId = typeof searchParams?.sessionId === 'string' ? searchParams.sessionId : null;
+
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
+  
+  let crmContext: any = null;
+  let connectionId = '';
+
+  if (leadId) {
+    const lead = await prisma.lead.findUnique({
+      where: { id: leadId, workspaceId: access.workspaceId },
+      include: { contact: true }
+    });
+    if (lead) {
+      crmContext = {
+        displayName: `${lead.contact.firstName} ${lead.contact.lastName || ''}`.trim(),
+        status: lead.status,
+        sourceSystem: lead.source,
+        payload: { mortgagorName: `${lead.contact.firstName} ${lead.contact.lastName || ''}`.trim() }
+      };
+      connectionId = `lead:${leadId}`;
+    }
+  } else if (dealId) {
+    const deal = await prisma.deal.findUnique({
+      where: { id: dealId, workspaceId: access.workspaceId },
+      include: { contact: true }
+    });
+    if (deal) {
+      crmContext = {
+        displayName: deal.title,
+        status: deal.stage,
+        sourceSystem: 'CRM Deal',
+        payload: { mortgagorName: `${deal.contact.firstName} ${deal.contact.lastName || ''}`.trim() }
+      };
+      connectionId = `deal:${dealId}`;
+    }
+  }
+
+  const workflowId = connectionId ? `foreclosure-intake:${connectionId}` : 'foreclosure-intake';
+
+  const foreclosureSummaryItems = [
+    { label: 'County', value: 'Macomb', source: 'Legal News' },
+    { label: 'Pipeline', value: 'Foreclosure intake', source: 'Workflow' },
+    { label: 'Status', value: crmContext ? crmContext.status : 'Preforeclosure review', source: 'CRM' },
+    { label: 'Sync gate', value: 'Human review before Lofty', source: 'Compliance', accent: true },
+  ];
+
+  const foreclosureDefaults = {
+    county: 'Macomb',
+    noticeType: 'Foreclosure by Advertisement',
+    publishedDate: new Date().toISOString().split('T')[0],
+    saleDate: '',
+    mortgagorName: crmContext ? crmContext.payload.mortgagorName : '',
+    propertyAddress: '',
+    city: '',
+    zip: '',
+    amountDueText: '',
+    attorneyName: '',
+    lawFirm: '',
+    attorneyPhone: '',
+    fileNumber: '',
+    parcelId: '',
+    redemptionPeriod: '6 months',
+    sourceUrl: 'https://www.legalnews.com/County/Notices?location=macomb',
+    rawNoticeText: '',
+    confidence: 'review',
+    leadStatus: 'PREFORECLOSURE',
+    assignedAgent: 'Unassigned',
+    tags: '#PreForeclosure, county:macomb, source:legalnews',
+    notes: 'Review the notice body and confirm the source-to-CRM mapping before sync.',
+  };
+
+  const foreclosureActivitySeed = [
+    {
+      title: 'Loaded from Legal News source',
+      detail:
+        'The workflow opens with the Macomb County Foreclosures bucket and a manual review gate before sync.',
+      timestamp: 'Now',
+    },
+    {
+      title: 'Source text preserved',
+      detail: 'The raw notice body is kept intact for compliance, auditability, and future enrichment.',
+      timestamp: 'Earlier',
+    },
+  ];
+
+  const subtitle = crmContext
+    ? `Opening from live CRM record ${crmContext.displayName} with exact public-record capture, CRM prep, and a human review gate before Lofty sync.`
+    : "A source-first intake screen for Macomb County foreclosure notices, with exact public-record capture, CRM prep, and a human review gate before Lofty sync.";
 
   return (
     <WorkflowStudio
+      key={workflowId}
       eyebrow="Foreclosure workflow map"
       title="Foreclosure Intake Screen"
-      routeLabel="/workflows/foreclosure-intake"
-      subtitle="A source-first intake screen for Macomb County foreclosure notices, with exact public-record capture, CRM prep, and a human review gate before Lofty sync."
-      workflowId="foreclosure-intake"
-      storageKey="workflow-foreclosure-intake"
+      routeLabel={crmContext ? `/dashboard → ${crmContext.displayName}` : "/workflows/foreclosure-intake"}
+      subtitle={subtitle}
+      workflowId={workflowId}
+      storageKey={`workflow-foreclosure-intake${connectionId ? `:${connectionId}` : ''}`}
       summaryItems={foreclosureSummaryItems}
       workspaceId={access.workspaceSlug}
+      existingSessionId={sessionId ?? undefined}
       sections={foreclosureSections as unknown as Parameters<typeof WorkflowStudio>[0]['sections']}
       actions={foreclosureActions as unknown as Parameters<typeof WorkflowStudio>[0]['actions']}
       validationTitle="Foreclosure validation"

@@ -1,37 +1,13 @@
 import { WorkflowStudio } from '@/components/workflows/workflow-studio';
 import { getServerSession } from 'next-auth/next';
-
+import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import {
   buildOfferActivitySeed,
   buildOfferDefaults,
   buildOfferSummaryItems,
-  getCrmRecord,
 } from '@/lib/crm-records';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
-
-function extractRecordId(searchParams: unknown) {
-  if (!searchParams) return null;
-
-  const params = searchParams as Record<string, unknown> & {
-    get?: (name: string) => string | null;
-  };
-
-  if (typeof params.get === 'function') {
-    return params.get('recordId')?.trim() || null;
-  }
-
-  const candidate = params.recordId;
-  if (Array.isArray(candidate)) {
-    return candidate[0]?.trim() || null;
-  }
-
-  if (typeof candidate === 'string') {
-    return candidate.trim() || null;
-  }
-
-  return null;
-}
 
 const offerSections = [
   {
@@ -99,18 +75,55 @@ const offerActions = [
 ] as const;
 
 type OfferDraftPageProps = {
-  searchParams?: unknown;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function OfferDraftPage({ searchParams }: OfferDraftPageProps) {
-  const recordId = extractRecordId(await Promise.resolve(searchParams));
+export default async function OfferDraftPage(props: OfferDraftPageProps) {
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
+  
+  const leadId = typeof searchParams?.leadId === 'string' ? searchParams.leadId : null;
+  const dealId = typeof searchParams?.dealId === 'string' ? searchParams.dealId : null;
+  const sessionId = typeof searchParams?.sessionId === 'string' ? searchParams.sessionId : null;
+  
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
-  const record = recordId ? await getCrmRecord(recordId, { workspaceSlug: access.workspaceSlug }) : null;
-  const workflowId = recordId ? `offer-draft:${recordId}` : 'offer-draft';
-  const displayRecord = record?.id === recordId ? record : null;
-  const subtitle = displayRecord
-    ? `Opening from live CRM record ${displayRecord.displayName} with draft persistence, validation checks, and mobile-safe controls.`
+  
+  let crmContext: any = null;
+  let connectionId = '';
+
+  if (leadId) {
+    const lead = await prisma.lead.findUnique({
+      where: { id: leadId, workspaceId: access.workspaceId },
+      include: { contact: true }
+    });
+    if (lead) {
+      crmContext = {
+        displayName: `${lead.contact.firstName} ${lead.contact.lastName || ''}`.trim(),
+        status: lead.status,
+        sourceSystem: lead.source,
+        payload: { buyerName: `${lead.contact.firstName} ${lead.contact.lastName || ''}`.trim() }
+      };
+      connectionId = `lead:${leadId}`;
+    }
+  } else if (dealId) {
+    const deal = await prisma.deal.findUnique({
+      where: { id: dealId, workspaceId: access.workspaceId },
+      include: { contact: true }
+    });
+    if (deal) {
+      crmContext = {
+        displayName: deal.title,
+        status: deal.stage,
+        sourceSystem: 'CRM Deal',
+        payload: { buyerName: `${deal.contact.firstName} ${deal.contact.lastName || ''}`.trim() }
+      };
+      connectionId = `deal:${dealId}`;
+    }
+  }
+
+  const workflowId = connectionId ? `offer-draft:${connectionId}` : 'offer-draft';
+  const subtitle = crmContext
+    ? `Opening from live CRM record ${crmContext.displayName} with draft persistence, validation checks, and mobile-safe controls.`
     : 'Interactive offer drafting with editable form state, backend draft persistence, live CRM data, validation checks, and mobile-safe action controls.';
 
   return (
@@ -118,13 +131,13 @@ export default async function OfferDraftPage({ searchParams }: OfferDraftPagePro
       key={workflowId}
       eyebrow="Offer workflow map"
       title="Offer Draft Screen"
-      routeLabel={displayRecord ? `/dashboard → ${displayRecord.displayName}` : '/workflows/offer-draft'}
+      routeLabel={crmContext ? `/dashboard → ${crmContext.displayName}` : '/workflows/offer-draft'}
       subtitle={subtitle}
       workflowId={workflowId}
-      storageKey={`workflow-offer-draft${recordId ? `:${recordId}` : ''}`}
-      summaryItems={buildOfferSummaryItems(displayRecord)}
+      storageKey={`workflow-offer-draft${connectionId ? `:${connectionId}` : ''}`}
+      summaryItems={buildOfferSummaryItems(crmContext)}
       workspaceId={access.workspaceSlug}
-      existingSessionId={recordId ?? undefined}
+      existingSessionId={sessionId ?? undefined}
       sections={offerSections as unknown as Parameters<typeof WorkflowStudio>[0]['sections']}
       actions={offerActions as unknown as Parameters<typeof WorkflowStudio>[0]['actions']}
       validationTitle="Offer validation"
@@ -144,8 +157,8 @@ export default async function OfferDraftPage({ searchParams }: OfferDraftPagePro
         'Offer terms can be traced back to the connected CRM record and MLS source.',
         'Broker approval remains the final gate before signature or submission.',
       ]}
-      defaultValues={buildOfferDefaults(displayRecord)}
-      activitySeed={buildOfferActivitySeed(displayRecord)}
+      defaultValues={buildOfferDefaults(crmContext)}
+      activitySeed={buildOfferActivitySeed(crmContext)}
     />
   );
 }

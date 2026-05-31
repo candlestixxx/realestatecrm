@@ -29,13 +29,6 @@ async function addTask(formData: FormData) {
     assignedToId: formData.get('assignedToId'),
   };
 
-  const session = await getServerSession(authOptions);
-  const access = await requireWorkspaceAccess(session);
-
-  if (rawData.workspaceId !== access.workspaceId) {
-    return { error: 'Workspace access denied.' };
-  }
-
   const validatedData = taskSchema.safeParse(rawData);
 
   if (!validatedData.success) {

@@ -11,7 +11,7 @@ export default async function DashboardHome() {
   const workspaceId = access.workspaceId;
   const userRole = access.workspaceRole;
 
-  const [leadCount, contactCount, taskCount, deals, workspaceMembers] = await Promise.all([
+  const [leadCount, contactCount, taskCount, deals, workspaceMembers, activeWorkflows] = await Promise.all([
     prisma.lead.count({ where: { workspaceId } }),
     prisma.contact.count({ where: { workspaceId } }),
     prisma.task.count({ where: { workspaceId, status: { not: 'DONE' } } }),
@@ -22,6 +22,12 @@ export default async function DashboardHome() {
           include: { user: true },
         })
       : Promise.resolve([]),
+    prisma.workflowSession.findMany({
+      where: { workspaceId, status: { not: 'APPROVED' } },
+      orderBy: { updatedAt: 'desc' },
+      take: 5,
+      include: { user: true },
+    }),
   ]);
 
   const activePipelineValue = deals.reduce((sum, deal) => sum + (deal.value || 0), 0);
@@ -159,6 +165,55 @@ export default async function DashboardHome() {
             </div>
           </div>
         </Link>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+        <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-border bg-muted/20 flex justify-between items-center">
+            <h2 className="text-lg font-bold">Active Workflows & Drip Campaigns</h2>
+            <Link href="/dashboard/workflows" className="text-primary hover:underline text-xs font-medium">
+              View All
+            </Link>
+          </div>
+          <div className="p-4">
+            {activeWorkflows.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">No active workflows found.</p>
+            ) : (
+              <div className="space-y-4">
+                {activeWorkflows.map((wf) => (
+                  <div key={wf.id} className="flex justify-between items-center p-3 border border-border rounded-lg bg-muted/5">
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-sm">{wf.type.replace('_', ' ')}</span>
+                      <span className="text-xs text-muted-foreground">Updated {new Date(wf.updatedAt).toLocaleDateString()}</span>
+                    </div>
+                    <span className="px-2 py-1 bg-secondary/10 text-secondary-foreground text-[10px] font-bold rounded-full uppercase tracking-tight">
+                      {wf.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-border bg-muted/20">
+            <h2 className="text-lg font-bold">AI Assistant / Gemini Sync</h2>
+            <p className="text-xs text-muted-foreground mt-1">Configure your default AI for drip campaigns and workflow execution.</p>
+          </div>
+          <div className="p-6 flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
+            <div>
+              <p className="font-medium">Gemini 2.5 Flash is Active</p>
+              <p className="text-sm text-muted-foreground mt-1">Ready to automate email/SMS follow-ups and analyze lead behavior.</p>
+            </div>
+            <button className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors">
+              Manage AI Integrations
+            </button>
+          </div>
+        </div>
       </div>
 
       {workspaceMembers.length > 0 && (

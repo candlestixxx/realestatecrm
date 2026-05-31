@@ -1,134 +1,146 @@
-import { readFile } from 'node:fs/promises';
-import { randomBytes, scryptSync } from 'node:crypto';
-import path from 'node:path';
-
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-const workspaceSlug = 'excel-legacy-team';
-const workspaceName = 'Excel Legacy Realty Team';
-const recordsPath = path.join(process.cwd(), 'data', 'crm-records.json');
-
-function hashPassword(password, salt = randomBytes(16).toString('hex')) {
-  const derived = scryptSync(password, salt, 64);
-  return `${salt}:${derived.toString('hex')}`;
-}
-
-function normalizeWorkflowType(workflowType) {
-  if (!workflowType) return null;
-  return workflowType === 'offer-draft' ? 'OFFER_DRAFT' : 'LISTING_ENTRY';
-}
-
-async function readSeedRecords() {
-  const raw = await readFile(recordsPath, 'utf8');
-  const parsed = JSON.parse(raw);
-  return Array.isArray(parsed.records) ? parsed.records : [];
-}
 
 async function main() {
-  const workspace = await prisma.workspace.upsert({
-    where: { slug: workspaceSlug },
-    update: { name: workspaceName },
-    create: {
-      id: workspaceSlug,
-      slug: workspaceSlug,
-      name: workspaceName,
+  console.log('Seeding database...');
+
+  // Clear existing to prevent duplicates on multiple seed runs
+  await prisma.workflowSession.deleteMany();
+  await prisma.activity.deleteMany();
+  await prisma.workspaceMember.deleteMany();
+  await prisma.deal.deleteMany();
+  await prisma.lead.deleteMany();
+  await prisma.contact.deleteMany();
+  await prisma.task.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.workspace.deleteMany();
+
+  // Create Workspace
+  const workspace = await prisma.workspace.create({
+    data: {
+      id: 'excel-legacy-team',
+      name: 'Excel Legacy Realty Team',
     },
   });
 
-  const seedEmail = process.env.SEED_ADMIN_EMAIL ?? process.env.AUTH_DEMO_EMAIL;
-  const seedUsername = process.env.SEED_ADMIN_USERNAME ?? process.env.AUTH_DEMO_USERNAME;
-  const seedPassword = process.env.SEED_ADMIN_PASSWORD ?? process.env.AUTH_DEMO_PASSWORD;
-  const seedName = process.env.SEED_ADMIN_NAME ?? 'Excel Legacy Admin';
+  // Create Users (Identities requested by user)
+  const hank = await prisma.user.create({
+    data: {
+      name: 'Hank Mendez',
+      email: 'hank.mendez@excellegacy.local',
+      role: 'BROKER',
+    },
+  });
 
-  let adminUser = null;
+  const harry = await prisma.user.create({
+    data: {
+      name: 'Harry',
+      email: 'harry@excellegacy.local',
+      role: 'REALTOR_AGENT',
+    },
+  });
 
-  if (seedEmail && seedUsername && seedPassword) {
-    adminUser = await prisma.user.upsert({
-      where: { email: seedEmail },
-      update: {
-        name: seedName,
-        username: seedUsername,
-        passwordHash: hashPassword(seedPassword),
-        role: 'BROKER_TEAM_LEAD',
-      },
-      create: {
-        name: seedName,
-        email: seedEmail,
-        username: seedUsername,
-        passwordHash: hashPassword(seedPassword),
-        role: 'BROKER_TEAM_LEAD',
-      },
-    });
-
-    await prisma.workspaceMember.upsert({
-      where: {
-        workspaceId_userId: {
-          workspaceId: workspace.id,
-          userId: adminUser.id,
-        },
-      },
-      update: { role: 'BROKER_TEAM_LEAD' },
-      create: {
+  // Link Users to Workspace
+  await prisma.workspaceMember.createMany({
+    data: [
+      {
+        userId: hank.id,
         workspaceId: workspace.id,
-        userId: adminUser.id,
-        role: 'BROKER_TEAM_LEAD',
+        role: 'BROKER',
       },
-    });
-  }
-
-  const records = await readSeedRecords();
-
-  for (const record of records) {
-    await prisma.crmRecord.upsert({
-      where: { id: record.id },
-      update: {
+      {
+        userId: harry.id,
         workspaceId: workspace.id,
-        recordType: record.recordType,
-        workflowType: normalizeWorkflowType(record.workflowType),
-        displayName: record.displayName,
-        subtitle: record.subtitle,
-        primaryAddress: record.primaryAddress,
-        status: record.status,
-        sourceSystem: record.sourceSystem,
-        sourceRecordId: record.sourceRecordId,
-        ownerId: adminUser?.id ?? null,
-        assignedUserId: adminUser?.id ?? null,
-        payload: record.payload ?? {},
-        updatedAt: new Date(record.updatedAt),
+        role: 'REALTOR_AGENT',
       },
-      create: {
-        id: record.id,
-        workspaceId: workspace.id,
-        recordType: record.recordType,
-        workflowType: normalizeWorkflowType(record.workflowType),
-        displayName: record.displayName,
-        subtitle: record.subtitle,
-        primaryAddress: record.primaryAddress,
-        status: record.status,
-        sourceSystem: record.sourceSystem,
-        sourceRecordId: record.sourceRecordId,
-        ownerId: adminUser?.id ?? null,
-        assignedUserId: adminUser?.id ?? null,
-        payload: record.payload ?? {},
-        createdAt: new Date(record.createdAt),
-        updatedAt: new Date(record.updatedAt),
-      },
-    });
-  }
+    ],
+  });
 
-  console.log(`Seeded ${records.length} CRM records for workspace ${workspace.slug}.`);
-  if (adminUser) {
-    console.log(`Seeded admin user ${adminUser.email}.`);
-  } else {
-    console.log('No admin user seeded because SEED_ADMIN_* or AUTH_DEMO_* credentials were not provided.');
-  }
+  // Create Contacts
+  const contact1 = await prisma.contact.create({
+    data: {
+      firstName: 'Sarah',
+      lastName: 'Jenkins',
+      email: 'sarah@example.com',
+      phone: '555-0192',
+      workspaceId: workspace.id,
+    },
+  });
+
+  const contact2 = await prisma.contact.create({
+    data: {
+      firstName: 'Michael',
+      lastName: 'Chen',
+      email: 'mchen@example.com',
+      phone: '555-8472',
+      workspaceId: workspace.id,
+    },
+  });
+
+  const contact3 = await prisma.contact.create({
+    data: {
+      firstName: 'Emily',
+      lastName: 'Davis',
+      email: 'emily.d@example.com',
+      phone: '555-3321',
+      workspaceId: workspace.id,
+    },
+  });
+
+  // Create Leads
+  await prisma.lead.create({
+    data: {
+      source: 'Zillow',
+      status: 'NEW',
+      score: 85,
+      workspaceId: workspace.id,
+      contactId: contact1.id,
+      userId: harry.id,
+    },
+  });
+
+  await prisma.lead.create({
+    data: {
+      source: 'Referral',
+      status: 'QUALIFIED',
+      score: 92,
+      workspaceId: workspace.id,
+      contactId: contact2.id,
+      userId: harry.id,
+    },
+  });
+
+  // Create Deals
+  await prisma.deal.create({
+    data: {
+      title: 'Smith Family Home',
+      value: 650000,
+      stage: 'QUALIFICATION',
+      workspaceId: workspace.id,
+      contactId: contact1.id,
+      userId: harry.id,
+    },
+  });
+
+  await prisma.deal.create({
+    data: {
+      title: '789 Pine Rd',
+      value: 890000,
+      stage: 'UNDER_CONTRACT',
+      workspaceId: workspace.id,
+      contactId: contact2.id,
+      userId: harry.id,
+    },
+  });
+
+  console.log('Seeding complete.');
 }
 
 main()
-  .catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();

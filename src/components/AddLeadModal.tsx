@@ -79,6 +79,15 @@ export default function AddLeadModal({
                 <p className="text-[10px] text-muted-foreground italic">Used for automated follow-ups and portal access.</p>
               </div>
               <div className="space-y-2">
+                <label className="text-sm font-medium" title="Primary contact phone number">Phone Number</label>
+                <input
+                  name="phone"
+                  type="tel"
+                  placeholder="(555) 000-0000"
+                  className="w-full bg-muted/50 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+              <div className="space-y-2">
                 <label className="text-sm font-medium">Workspace</label>
                 <select
                   name="workspaceId"

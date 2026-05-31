@@ -92,7 +92,6 @@ export default async function DealsPage() {
   });
 
   const stages = [
-    { id: 'PROSPECTING', label: 'Prospecting' },
     { id: 'QUALIFICATION', label: 'Qualification' },
     { id: 'PROPOSAL', label: 'Proposal/Showing' },
     { id: 'NEGOTIATION', label: 'Negotiation' },

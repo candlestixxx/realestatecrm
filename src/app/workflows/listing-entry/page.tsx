@@ -1,37 +1,13 @@
 import { WorkflowStudio } from '@/components/workflows/workflow-studio';
 import { getServerSession } from 'next-auth/next';
-
+import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import {
   buildListingActivitySeed,
   buildListingDefaults,
   buildListingSummaryItems,
-  getCrmRecord,
 } from '@/lib/crm-records';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
-
-function extractRecordId(searchParams: unknown) {
-  if (!searchParams) return null;
-
-  const params = searchParams as Record<string, unknown> & {
-    get?: (name: string) => string | null;
-  };
-
-  if (typeof params.get === 'function') {
-    return params.get('recordId')?.trim() || null;
-  }
-
-  const candidate = params.recordId;
-  if (Array.isArray(candidate)) {
-    return candidate[0]?.trim() || null;
-  }
-
-  if (typeof candidate === 'string') {
-    return candidate.trim() || null;
-  }
-
-  return null;
-}
 
 const listingSections = [
   {
@@ -97,18 +73,55 @@ const listingActions = [
 ] as const;
 
 type ListingEntryPageProps = {
-  searchParams?: unknown;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function ListingEntryPage({ searchParams }: ListingEntryPageProps) {
-  const recordId = extractRecordId(await Promise.resolve(searchParams));
+export default async function ListingEntryPage(props: ListingEntryPageProps) {
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
+  
+  const leadId = typeof searchParams?.leadId === 'string' ? searchParams.leadId : null;
+  const dealId = typeof searchParams?.dealId === 'string' ? searchParams.dealId : null;
+  const sessionId = typeof searchParams?.sessionId === 'string' ? searchParams.sessionId : null;
+
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
-  const record = recordId ? await getCrmRecord(recordId, { workspaceSlug: access.workspaceSlug }) : null;
-  const workflowId = recordId ? `listing-entry:${recordId}` : 'listing-entry';
-  const displayRecord = record?.id === recordId ? record : null;
-  const subtitle = displayRecord
-    ? `Opening from live CRM record ${displayRecord.displayName} with editable property data, backend draft persistence, and mobile-first controls.`
+  
+  let crmContext: any = null;
+  let connectionId = '';
+
+  if (leadId) {
+    const lead = await prisma.lead.findUnique({
+      where: { id: leadId, workspaceId: access.workspaceId },
+      include: { contact: true }
+    });
+    if (lead) {
+      crmContext = {
+        displayName: `${lead.contact.firstName} ${lead.contact.lastName || ''}`.trim(),
+        status: lead.status,
+        sourceSystem: lead.source,
+        payload: { sellerName: `${lead.contact.firstName} ${lead.contact.lastName || ''}`.trim() }
+      };
+      connectionId = `lead:${leadId}`;
+    }
+  } else if (dealId) {
+    const deal = await prisma.deal.findUnique({
+      where: { id: dealId, workspaceId: access.workspaceId },
+      include: { contact: true }
+    });
+    if (deal) {
+      crmContext = {
+        displayName: deal.title,
+        status: deal.stage,
+        sourceSystem: 'CRM Deal',
+        payload: { sellerName: `${deal.contact.firstName} ${deal.contact.lastName || ''}`.trim() }
+      };
+      connectionId = `deal:${dealId}`;
+    }
+  }
+
+  const workflowId = connectionId ? `listing-entry:${connectionId}` : 'listing-entry';
+  const subtitle = crmContext
+    ? `Opening from live CRM record ${crmContext.displayName} with editable property data, backend draft persistence, and mobile-first controls.`
     : 'Interactive listing entry with editable property data, backend draft persistence, live CRM records, validation, and mobile-first controls.';
 
   return (
@@ -116,13 +129,13 @@ export default async function ListingEntryPage({ searchParams }: ListingEntryPag
       key={workflowId}
       eyebrow="Listing workflow map"
       title="Listing Entry Screen"
-      routeLabel={displayRecord ? `/dashboard → ${displayRecord.displayName}` : '/workflows/listing-entry'}
+      routeLabel={crmContext ? `/dashboard → ${crmContext.displayName}` : '/workflows/listing-entry'}
       subtitle={subtitle}
       workflowId={workflowId}
-      storageKey={`workflow-listing-entry${recordId ? `:${recordId}` : ''}`}
-      summaryItems={buildListingSummaryItems(displayRecord)}
+      storageKey={`workflow-listing-entry${connectionId ? `:${connectionId}` : ''}`}
+      summaryItems={buildListingSummaryItems(crmContext)}
       workspaceId={access.workspaceSlug}
-      existingSessionId={recordId ?? undefined}
+      existingSessionId={sessionId ?? undefined}
       sections={listingSections as unknown as Parameters<typeof WorkflowStudio>[0]['sections']}
       actions={listingActions as unknown as Parameters<typeof WorkflowStudio>[0]['actions']}
       validationTitle="Listing validation"
@@ -142,8 +155,8 @@ export default async function ListingEntryPage({ searchParams }: ListingEntryPag
         'Property facts should remain traceable back to the approved source system.',
         'Human review is required before publish/submit actions are finalized.',
       ]}
-      defaultValues={buildListingDefaults(displayRecord)}
-      activitySeed={buildListingActivitySeed(displayRecord)}
+      defaultValues={buildListingDefaults(crmContext)}
+      activitySeed={buildListingActivitySeed(crmContext)}
     />
   );
 }

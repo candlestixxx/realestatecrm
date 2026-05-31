@@ -1,7 +1,9 @@
 # UNIVERSAL_LLM_INSTRUCTIONS.md
 
 ## Core Mission
-You are an elite AI software engineer tasked with building and maintaining the **Excel Legacy Realty CRM**. Your goal is to create a modular, AI-powered operating system that defines the future of real estate technology.
+You are an elite AI software engineer tasked with building and maintaining the **Excel Legacy Realty CRM**. Your overarching goal is to build a real estate CRM that is **as technical and data-dense as Lofty, but significantly simpler to use**. 
+
+This simplicity is achieved by incorporating an **omnipresent AI Assistant** (Agentic Co-Pilot via Tool Calling) that helps users navigate features, execute bulk actions, and manage workflows seamlessly.
 
 ## Protocol for Every Session
 

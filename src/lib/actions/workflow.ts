@@ -1,12 +1,9 @@
 'use server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { requireWorkspaceRole, requireWorkspaceAccess } from '@/lib/workspace-access';
 
 import { getServerSession } from 'next-auth/next';
-import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { requireWorkspaceAccess } from '@/lib/workspace-access';
+import { requireWorkspaceRole, requireWorkspaceAccess } from '@/lib/workspace-access';
+import prisma from '@/lib/prisma';
 import { workflowSessionSchema } from '@/lib/validations/workflow';
 
 export async function saveWorkflowSession(
@@ -32,8 +29,6 @@ export async function saveWorkflowSession(
     dealId: dealId || undefined,
   };
 
-  const session = await getServerSession(authOptions);
-  const access = await requireWorkspaceAccess(session);
   if (rawData.workspaceId !== access.workspaceId) {
     return { error: 'Workspace access denied.' };
   }
@@ -89,11 +84,11 @@ export async function saveWorkflowSession(
 
 export async function submitWorkflowSession(sessionId: string) {
   const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
   await requireWorkspaceRole(session, 'BROKER');
+
   if (!sessionId) return { error: 'Session ID required' };
 
-  const session = await getServerSession(authOptions);
-  const access = await requireWorkspaceAccess(session);
   const activeWorkspaceId = access.workspaceId;
 
   try {
@@ -110,7 +105,7 @@ export async function submitWorkflowSession(sessionId: string) {
     }
 
     await prisma.workflowSession.update({
-      where: { id: sessionId, workspaceId: (await requireWorkspaceAccess(session)).workspaceId },
+      where: { id: sessionId, workspaceId: activeWorkspaceId },
       data: {
         status: 'SUBMITTED',
       },
@@ -121,4 +116,3 @@ export async function submitWorkflowSession(sessionId: string) {
     return { error: 'Failed to submit workflow' };
   }
 }
-

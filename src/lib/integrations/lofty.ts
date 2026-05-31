@@ -92,7 +92,7 @@ export function parseLoftyLeadSearchResponse(body: LoftyApiEnvelope): LoftyConta
  */
 function getHeaders(apiKey: string) {
   return {
-    'Authorization': `Bearer ${apiKey}`,
+    'Authorization': `token ${apiKey}`,
     'Content-Type': 'application/json',
   };
 }

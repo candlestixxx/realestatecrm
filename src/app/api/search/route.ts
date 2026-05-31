@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { getWorkspaceScope, DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
+import { getWorkspaceScope } from '@/lib/workspace-context';
 
 export async function GET(request: Request) {
   try {

@@ -58,10 +58,16 @@ export default async function DealDetailPage({ params }: { params: Promise<{ id:
             Edit Deal
           </button>
           <Link
-            href={`/workflows/offer-draft?recordId=${deal.id}`}
+            href={`/workflows/offer-draft?dealId=${deal.id}`}
             className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors"
           >
-            New Offer Draft
+            New Offer
+          </Link>
+          <Link
+            href={`/workflows/listing-entry?dealId=${deal.id}`}
+            className="px-4 py-2 border border-primary text-primary font-medium rounded-md hover:bg-primary/10 transition-colors"
+          >
+            New Listing
           </Link>
         </div>
       </div>

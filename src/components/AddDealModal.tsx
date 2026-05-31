@@ -75,7 +75,6 @@ export default function AddDealModal({
                   required
                   className="w-full bg-muted/50 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 >
-                  <option value="PROSPECTING">Prospecting</option>
                   <option value="QUALIFICATION">Qualification</option>
                   <option value="PROPOSAL">Proposal/Showing</option>
                   <option value="NEGOTIATION">Negotiation</option>

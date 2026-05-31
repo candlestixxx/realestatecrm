@@ -1,10 +1,17 @@
-## [0.44.0] - Deployment Checklist  Environment Formalization
-
-- Expanded `.env.example` with fully documented placeholders mapping to all required application scopes (Database, NextAuth, Mail, Vectors).
-- Overhauled `DEPLOY.md` to establish a robust pre-flight checklist enforcing staging build checks, DB migration sequences, and compliance verification.
-- Validated workspace demo fallback mechanisms to ensure they automatically seal when local bypass keys are omitted from the production environment.
-
 # CHANGELOG.md
+
+## [0.45.0] - AI-Driven Segmentation & Bulk Workflows
+
+- **Workspace as Segment:** Formalized the multi-tenancy model to frame Workspaces as selectable Lead Segments/Lists, integrated with a global cookie-based switcher in the header.
+- **Bulk Lead Management:** Implemented an interactive client-side table for Leads with master checkbox selection and a dynamic bulk action bar.
+- **Dynamic Pagination:** Added server-side supported pagination limits (10, 25, 50, 75, 100) controlled via UI dropdown and URL parameters.
+- **Workflow Overview:** Integrated an active workflow performance section on the main dashboard to track real-time operational pulse.
+- **AI Sync (Gemini):** Added a dedicated Gemini 2.5 Flash status panel to the dashboard to monitor AI readiness for drip campaigns.
+- **Onboarding Tour:** Built a first-time user tour component to explain the new segmentation mental model and bulk action features.
+- **Feature Connectivity:** Wired up bulk action triggers for "Add to Segment", "Add to Workflow", and "Start AI Drip" (UI layer).
+- **Bug Fixes:** Resolved build errors related to duplicate variable definitions in the Tasks page and improper anchor tag navigation in the sidebar.
+
+## [0.44.0] - Deployment Checklist & Environment Formalization
 
 ## [0.43.0] - Marketing Media Pipeline
 

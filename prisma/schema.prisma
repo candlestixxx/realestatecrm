@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "windows", "debian-openssl-3.0.x"]
@@ -12,101 +9,117 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String            @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?           @unique
   emailVerified DateTime?
   image         String?
-  role          String    @default("REALTOR_AGENT") // OWNER, BROKER, ASSOCIATE_BROKER, REALTOR_AGENT, OFFICE_MANAGER, ADMIN
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  workspaces    WorkspaceMember[]
-  leads         Lead[]
+  role          String            @default("AGENT")
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  activities    Activity[]
   contacts      Contact[]
   deals         Deal[]
-  workflows     WorkflowSession[]
-  activities    Activity[]
+  leads         Lead[]
   assignedTasks Task[]            @relation("TaskAssignee")
+  workflows     WorkflowSession[]
+  workspaces    WorkspaceMember[]
 }
 
 model Workspace {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  members   WorkspaceMember[]
-  leads     Lead[]
-  contacts  Contact[]
-  deals     Deal[]
-  workflows WorkflowSession[]
-  Activity  Activity[]
+  id         String            @id @default(cuid())
+  name       String
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  Activity   Activity[]
+  contacts   Contact[]
+  deals      Deal[]
+  leads      Lead[]
+  workflows  WorkflowSession[]
+  members    WorkspaceMember[]
+  smartPlans SmartPlan[]
 }
 
 model WorkspaceMember {
-  id          String @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   workspaceId String
-  role        String @default("REALTOR_AGENT") // OWNER, BROKER, ASSOCIATE_BROKER, REALTOR_AGENT, OFFICE_MANAGER, ADMIN
-
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  role        String    @default("AGENT")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, workspaceId])
 }
 
 model Contact {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   firstName   String
   lastName    String?
   email       String?
   phone       String?
   workspaceId String
   userId      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user      User?      @relation(fields: [userId], references: [id])
-  leads     Lead[]
-  deals     Deal[]
-  Activity  Activity[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Activity    Activity[]
+  user        User?      @relation(fields: [userId], references: [id])
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deals       Deal[]
+  leads       Lead[]
 }
 
 model Lead {
-  id          String   @id @default(cuid())
-  source      String?
-  status      String   @default("NEW")
-  score       Int?     @default(0)
-  workspaceId String
-  contactId   String
-  userId      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String            @id @default(cuid())
+  source          String?
+  status          String            @default("NEW")
+  score           Int?              @default(0)
+  workspaceId     String
+  contactId       String
+  userId          String?
+  isAiAssisted    Boolean           @default(false)
+  
+  // Enrichment Data (Scrapers)
+  socialProfiles  String?           // JSON string of social links
+  publicRecords   String?           // JSON string of public record data
+  lastEnrichedAt  DateTime?
 
-  workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  user            User?             @relation(fields: [userId], references: [id])
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   Activity        Activity[]
+  user            User?             @relation(fields: [userId], references: [id])
+  contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   WorkflowSession WorkflowSession[]
+  smartPlanId     String?
+  smartPlan       SmartPlan?        @relation(fields: [smartPlanId], references: [id])
+}
+
+model SmartPlan {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  isActive    Boolean   @default(true)
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  leads       Lead[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Deal {
-  id          String   @id @default(cuid())
-  title       String
-  value       Float?
-  stage       String   @default("LEAD")
-  workspaceId String
-  contactId   String
-  userId      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  user            User?             @relation(fields: [userId], references: [id])
+  id              String            @id @default(cuid())
+  title           String
+  value           Float?
+  stage           String            @default("LEAD")
+  workspaceId     String
+  contactId       String
+  userId          String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   Activity        Activity[]
+  user            User?             @relation(fields: [userId], references: [id])
+  contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   WorkflowSession WorkflowSession[]
 }
 
@@ -120,51 +133,43 @@ model Task {
   assignedToId String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-
-  assignedTo User? @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  assignedTo   User?     @relation("TaskAssignee", fields: [assignedToId], references: [id])
 }
 
 model Activity {
-  id       String  @id @default(cuid())
-  type     String  @default("NOTE") // Note, Status Change, Email, Call
-  content  String
-  metadata String? // JSON string for additional context
-
-  workspaceId String
-  userId      String?
-
-  leadId    String?
-  dealId    String?
-  contactId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user      User?     @relation(fields: [userId], references: [id])
-  lead      Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  deal      Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  contact   Contact?  @relation(fields: [contactId], references: [id], onDelete: Cascade)
-}
-
-model WorkflowSession {
-  id     String @id @default(cuid())
-  type   String // e.g., 'OFFER_DRAFT', 'LISTING_ENTRY'
-  status String @default("DRAFT") // DRAFT, SUBMITTED, APPROVED
-  data   String // JSON payload of the workflow state
-
+  id          String    @id @default(cuid())
+  type        String    @default("NOTE")
+  content     String
+  metadata    String?
   workspaceId String
   userId      String?
   leadId      String?
   dealId      String?
+  contactId   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  contact     Contact?  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  deal        Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  lead        Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user      User?     @relation(fields: [userId], references: [id])
-  lead      Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  deal      Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+model WorkflowSession {
+  id          String    @id @default(cuid())
+  type        String
+  status      String    @default("DRAFT")
+  data        String
+  workspaceId String
+  userId      String?
+  leadId      String?
+  dealId      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deal        Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  lead        Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {

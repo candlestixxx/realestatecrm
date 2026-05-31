@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import AIChat from '@/components/AIChat';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
@@ -5,27 +6,22 @@ import SignOutButton from '@/components/SignOutButton';
 import { getProjectVersion } from '@/lib/version';
 import { CommandPalette } from '@/components/CommandPalette';
 import { DashboardHeaderActions } from '@/components/DashboardHeaderActions';
-import prisma from '@/lib/prisma';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
+import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher';
+import { OnboardingTour } from '@/components/OnboardingTour';
+import prisma from '@/lib/prisma';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
-  const workspaceId = access.workspaceId;
 
-  const [workspaces, contacts] = await Promise.all([
-    prisma.workspace.findMany({
-      where: {
-        members: {
-          some: { userId: access.userId },
-        },
+  const workspaces = await prisma.workspace.findMany({
+    where: {
+      members: {
+        some: { userId: access.userId },
       },
-    }),
-    prisma.contact.findMany({
-      where: { workspaceId },
-      orderBy: { firstName: 'asc' },
-    }),
-  ]);
+    },
+  });
 
   return (
     <div className="flex h-screen bg-background">
@@ -40,42 +36,53 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
-          <a
+          <Link
             href="/dashboard"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Dashboard
-          </a>
-          <a
+          </Link>
+          <Link
             href="/dashboard/leads"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Leads
-          </a>
-          <a
+          </Link>
+          <Link
             href="/dashboard/contacts"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Contacts
-          </a>
-          <a
+          </Link>
+          <Link
             href="/dashboard/deals"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Deals
-          </a>
-          <a
+          </Link>
+          <Link
             href="/dashboard/tasks"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Tasks
-          </a>
-          <a
+          </Link>
+          <Link
             href="/dashboard/workflows"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Workflows
-          </a>
+          </Link>
+          <Link
+            href="/dashboard/sync-queue"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              ↗ Sync Queue
+              <span className="text-[10px] px-1.5 py-0.5 bg-primary/20 text-primary rounded-full font-medium">
+                MyPlus → Lofty
+              </span>
+            </span>
+          </Link>
         </nav>
         <div className="p-4 border-t border-border">
           <div className="mb-4 text-[10px] text-muted-foreground uppercase tracking-widest text-center">
@@ -106,16 +113,20 @@ export default async function DashboardLayout({ children }: { children: React.Re
               E
             </div>
           </div>
-          <div className="flex-1 flex justify-center px-4">
-            <CommandPalette />
+          <div className="flex-1 flex items-center justify-between px-4">
+            <div className="flex-1 flex justify-center">
+              <CommandPalette />
+            </div>
+            <WorkspaceSwitcher workspaces={workspaces} activeSlug={access.workspaceSlug} />
           </div>
-          <div className="flex items-center gap-4">
-            <DashboardHeaderActions workspaces={workspaces} contacts={contacts} />
+          <div className="flex items-center gap-4 ml-4">
+            <DashboardHeaderActions />
           </div>
         </header>
         <div className="flex-1 overflow-auto p-6">{children}</div>
       </main>
       <AIChat />
+      <OnboardingTour />
     </div>
   );
 }

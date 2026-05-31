@@ -11,6 +11,8 @@ import { AppRole, isAtLeastRole } from '@/lib/permissions';
 import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 import AddLeadModal from '@/components/AddLeadModal';
 
+import { LeadTableClient } from '@/components/LeadTableClient';
+
 async function addLead(formData: FormData) {
   'use server';
 
@@ -31,7 +33,8 @@ async function addLead(formData: FormData) {
     firstName: formData.get('firstName'),
     lastName: formData.get('lastName'),
     email: formData.get('email'),
-    workspaceId: access.workspaceId,
+    phone: formData.get('phone'),
+    workspaceId: formData.get('workspaceId'),
   };
 
   const validatedData = leadSchema.safeParse(rawData);
@@ -39,7 +42,7 @@ async function addLead(formData: FormData) {
     return { error: validatedData.error.issues[0].message };
   }
 
-  const { firstName, lastName, email } = validatedData.data;
+  const { firstName, lastName, email, phone, workspaceId } = validatedData.data;
 
   try {
     const contact = await prisma.contact.create({
@@ -47,7 +50,8 @@ async function addLead(formData: FormData) {
         firstName,
         lastName: lastName || null,
         email: email || null,
-        workspaceId: access.workspaceId,
+        phone: phone || null,
+        workspaceId: workspaceId,
       },
     });
 
@@ -56,7 +60,7 @@ async function addLead(formData: FormData) {
         status: 'NEW',
         score: 50,
         source: 'Manual',
-        workspaceId: access.workspaceId,
+        workspaceId: workspaceId,
         contactId: contact.id,
       },
     });
@@ -76,7 +80,7 @@ export default async function LeadsPage(props: {
   const query = searchParams?.q || '';
   const statusFilter = searchParams?.status || 'ALL';
   const currentPage = Math.max(1, Number(searchParams?.page) || 1);
-  const pageSize = 10;
+  const pageSize = Math.max(10, Math.min(100, Number(searchParams?.limit) || 10));
 
   const session = await getServerSession(authOptions);
   const access = (await resolveWorkspaceAccess(session)) ?? {
@@ -102,7 +106,7 @@ export default async function LeadsPage(props: {
     whereClause.status = statusFilter;
   }
 
-  let leads: any[] = [];
+  let leads: Prisma.LeadGetPayload<{ include: { contact: true } }>[] = [];
   let totalCount = 0;
   let loadError: string | null = null;
 
@@ -118,14 +122,12 @@ export default async function LeadsPage(props: {
       prisma.lead.count({ where: whereClause }),
     ]);
 
-    leads = leadRows as any[];
+    leads = leadRows;
     totalCount = leadTotal;
   } catch (error) {
     console.error('Leads page load failed:', error);
     loadError = 'The leads list could not load from the database. Showing a safe fallback view.';
   }
-
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   const workspaces = await prisma.workspace.findMany({
     where: {
@@ -170,13 +172,14 @@ export default async function LeadsPage(props: {
             defaultValue={statusFilter}
             className="bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
           >
-
             <option value="ALL">All Statuses</option>
             <option value="NEW">NEW</option>
+            <option value="PROSPECTING">PROSPECTING</option>
             <option value="CONTACTED">CONTACTED</option>
             <option value="QUALIFIED">QUALIFIED</option>
           </select>
           <input type="hidden" name="page" value={currentPage} />
+          <input type="hidden" name="limit" value={pageSize} />
           <button
             type="submit"
             className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/90 transition-colors"
@@ -185,100 +188,12 @@ export default async function LeadsPage(props: {
           </button>
         </form>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
-              <tr>
-                <th className="px-6 py-3 font-medium">Name</th>
-                <th className="px-6 py-3 font-medium">Contact</th>
-                <th className="px-6 py-3 font-medium">Status</th>
-                <th className="px-6 py-3 font-medium">Score</th>
-                <th className="px-6 py-3 font-medium">Source</th>
-                <th className="px-6 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {leads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-muted/10 transition-colors">
-                  <td className="px-6 py-4 font-medium">
-                    {lead.contact?.firstName} {lead.contact?.lastName}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span>{lead.contact?.email}</span>
-                      <span className="text-xs text-muted-foreground">{lead.contact?.phone}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full font-medium border ${
-                        lead.status === 'NEW'
-                          ? 'bg-secondary/20 text-secondary-foreground border-secondary/30'
-                          : lead.status === 'QUALIFIED'
-                            ? 'bg-primary/20 text-primary border-primary/30'
-                            : 'bg-muted text-muted-foreground border-border'
-                      }`}
-                    >
-                      {lead.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-full bg-muted rounded-full h-2 max-w-[60px]">
-                        <div
-                          className={`h-2 rounded-full ${lead.score && lead.score > 80 ? 'bg-primary' : 'bg-primary/50'}`}
-                          style={{ width: `${lead.score || 0}%` }}
-                        />
-                      </div>
-                      <span
-                        className={`text-xs font-bold ${lead.score && lead.score > 80 ? 'text-primary' : 'text-muted-foreground'}`}
-                      >
-                        {lead.score}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-muted-foreground">{lead.source}</td>
-                  <td className="px-6 py-4 text-right">
-                    <Link
-                      href={`/dashboard/leads/${lead.id}`}
-                      className="text-primary hover:underline text-sm font-medium"
-                    >
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-              {leads.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
-                    No leads found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="p-4 border-t border-border flex items-center justify-between text-sm text-muted-foreground bg-muted/10">
-          <span>
-            Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalCount)} of{' '}
-            {totalCount} entries
-          </span>
-          <div className="flex gap-2">
-            <Link
-              href={`/dashboard/leads?q=${query}&status=${statusFilter}&page=${currentPage - 1}`}
-              className={`px-3 py-1 border border-border rounded hover:bg-muted transition-colors ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
-            >
-              Prev
-            </Link>
-            <Link
-              href={`/dashboard/leads?q=${query}&status=${statusFilter}&page=${currentPage + 1}`}
-              className={`px-3 py-1 border border-border rounded hover:bg-muted transition-colors ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
-            >
-              Next
-            </Link>
-          </div>
-        </div>
+        <LeadTableClient
+          initialLeads={leads}
+          totalCount={totalCount}
+          currentPage={currentPage}
+          pageSize={pageSize}
+        />
       </div>
     </div>
   );

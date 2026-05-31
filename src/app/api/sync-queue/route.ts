@@ -222,6 +222,68 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ item: updated, queueStats: await getQueueStats() });
     }
 
+    // ─── Sync items from queue into core CRM ──────────────────────────────
+    case 'syncToCrm': {
+      const queueItems = await getSyncQueue();
+      const queued = queueItems.filter(i => i.status === 'QUEUED').slice(0, 50); // limit batch
+
+      let syncedCount = 0;
+
+      for (const item of queued) {
+        try {
+          // Check if contact already exists by email/phone or leadId
+          const existingLead = await prisma.lead.findFirst({
+            where: { 
+               OR: [
+                 { id: item.leadId },
+                 { contact: { email: item.email } },
+                 { contact: { phone: item.phone } }
+               ],
+               workspaceId: access.workspaceId 
+            }
+          });
+
+          if (existingLead) {
+             await updateSyncItem(item.id, { status: 'SYNCED', syncedAt: new Date().toISOString() });
+             continue;
+          }
+
+          // Create new contact + lead
+          const contact = await prisma.contact.create({
+            data: {
+              firstName: item.firstName,
+              lastName: item.lastName,
+              email: item.email,
+              phone: item.phone,
+              workspaceId: access.workspaceId,
+            }
+          });
+
+          await prisma.lead.create({
+            data: {
+              id: item.leadId.startsWith('ld_') ? item.leadId : undefined,
+              status: 'NEW',
+              source: item.source || 'MyPlus Sync',
+              workspaceId: access.workspaceId,
+              contactId: contact.id,
+            }
+          });
+
+          await updateSyncItem(item.id, { status: 'SYNCED', syncedAt: new Date().toISOString() });
+          syncedCount++;
+        } catch (err) {
+          console.error(`Failed to sync item ${item.id}:`, err);
+          await updateSyncItem(item.id, { status: 'FAILED', error: 'Database sync error' });
+        }
+      }
+
+      return NextResponse.json({ 
+        success: true, 
+        syncedCount, 
+        queueStats: await getQueueStats() 
+      });
+    }
+
     default:
       return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
   }

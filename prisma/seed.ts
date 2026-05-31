@@ -21,22 +21,37 @@ async function main() {
     },
   });
 
-  // Create User
-  const user = await prisma.user.create({
+  // Create Users
+  const hank = await prisma.user.create({
     data: {
-      name: 'J Smith',
-      email: 'jsmith@example.com',
-      role: 'AGENT',
+      name: 'Hank Mendez',
+      email: 'hank.mendez@excellegacy.local',
+      role: 'BROKER',
     },
   });
 
-  // Link User to Workspace
-  await prisma.workspaceMember.create({
+  const harry = await prisma.user.create({
     data: {
-      userId: user.id,
-      workspaceId: workspace.id,
-      role: 'AGENT',
+      name: 'Harry',
+      email: 'harry@excellegacy.local',
+      role: 'REALTOR_AGENT',
     },
+  });
+
+  // Link Users to Workspace
+  await prisma.workspaceMember.createMany({
+    data: [
+      {
+        userId: hank.id,
+        workspaceId: workspace.id,
+        role: 'BROKER',
+      },
+      {
+        userId: harry.id,
+        workspaceId: workspace.id,
+        role: 'REALTOR_AGENT',
+      },
+    ],
   });
 
   // Create Contacts
