@@ -45,3 +45,4 @@ ios/Pods/
 data/
 metamcp.db
 audit*.jsonl
+dev.db
