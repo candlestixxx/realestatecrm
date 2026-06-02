@@ -35,9 +35,9 @@ model Workspace {
   contacts   Contact[]
   deals      Deal[]
   leads      Lead[]
+  smartPlans SmartPlan[]
   workflows  WorkflowSession[]
   members    WorkspaceMember[]
-  smartPlans SmartPlan[]
 }
 
 model WorkspaceMember {
@@ -77,21 +77,18 @@ model Lead {
   contactId       String
   userId          String?
   isAiAssisted    Boolean           @default(false)
-  
-  // Enrichment Data (Scrapers)
-  socialProfiles  String?           // JSON string of social links
-  publicRecords   String?           // JSON string of public record data
+  socialProfiles  String?
+  publicRecords   String?
   lastEnrichedAt  DateTime?
-
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  Activity        Activity[]
-  user            User?             @relation(fields: [userId], references: [id])
-  contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  WorkflowSession WorkflowSession[]
   smartPlanId     String?
+  Activity        Activity[]
   smartPlan       SmartPlan?        @relation(fields: [smartPlanId], references: [id])
+  workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  user            User?             @relation(fields: [userId], references: [id])
+  WorkflowSession WorkflowSession[]
 }
 
 model SmartPlan {
@@ -100,10 +97,10 @@ model SmartPlan {
   description String?
   isActive    Boolean   @default(true)
   workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  leads       Lead[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  leads       Lead[]
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 model Deal {

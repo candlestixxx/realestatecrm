@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "savedAt": "2026-06-02T02:00:13.082Z",
+  "memories": [
+    {
+      "id": "fe18adfd38bd9665",
+      "type": "working",
+      "namespace": "project",
+      "content": "browser_proxy_fetch failed\nbrowser_proxy_fetch failed after 133ms. Tool execution failed: Tool browser_proxy_fetch not found in any connected MCP server.\nFacts:\n- Tool: browser_proxy_fetch\n- Duration: 133ms\n- Failure: Tool execution failed: Tool browser_proxy_fetch not found in any connected MCP server.",
+      "metadata": {
+        "source": "tool_execution",
+        "tags": [
+          "tool-execution",
+          "browser_proxy_fetch",
+          "failure",
+          "browser",
+          "proxy",
+          "fetch",
+          "warning"
+        ],
+        "durationMs": 133,
+        "success": false,
+        "structuredObservation": {
+          "type": "warning",
+          "title": "browser_proxy_fetch failed",
+          "narrative": "browser_proxy_fetch failed after 133ms. Tool execution failed: Tool browser_proxy_fetch not found in any connected MCP server.",
+          "facts": [
+            "Tool: browser_proxy_fetch",
+            "Duration: 133ms",
+            "Failure: Tool execution failed: Tool browser_proxy_fetch not found in any connected MCP server."
+          ],
+          "concepts": [
+            "tool-execution",
+            "browser_proxy_fetch",
+            "failure",
+            "browser",
+            "proxy",
+            "fetch",
+            "warning"
+          ],
+          "filesRead": [],
+          "filesModified": [],
+          "toolName": "browser_proxy_fetch",
+          "contentHash": "c7acec2a027fa4af6fdc3d30f2a8658071db6c8805c37f67f852da34ddf259c8",
+          "recordedAt": 1780365605546
+        },
+        "observationType": "warning",
+        "observationHash": "c7acec2a027fa4af6fdc3d30f2a8658071db6c8805c37f67f852da34ddf259c8",
+        "toolName": "browser_proxy_fetch",
+        "filesRead": [],
+        "filesModified": [],
+        "rawInput": "{\n  \"url\": \"http://localhost:3001\"\n}",
+        "rawOutput": "{}"
+      },
+      "createdAt": "2026-06-02T02:00:05.548Z",
+      "accessedAt": "2026-06-02T02:00:05.548Z",
+      "accessCount": 0
+    }
+  ]
+}
