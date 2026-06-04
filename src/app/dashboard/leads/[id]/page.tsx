@@ -24,7 +24,10 @@ export default async function LeadDetailPage(props: {
   const lead = await prisma.lead.findFirst({
     where: { id: resolvedParams.id, workspaceId: access.workspaceId },
     include: {
-      contact: true,
+      contact: {
+        include: { deals: true }
+      },
+      tasks: true,
       workspace: true,
       Activity: {
         orderBy: { createdAt: 'desc' },
@@ -41,6 +44,9 @@ export default async function LeadDetailPage(props: {
 
   const tabs = [
     { id: 'profile', label: 'Profile & Activity' },
+    { id: 'communications', label: 'Communications' },
+    { id: 'deals', label: 'Deals & Showings' },
+    { id: 'tasks', label: 'Tasks' },
     { id: 'intelligence', label: 'Intelligence (Scrapers)' },
     { id: 'workflows', label: 'Workflows & Plans' },
   ];
@@ -86,12 +92,12 @@ export default async function LeadDetailPage(props: {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-border">
+      <div className="flex border-b border-border overflow-x-auto no-scrollbar">
         {tabs.map((tab) => (
           <Link
             key={tab.id}
             href={`?tab=${tab.id}`}
-            className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
+            className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
               activeTab === tab.id
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
@@ -120,14 +126,18 @@ export default async function LeadDetailPage(props: {
                         <span className="text-sm">
                           {activity.type === 'NOTE' ? '📝' : 
                            activity.type === 'CALL' ? '📞' : 
-                           activity.type === 'EMAIL' ? '✉️' : '⚡'}
+                           activity.type === 'EMAIL' ? '✉️' : 
+                           activity.type === 'SMS' ? '📱' : 
+                           activity.type === 'VIDEO' ? '🎥' : '⚡'}
                         </span>
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium">
                           {activity.type === 'NOTE' ? 'Internal Note' : 
                            activity.type === 'CALL' ? 'Phone Call Logged' : 
-                           activity.type === 'EMAIL' ? 'Email Sent' : 'Activity Logged'}
+                           activity.type === 'EMAIL' ? 'Email Sent' : 
+                           activity.type === 'SMS' ? 'SMS Sent' : 
+                           activity.type === 'VIDEO' ? 'Video Chat' : 'Activity Logged'}
                         </p>
                         <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
                           {activity.content}
@@ -152,6 +162,118 @@ export default async function LeadDetailPage(props: {
                   />
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === 'communications' && (
+            <div className="bg-background border border-border rounded-xl shadow-sm p-6 min-h-[400px]">
+              <h2 className="text-lg font-bold mb-4">Communications Hub</h2>
+              <p className="text-sm text-muted-foreground mb-6">Send SMS, Emails, and initiate Video Chats directly from the CRM.</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                <button className="flex flex-col items-center justify-center p-6 border border-border rounded-xl hover:bg-muted/10 transition-colors">
+                  <span className="text-3xl mb-2">📱</span>
+                  <span className="font-bold text-sm">Send SMS</span>
+                </button>
+                <button className="flex flex-col items-center justify-center p-6 border border-border rounded-xl hover:bg-muted/10 transition-colors">
+                  <span className="text-3xl mb-2">✉️</span>
+                  <span className="font-bold text-sm">Send Email</span>
+                </button>
+                <button className="flex flex-col items-center justify-center p-6 border border-border rounded-xl bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                  <span className="text-3xl mb-2">🎥</span>
+                  <span className="font-bold text-sm text-secondary">Start Video Chat</span>
+                </button>
+              </div>
+
+              <div className="border border-border rounded-xl p-4 bg-muted/5">
+                <h3 className="text-sm font-bold mb-2">Draft Message</h3>
+                <textarea 
+                  className="w-full h-24 p-3 bg-background border border-border rounded-md text-sm mb-4" 
+                  placeholder="Type your message here..."
+                ></textarea>
+                <div className="flex justify-end">
+                  <button className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-md">
+                    Send Message
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'deals' && (
+            <div className="bg-background border border-border rounded-xl shadow-sm p-6 min-h-[400px]">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold">Deals, Offers & Showings</h2>
+                <button className="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold rounded-md transition-colors">
+                  + Schedule Showing
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                {lead.contact.deals.length === 0 ? (
+                  <div className="text-center py-8 border border-dashed border-border rounded-xl">
+                     <p className="text-sm text-muted-foreground">No active deals or showings for this lead.</p>
+                  </div>
+                ) : (
+                  lead.contact.deals.map(deal => (
+                    <div key={deal.id} className="p-4 border border-border rounded-xl flex items-center justify-between">
+                      <div>
+                        <h3 className="font-bold text-sm">{deal.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">Stage: {deal.stage} • Value: ${deal.value?.toLocaleString() || 'N/A'}</p>
+                      </div>
+                      <Link href={`/dashboard/deals/${deal.id}`} className="px-3 py-1 bg-muted border border-border rounded text-xs font-bold hover:bg-muted/80">
+                        View Deal
+                      </Link>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-border">
+                 <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-md font-bold">Automated MLS Searches</h3>
+                    <button className="px-3 py-1.5 bg-secondary/10 text-secondary hover:bg-secondary/20 text-xs font-bold rounded-md transition-colors">
+                      + Setup Alert
+                    </button>
+                 </div>
+                 <div className="p-4 bg-muted/10 border border-border rounded-xl text-center">
+                    <p className="text-sm text-muted-foreground italic">No automated searches configured yet.</p>
+                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'tasks' && (
+            <div className="bg-background border border-border rounded-xl shadow-sm p-6 min-h-[400px]">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold">Tasks & Follow-ups</h2>
+                <button className="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold rounded-md transition-colors">
+                  + Add Task
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {lead.tasks && lead.tasks.length === 0 ? (
+                  <div className="text-center py-8 border border-dashed border-border rounded-xl">
+                     <p className="text-sm text-muted-foreground">No tasks assigned for this lead.</p>
+                  </div>
+                ) : (
+                  lead.tasks && lead.tasks.map(task => (
+                    <div key={task.id} className="p-4 border border-border rounded-xl flex items-center gap-4">
+                      <input type="checkbox" className="w-5 h-5 rounded border-border" checked={task.status === 'DONE'} readOnly />
+                      <div className="flex-1">
+                        <h3 className={`font-bold text-sm ${task.status === 'DONE' ? 'line-through text-muted-foreground' : ''}`}>{task.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">{task.description}</p>
+                      </div>
+                      {task.dueDate && (
+                        <div className="text-xs font-medium px-2 py-1 bg-muted rounded border border-border">
+                          {new Date(task.dueDate).toLocaleDateString()}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
 
@@ -211,7 +333,7 @@ export default async function LeadDetailPage(props: {
                </div>
 
                <div className="mt-8 pt-8 border-t border-border">
-                  <h2 className="text-lg font-bold mb-4">AI Smart Plans</h2>
+                  <h2 className="text-lg font-bold mb-4">AI Smart Plans & Drip Campaigns</h2>
                   <div className="p-4 bg-muted/20 border border-border rounded-xl flex items-center justify-between">
                      <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
@@ -219,7 +341,7 @@ export default async function LeadDetailPage(props: {
                         </div>
                         <div className="flex flex-col">
                            <span className="font-bold text-sm">Automated Drip Campaign</span>
-                           <span className="text-xs text-muted-foreground">AI is monitoring and communicating with this lead.</span>
+                           <span className="text-xs text-muted-foreground">AI is monitoring and communicating with this lead via SMS and Email.</span>
                         </div>
                      </div>
                      <button className="px-3 py-1.5 bg-background border border-border text-xs font-bold rounded hover:bg-muted">
@@ -300,7 +422,7 @@ export default async function LeadDetailPage(props: {
                 ✨ Gemini CRM Assistant
              </h2>
              <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                "This lead has high engagement with the <strong>Offer Draft</strong> workflow but hasn't responded to the last text. I recommend a personalized follow-up call regarding the 123 Elm St property."
+                &quot;This lead has high engagement with the <strong>Offer Draft</strong> workflow but hasn&apos;t responded to the last text. I recommend a personalized follow-up call regarding the 123 Elm St property.&quot;
              </p>
              <button className="w-full py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors">
                 Draft Follow-up Email

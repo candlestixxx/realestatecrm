@@ -89,6 +89,7 @@ model Lead {
   contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
   user            User?             @relation(fields: [userId], references: [id])
   WorkflowSession WorkflowSession[]
+  tasks           Task[]
 }
 
 model SmartPlan {
@@ -118,6 +119,7 @@ model Deal {
   contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
   workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   WorkflowSession WorkflowSession[]
+  tasks           Task[]
 }
 
 model Task {
@@ -128,9 +130,13 @@ model Task {
   workspaceId  String
   dueDate      DateTime?
   assignedToId String?
+  leadId       String?
+  dealId       String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   assignedTo   User?     @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  lead         Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  deal         Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
 }
 
 model Activity {
