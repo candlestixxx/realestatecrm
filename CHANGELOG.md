@@ -1,48 +1,13 @@
-## [0.44.0] - Deployment Checklist  Environment Formalization
-
-- Expanded `.env.example` with fully documented placeholders mapping to all required application scopes (Database, NextAuth, Mail, Vectors).
-- Overhauled `DEPLOY.md` to establish a robust pre-flight checklist enforcing staging build checks, DB migration sequences, and compliance verification.
-- Validated workspace demo fallback mechanisms to ensure they automatically seal when local bypass keys are omitted from the production environment.
-
 # CHANGELOG.md
-## [0.43.0] - Marketing Media Pipeline
 
-- Scaffolded the Marketing Media Pipeline state model for handling image generation, video assembly, and social distribution tracking.
-- Built the Image Workflow UI component handling Day/Night variant logic, Magnific AI prompt previewing, and stage review states.
-- Built the Video Workflow UI component featuring timeline selection placeholders, 9:16/16:9 format switching, and enhancement toggles.
-- Added the Integration shell to handle syncing finished marketing materials to Lofty Landing Pages and formatting captions for cross-platform Social Posts.
-- Registered new server routes to serve the compiled Media Pipeline under `/workflows/marketing-media`.
+## [0.46.0] - Lead Intelligence & AI Assistant Tool Calling
 
-## [0.42.0] - Role Hierarchy + Compliance Boundary
+- **Lead Profile Intelligence Center:** Overhauled the Lead Profile layout into a multi-tab interface with research actions for social media profiles and public records.
+- **AI Scraper Infrastructure:** Integrated background simulation of AI-based research to auto-enrich profiles with property ownership, voter registration, corporate filings, and social accounts.
+- **Omnichannel Tools:** Wired SMS and Showing communication forms with server-side actions, enabling timeline logging and automated keyword trigger logic.
+- **AI Tool Calling (Agentic Co-Pilot):** Upgraded the global AI chat assistant model to `gemini-2.0-flash-001` with support for server-side function calling, allowing it to dynamically fetch lead count, create tasks, and lookup contacts.
+- **Prisma Schema Update:** Added `DealStakeholder` and `DealRequirement` models to the database schema.
 
-- Formalized role hierarchy into `OWNER`, `BROKER`, `ASSOCIATE_BROKER`, `REALTOR_AGENT`, `OFFICE_MANAGER`, `ADMIN` enum mapping.
-- Introduced `hasPermission` and `requireWorkspaceRole` in `src/lib/workspace-access.ts` to strictly enforce role constraints dynamically.
-- Applied strict `BROKER` role checks to the `submitWorkflowSession` endpoint to enforce compliance boundaries preventing unauthorized deal publish/submit actions.
-- Surfaced the active workspace role inside the global dashboard UI for visual clarity.
-
-## [0.41.0] - Auth Hardening & Regression Guard
-
-- Audited and hardened workspace isolation across API routes and Server Actions.
-- Ensured `src/app/api/workflows/[workflowId]/route.ts` correctly resolves session before operating on workflows.
-- Hardened `saveWorkflowSession` and `submitWorkflowSession` to strictly enforce `workspaceId` matching.
-- Added rigorous explicit Prisma `where: { workspaceId }` filtering into dashboard page read operations.
-
-
-
-## [0.40.0] - AI Assistant Refinement & Dashboard Consolidation
-
-- Added Vercel AI SDK tool calling functionality (`getLeadCount`, `getRecentDeals`) to `/api/chat` route.
-- Updated `AIChat` frontend component to use `@ai-sdk/react` `useChat` and display database tool invocation states dynamically.
-- Fixed NextAuth credential login bug by correcting the expected payload from `username` to `email`.
-- Consolidated duplicate `/dashboard` routes and layouts to ensure the AI assistant mounts globally across the main CRM application.
-- Resolved `ai` and `zod` module resolution conflicts to pass all TypeScript and ESLint checks.
-
-
-## [0.39.0] - RAG Consolidation & Code Clean-up
-
-- Consolidated RAG vector sync and query logic by merging `src/lib/rag-sync.ts` into `src/lib/rag.ts`.
-- Re-routed all references from `rag-sync.ts` across the application to `rag.ts`.
-- Resolved residual type errors related to Prisma queries in CRM layouts and Activity server actions.
 
 ## [0.45.0] - AI-Driven Segmentation & Bulk Workflows
 
@@ -56,6 +21,10 @@
 - **Bug Fixes:** Resolved build errors related to duplicate variable definitions in the Tasks page and improper anchor tag navigation in the sidebar.
 
 ## [0.44.0] - Deployment Checklist & Environment Formalization
+
+- Expanded `.env.example` with fully documented placeholders mapping to all required application scopes (Database, NextAuth, Mail, Vectors).
+- Overhauled `DEPLOY.md` to establish a robust pre-flight checklist enforcing staging build checks, DB migration sequences, and compliance verification.
+- Validated workspace demo fallback mechanisms to ensure they automatically seal when local bypass keys are omitted from the production environment.
 
 ## [0.43.0] - Marketing Media Pipeline
 

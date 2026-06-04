@@ -43,7 +43,7 @@
 - [x] Semantic Retrieval (RAG context injection).
 - [x] Workspace-aware RAG sync.
 - [x] RAG Consolidation: Refactor overlapping logic in `src/lib/rag.ts` and `src/lib/rag-sync.ts`.
-- [ ] **AI Tool Calling:** Integrate `@ai-sdk/react` function calling to execute CRM actions (Lead routing, Task creation, Segments management).
+- [x] **AI Tool Calling:** Integrate `@ai-sdk/react` function calling to execute CRM actions (Lead routing, Task creation, Segments management).
 - [ ] **AI Drip Execution:** Connect Twilio/SendGrid for automated SMS/Email dispatching led by Gemini.
 
 ## Tech Debt & Improvements
