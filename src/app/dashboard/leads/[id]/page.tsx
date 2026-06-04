@@ -8,7 +8,7 @@ import { createActivityAction as addActivity } from '@/lib/actions/activity';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 import { LeadIntelligence } from '@/components/LeadIntelligence';
-import SmsForm from '@/components/SmsForm';
+import CommunicationsHub from '@/components/CommunicationsHub';
 import ShowingForm from '@/components/ShowingForm';
 
 export default async function LeadDetailPage(props: {
@@ -168,27 +168,7 @@ export default async function LeadDetailPage(props: {
           )}
 
           {activeTab === 'communications' && (
-            <div className="bg-background border border-border rounded-xl shadow-sm p-6 min-h-[400px]">
-              <h2 className="text-lg font-bold mb-4">Communications Hub</h2>
-              <p className="text-sm text-muted-foreground mb-6">Send SMS, Emails, and initiate Video Chats directly from the CRM.</p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                <button className="flex flex-col items-center justify-center p-6 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                  <span className="text-3xl mb-2">📱</span>
-                  <span className="font-bold text-sm">Send SMS</span>
-                </button>
-                <button className="flex flex-col items-center justify-center p-6 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                  <span className="text-3xl mb-2">✉️</span>
-                  <span className="font-bold text-sm">Send Email</span>
-                </button>
-                <button className="flex flex-col items-center justify-center p-6 border border-border rounded-xl bg-secondary/5 hover:bg-secondary/10 transition-colors">
-                  <span className="text-3xl mb-2">🎥</span>
-                  <span className="font-bold text-sm text-secondary">Start Video Chat</span>
-                </button>
-              </div>
-
-              <SmsForm leadId={lead.id} phone={lead.contact.phone} />
-            </div>
+            <CommunicationsHub leadId={lead.id} phone={lead.contact.phone} email={lead.contact.email} />
           )}
 
           {activeTab === 'deals' && (
