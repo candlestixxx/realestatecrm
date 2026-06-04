@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { enrichLeadAction } from '@/lib/actions/enrichment';
 
 type EnrichmentData = {
   socialProfiles: { platform: string; url: string; lastSeen: string }[];
@@ -50,6 +51,7 @@ export function LeadIntelligence({
 
     try {
       const result = await promise;
+      await enrichLeadAction(leadId, result);
       setData(result);
     } catch (err) {
       console.error(err);

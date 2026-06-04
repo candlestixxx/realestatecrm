@@ -7,7 +7,7 @@ import { getWorkspaceScope, DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-conte
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    const { workspaceSlug: workspaceId, actorId } = getWorkspaceScope(session);
+    const { workspaceSlug: workspaceId, actorId } = await getWorkspaceScope(session);
 
     // Enforce authentication context existence
     if (!actorId || !workspaceId || workspaceId === DEFAULT_WORKSPACE_SLUG) {

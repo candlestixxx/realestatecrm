@@ -5,6 +5,8 @@ export const contactSchema = z.object({
   lastName: z.string().optional(),
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
   phone: z.string().optional(),
+  address: z.string().optional(),
+  notes: z.string().optional(),
   workspaceId: z.string().min(1, 'Workspace is required'),
 });
 

@@ -24,6 +24,7 @@ model User {
   assignedTasks Task[]            @relation("TaskAssignee")
   workflows     WorkflowSession[]
   workspaces    WorkspaceMember[]
+  stakeholderIn DealStakeholder[]
 }
 
 model Workspace {
@@ -57,6 +58,7 @@ model Contact {
   lastName    String?
   email       String?
   phone       String?
+  address     String?
   workspaceId String
   userId      String?
   createdAt   DateTime   @default(now())
@@ -66,12 +68,14 @@ model Contact {
   workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   deals       Deal[]
   leads       Lead[]
+  stakeholderIn DealStakeholder[]
 }
 
 model Lead {
   id              String            @id @default(cuid())
+  type            String            @default("BUYER") // BUYER, SELLER, CLOSED
   source          String?
-  status          String            @default("NEW")
+  status          String            @default("NEW") // Expanded statuses handled in UI logic
   score           Int?              @default(0)
   workspaceId     String
   contactId       String
@@ -120,6 +124,35 @@ model Deal {
   workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   WorkflowSession WorkflowSession[]
   tasks           Task[]
+  stakeholders    DealStakeholder[]
+  requirements    DealRequirement[]
+}
+
+model DealStakeholder {
+  id          String    @id @default(cuid())
+  dealId      String
+  contactId   String?   
+  userId      String?   
+  role        String    // TITLE, LENDER, INSPECTOR, APPRAISER, CLIENT
+  permissions String    @default("VIEW_STATUS") // UPLOAD_DOCS, VIEW_STATUS, FULL_ACCESS
+  deal        Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id])
+  contact     Contact?  @relation(fields: [contactId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model DealRequirement {
+  id          String    @id @default(cuid())
+  dealId      String
+  title       String    
+  description String?
+  status      String    @default("PENDING") // PENDING (Red), IN_PROGRESS (Yellow), COMPLETED (Green)
+  assignedTo  String?   // Role string (e.g. TITLE) or specific User ID
+  isRequired  Boolean   @default(true)
+  deal        Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Task {

@@ -2,13 +2,14 @@ import { getServerSession } from 'next-auth/next';
 import prisma from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 import AddContactModal from '@/components/AddContactModal';
+import CreateSegmentModal from '@/components/CreateSegmentModal';
 import { authOptions } from '@/lib/auth';
 import { contactSchema } from '@/lib/validations/contact';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { syncContactToVectorStore } from '@/lib/rag';
-import Link from 'next/link';
-
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
+import { ContactTableClient } from '@/components/ContactTableClient';
+import { createWorkspaceAction } from '@/lib/actions/create-workspace';
 
 async function addContact(formData: FormData) {
   'use server';
@@ -26,6 +27,8 @@ async function addContact(formData: FormData) {
     lastName: formData.get('lastName'),
     email: formData.get('email'),
     phone: formData.get('phone'),
+    address: formData.get('address'),
+    notes: formData.get('notes'),
     workspaceId, // Override client value with session value
   };
 
@@ -35,7 +38,7 @@ async function addContact(formData: FormData) {
     return { error: validatedData.error.issues[0].message };
   }
 
-  const { firstName, lastName, email, phone } = validatedData.data;
+  const { firstName, lastName, email, phone, address, notes } = validatedData.data;
 
   try {
     const contact = await prisma.contact.create({
@@ -44,9 +47,22 @@ async function addContact(formData: FormData) {
         lastName: lastName || null,
         email: email || null,
         phone: phone || null,
+        address: address || null,
         workspaceId,
       },
     });
+
+    if (notes) {
+      await prisma.activity.create({
+        data: {
+          type: 'NOTE',
+          content: notes,
+          workspaceId,
+          userId: access.userId,
+          contactId: contact.id,
+        },
+      });
+    }
 
     await syncContactToVectorStore(contact);
   } catch (error) {
@@ -66,6 +82,7 @@ export default async function ContactsPage(props: {
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
   const workspaceId = access.workspaceId;
+  
   const whereClause: Prisma.ContactWhereInput = { workspaceId };
   if (query) {
     whereClause.OR = [
@@ -103,9 +120,7 @@ export default async function ContactsPage(props: {
           <p className="text-muted-foreground">Manage your client relationships and network.</p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-muted text-foreground font-medium rounded-md hover:bg-muted/80 transition-colors">
-            Import
-          </button>
+          <CreateSegmentModal createWorkspaceAction={createWorkspaceAction} />
           <AddContactModal addContactAction={addContact} workspaces={workspaces} />
         </div>
       </div>
@@ -128,71 +143,13 @@ export default async function ContactsPage(props: {
           </button>
         </form>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
-              <tr>
-                <th className="px-6 py-3 font-medium">Name</th>
-                <th className="px-6 py-3 font-medium">Email</th>
-                <th className="px-6 py-3 font-medium">Phone</th>
-                <th className="px-6 py-3 font-medium">Added</th>
-                <th className="px-6 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {contacts.map((contact) => (
-                <tr key={contact.id} className="hover:bg-muted/10 transition-colors">
-                  <td className="px-6 py-4 font-medium">
-                    <Link href={`/dashboard/contacts/${contact.id}`} className="hover:underline">
-                      {contact.firstName} {contact.lastName}
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 text-muted-foreground">{contact.email || '--'}</td>
-                  <td className="px-6 py-4 text-muted-foreground">{contact.phone || '--'}</td>
-                  <td className="px-6 py-4 text-muted-foreground">
-                    {new Date(contact.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Link
-                      href={`/dashboard/contacts/${contact.id}`}
-                      className="text-primary hover:underline text-sm font-medium"
-                    >
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-              {contacts.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
-                    No contacts found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="p-4 border-t border-border flex items-center justify-between text-sm text-muted-foreground bg-muted/10">
-          <span>
-            Showing {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1} to{' '}
-            {Math.min(currentPage * pageSize, totalCount)} of {totalCount} entries
-          </span>
-          <div className="flex gap-2">
-            <Link
-              href={`/dashboard/contacts?q=${query}&page=${currentPage - 1}`}
-              className={`px-3 py-1 border border-border rounded hover:bg-muted transition-colors ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
-            >
-              Prev
-            </Link>
-            <Link
-              href={`/dashboard/contacts?q=${query}&page=${currentPage + 1}`}
-              className={`px-3 py-1 border border-border rounded hover:bg-muted transition-colors ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
-            >
-              Next
-            </Link>
-          </div>
-        </div>
+        <ContactTableClient
+          initialContacts={contacts}
+          totalCount={totalCount}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          workspaces={workspaces}
+        />
       </div>
     </div>
   );

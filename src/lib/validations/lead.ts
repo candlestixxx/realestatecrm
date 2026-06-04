@@ -5,6 +5,9 @@ export const leadSchema = z.object({
   lastName: z.string().optional(),
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
   phone: z.string().optional().or(z.literal('')),
+  address: z.string().optional(),
+  notes: z.string().optional(),
+  type: z.enum(['BUYER', 'SELLER', 'CLOSED']).default('BUYER'),
   workspaceId: z.string().min(1, 'Workspace is required'),
 });
 

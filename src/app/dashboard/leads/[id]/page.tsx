@@ -8,6 +8,8 @@ import { createActivityAction as addActivity } from '@/lib/actions/activity';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 import { LeadIntelligence } from '@/components/LeadIntelligence';
+import SmsForm from '@/components/SmsForm';
+import ShowingForm from '@/components/ShowingForm';
 
 export default async function LeadDetailPage(props: {
   params: Promise<{ id: string }>;
@@ -185,18 +187,7 @@ export default async function LeadDetailPage(props: {
                 </button>
               </div>
 
-              <div className="border border-border rounded-xl p-4 bg-muted/5">
-                <h3 className="text-sm font-bold mb-2">Draft Message</h3>
-                <textarea 
-                  className="w-full h-24 p-3 bg-background border border-border rounded-md text-sm mb-4" 
-                  placeholder="Type your message here..."
-                ></textarea>
-                <div className="flex justify-end">
-                  <button className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-md">
-                    Send Message
-                  </button>
-                </div>
-              </div>
+              <SmsForm leadId={lead.id} phone={lead.contact.phone} />
             </div>
           )}
 
@@ -204,12 +195,9 @@ export default async function LeadDetailPage(props: {
             <div className="bg-background border border-border rounded-xl shadow-sm p-6 min-h-[400px]">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold">Deals, Offers & Showings</h2>
-                <button className="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold rounded-md transition-colors">
-                  + Schedule Showing
-                </button>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-4 mb-8">
                 {lead.contact.deals.length === 0 ? (
                   <div className="text-center py-8 border border-dashed border-border rounded-xl">
                      <p className="text-sm text-muted-foreground">No active deals or showings for this lead.</p>
@@ -228,6 +216,8 @@ export default async function LeadDetailPage(props: {
                   ))
                 )}
               </div>
+
+              <ShowingForm leadId={lead.id} />
 
               <div className="mt-8 pt-8 border-t border-border">
                  <div className="flex items-center justify-between mb-4">
@@ -356,22 +346,32 @@ export default async function LeadDetailPage(props: {
         {/* Sidebar Info */}
         <div className="md:col-span-1 space-y-6">
           <div className="bg-background border border-border rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold mb-4">Status & Score</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">Status & Goal</h2>
+              <span className="px-2 py-0.5 bg-muted text-foreground text-[10px] font-bold uppercase rounded border border-border">
+                 {lead.type || 'BUYER'}
+              </span>
+            </div>
             <div className="space-y-4">
               <div>
                  <label className="text-[10px] text-muted-foreground uppercase font-bold">Lead Status</label>
                  <div className="mt-1">
-                  <span
-                    className={`px-3 py-1 text-sm rounded-full font-medium border ${
-                      lead.status === 'NEW'
-                        ? 'bg-secondary/20 text-secondary-foreground border-secondary/30'
-                        : lead.status === 'QUALIFIED'
-                          ? 'bg-primary/20 text-primary border-primary/30'
-                          : 'bg-muted text-muted-foreground border-border'
-                    }`}
+                  <select 
+                    className="w-full p-2 bg-background border border-border rounded text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                    defaultValue={lead.status}
                   >
-                    {lead.status}
-                  </span>
+                    <option value="NEW">New Lead</option>
+                    <option value="ACTIVE_LEAD">Active Lead</option>
+                    <option value="PROSPECT">Prospect</option>
+                    <option value="PREFORECLOSURE">Preforeclosure</option>
+                    <option value="FSBO">FSBO</option>
+                    <option value="CIRCLE_PROSPECT">Circle Prospect / Neighborhood</option>
+                    <option value="SPHERE">Sphere of Influence (SOI)</option>
+                    <option value="SERVICE_PROVIDER">Service Provider</option>
+                    <option value="CLOSED_CLIENT">Closed Client</option>
+                    <option value="EXPIRED">Expired / Withdrawn</option>
+                    <option value="CANCELED">Canceled</option>
+                  </select>
                  </div>
               </div>
               <div>

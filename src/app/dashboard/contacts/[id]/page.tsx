@@ -14,6 +14,8 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
   const access = await requireWorkspaceAccess(session);
   const userRole = access.workspaceRole;
 
+  console.log(`[ContactDetail] Fetching contact ${resolvedParams.id} in workspace ${access.workspaceId}`);
+
   const contact = await prisma.contact.findFirst({
     where: { id: resolvedParams.id, workspaceId: access.workspaceId },
     include: {
@@ -26,6 +28,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
   });
 
   if (!contact) {
+    console.warn(`[ContactDetail] Contact ${resolvedParams.id} not found in workspace ${access.workspaceId}`);
     notFound();
   }
 

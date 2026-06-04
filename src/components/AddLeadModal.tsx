@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
@@ -14,6 +14,7 @@ export default function AddLeadModal({
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const addressInputRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(formData: FormData) {
     setError(null);
@@ -21,103 +22,165 @@ export default function AddLeadModal({
     if (result && result.error) {
       setError(result.error);
     } else {
-      toast.success('Success!');
+      toast.success('Lead added successfully!');
       setIsOpen(false);
       router.refresh();
     }
   }
 
+  // --- Google Maps Autocomplete Logic ---
+  useEffect(() => {
+    const google = (window as any).google;
+    if (isOpen && addressInputRef.current && google) {
+      const autocomplete = new google.maps.places.Autocomplete(addressInputRef.current, {
+        types: ['address'],
+        componentRestrictions: { country: 'us' }
+      });
+
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place.formatted_address) {
+          if (addressInputRef.current) {
+             addressInputRef.current.value = place.formatted_address;
+          }
+        }
+      });
+    }
+  }, [isOpen]);
+
   return (
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors"
+        className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors shadow-sm"
       >
         Add Lead
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-background rounded-xl border border-border shadow-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add New Lead</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-background rounded-2xl border border-border shadow-2xl p-6 w-full max-w-xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between mb-6">
+               <h2 className="text-2xl font-bold tracking-tight">Add New Lead</h2>
+               <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+               </button>
+            </div>
+            
             {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm font-medium">
                 {error}
               </div>
             )}
+            
             <form action={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-1" title="The lead's official first name">
-                  First Name <span className="text-red-500">*</span>
-                </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                 <div className="sm:col-span-2 space-y-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Lead Type / Goal</label>
+                    <div className="grid grid-cols-2 gap-2">
+                       <label className="flex items-center gap-2 p-2 border border-border rounded-lg cursor-pointer hover:bg-muted/30 has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-all">
+                          <input type="radio" name="type" value="BUYER" defaultChecked className="text-primary focus:ring-primary h-4 w-4" />
+                          <span className="text-sm font-bold">Buyer</span>
+                       </label>
+                       <label className="flex items-center gap-2 p-2 border border-border rounded-lg cursor-pointer hover:bg-muted/30 has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-all">
+                          <input type="radio" name="type" value="SELLER" className="text-primary focus:ring-primary h-4 w-4" />
+                          <span className="text-sm font-bold">Seller</span>
+                       </label>
+                    </div>
+                 </div>
+                 <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Workspace</label>
+                    <select
+                      name="workspaceId"
+                      required
+                      className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary appearance-none h-[42px]"
+                    >
+                      {workspaces.map((ws) => (
+                        <option key={ws.id} value={ws.id}>
+                          {ws.name}
+                        </option>
+                      ))}
+                    </select>
+                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">First Name</label>
+                  <input
+                    required
+                    name="firstName"
+                    type="text"
+                    placeholder="John"
+                    className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Last Name</label>
+                  <input
+                    name="lastName"
+                    type="text"
+                    placeholder="Doe"
+                    className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email</label>
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="john@example.com"
+                    className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Phone</label>
+                  <input
+                    name="phone"
+                    type="tel"
+                    placeholder="(555) 000-0000"
+                    className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Property of Interest (Address)</label>
                 <input
-                  required
-                  name="firstName"
+                  ref={addressInputRef}
+                  name="address"
                   type="text"
-                  placeholder="e.g. John"
-                  className="w-full bg-muted/50 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <p className="text-[10px] text-muted-foreground italic">Required for record identification.</p>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium" title="The lead's official last name or surname">Last Name</label>
-                <input
-                  name="lastName"
-                  type="text"
-                  placeholder="e.g. Doe"
-                  className="w-full bg-muted/50 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="Start typing an address..."
+                  className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium" title="Primary contact email address">Email Address</label>
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="john.doe@example.com"
-                  className="w-full bg-muted/50 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <p className="text-[10px] text-muted-foreground italic">Used for automated follow-ups and portal access.</p>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Initial Discovery Note</label>
+                <textarea
+                  name="notes"
+                  rows={3}
+                  placeholder="Enter what you know about this lead's goals..."
+                  className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                ></textarea>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium" title="Primary contact phone number">Phone Number</label>
-                <input
-                  name="phone"
-                  type="tel"
-                  placeholder="(555) 000-0000"
-                  className="w-full bg-muted/50 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Workspace</label>
-                <select
-                  name="workspaceId"
-                  required
-                  className="w-full bg-muted/50 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  {workspaces.map((ws) => (
-                    <option key={ws.id} value={ws.id}>
-                      {ws.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex justify-end gap-2 pt-4">
+
+              <div className="flex justify-end gap-2 pt-6">
                 <button
                   type="button"
-                  onClick={() => {
-                    toast.success('Success!');
-                    setIsOpen(false);
-                    setError(null);
-                  }}
+                  onClick={() => setIsOpen(false)}
                   className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-md transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors"
+                  className="px-6 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-md hover:bg-primary/90 transition-colors shadow-lg"
                 >
-                  Save Lead
+                  Save & Start Follow-up
                 </button>
               </div>
             </form>

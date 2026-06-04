@@ -1,6 +1,6 @@
 {
   "name": "real-estate-crm",
-  "version": "0.44.0",
+  "version": "0.46.0",
   "private": true,
   "scripts": {
     "predev": "kill-port 3000",
@@ -23,6 +23,7 @@
     "seed": "node prisma/seed.mjs"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.80",
     "@ai-sdk/openai": "^1.0.0",
     "@ai-sdk/react": "^1.0.0",
     "@next-auth/prisma-adapter": "^1.0.7",

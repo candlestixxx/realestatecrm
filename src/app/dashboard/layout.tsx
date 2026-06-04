@@ -10,6 +10,7 @@ import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher';
 import { OnboardingTour } from '@/components/OnboardingTour';
 import prisma from '@/lib/prisma';
+import Script from 'next/script';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -127,6 +128,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </main>
       <AIChat />
       <OnboardingTour />
+      <Script
+        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&libraries=places`}
+        strategy="afterInteractive"
+      />
     </div>
   );
 }

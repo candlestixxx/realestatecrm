@@ -34,6 +34,9 @@ async function addLead(formData: FormData) {
     lastName: formData.get('lastName'),
     email: formData.get('email'),
     phone: formData.get('phone'),
+    address: formData.get('address'),
+    notes: formData.get('notes'),
+    type: formData.get('type') || 'BUYER',
     workspaceId: formData.get('workspaceId'),
   };
 
@@ -42,7 +45,7 @@ async function addLead(formData: FormData) {
     return { error: validatedData.error.issues[0].message };
   }
 
-  const { firstName, lastName, email, phone, workspaceId } = validatedData.data;
+  const { firstName, lastName, email, phone, address, notes, type, workspaceId } = validatedData.data;
 
   try {
     const contact = await prisma.contact.create({
@@ -51,6 +54,7 @@ async function addLead(formData: FormData) {
         lastName: lastName || null,
         email: email || null,
         phone: phone || null,
+        address: address || null,
         workspaceId: workspaceId,
       },
     });
@@ -60,10 +64,23 @@ async function addLead(formData: FormData) {
         status: 'NEW',
         score: 50,
         source: 'Manual',
+        type: type,
         workspaceId: workspaceId,
         contactId: contact.id,
       },
     });
+
+    if (notes) {
+      await prisma.activity.create({
+        data: {
+          type: 'NOTE',
+          content: notes,
+          workspaceId,
+          userId: access.userId,
+          leadId: lead.id,
+        },
+      });
+    }
 
     await Promise.all([syncContactToVectorStore(contact), syncLeadToVectorStore(lead, contact)]);
     return { success: true };

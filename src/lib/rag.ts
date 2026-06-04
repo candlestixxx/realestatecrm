@@ -169,7 +169,7 @@ async function generateEmbedding(text: string) {
 
   try {
     const result = await embed({
-      model: openai.embedding(DEFAULT_EMBEDDING_MODEL),
+      model: openai.embedding(DEFAULT_EMBEDDING_MODEL) as any,
       value: text,
     });
 
