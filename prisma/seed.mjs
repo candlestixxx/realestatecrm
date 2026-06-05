@@ -25,6 +25,15 @@ async function main() {
   });
 
   // Create Users (Identities requested by user)
+  const admin = await prisma.user.create({
+    data: {
+      id: 'universal-admin',
+      name: 'Universal Admin',
+      email: 'admin@excellegacy.com',
+      role: 'OWNER',
+    },
+  });
+
   const hank = await prisma.user.create({
     data: {
       name: 'Hank Mendez',
@@ -44,6 +53,11 @@ async function main() {
   // Link Users to Workspace
   await prisma.workspaceMember.createMany({
     data: [
+      {
+        userId: admin.id,
+        workspaceId: workspace.id,
+        role: 'OWNER',
+      },
       {
         userId: hank.id,
         workspaceId: workspace.id,
