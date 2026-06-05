@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "predev": "kill-port 3000",
-    "dev": "next dev",
+    "dev": "next dev -p 3000",
     "prebuild": "kill-port 3000",
     "build": "next build",
     "prestart": "kill-port 3000",
-    "start": "next start",
+    "start": "next start -p 3000",
     "lint": "eslint",
     "format": "prettier --write \".\"",
     "postinstall": "prisma generate",
