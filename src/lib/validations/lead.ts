@@ -9,6 +9,7 @@ export const leadSchema = z.object({
   notes: z.string().optional(),
   type: z.enum(['BUYER', 'SELLER', 'CLOSED']).default('BUYER'),
   workspaceId: z.string().min(1, 'Workspace is required'),
+  tags: z.string().optional(),
 });
 
 export type LeadInput = z.infer<typeof leadSchema>;

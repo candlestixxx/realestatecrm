@@ -4,71 +4,9 @@ import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 import AddTaskModal from '@/components/AddTaskModal';
-import { taskSchema } from '@/lib/validations/task';
+import { addTaskAction } from '@/lib/actions/task';
 import Link from 'next/link';
-
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
-
-async function addTask(formData: FormData) {
-  'use server';
-
-  const session = await getServerSession(authOptions);
-  const access = await requireWorkspaceAccess(session);
-  const workspaceId = access.workspaceId;
-
-  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
-    return { error: 'Insufficient permissions to add tasks.' };
-  }
-
-  const rawData = {
-    title: formData.get('title'),
-    description: formData.get('description'),
-    status: formData.get('status'),
-    workspaceId, // Override client value
-    dueDate: formData.get('dueDate'),
-    assignedToId: formData.get('assignedToId'),
-  };
-
-  if (rawData.workspaceId !== access.workspaceId) {
-    return { error: 'Workspace access denied.' };
-  }
-
-  const validatedData = taskSchema.safeParse(rawData);
-
-  if (!validatedData.success) {
-    return { error: validatedData.error.issues[0].message };
-  }
-
-  const { title, description, status, dueDate, assignedToId } = validatedData.data;
-
-  try {
-    if (assignedToId) {
-      // Verify assignee is in workspace
-      const membership = await prisma.workspaceMember.findUnique({
-        where: {
-          userId_workspaceId: { userId: assignedToId, workspaceId },
-        },
-      });
-      if (!membership) {
-        return { error: 'Assigned user is not a member of this workspace.' };
-      }
-    }
-
-    await prisma.task.create({
-      data: {
-        title,
-        description: description || null,
-        status,
-        workspaceId,
-        dueDate: dueDate ? new Date(dueDate) : null,
-        assignedToId: assignedToId || null,
-      },
-    });
-  } catch (error) {
-    console.error('Failed to add task:', error);
-    return { error: 'An unexpected error occurred while saving.' };
-  }
-}
 
 export default async function TasksPage(props: {
   searchParams?: Promise<{ status?: string; q?: string; page?: string }>;
@@ -129,7 +67,7 @@ export default async function TasksPage(props: {
           <p className="text-muted-foreground">Manage your daily to-dos and action items.</p>
         </div>
         <div className="flex gap-2">
-          <AddTaskModal addTaskAction={addTask} workspaces={workspaces} users={users} />
+          <AddTaskModal addTaskAction={addTaskAction} workspaces={workspaces} users={users} />
         </div>
       </div>
 

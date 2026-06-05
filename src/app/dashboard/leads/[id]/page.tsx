@@ -10,6 +10,10 @@ import { AppRole, isAtLeastRole } from '@/lib/permissions';
 import { LeadIntelligence } from '@/components/LeadIntelligence';
 import CommunicationsHub from '@/components/CommunicationsHub';
 import ShowingForm from '@/components/ShowingForm';
+import LeadStatusSelector from '@/components/LeadStatusSelector';
+import LeadTagsEditor from '@/components/LeadTagsEditor';
+import SearchAlertsWidget from '@/components/SearchAlertsWidget';
+import LeadCampaignEnrollment from '@/components/LeadCampaignEnrollment';
 
 export default async function LeadDetailPage(props: {
   params: Promise<{ id: string }>;
@@ -31,6 +35,7 @@ export default async function LeadDetailPage(props: {
       },
       tasks: true,
       workspace: true,
+      searchAlerts: true,
       Activity: {
         orderBy: { createdAt: 'desc' },
       },
@@ -43,6 +48,11 @@ export default async function LeadDetailPage(props: {
   if (!lead) {
     notFound();
   }
+
+  const campaigns = await prisma.smartPlan.findMany({
+    where: { workspaceId: access.workspaceId, isActive: true },
+    select: { id: true, name: true },
+  });
 
   const tabs = [
     { id: 'profile', label: 'Profile & Activity' },
@@ -200,15 +210,7 @@ export default async function LeadDetailPage(props: {
               <ShowingForm leadId={lead.id} />
 
               <div className="mt-8 pt-8 border-t border-border">
-                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-md font-bold">Automated MLS Searches</h3>
-                    <button className="px-3 py-1.5 bg-secondary/10 text-secondary hover:bg-secondary/20 text-xs font-bold rounded-md transition-colors">
-                      + Setup Alert
-                    </button>
-                 </div>
-                 <div className="p-4 bg-muted/10 border border-border rounded-xl text-center">
-                    <p className="text-sm text-muted-foreground italic">No automated searches configured yet.</p>
-                 </div>
+                 <SearchAlertsWidget leadId={lead.id} alerts={lead.searchAlerts} />
               </div>
             </div>
           )}
@@ -304,20 +306,7 @@ export default async function LeadDetailPage(props: {
 
                <div className="mt-8 pt-8 border-t border-border">
                   <h2 className="text-lg font-bold mb-4">AI Smart Plans & Drip Campaigns</h2>
-                  <div className="p-4 bg-muted/20 border border-border rounded-xl flex items-center justify-between">
-                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                           🤖
-                        </div>
-                        <div className="flex flex-col">
-                           <span className="font-bold text-sm">Automated Drip Campaign</span>
-                           <span className="text-xs text-muted-foreground">AI is monitoring and communicating with this lead via SMS and Email.</span>
-                        </div>
-                     </div>
-                     <button className="px-3 py-1.5 bg-background border border-border text-xs font-bold rounded hover:bg-muted">
-                        Manage Plan
-                     </button>
-                  </div>
+                  <LeadCampaignEnrollment leadId={lead.id} activePlanId={lead.smartPlanId} campaigns={campaigns} />
                </div>
             </div>
           )}
@@ -336,22 +325,7 @@ export default async function LeadDetailPage(props: {
               <div>
                  <label className="text-[10px] text-muted-foreground uppercase font-bold">Lead Status</label>
                  <div className="mt-1">
-                  <select 
-                    className="w-full p-2 bg-background border border-border rounded text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
-                    defaultValue={lead.status}
-                  >
-                    <option value="NEW">New Lead</option>
-                    <option value="ACTIVE_LEAD">Active Lead</option>
-                    <option value="PROSPECT">Prospect</option>
-                    <option value="PREFORECLOSURE">Preforeclosure</option>
-                    <option value="FSBO">FSBO</option>
-                    <option value="CIRCLE_PROSPECT">Circle Prospect / Neighborhood</option>
-                    <option value="SPHERE">Sphere of Influence (SOI)</option>
-                    <option value="SERVICE_PROVIDER">Service Provider</option>
-                    <option value="CLOSED_CLIENT">Closed Client</option>
-                    <option value="EXPIRED">Expired / Withdrawn</option>
-                    <option value="CANCELED">Canceled</option>
-                  </select>
+                   <LeadStatusSelector leadId={lead.id} initialStatus={lead.status} />
                  </div>
               </div>
               <div>
@@ -369,6 +343,9 @@ export default async function LeadDetailPage(props: {
                     {lead.score}
                   </span>
                 </div>
+              </div>
+              <div className="pt-4 border-t border-border">
+                <LeadTagsEditor leadId={lead.id} initialTags={lead.tags} />
               </div>
             </div>
           </div>

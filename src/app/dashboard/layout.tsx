@@ -68,6 +68,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
             Tasks
           </Link>
           <Link
+            href="/dashboard/campaigns"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Campaigns
+          </Link>
+          <Link
             href="/dashboard/workflows"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
@@ -118,7 +124,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <div className="flex-1 flex justify-center">
               <CommandPalette />
             </div>
-            <WorkspaceSwitcher workspaces={workspaces} activeSlug={access.workspaceSlug} />
+            <div className="flex items-center gap-4">
+              <WorkspaceSwitcher workspaces={workspaces} activeSlug={access.workspaceSlug} />
+              <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-secondary/15 text-secondary border border-secondary/30 uppercase tracking-wider">
+                {access.workspaceRole.replace('REALTOR_', '').replace('_', ' ')} Seat
+              </span>
+            </div>
           </div>
           <div className="flex items-center gap-4 ml-4">
             <DashboardHeaderActions />

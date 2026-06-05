@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
+import AddTaskModal from './AddTaskModal';
+import { addTaskAction } from '@/lib/actions/task';
 
 type LeadRow = {
   id: string;
@@ -11,6 +13,7 @@ type LeadRow = {
   score: number | null;
   source: string | null;
   isAiAssisted: boolean;
+  tags?: string | null;
   contact: {
     firstName: string;
     lastName: string | null;
@@ -24,11 +27,15 @@ export function LeadTableClient({
   totalCount,
   currentPage,
   pageSize,
+  workspaces,
+  users,
 }: {
   initialLeads: LeadRow[];
   totalCount: number;
   currentPage: number;
   pageSize: number;
+  workspaces: { id: string; name: string }[];
+  users: { id: string; name: string | null }[];
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -278,7 +285,27 @@ export function LeadTableClient({
                   />
                 </td>
                 <td className="px-6 py-4 font-medium">
-                  {lead.contact?.firstName} {lead.contact?.lastName}
+                  <div className="flex flex-col">
+                    <Link
+                      href={`/dashboard/leads/${lead.id}`}
+                      className="hover:text-primary hover:underline font-bold text-foreground transition-colors"
+                    >
+                      {lead.contact?.firstName} {lead.contact?.lastName}
+                    </Link>
+                    {lead.tags && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {lead.tags.split(',').map(tag => {
+                          const cleanTag = tag.trim();
+                          if (!cleanTag) return null;
+                          return (
+                            <span key={cleanTag} className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-tighter">
+                              {cleanTag.startsWith('#') ? cleanTag : `#${cleanTag}`}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
@@ -304,19 +331,29 @@ export function LeadTableClient({
                     <span className="flex items-center gap-1 text-xs text-primary font-bold">
                        <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
                        AI ACTIVE
-                    </span>
+                     </span>
                   ) : (
                     <span className="text-xs text-muted-foreground italic">Manual Only</span>
                   )}
                 </td>
                 <td className="px-6 py-4 text-muted-foreground">{lead.source}</td>
                 <td className="px-6 py-4 text-right">
-                  <Link
-                    href={`/dashboard/leads/${lead.id}`}
-                    className="text-primary hover:underline text-sm font-medium"
-                  >
-                    View Profile
-                  </Link>
+                  <div className="flex items-center justify-end gap-2">
+                    <AddTaskModal
+                      addTaskAction={addTaskAction}
+                      workspaces={workspaces}
+                      users={users}
+                      leadId={lead.id}
+                      triggerText="+ Task"
+                      triggerClassName="px-2.5 py-1.5 bg-secondary/15 text-secondary hover:bg-secondary/20 text-[10px] font-bold rounded-lg border border-secondary/30 transition-colors uppercase tracking-wider"
+                    />
+                    <Link
+                      href={`/dashboard/leads/${lead.id}`}
+                      className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors shadow-sm"
+                    >
+                      View Lead
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -84,6 +84,7 @@ model Lead {
   socialProfiles  String?
   publicRecords   String?
   lastEnrichedAt  DateTime?
+  tags            String?           // Comma-separated hashtags
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   smartPlanId     String?
@@ -94,12 +95,14 @@ model Lead {
   user            User?             @relation(fields: [userId], references: [id])
   WorkflowSession WorkflowSession[]
   tasks           Task[]
+  searchAlerts    SearchAlert[]
 }
 
 model SmartPlan {
   id          String    @id @default(cuid())
   name        String
   description String?
+  steps       String?   // JSON string of steps
   isActive    Boolean   @default(true)
   workspaceId String
   createdAt   DateTime  @default(now())
@@ -214,4 +217,16 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model SearchAlert {
+  id          String   @id @default(cuid())
+  leadId      String
+  criteria    String   // JSON string: { city, minPrice, maxPrice, beds, baths }
+  type        String   // VIEW, SHOWING, OFFER
+  frequency   String   // INSTANT, DAILY, WEEKLY
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
 }

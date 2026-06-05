@@ -61,9 +61,11 @@ function now() {
 
 export async function getSyncQueue(): Promise<SyncQueueItem[]> {
   const store = await readStore();
-  return store.items.sort(
-    (a, b) => a.createdAt.localeCompare(b.createdAt),
-  );
+  return store.items.sort((a, b) => {
+    const aTime = a.createdAt || '';
+    const bTime = b.createdAt || '';
+    return aTime.localeCompare(bTime);
+  });
 }
 
 export async function getSyncQueueItem(id: string): Promise<SyncQueueItem | null> {

@@ -4,6 +4,17 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
+const MOCK_ADDRESSES = [
+  '123 Elm St, Detroit, MI 48201',
+  '456 Oak Ave, Grand Rapids, MI 49503',
+  '789 Pine Rd, Lansing, MI 48933',
+  '101 Maple Ln, Ann Arbor, MI 48104',
+  '202 Birch Dr, Traverse City, MI 49684',
+  '303 Cedar Ct, Royal Oak, MI 48067',
+  '404 Walnut Way, Troy, MI 48084',
+  '505 Beech St, Plymouth, MI 48170'
+];
+
 export default function AddLeadModal({
   addLeadAction,
   workspaces,
@@ -13,6 +24,10 @@ export default function AddLeadModal({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [addressInput, setAddressInput] = useState('');
+  const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [googleAvailable, setGoogleAvailable] = useState(false);
   const router = useRouter();
   const addressInputRef = useRef<HTMLInputElement>(null);
 
@@ -24,6 +39,8 @@ export default function AddLeadModal({
     } else {
       toast.success('Lead added successfully!');
       setIsOpen(false);
+      setAddressInput('');
+      setAddressSuggestions([]);
       router.refresh();
     }
   }
@@ -31,7 +48,8 @@ export default function AddLeadModal({
   // --- Google Maps Autocomplete Logic ---
   useEffect(() => {
     const google = (window as any).google;
-    if (isOpen && addressInputRef.current && google) {
+    if (isOpen && addressInputRef.current && google && google.maps && google.maps.places) {
+      setGoogleAvailable(true);
       const autocomplete = new google.maps.places.Autocomplete(addressInputRef.current, {
         types: ['address'],
         componentRestrictions: { country: 'us' }
@@ -40,13 +58,31 @@ export default function AddLeadModal({
       autocomplete.addListener('place_changed', () => {
         const place = autocomplete.getPlace();
         if (place.formatted_address) {
-          if (addressInputRef.current) {
-             addressInputRef.current.value = place.formatted_address;
-          }
+          setAddressInput(place.formatted_address);
         }
       });
+    } else {
+      setGoogleAvailable(false);
     }
   }, [isOpen]);
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAddressInput(value);
+
+    if (!googleAvailable) {
+      if (value.trim().length > 1) {
+        const filtered = MOCK_ADDRESSES.filter(addr =>
+          addr.toLowerCase().includes(value.toLowerCase())
+        );
+        setAddressSuggestions(filtered);
+        setShowSuggestions(true);
+      } else {
+        setAddressSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }
+  };
 
   return (
     <>
@@ -149,11 +185,49 @@ export default function AddLeadModal({
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Property of Interest (Address)</label>
+                <div className="relative">
+                  <input
+                    ref={addressInputRef}
+                    name="address"
+                    type="text"
+                    value={addressInput}
+                    onChange={handleAddressChange}
+                    onFocus={() => {
+                      if (!googleAvailable && addressInput.trim().length > 1) {
+                        setShowSuggestions(true);
+                      }
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => setShowSuggestions(false), 200);
+                    }}
+                    placeholder="Start typing an address..."
+                    className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  {!googleAvailable && showSuggestions && addressSuggestions.length > 0 && (
+                    <ul className="absolute z-50 left-0 right-0 mt-1 bg-background border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto divide-y divide-border">
+                      {addressSuggestions.map(addr => (
+                        <li
+                          key={addr}
+                          onMouseDown={() => {
+                            setAddressInput(addr);
+                            setShowSuggestions(false);
+                          }}
+                          className="px-3 py-2 text-sm hover:bg-muted cursor-pointer text-foreground transition-colors text-left"
+                        >
+                          📍 {addr}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Hashtags (Comma-separated)</label>
                 <input
-                  ref={addressInputRef}
-                  name="address"
+                  name="tags"
                   type="text"
-                  placeholder="Start typing an address..."
+                  placeholder="e.g. #buyer, #investor, #first-time"
                   className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>

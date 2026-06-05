@@ -38,6 +38,7 @@ async function addLead(formData: FormData) {
     notes: formData.get('notes'),
     type: formData.get('type') || 'BUYER',
     workspaceId: formData.get('workspaceId'),
+    tags: formData.get('tags'),
   };
 
   const validatedData = leadSchema.safeParse(rawData);
@@ -45,7 +46,7 @@ async function addLead(formData: FormData) {
     return { error: validatedData.error.issues[0].message };
   }
 
-  const { firstName, lastName, email, phone, address, notes, type, workspaceId } = validatedData.data;
+  const { firstName, lastName, email, phone, address, notes, type, workspaceId, tags } = validatedData.data;
 
   try {
     const contact = await prisma.contact.create({
@@ -67,6 +68,7 @@ async function addLead(formData: FormData) {
         type: type,
         workspaceId: workspaceId,
         contactId: contact.id,
+        tags: tags || null,
       },
     });
 
@@ -154,6 +156,15 @@ export default async function LeadsPage(props: {
     },
   });
 
+  const users = await prisma.user.findMany({
+    where: {
+      workspaces: {
+        some: { workspaceId },
+      },
+    },
+    select: { id: true, name: true },
+  });
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -210,6 +221,8 @@ export default async function LeadsPage(props: {
           totalCount={totalCount}
           currentPage={currentPage}
           pageSize={pageSize}
+          workspaces={workspaces}
+          users={users}
         />
       </div>
     </div>

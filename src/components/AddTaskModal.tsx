@@ -8,10 +8,16 @@ export default function AddTaskModal({
   addTaskAction,
   workspaces,
   users,
+  leadId,
+  triggerText = 'Add Task',
+  triggerClassName = 'px-4 py-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors',
 }: {
   addTaskAction: (formData: FormData) => Promise<{ error?: string } | void>;
   workspaces: { id: string; name: string }[];
   users: { id: string; name: string | null }[];
+  leadId?: string;
+  triggerText?: string;
+  triggerClassName?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,9 +39,9 @@ export default function AddTaskModal({
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors"
+        className={triggerClassName}
       >
-        Add Task
+        {triggerText}
       </button>
 
       {isOpen && (
@@ -48,6 +54,7 @@ export default function AddTaskModal({
               </div>
             )}
             <form action={handleSubmit} className="space-y-4">
+              <input type="hidden" name="leadId" value={leadId || ''} />
               <div className="space-y-2">
                 <label className="text-sm font-medium">Task Title</label>
                 <input
