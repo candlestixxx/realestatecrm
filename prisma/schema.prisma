@@ -28,17 +28,20 @@ model User {
 }
 
 model Workspace {
-  id         String            @id @default(cuid())
-  name       String
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
-  Activity   Activity[]
-  contacts   Contact[]
-  deals      Deal[]
-  leads      Lead[]
-  smartPlans SmartPlan[]
-  workflows  WorkflowSession[]
-  members    WorkspaceMember[]
+  id             String            @id @default(cuid())
+  name           String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  Activity       Activity[]
+  contacts       Contact[]
+  deals          Deal[]
+  leads          Lead[]
+  smartPlans     SmartPlan[]
+  workflows      WorkflowSession[]
+  members        WorkspaceMember[]
+  segments       Segment[]
+  agentWorkflows AgentWorkflow[]
+  agentLogs      AgentLog[]
 }
 
 model WorkspaceMember {
@@ -96,6 +99,8 @@ model Lead {
   WorkflowSession WorkflowSession[]
   tasks           Task[]
   searchAlerts    SearchAlert[]
+  segments        Segment[]         @relation("LeadSegments")
+  agentLogs       AgentLog[]
 }
 
 model SmartPlan {
@@ -229,4 +234,41 @@ model SearchAlert {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model Segment {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  filters     String?  // JSON string
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  leads       Lead[]   @relation("LeadSegments")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model AgentWorkflow {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  trigger     String   // e.g. "NEW_LEAD", "STATUS_CHANGE", "MANUAL"
+  actions     String   // JSON string
+  isActive    Boolean  @default(true)
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model AgentLog {
+  id          String   @id @default(cuid())
+  actionType  String   // SMS, EMAIL, STATUS_UPDATE, NOTE
+  details     String
+  leadId      String?
+  userId      String?
+  workspaceId String
+  createdAt   DateTime @default(now())
+  lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }

@@ -5,11 +5,11 @@ import {
   buildMyPlusSearchUrl,
   buildSearchQuery,
   buildSyncPlan,
-} from '../src/lib/integrations/myplus.ts';
+} from '../src/lib/integrations/myplus';
 import {
   mapLoftyLead,
   parseLoftyLeadSearchResponse,
-} from '../src/lib/integrations/lofty.ts';
+} from '../src/lib/integrations/lofty';
 
 test('buildSearchQuery trims missing last names', () => {
   assert.equal(buildSearchQuery('Danette', ''), 'Danette');

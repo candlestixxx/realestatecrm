@@ -10,6 +10,7 @@ import { syncContactToVectorStore, syncLeadToVectorStore } from '@/lib/rag';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 import AddLeadModal from '@/components/AddLeadModal';
+import { seedSegmentsIfEmpty } from '@/lib/actions/segment';
 
 import { LeadTableClient } from '@/components/LeadTableClient';
 
@@ -93,7 +94,7 @@ async function addLead(formData: FormData) {
 }
 
 export default async function LeadsPage(props: {
-  searchParams?: Promise<{ status?: string; q?: string; page?: string }>;
+  searchParams?: Promise<{ status?: string; q?: string; page?: string; limit?: string }>;
 }) {
   const searchParams = props.searchParams ? await props.searchParams : undefined;
   const query = searchParams?.q || '';
@@ -111,6 +112,10 @@ export default async function LeadsPage(props: {
   };
 
   const workspaceId = access.workspaceId || DEFAULT_WORKSPACE_SLUG;
+
+  // Auto-seed default segments if empty
+  await seedSegmentsIfEmpty(workspaceId);
+
   const whereClause: Prisma.LeadWhereInput = { workspaceId };
 
   if (query) {
@@ -163,6 +168,12 @@ export default async function LeadsPage(props: {
       },
     },
     select: { id: true, name: true },
+  });
+
+  const segments = await prisma.segment.findMany({
+    where: { workspaceId },
+    select: { id: true, name: true },
+    orderBy: { name: 'asc' },
   });
 
   return (
@@ -223,6 +234,7 @@ export default async function LeadsPage(props: {
           pageSize={pageSize}
           workspaces={workspaces}
           users={users}
+          segments={segments}
         />
       </div>
     </div>

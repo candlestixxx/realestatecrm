@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useChat } from '@ai-sdk/react';
-import type { ToolInvocation } from 'ai';
 
 export default function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -74,7 +73,7 @@ export default function AIChat() {
                 >
                   {m.content}
 
-                  {m.toolInvocations?.map((toolInvocation: ToolInvocation) => {
+                  {m.toolInvocations?.map((toolInvocation: any) => {
                     const toolCallId = toolInvocation.toolCallId;
 
                     if (toolInvocation.state === 'result') {

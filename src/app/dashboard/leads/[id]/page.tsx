@@ -14,6 +14,8 @@ import LeadStatusSelector from '@/components/LeadStatusSelector';
 import LeadTagsEditor from '@/components/LeadTagsEditor';
 import SearchAlertsWidget from '@/components/SearchAlertsWidget';
 import LeadCampaignEnrollment from '@/components/LeadCampaignEnrollment';
+import LeadQuickActions from '@/components/LeadQuickActions';
+import DealStageTracker from '@/components/DealStageTracker';
 
 export default async function LeadDetailPage(props: {
   params: Promise<{ id: string }>;
@@ -54,6 +56,38 @@ export default async function LeadDetailPage(props: {
     select: { id: true, name: true },
   });
 
+  const siblingLeads = await prisma.lead.findMany({
+    where: { workspaceId: access.workspaceId },
+    select: { id: true },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const leadIndex = siblingLeads.findIndex((s) => s.id === lead.id);
+  const prevLeadId = leadIndex > 0 ? siblingLeads[leadIndex - 1].id : null;
+  const nextLeadId = leadIndex < siblingLeads.length - 1 ? siblingLeads[leadIndex + 1].id : null;
+
+  const allSegments = await prisma.segment.findMany({
+    where: { workspaceId: access.workspaceId },
+    select: { id: true, name: true },
+  });
+
+  const workspaces = await prisma.workspace.findMany({
+    where: {
+      members: {
+        some: { userId: access.userId },
+      },
+    },
+  });
+
+  const users = await prisma.user.findMany({
+    where: {
+      workspaces: {
+        some: { workspaceId: access.workspaceId },
+      },
+    },
+    select: { id: true, name: true },
+  });
+
   const tabs = [
     { id: 'profile', label: 'Profile & Activity' },
     { id: 'communications', label: 'Communications' },
@@ -67,12 +101,36 @@ export default async function LeadDetailPage(props: {
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* Breadcrumbs */}
       <div className="flex items-center justify-between gap-4">
-        <Link
-          href="/dashboard/leads"
-          className="text-muted-foreground hover:text-foreground text-sm flex items-center gap-1"
-        >
-          &larr; Back to Leads
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/dashboard/leads"
+            className="text-muted-foreground hover:text-foreground text-sm flex items-center gap-1"
+          >
+            &larr; Back to Leads
+          </Link>
+          <div className="h-4 w-[1px] bg-border hidden sm:block"></div>
+          <div className="flex items-center gap-2">
+            {prevLeadId && (
+              <Link
+                href={`/dashboard/leads/${prevLeadId}`}
+                className="px-2 py-1 bg-muted hover:bg-muted/80 border border-border rounded text-[10px] font-bold uppercase transition-colors"
+              >
+                &larr; Prev
+              </Link>
+            )}
+            <span className="text-[10px] text-muted-foreground font-semibold">
+              {leadIndex + 1} of {siblingLeads.length} Leads
+            </span>
+            {nextLeadId && (
+              <Link
+                href={`/dashboard/leads/${nextLeadId}`}
+                className="px-2 py-1 bg-muted hover:bg-muted/80 border border-border rounded text-[10px] font-bold uppercase transition-colors"
+              >
+                Next &rarr;
+              </Link>
+            )}
+          </div>
+        </div>
         <div className="flex items-center gap-2">
            <span className="px-2 py-0.5 bg-secondary/10 text-secondary-foreground text-[10px] font-bold rounded border border-secondary/20 uppercase tracking-tighter">
             {userRole.replace('_', ' ')}
@@ -86,20 +144,24 @@ export default async function LeadDetailPage(props: {
       </div>
 
       {/* Profile Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 p-4 bg-muted/10 border border-border rounded-2xl">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {lead.contact.firstName} {lead.contact.lastName}
-          </h1>
-          <p className="text-muted-foreground italic text-sm">Lead ID: {lead.id}</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-tight">
+              {lead.contact.firstName} {lead.contact.lastName}
+            </h1>
+            <LeadQuickActions
+              leadId={lead.id}
+              leadName={`${lead.contact.firstName} ${lead.contact.lastName || ''}`.trim()}
+              segments={allSegments}
+              workspaces={workspaces}
+              users={users}
+            />
+          </div>
+          <p className="text-muted-foreground italic text-sm mt-1">Lead ID: {lead.id}</p>
         </div>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-muted text-foreground font-medium rounded-md hover:bg-muted/80 transition-colors">
-            Edit
-          </button>
-          <button className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors">
-            Convert to Deal
-          </button>
+        <div className="flex-1 max-w-xl">
+          <DealStageTracker leadId={lead.id} />
         </div>
       </div>
 

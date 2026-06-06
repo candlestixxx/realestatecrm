@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {
   buildIntegrationReadiness,
   buildMyPlusChimeChecklist,
-} from '../src/lib/integrations/sync-workflow.ts';
+} from '../src/lib/integrations/sync-workflow';
 
 test('buildMyPlusChimeChecklist requires the native Lofty provider, not Zapier', () => {
   const checklist = buildMyPlusChimeChecklist();

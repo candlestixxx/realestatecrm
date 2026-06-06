@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google';
-import { streamText, tool } from 'ai';
+import { streamText } from 'ai';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
@@ -32,22 +32,22 @@ export async function POST(req: Request) {
       workspaceContext,
     messages,
     tools: {
-      getLeadCount: tool({
+      getLeadCount: {
         description: 'Get the total number of leads in the current workspace.',
         parameters: z.object({
           status: z.string().optional().describe('Optional status to filter by.'),
         }),
-        execute: async (args: { status?: string }) => {
+        execute: async ({ status }: { status?: string }) => {
           const count = await prisma.lead.count({
             where: {
               workspaceId: access.workspaceId,
-              ...(args.status && { status: args.status }),
+              ...(status && { status }),
             },
           });
-          return { count, status: args.status || 'ALL' };
+          return { count, status: status || 'ALL' };
         },
-      }),
-      createTask: tool({
+      },
+      createTask: {
         description: 'Create a new task for the agent.',
         parameters: z.object({
           title: z.string().describe('The title of the task.'),
@@ -55,46 +55,46 @@ export async function POST(req: Request) {
           dueDate: z.string().optional().describe('ISO date string for the due date.'),
           leadId: z.string().optional().describe('Link to a specific lead ID.'),
         }),
-        execute: async (args: { title: string; description?: string; dueDate?: string; leadId?: string }) => {
+        execute: async ({ title, description, dueDate, leadId }: { title: string; description?: string; dueDate?: string; leadId?: string }) => {
           const task = await prisma.task.create({
             data: {
-              title: args.title,
-              description: args.description,
-              dueDate: args.dueDate ? new Date(args.dueDate) : null,
+              title,
+              description,
+              dueDate: dueDate ? new Date(dueDate) : null,
               workspaceId: access.workspaceId,
               assignedToId: access.userId,
-              leadId: args.leadId,
+              leadId,
             },
           });
           return { success: true, taskId: task.id, title: task.title };
         },
-      }),
-      searchContacts: tool({
+      },
+      searchContacts: {
         description: 'Search for contacts by name or email.',
         parameters: z.object({
           query: z.string().describe('The name or email fragment to search for.'),
         }),
-        execute: async (args: { query: string }) => {
+        execute: async ({ query }: { query: string }) => {
           const contacts = await prisma.contact.findMany({
             where: {
               workspaceId: access.workspaceId,
               OR: [
-                { firstName: { contains: args.query } },
-                { lastName: { contains: args.query } },
-                { email: { contains: args.query } },
+                { firstName: { contains: query } },
+                { lastName: { contains: query } },
+                { email: { contains: query } },
               ],
             },
             take: 5,
           });
           return { contacts };
         },
-      }),
-      explainFeature: tool({
+      },
+      explainFeature: {
         description: 'Provide an explanation of how a specific CRM feature works.',
         parameters: z.object({
           feature: z.enum(['SEGMENTS', 'WORKFLOWS', 'SYNC_QUEUE', 'INTELLIGENCE', 'DEAL_HUB']),
         }),
-        execute: async (args: { feature: 'SEGMENTS' | 'WORKFLOWS' | 'SYNC_QUEUE' | 'INTELLIGENCE' | 'DEAL_HUB' }) => {
+        execute: async ({ feature }: { feature: 'SEGMENTS' | 'WORKFLOWS' | 'SYNC_QUEUE' | 'INTELLIGENCE' | 'DEAL_HUB' }) => {
           const explanations = {
             SEGMENTS: 'Segments (Workspaces) allow you to isolate leads into targeted lists like "Past Clients" or "Hot Leads". Change segments in the top header.',
             WORKFLOWS: 'Workflows are multi-step processes for automating complex tasks like "Foreclosure Intake" or "Offer Drafting".',
@@ -102,10 +102,10 @@ export async function POST(req: Request) {
             INTELLIGENCE: 'Lead Intelligence uses AI to scrape social media and public records to enrich your lead data.',
             DEAL_HUB: 'The Deal Hub is where you coordinate transactions with Title, Mortgage, and Inspectors in a shared portal.',
           };
-          return { explanation: explanations[args.feature] };
+          return { explanation: explanations[feature] };
         },
-      }),
-    },
+      },
+    } as any,
   });
 
   return result.toTextStreamResponse();

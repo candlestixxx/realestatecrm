@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AddTaskModal from './AddTaskModal';
 import { addTaskAction } from '@/lib/actions/task';
+import { addLeadsToSegmentBulkAction } from '@/lib/actions/segment';
 
 type LeadRow = {
   id: string;
@@ -29,6 +30,7 @@ export function LeadTableClient({
   pageSize,
   workspaces,
   users,
+  segments = [],
 }: {
   initialLeads: LeadRow[];
   totalCount: number;
@@ -36,6 +38,7 @@ export function LeadTableClient({
   pageSize: number;
   workspaces: { id: string; name: string }[];
   users: { id: string; name: string | null }[];
+  segments?: { id: string; name: string }[];
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -65,6 +68,7 @@ export function LeadTableClient({
   };
 
   const [showWorkflowModal, setShowWorkflowModal] = useState(false);
+  const [showSegmentModal, setShowSegmentModal] = useState(false);
 
   const startWorkflow = (path: string) => {
     if (selectedIds.size !== 1) {
@@ -76,6 +80,23 @@ export function LeadTableClient({
     router.push(`${path}?leadId=${leadId}`);
   };
 
+  const handleAddToSegment = async (segmentId: string) => {
+    try {
+      const ids = Array.from(selectedIds);
+      const res = await addLeadsToSegmentBulkAction(ids, segmentId);
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success(`Successfully added ${ids.length} leads to the segment.`);
+        setSelectedIds(new Set());
+        setShowSegmentModal(false);
+        router.refresh();
+      }
+    } catch (err) {
+      toast.error('Failed to add leads to segment.');
+    }
+  };
+
   const bulkAction = async (action: string) => {
     if (action === 'Add to Workflow') {
       if (selectedIds.size !== 1) {
@@ -83,6 +104,15 @@ export function LeadTableClient({
         return;
       }
       setShowWorkflowModal(true);
+      return;
+    }
+
+    if (action === 'Add to Segment') {
+      if (selectedIds.size === 0) {
+        toast.error('Select at least one lead first.');
+        return;
+      }
+      setShowSegmentModal(true);
       return;
     }
 
@@ -203,6 +233,39 @@ export function LeadTableClient({
           </div>
         </div>
       )}
+
+      {/* Segment Selection Modal */}
+      {showSegmentModal && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-md overflow-hidden">
+            <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
+              <h3 className="font-bold text-lg">Add to Segment</h3>
+              <button onClick={() => setShowSegmentModal(false)} className="text-muted-foreground hover:text-foreground">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-4 space-y-2 max-h-[300px] overflow-y-auto">
+              {segments.length === 0 ? (
+                <div className="p-4 text-center text-sm text-muted-foreground">
+                  No segments found. Go to the Segments page to create one.
+                </div>
+              ) : (
+                segments.map((seg) => (
+                  <button
+                    key={seg.id}
+                    onClick={() => handleAddToSegment(seg.id)}
+                    className="w-full flex items-center justify-between p-3 rounded-xl border border-border bg-background hover:bg-muted/50 transition-all text-left font-bold text-sm"
+                  >
+                    <span>📁 {seg.name}</span>
+                    <span className="text-xs text-primary font-normal">Select &rarr;</span>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Bulk Actions Bar (Sticky/Floating overlay when selection exists) */}
       {selectedIds.size > 0 && (

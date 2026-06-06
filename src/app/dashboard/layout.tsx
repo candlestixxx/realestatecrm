@@ -11,6 +11,7 @@ import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher';
 import { OnboardingTour } from '@/components/OnboardingTour';
 import prisma from '@/lib/prisma';
 import Script from 'next/script';
+import SidebarAIAssistant from '@/components/SidebarAIAssistant';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -50,10 +51,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
             Leads
           </Link>
           <Link
-            href="/dashboard/contacts"
+            href="/dashboard/segments"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
-            Contacts
+            Segments
           </Link>
           <Link
             href="/dashboard/deals"
@@ -72,6 +73,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             Campaigns
+          </Link>
+          <Link
+            href="/dashboard/agent-studio"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Agent Studio
           </Link>
           <Link
             href="/dashboard/workflows"
@@ -135,7 +142,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <DashboardHeaderActions />
           </div>
         </header>
-        <div className="flex-1 overflow-auto p-6">{children}</div>
+        <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 overflow-auto p-6">{children}</div>
+          <SidebarAIAssistant />
+        </div>
       </main>
       <AIChat />
       <OnboardingTour />
