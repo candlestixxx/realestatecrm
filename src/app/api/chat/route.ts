@@ -16,12 +16,12 @@ export async function POST(req: Request) {
   const latestUserMessage = [...(messages as CoreMessage[])].reverse().find((message) => message.role === 'user')?.content ?? '';
   const workspaceContext = await buildChatContext({ workspaceSlug: access.workspaceSlug, query: latestUserMessage as string });
 
-  const result = streamText({
+  const result = await streamText({
     model: openai('gpt-4o'),
     system:
       'You are Jules, a highly intelligent and luxurious real estate AI assistant operating inside the Excel Legacy Realty CRM. Your primary function is to assist agents with their daily workflows, analyze their pipelines, and answer questions concisely and professionally. You must always maintain a high-end, consultative tone. Use the provided workspace context as trusted CRM memory and cite it when relevant.\n\n' +
       workspaceContext,
-    messages,
+    messages: messages as CoreMessage[],
     tools: {
       getLeadCount: tool({
         description: 'Get the total number of leads in the current workspace, optionally filtered by status.',
@@ -58,5 +58,5 @@ export async function POST(req: Request) {
     },
   });
 
-  return result.toTextStreamResponse();
+  return result.toAIStreamResponse();
 }

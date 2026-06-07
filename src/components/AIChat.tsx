@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useChat } from '@ai-sdk/react';
-import { ToolInvocation } from 'ai';
 
 export default function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -77,10 +76,10 @@ export default function AIChat() {
                 >
                   {m.content}
 
-                  {m.toolInvocations?.map((toolInvocation: ToolInvocation) => {
+                  {m.toolInvocations?.map((toolInvocation: { toolCallId: string; toolName: string; state?: string; }) => {
                     const toolCallId = toolInvocation.toolCallId;
 
-                    if (toolInvocation.state === 'result') {
+                    if ('state' in toolInvocation && toolInvocation.state === 'result') {
                       return (
                         <div key={toolCallId} className="mt-2 text-xs opacity-75 border border-border rounded p-2 bg-background/50">
                           <span className="font-semibold block mb-1">Used CRM Tool: {toolInvocation.toolName}</span>
