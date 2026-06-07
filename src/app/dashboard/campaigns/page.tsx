@@ -19,9 +19,43 @@ export default async function CampaignsPage() {
     },
   });
 
+  const leads = await prisma.lead.findMany({
+    where: { workspaceId },
+    orderBy: { contact: { firstName: 'asc' } },
+    select: {
+      id: true,
+      contact: {
+        select: {
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+        },
+      },
+    },
+  });
+
+  const segments = await prisma.segment.findMany({
+    where: { workspaceId },
+    orderBy: { name: 'asc' },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
   return (
     <div className="max-w-6xl mx-auto">
-      <CampaignsListClient campaigns={campaigns} />
+      <CampaignsListClient
+        campaigns={campaigns}
+        leads={leads.map(l => ({
+          id: l.id,
+          name: `${l.contact.firstName} ${l.contact.lastName || ''}`.trim(),
+          email: l.contact.email,
+          phone: l.contact.phone,
+        }))}
+        segments={segments}
+      />
     </div>
   );
 }

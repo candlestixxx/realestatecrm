@@ -5,6 +5,8 @@ import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
+import { AppRole, isAtLeastRole } from '@/lib/permissions';
+import { sendMail } from '@/lib/email-config';
 
 export async function sendEmailAction(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -19,43 +21,11 @@ export async function sendEmailAction(formData: FormData) {
     return { error: 'Email and message content are required.' };
   }
 
-  // --- RESEND API INTEGRATION ---
-  const resendApiKey = process.env.RESEND_API_KEY?.trim();
-  const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'crm@excellegacyrealty.com';
-
-  if (resendApiKey) {
-    try {
-      console.log(`[Email API] Sending real Resend email to ${email}...`);
-      const resendUrl = 'https://api.resend.com/emails';
-      
-      const res = await fetch(resendUrl, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: `Excel Legacy Realty <${fromEmail}>`,
-          to: [email],
-          subject: subject,
-          text: message,
-        }),
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error('[Email API] Resend error response:', errorText);
-        return { error: `Resend failed: ${res.statusText}` };
-      }
-      console.log(`[Email API] Resend email successfully sent to ${email}`);
-    } catch (err) {
-      console.error('[Email API] Resend connection error:', err);
-      return { error: 'Failed to establish connection to Resend API.' };
-    }
-  } else {
-    // Fallback simulation for local dev without credentials
-    console.log(`[Email API] [SIMULATION] Sending email to ${email}: Subject: "${subject}", Content: "${message}"`);
-    await new Promise((resolve) => setTimeout(resolve, 800));
+  try {
+    await sendMail({ to: email, subject, message });
+  } catch (err: any) {
+    console.error('[Email Action] Error dispatching mail:', err);
+    return { error: err.message || 'Failed to dispatch email. Check settings configuration.' };
   }
 
   if (leadId) {
@@ -72,7 +42,63 @@ export async function sendEmailAction(formData: FormData) {
   }
 
   revalidatePath('/dashboard/leads');
-  revalidatePath(`/dashboard/leads/${leadId}`);
+  if (leadId) revalidatePath(`/dashboard/leads/${leadId}`);
 
   return { success: true };
+}
+
+export async function sendMassEmailToSegmentAction(segmentId: string, subject: string, message: string) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions.' };
+  }
+
+  try {
+    const segment = await prisma.segment.findFirst({
+      where: { id: segmentId, workspaceId: access.workspaceId },
+      include: { leads: { include: { contact: true } } },
+    });
+
+    if (!segment) {
+      return { error: 'Segment not found.' };
+    }
+
+    const emailList = segment.leads
+      .map((lead) => lead.contact.email)
+      .filter((email): email is string => !!email);
+
+    if (emailList.length === 0) {
+      return { error: 'No leads in this segment have valid email addresses.' };
+    }
+
+    let sentCount = 0;
+
+    for (const toEmail of emailList) {
+      try {
+        await sendMail({ to: toEmail, subject, message });
+        sentCount++;
+      } catch (err) {
+        console.error(`Failed bulk email delivery to ${toEmail}:`, err);
+      }
+    }
+
+    await prisma.activity.create({
+      data: {
+        type: 'EMAIL',
+        content: `Bulk Email sent to Segment: "${segment.name}" (Subject: ${subject}). Sent to ${sentCount} recipients.`,
+        workspaceId: access.workspaceId,
+        userId: access.userId,
+      },
+    });
+
+    revalidatePath('/dashboard/segments');
+    revalidatePath('/dashboard/leads');
+
+    return { success: true, sentCount };
+  } catch (error) {
+    console.error('Failed to send mass email:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
 }

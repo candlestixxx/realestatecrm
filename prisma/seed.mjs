@@ -37,15 +37,23 @@ async function main() {
   const hank = await prisma.user.create({
     data: {
       name: 'Hank Mendez',
-      email: 'hank.mendez@excellegacy.local',
+      email: 'hankrealtyexec@gmail.com',
       role: 'BROKER',
     },
   });
 
   const harry = await prisma.user.create({
     data: {
-      name: 'Harry',
-      email: 'harry@excellegacy.local',
+      name: 'Harry Kourlos',
+      email: 'harryrealtyexec@gmail.com',
+      role: 'REALTOR_AGENT',
+    },
+  });
+
+  const don = await prisma.user.create({
+    data: {
+      name: 'Don Sobieski',
+      email: 'realtordon26@gmail.com',
       role: 'REALTOR_AGENT',
     },
   });
@@ -65,6 +73,11 @@ async function main() {
       },
       {
         userId: harry.id,
+        workspaceId: workspace.id,
+        role: 'REALTOR_AGENT',
+      },
+      {
+        userId: don.id,
         workspaceId: workspace.id,
         role: 'REALTOR_AGENT',
       },

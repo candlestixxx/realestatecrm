@@ -11,78 +11,122 @@ export default function LeadTagsEditor({
   leadId: string;
   initialTags: string | null;
 }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [tags, setTags] = useState(initialTags || '');
+  const [tagsList, setTagsList] = useState<string[]>(() => {
+    if (!initialTags) return [];
+    return initialTags.split(',').map(t => t.trim()).filter(Boolean);
+  });
+  const [isAdding, setIsAdding] = useState(false);
+  const [newTagInput, setNewTagInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = async () => {
+  const saveTags = async (updatedList: string[]) => {
     setIsSaving(true);
+    const tagsString = updatedList.join(', ');
     try {
-      const res = await updateLeadTagsAction(leadId, tags);
+      const res = await updateLeadTagsAction(leadId, tagsString);
       if (res && res.error) {
         toast.error(res.error);
+        return false;
       } else {
-        toast.success('Tags updated!');
-        setIsEditing(false);
+        setTagsList(updatedList);
+        return true;
       }
     } catch (err) {
-      toast.error('Failed to save tags.');
+      toast.error('Failed to update hashtags.');
+      return false;
     } finally {
       setIsSaving(false);
     }
   };
 
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Hashtags</span>
-        <button
-          onClick={() => {
-            if (isEditing) handleSave();
-            else setIsEditing(true);
-          }}
-          disabled={isSaving}
-          className="text-xs text-primary hover:underline font-semibold"
-        >
-          {isSaving ? 'Saving...' : isEditing ? 'Done' : 'Edit'}
-        </button>
-      </div>
+  const handleAddTag = async () => {
+    const cleanTag = newTagInput.trim().replace(/^#/, '');
+    if (!cleanTag) {
+      setIsAdding(false);
+      return;
+    }
 
-      {isEditing ? (
-        <div className="flex gap-2">
+    if (tagsList.includes(cleanTag)) {
+      toast.error('Hashtag already exists.');
+      setNewTagInput('');
+      setIsAdding(false);
+      return;
+    }
+
+    const nextList = [...tagsList, cleanTag];
+    const ok = await saveTags(nextList);
+    if (ok) {
+      toast.success(`Added hashtag: #${cleanTag}`);
+      setNewTagInput('');
+      setIsAdding(false);
+    }
+  };
+
+  const handleDeleteTag = async (tagToDelete: string) => {
+    const nextList = tagsList.filter(t => t !== tagToDelete);
+    const ok = await saveTags(nextList);
+    if (ok) {
+      toast.success(`Removed hashtag: #${tagToDelete}`);
+    }
+  };
+
+  return (
+    <div className="space-y-2 select-none">
+      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block">Tag / Hashtags</span>
+      
+      <div className="flex flex-wrap gap-1.5 items-center min-h-[30px]">
+        {/* Render existing hashtag chips */}
+        {tagsList.map((tag) => (
+          <span
+            key={tag}
+            className="flex items-center gap-1 pl-2 pr-1.5 py-0.5 text-[10px] font-bold rounded-lg bg-primary/10 text-primary border border-primary/20 uppercase tracking-tighter"
+          >
+            <span>#{tag}</span>
+            <button
+              onClick={() => handleDeleteTag(tag)}
+              disabled={isSaving}
+              className="w-3.5 h-3.5 rounded-full flex items-center justify-center hover:bg-primary/20 transition-colors text-[8px] font-black"
+              title="Delete hashtag"
+            >
+              ✕
+            </button>
+          </span>
+        ))}
+
+        {/* Inline Input Creator */}
+        {isAdding ? (
           <input
             type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="e.g. #buyer, #investor"
-            className="flex-1 text-xs bg-muted/30 border border-border rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary"
+            value={newTagInput}
+            onChange={(e) => setNewTagInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSave();
-              if (e.key === 'Escape') setIsEditing(false);
+              if (e.key === 'Enter') handleAddTag();
+              if (e.key === 'Escape') {
+                setIsAdding(false);
+                setNewTagInput('');
+              }
             }}
+            onBlur={handleAddTag}
+            placeholder="New hashtag..."
+            className="w-24 text-[10px] font-bold bg-muted/40 border border-border rounded-lg px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary h-[22px]"
             autoFocus
+            disabled={isSaving}
           />
-        </div>
-      ) : (
-        <div className="flex flex-wrap gap-1 min-h-[24px]">
-          {tags.trim() ? (
-            tags.split(',').map((tag) => {
-              const cleanTag = tag.trim();
-              if (!cleanTag) return null;
-              return (
-                <span
-                  key={cleanTag}
-                  className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-tighter"
-                >
-                  {cleanTag.startsWith('#') ? cleanTag : `#${cleanTag}`}
-                </span>
-              );
-            })
-          ) : (
-            <span className="text-xs text-muted-foreground italic">No hashtags added yet.</span>
-          )}
-        </div>
-      )}
+        ) : (
+          <button
+            onClick={() => setIsAdding(true)}
+            disabled={isSaving}
+            className="px-2 py-0.5 text-[10px] font-bold rounded-lg bg-muted border border-border text-muted-foreground hover:text-foreground transition-all cursor-pointer h-[22px]"
+            title="Add new tag"
+          >
+            + Add
+          </button>
+        )}
+
+        {isSaving && (
+          <span className="w-1.5 h-1.5 bg-primary rounded-full animate-ping ml-1"></span>
+        )}
+      </div>
     </div>
   );
 }

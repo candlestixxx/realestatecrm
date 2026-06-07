@@ -1,7 +1,7 @@
 import { SignInForm } from '@/components/auth/signin-form';
 
 type SignInPageProps = {
-  searchParams?: Promise<Record<string, string | string[] | undefined>> | unknown;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 function extractError(searchParams: unknown) {
@@ -28,10 +28,6 @@ function extractError(searchParams: unknown) {
 }
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
-  let resolvedParams = searchParams;
-  if (searchParams instanceof Promise) {
-    resolvedParams = await searchParams;
-  }
-
+  const resolvedParams = searchParams ? await searchParams : {};
   return <SignInForm error={extractError(resolvedParams)} />;
 }

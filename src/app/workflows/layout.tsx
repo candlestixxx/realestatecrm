@@ -8,22 +8,12 @@ import { CommandPalette } from '@/components/CommandPalette';
 import { DashboardHeaderActions } from '@/components/DashboardHeaderActions';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher';
-import { OnboardingTour } from '@/components/OnboardingTour';
 import prisma from '@/lib/prisma';
-import Script from 'next/script';
 import SidebarAIAssistant from '@/components/SidebarAIAssistant';
-import { processDueCampaignTasks } from '@/lib/campaign-processor';
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function WorkflowsLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
-
-  // Auto-process any pending drip campaign steps that are now due
-  try {
-    await processDueCampaignTasks();
-  } catch (e) {
-    console.error('Failed processing due drip campaigns in layout:', e);
-  }
 
   const workspaces = await prisma.workspace.findMany({
     where: {
@@ -39,13 +29,24 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <aside className="w-64 border-r border-border bg-muted/30 flex flex-col hidden md:flex">
         <div className="h-16 flex items-center px-6 border-b border-border">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-sm bg-secondary flex items-center justify-center font-bold text-secondary-foreground text-xs">
-              E
-            </div>
-            <span className="font-semibold text-primary dark:text-foreground">Excel Legacy</span>
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-sm bg-secondary flex items-center justify-center font-bold text-secondary-foreground text-xs">
+                E
+              </div>
+              <span className="font-semibold text-primary dark:text-foreground">Excel Legacy</span>
+            </Link>
           </div>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
+          {/* Back to CRM Navigation */}
+          <div className="px-3 py-1 mb-2">
+            <Link
+              href="/dashboard/deals"
+              className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
+            >
+              &larr; Back to CRM Pipeline
+            </Link>
+          </div>
           <Link
             href="/dashboard"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
@@ -90,7 +91,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </Link>
           <Link
             href="/dashboard/workflows"
-            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-3 px-3 py-2 rounded-md bg-muted text-foreground transition-colors"
           >
             Workflows
           </Link>
@@ -100,9 +101,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
           >
             <span className="flex items-center gap-2">
               ↗ Sync Queue
-              <span className="text-[10px] px-1.5 py-0.5 bg-primary/20 text-primary rounded-full font-medium">
-                MyPlus → Lofty
-              </span>
             </span>
           </Link>
           <Link
@@ -148,10 +146,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6 sticky top-0 z-10">
-          <div className="md:hidden flex items-center gap-2">
-            <div className="w-6 h-6 rounded-sm bg-secondary flex items-center justify-center font-bold text-secondary-foreground text-xs">
-              E
-            </div>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dashboard/deals"
+              className="text-muted-foreground hover:text-foreground text-sm flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-muted/50 border border-border transition-colors font-medium"
+            >
+              &larr; Back to CRM
+            </Link>
           </div>
           <div className="flex-1 flex items-center justify-between px-4">
             <div className="flex-1 flex justify-center">
@@ -169,16 +170,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </header>
         <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1 overflow-auto p-6">{children}</div>
+          <div className="flex-1 overflow-auto p-6 bg-background/50">{children}</div>
           <SidebarAIAssistant />
         </div>
       </main>
       <AIChat />
-      <OnboardingTour />
-      <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&libraries=places`}
-        strategy="afterInteractive"
-      />
     </div>
   );
 }

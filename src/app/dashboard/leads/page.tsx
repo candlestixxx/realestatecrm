@@ -123,6 +123,7 @@ export default async function LeadsPage(props: {
       { contact: { firstName: { contains: query } } },
       { contact: { lastName: { contains: query } } },
       { contact: { email: { contains: query } } },
+      { tags: { contains: query } },
     ];
   }
 
@@ -172,6 +173,12 @@ export default async function LeadsPage(props: {
 
   const segments = await prisma.segment.findMany({
     where: { workspaceId },
+    select: { id: true, name: true },
+    orderBy: { name: 'asc' },
+  });
+
+  const campaigns = await prisma.smartPlan.findMany({
+    where: { workspaceId, isActive: true },
     select: { id: true, name: true },
     orderBy: { name: 'asc' },
   });
@@ -235,6 +242,7 @@ export default async function LeadsPage(props: {
           workspaces={workspaces}
           users={users}
           segments={segments}
+          campaigns={campaigns}
         />
       </div>
     </div>

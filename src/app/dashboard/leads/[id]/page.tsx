@@ -13,9 +13,10 @@ import ShowingForm from '@/components/ShowingForm';
 import LeadStatusSelector from '@/components/LeadStatusSelector';
 import LeadTagsEditor from '@/components/LeadTagsEditor';
 import SearchAlertsWidget from '@/components/SearchAlertsWidget';
-import LeadCampaignEnrollment from '@/components/LeadCampaignEnrollment';
+import LeadAutomationsWidget from '@/components/LeadAutomationsWidget';
 import LeadQuickActions from '@/components/LeadQuickActions';
 import DealStageTracker from '@/components/DealStageTracker';
+import LeadContactInfoCard from '@/components/LeadContactInfoCard';
 
 export default async function LeadDetailPage(props: {
   params: Promise<{ id: string }>;
@@ -53,7 +54,7 @@ export default async function LeadDetailPage(props: {
 
   const campaigns = await prisma.smartPlan.findMany({
     where: { workspaceId: access.workspaceId, isActive: true },
-    select: { id: true, name: true },
+    select: { id: true, name: true, description: true, steps: true },
   });
 
   const siblingLeads = await prisma.lead.findMany({
@@ -94,7 +95,7 @@ export default async function LeadDetailPage(props: {
     { id: 'deals', label: 'Deals & Showings' },
     { id: 'tasks', label: 'Tasks' },
     { id: 'intelligence', label: 'Intelligence (Scrapers)' },
-    { id: 'workflows', label: 'Workflows & Plans' },
+    { id: 'workflows', label: 'Automations' },
   ];
 
   return (
@@ -366,10 +367,9 @@ export default async function LeadDetailPage(props: {
                   )}
                </div>
 
-               <div className="mt-8 pt-8 border-t border-border">
-                  <h2 className="text-lg font-bold mb-4">AI Smart Plans & Drip Campaigns</h2>
-                  <LeadCampaignEnrollment leadId={lead.id} activePlanId={lead.smartPlanId} campaigns={campaigns} />
-               </div>
+                <div className="mt-8 pt-8 border-t border-border">
+                   <LeadAutomationsWidget leadId={lead.id} activePlanId={lead.smartPlanId} campaigns={campaigns} />
+                </div>
             </div>
           )}
         </div>
@@ -412,29 +412,7 @@ export default async function LeadDetailPage(props: {
             </div>
           </div>
 
-          <div className="bg-background border border-border rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold mb-4">Contact Info</h2>
-            <div className="space-y-4">
-              <div>
-                <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Email
-                </span>
-                <p className="font-medium mt-1 truncate">{lead.contact.email || 'No email'}</p>
-              </div>
-              <div>
-                <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Phone
-                </span>
-                <p className="font-medium mt-1">{lead.contact.phone || 'No phone'}</p>
-              </div>
-              <div>
-                <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Source
-                </span>
-                <p className="font-medium mt-1 capitalize">{lead.source || 'Manual'}</p>
-              </div>
-            </div>
-          </div>
+          <LeadContactInfoCard leadId={lead.id} contact={lead.contact} source={lead.source} />
 
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
              <h2 className="text-sm font-bold text-primary mb-3 flex items-center gap-2">

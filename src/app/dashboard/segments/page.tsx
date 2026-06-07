@@ -4,6 +4,8 @@ import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
 import { seedSegmentsIfEmpty } from '@/lib/actions/segment';
 import Link from 'next/link';
+import MassOutreachModal from '@/components/MassOutreachModal';
+import { sendMassEmailToSegmentAction } from '@/lib/actions/email';
 
 export default async function SegmentsPage() {
   const session = await getServerSession(authOptions);
@@ -112,9 +114,11 @@ export default async function SegmentsPage() {
                   <td className="px-6 py-4 text-muted-foreground">N/A</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-3">
-                      <button className="text-[11px] font-bold text-primary hover:underline">
-                        ✉️ Mass Outreach
-                      </button>
+                      <MassOutreachModal
+                        segmentId={seg.id}
+                        segmentName={seg.name}
+                        sendMassEmailToSegmentAction={sendMassEmailToSegmentAction}
+                      />
                       <button className="text-[11px] font-bold text-primary hover:underline">
                         ⚡ Add Smart Plan
                       </button>

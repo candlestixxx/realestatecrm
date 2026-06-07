@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AddTaskModal from './AddTaskModal';
 import { addTaskAction } from '@/lib/actions/task';
+import { bulkEnrollLeadsInCampaignAction } from '@/lib/actions/campaign';
+import { deleteLeadAction } from '@/lib/actions/lead';
 import { addLeadsToSegmentBulkAction } from '@/lib/actions/segment';
 
 type LeadRow = {
@@ -31,6 +33,7 @@ export function LeadTableClient({
   workspaces,
   users,
   segments = [],
+  campaigns = [],
 }: {
   initialLeads: LeadRow[];
   totalCount: number;
@@ -39,6 +42,7 @@ export function LeadTableClient({
   workspaces: { id: string; name: string }[];
   users: { id: string; name: string | null }[];
   segments?: { id: string; name: string }[];
+  campaigns?: { id: string; name: string }[];
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -69,6 +73,24 @@ export function LeadTableClient({
 
   const [showWorkflowModal, setShowWorkflowModal] = useState(false);
   const [showSegmentModal, setShowSegmentModal] = useState(false);
+  const [showCampaignModal, setShowCampaignModal] = useState(false);
+
+  const handleEnrollCampaignBulk = async (campaignId: string) => {
+    try {
+      const ids = Array.from(selectedIds);
+      const res = await bulkEnrollLeadsInCampaignAction(ids, campaignId);
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success(`Successfully enrolled ${ids.length} leads in the Smart Plan.`);
+        setSelectedIds(new Set());
+        setShowCampaignModal(false);
+        router.refresh();
+      }
+    } catch (err) {
+      toast.error('Failed to bulk enroll in campaign.');
+    }
+  };
 
   const startWorkflow = (path: string) => {
     if (selectedIds.size !== 1) {
@@ -113,6 +135,15 @@ export function LeadTableClient({
         return;
       }
       setShowSegmentModal(true);
+      return;
+    }
+
+    if (action === 'Add to Smart Plan') {
+      if (selectedIds.size === 0) {
+        toast.error('Select at least one lead first.');
+        return;
+      }
+      setShowCampaignModal(true);
       return;
     }
 
@@ -266,6 +297,38 @@ export function LeadTableClient({
         </div>
       )}
 
+      {/* Campaign Selection Modal */}
+      {showCampaignModal && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-md overflow-hidden">
+            <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
+              <h3 className="font-bold text-lg">Enroll in Drip Campaign</h3>
+              <button onClick={() => setShowCampaignModal(false)} className="text-muted-foreground hover:text-foreground">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-4 space-y-2 max-h-[300px] overflow-y-auto">
+              {campaigns.length === 0 ? (
+                <div className="p-4 text-center text-sm text-muted-foreground">
+                  No campaigns found. Go to the Campaigns page to create one.
+                </div>
+              ) : (
+                campaigns.map((camp) => (
+                  <button
+                    key={camp.id}
+                    onClick={() => handleEnrollCampaignBulk(camp.id)}
+                    className="w-full flex items-center justify-between p-3 rounded-xl border border-border bg-background hover:bg-muted/50 transition-all text-left font-bold text-sm"
+                  >
+                    <span>🤖 {camp.name}</span>
+                    <span className="text-xs text-primary font-normal">Enroll Selected &rarr;</span>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Bulk Actions Bar (Sticky/Floating overlay when selection exists) */}
       {selectedIds.size > 0 && (
@@ -297,6 +360,24 @@ export function LeadTableClient({
                 className="px-2 py-1 bg-background border border-border text-[10px] font-bold uppercase rounded hover:bg-muted transition-colors"
               >
                 + Workflow
+              </button>
+              <button
+                onClick={async () => {
+                  const ids = Array.from(selectedIds);
+                  if (confirm(`Are you sure you want to delete the ${ids.length} selected leads?`)) {
+                    let successCount = 0;
+                    for (const id of ids) {
+                      const res = await deleteLeadAction(id);
+                      if (!res.error) successCount++;
+                    }
+                    toast.success(`Successfully deleted ${successCount} leads.`);
+                    setSelectedIds(new Set());
+                    router.refresh();
+                  }
+                }}
+                className="px-2 py-1 bg-red-600 text-white border border-red-700 text-[10px] font-bold uppercase rounded hover:bg-red-700 transition-colors shadow-sm"
+              >
+                🗑️ Delete Selected
               </button>
             </div>
           </div>
@@ -416,6 +497,22 @@ export function LeadTableClient({
                     >
                       View Lead
                     </Link>
+                    <button
+                      onClick={async () => {
+                        if (confirm(`Are you sure you want to delete lead "${lead.contact?.firstName} ${lead.contact?.lastName || ''}"?`)) {
+                          const res = await deleteLeadAction(lead.id);
+                          if (res && res.error) {
+                            toast.error(res.error);
+                          } else {
+                            toast.success('Lead deleted successfully!');
+                            router.refresh();
+                          }
+                        }
+                      }}
+                      className="px-2.5 py-1.5 bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-lg text-[10px] font-bold uppercase transition-colors"
+                    >
+                      🗑️ Delete
+                    </button>
                   </div>
                 </td>
               </tr>

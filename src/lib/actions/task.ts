@@ -24,6 +24,9 @@ export async function addTaskAction(formData: FormData) {
     workspaceId, // Override client value
     dueDate: formData.get('dueDate'),
     assignedToId: formData.get('assignedToId'),
+    triggerEmail: formData.get('triggerEmail') === 'true',
+    triggerSMS: formData.get('triggerSMS') === 'true',
+    triggerCall: formData.get('triggerCall') === 'true',
   };
 
   const leadId = formData.get('leadId') as string | null;
@@ -38,7 +41,7 @@ export async function addTaskAction(formData: FormData) {
     return { error: validatedData.error.issues[0].message };
   }
 
-  const { title, description, status, dueDate, assignedToId } = validatedData.data;
+  const { title, description, status, dueDate, assignedToId, triggerEmail, triggerSMS, triggerCall } = validatedData.data;
 
   try {
     if (assignedToId) {
@@ -53,7 +56,7 @@ export async function addTaskAction(formData: FormData) {
       }
     }
 
-    await prisma.task.create({
+    const task = await prisma.task.create({
       data: {
         title,
         description: description || null,
@@ -62,8 +65,30 @@ export async function addTaskAction(formData: FormData) {
         dueDate: dueDate ? new Date(dueDate) : null,
         assignedToId: assignedToId || null,
         leadId: leadId || null,
+        triggerEmail: triggerEmail || false,
+        triggerSMS: triggerSMS || false,
+        triggerCall: triggerCall || false,
       },
     });
+
+    if (assignedToId && (triggerEmail || triggerSMS || triggerCall)) {
+      const assigneeUser = await prisma.user.findUnique({ where: { id: assignedToId } });
+      const triggerList = [
+        triggerEmail ? 'Email' : null,
+        triggerSMS ? 'Text/SMS' : null,
+        triggerCall ? 'Call Task Phone Alert' : null,
+      ].filter(Boolean).join(', ');
+
+      await prisma.activity.create({
+        data: {
+          type: 'SYSTEM',
+          content: `Task alerts triggered & sent to user ${assigneeUser?.name || assigneeUser?.email || assignedToId} via: ${triggerList}`,
+          workspaceId,
+          userId: access.userId,
+          leadId: leadId || null,
+        },
+      });
+    }
 
     revalidatePath('/dashboard/tasks');
     if (leadId) {

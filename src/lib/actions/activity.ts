@@ -102,9 +102,9 @@ export async function createActivityAction(formData: FormData) {
     });
 
     const revalidateTargets = new Set<string>();
-    if (data.leadId) revalidateTargets.add(`/leads/${data.leadId}`);
-    if (data.dealId) revalidateTargets.add(`/deals/${data.dealId}`);
-    if (data.contactId) revalidateTargets.add(`/contacts/${data.contactId}`);
+    if (data.leadId) revalidateTargets.add(`/dashboard/leads/${data.leadId}`);
+    if (data.dealId) revalidateTargets.add(`/dashboard/deals/${data.dealId}`);
+    if (data.contactId) revalidateTargets.add(`/dashboard/contacts/${data.contactId}`);
 
     for (const target of revalidateTargets) {
       revalidatePath(target);

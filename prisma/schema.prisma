@@ -42,6 +42,7 @@ model Workspace {
   segments       Segment[]
   agentWorkflows AgentWorkflow[]
   agentLogs      AgentLog[]
+  landingPages   LandingPage[]
 }
 
 model WorkspaceMember {
@@ -56,22 +57,28 @@ model WorkspaceMember {
 }
 
 model Contact {
-  id          String     @id @default(cuid())
-  firstName   String
-  lastName    String?
-  email       String?
-  phone       String?
-  address     String?
-  workspaceId String
-  userId      String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  Activity    Activity[]
-  user        User?      @relation(fields: [userId], references: [id])
-  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  deals       Deal[]
-  leads       Lead[]
-  stakeholderIn DealStakeholder[]
+  id               String     @id @default(cuid())
+  firstName        String
+  lastName         String?
+  email            String?
+  phone            String?
+  address          String?
+  workspaceId      String
+  userId           String?
+  additionalPhones String?   // JSON array of additional phones
+  additionalEmails String?   // JSON array of additional emails
+  spouseName       String?
+  spousePhone      String?
+  spouseEmail      String?
+  familyMembers    String?   // JSON array of family members
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  Activity         Activity[]
+  user             User?      @relation(fields: [userId], references: [id])
+  workspace        Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deals            Deal[]
+  leads            Lead[]
+  stakeholderIn    DealStakeholder[]
 }
 
 model Lead {
@@ -173,6 +180,9 @@ model Task {
   assignedToId String?
   leadId       String?
   dealId       String?
+  triggerEmail Boolean   @default(false)
+  triggerSMS   Boolean   @default(false)
+  triggerCall  Boolean   @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   assignedTo   User?     @relation("TaskAssignee", fields: [assignedToId], references: [id])
@@ -270,5 +280,18 @@ model AgentLog {
   workspaceId String
   createdAt   DateTime @default(now())
   lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model LandingPage {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  subdomain   String?
+  blocks      String   // JSON string of page sections
+  ownerId     String?
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
