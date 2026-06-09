@@ -87,6 +87,7 @@ export default function CampaignsListClient({
   const [activeTab, setActiveTab] = useState<'plans' | 'library'>('plans');
   const [activeEditorId, setActiveEditorId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [createTrigger, setCreateTrigger] = useState<'NONE' | 'LEAD_CREATED' | 'ASSIGNMENT_CHANGED' | 'SEGMENT_MATCHED'>('NONE');
   const [error, setError] = useState<string | null>(null);
   
   // Folder Navigation State
@@ -94,6 +95,9 @@ export default function CampaignsListClient({
   const [folders, setFolders] = useState<string[]>(['Foreclosure Plan Folder', 'Follow-up folder']);
   const [newFolderName, setNewFolderName] = useState('');
   const [showAddFolder, setShowAddFolder] = useState(false);
+  
+  // Lead Type Breakdown Filter State
+  const [leadTypeFilter, setLeadTypeFilter] = useState<'ALL' | 'BUYER' | 'SELLER'>('ALL');
   
   // Search and selection
   const [planSearch, setPlanSearch] = useState('');
@@ -108,13 +112,26 @@ export default function CampaignsListClient({
 
   const activeCampaign = campaigns.find(c => c.id === activeEditorId);
 
-  // Filter campaigns based on search and folders
+  // Filter campaigns based on search, folders and lead type breakdown
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter(c => {
       const matchSearch = c.name.toLowerCase().includes(planSearch.toLowerCase()) || 
         (c.description && c.description.toLowerCase().includes(planSearch.toLowerCase()));
       
       if (!matchSearch) return false;
+
+      // Filter by Lead Type
+      let settings: any = {};
+      try {
+        if (c.steps) {
+          const parsed = JSON.parse(c.steps);
+          settings = parsed.settings || {};
+        }
+      } catch (e) {}
+
+      const planLeadType = settings.leadType || 'BOTH';
+      if (leadTypeFilter === 'BUYER' && planLeadType === 'SELLER') return false;
+      if (leadTypeFilter === 'SELLER' && planLeadType === 'BUYER') return false;
 
       // Mock folder assignment logic (e.g. if "foreclosure" matches, show in Foreclosure folder)
       if (selectedFolder === 'Foreclosure Plan Folder') {
@@ -125,7 +142,7 @@ export default function CampaignsListClient({
       }
       return true;
     });
-  }, [campaigns, planSearch, selectedFolder]);
+  }, [campaigns, planSearch, selectedFolder, leadTypeFilter]);
 
   // Filter leads for enrollment modal
   const filteredLeads = useMemo(() => {
@@ -376,128 +393,176 @@ export default function CampaignsListClient({
         {/* Main Content Pane */}
         <div className="lg:col-span-3 space-y-6">
           {activeTab === 'plans' ? (
-            <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr className="bg-muted/30 border-b border-border uppercase font-bold text-muted-foreground tracking-wider">
-                      <th className="p-3 w-8"><input type="checkbox" className="rounded" /></th>
-                      <th className="p-3">Plan Name</th>
-                      <th className="p-3">Scope</th>
-                      <th className="p-3">Lead Type</th>
-                      <th className="p-3 text-center">Steps</th>
-                      <th className="p-3">Auto Apply Conditions</th>
-                      <th className="p-3 text-center">Auto Apply</th>
-                      <th className="p-3 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredCampaigns.map((c) => {
-                      let stepCount = 0;
-                      let settings: any = {};
-                      try {
-                        if (c.steps) {
-                          const parsed = JSON.parse(c.steps);
-                          if (parsed.items) {
-                            stepCount = parsed.items.length;
-                            settings = parsed.settings || {};
-                          } else if (Array.isArray(parsed)) {
-                            stepCount = parsed.length;
+            <div className="space-y-4">
+              
+              {/* Buyer / Seller breakdown quick filter bar */}
+              <div className="flex items-center justify-between bg-muted/20 p-2.5 rounded-xl border border-border">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground mr-2 select-none">Plan Categories:</span>
+                  <button
+                    onClick={() => setLeadTypeFilter('ALL')}
+                    className={`px-3 py-1 text-[10px] font-bold rounded-lg uppercase transition-all cursor-pointer ${
+                      leadTypeFilter === 'ALL'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'bg-background hover:bg-muted text-muted-foreground border border-border'
+                    }`}
+                  >
+                    All Plans
+                  </button>
+                  <button
+                    onClick={() => setLeadTypeFilter('BUYER')}
+                    className={`px-3 py-1 text-[10px] font-bold rounded-lg uppercase transition-all cursor-pointer ${
+                      leadTypeFilter === 'BUYER'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'bg-background hover:bg-muted text-muted-foreground border border-border'
+                    }`}
+                  >
+                    Buyer Plans
+                  </button>
+                  <button
+                    onClick={() => setLeadTypeFilter('SELLER')}
+                    className={`px-3 py-1 text-[10px] font-bold rounded-lg uppercase transition-all cursor-pointer ${
+                      leadTypeFilter === 'SELLER'
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'bg-background hover:bg-muted text-muted-foreground border border-border'
+                    }`}
+                  >
+                    Seller Plans
+                  </button>
+                </div>
+                <div className="text-[10px] font-bold text-muted-foreground select-none">
+                  Showing {filteredCampaigns.length} campaigns
+                </div>
+              </div>
+
+              <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-muted/30 border-b border-border uppercase font-bold text-muted-foreground tracking-wider">
+                        <th className="p-3 w-8"><input type="checkbox" className="rounded" /></th>
+                        <th className="p-3">Plan Name</th>
+                        <th className="p-3">Scope</th>
+                        <th className="p-3">Lead Type</th>
+                        <th className="p-3 text-center">Steps</th>
+                        <th className="p-3">Auto Apply Conditions</th>
+                        <th className="p-3 text-center">Auto Apply</th>
+                        <th className="p-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredCampaigns.map((c) => {
+                        let stepCount = 0;
+                        let settings: any = {};
+                        try {
+                          if (c.steps) {
+                            const parsed = JSON.parse(c.steps);
+                            if (parsed.items) {
+                              stepCount = parsed.items.length;
+                              settings = parsed.settings || {};
+                            } else if (Array.isArray(parsed)) {
+                              stepCount = parsed.length;
+                            }
                           }
-                        }
-                      } catch (e) {}
+                        } catch (e) {}
 
-                      // Apply triggers formatter
-                      let conditionText = 'Manual Enrollment';
-                      if (settings.autoApplyTrigger && settings.autoApplyTrigger !== 'NONE') {
-                        const trigger = settings.autoApplyTrigger === 'LEAD_CREATED' ? 'Lead Created' :
-                                      settings.autoApplyTrigger === 'ASSIGNMENT_CHANGED' ? 'Lead Assigned' : 'Segment Matched';
-                        
-                        let crit = '';
-                        if (settings.autoApplyCriteria) {
-                          const seg = segments.find(s => s.id === settings.autoApplyCriteria);
-                          crit = seg ? ` (${seg.name})` : '';
+                        // Apply triggers formatter
+                        let conditionText = 'Manual Enrollment';
+                        if (settings.autoApplyTrigger && settings.autoApplyTrigger !== 'NONE') {
+                          const trigger = settings.autoApplyTrigger === 'LEAD_CREATED' ? 'Lead Created' :
+                                        settings.autoApplyTrigger === 'ASSIGNMENT_CHANGED' ? 'Lead Assigned' : 'Segment Matched';
+                          
+                          let crit = '';
+                          if (settings.autoApplyCriteria) {
+                            const seg = segments.find(s => s.id === settings.autoApplyCriteria);
+                            crit = seg ? ` (${seg.name})` : '';
+                          }
+                          conditionText = `${trigger}${crit}`;
                         }
-                        conditionText = `${trigger}${crit}`;
-                      }
 
-                      return (
-                        <tr key={c.id} className="border-b border-border hover:bg-muted/10 transition-colors">
-                          <td className="p-3"><input type="checkbox" className="rounded" /></td>
-                          <td className="p-3">
-                            <span className="font-bold text-sm text-foreground block">{c.name}</span>
-                            <span className="text-[10px] text-muted-foreground line-clamp-1 max-w-[200px]">
-                              {c.description || 'No description provided.'}
-                            </span>
-                          </td>
-                          <td className="p-3">
-                            <span className="px-1.5 py-0.5 bg-muted text-muted-foreground border border-border rounded uppercase text-[9px] font-bold">
-                              {settings.scope || 'Company'}
-                            </span>
-                          </td>
-                          <td className="p-3 font-semibold text-muted-foreground">
-                            {settings.leadType || 'Both'}
-                          </td>
-                          <td className="p-3 text-center font-bold text-foreground">
-                            {stepCount}
-                          </td>
-                          <td className="p-3 text-muted-foreground font-medium">
-                            {conditionText}
-                          </td>
-                          <td className="p-3 text-center">
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={c.isActive}
-                                onChange={() => handleToggle(c.id, c.isActive)}
-                                className="sr-only peer"
-                              />
-                              <div className="w-7 h-4 bg-muted border border-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-green-500"></div>
-                            </label>
-                          </td>
-                          <td className="p-3 text-right space-x-2">
-                            <button
-                              onClick={() => setEnrollCampaignId(c.id)}
-                              className="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all font-bold rounded text-[10px] uppercase"
-                            >
-                              Run / Enroll
-                            </button>
-                            <button
-                              onClick={() => setActiveEditorId(c.id)}
-                              className="px-2 py-1 bg-muted border border-border hover:bg-muted/80 font-bold rounded text-[10px] uppercase text-muted-foreground hover:text-foreground"
-                            >
-                              👁️ Edit
-                            </button>
-                            <button
-                              onClick={async () => {
-                                if (confirm(`Are you sure you want to delete the Smart Plan "${c.name}"? This action cannot be undone.`)) {
-                                  const res = await deleteCampaignAction(c.id);
-                                  if (res && res.error) {
-                                    toast.error(res.error);
-                                  } else {
-                                    toast.success('Smart Plan deleted successfully!');
-                                    router.refresh();
+                        return (
+                          <tr key={c.id} className="border-b border-border hover:bg-muted/10 transition-colors">
+                            <td className="p-3"><input type="checkbox" className="rounded" /></td>
+                            <td className="p-3">
+                              <span className="font-bold text-sm text-foreground block">{c.name}</span>
+                              <span className="text-[10px] text-muted-foreground line-clamp-1 max-w-[200px]">
+                                {c.description || 'No description provided.'}
+                              </span>
+                            </td>
+                            <td className="p-3">
+                              <span className="px-1.5 py-0.5 bg-muted text-muted-foreground border border-border rounded uppercase text-[9px] font-bold">
+                                {settings.scope || 'Company'}
+                              </span>
+                            </td>
+                            <td className="p-3 font-semibold text-muted-foreground">
+                              {settings.leadType || 'Both'}
+                            </td>
+                            <td className="p-3 text-center font-bold text-foreground">
+                              {stepCount}
+                            </td>
+                            <td className="p-3 text-muted-foreground font-medium">
+                              {conditionText}
+                            </td>
+                            <td className="p-3 text-center">
+                              <div className="flex flex-col items-center gap-1">
+                                <span className={`text-[9px] font-black uppercase tracking-wider ${c.isActive ? 'text-green-500' : 'text-slate-400'}`}>
+                                  {c.isActive ? 'Active' : 'Paused'}
+                                </span>
+                                <label className="relative inline-flex items-center cursor-pointer select-none">
+                                  <input
+                                    type="checkbox"
+                                    checked={c.isActive}
+                                    onChange={() => handleToggle(c.id, c.isActive)}
+                                    className="sr-only peer"
+                                  />
+                                  <div className="w-7 h-4 bg-muted border border-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-green-500"></div>
+                                </label>
+                              </div>
+                            </td>
+                            <td className="p-3 text-right space-x-2">
+                              <button
+                                onClick={() => setEnrollCampaignId(c.id)}
+                                className="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all font-bold rounded text-[10px] uppercase cursor-pointer"
+                              >
+                                Run / Enroll
+                              </button>
+                              <button
+                                onClick={() => setActiveEditorId(c.id)}
+                                className="px-2 py-1 bg-muted border border-border hover:bg-muted/80 font-bold rounded text-[10px] uppercase text-muted-foreground hover:text-foreground cursor-pointer"
+                              >
+                                👁️ Edit
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  if (confirm(`Are you sure you want to delete the Smart Plan "${c.name}"? This action cannot be undone.`)) {
+                                    const res = await deleteCampaignAction(c.id);
+                                    if (res && res.error) {
+                                      toast.error(res.error);
+                                    } else {
+                                      toast.success('Smart Plan deleted successfully!');
+                                      router.refresh();
+                                    }
                                   }
-                                }
-                              }}
-                              className="px-2 py-1 bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all font-bold rounded text-[10px] uppercase"
-                            >
-                              🗑️ Delete
-                            </button>
+                                }}
+                                className="px-2 py-1 bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all font-bold rounded text-[10px] uppercase cursor-pointer"
+                              >
+                                🗑️ Delete
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+
+                      {filteredCampaigns.length === 0 && (
+                        <tr>
+                          <td colSpan={8} className="p-12 text-center text-muted-foreground italic border-b border-border">
+                            No active drip plans found. Try changing your search or category filters!
                           </td>
                         </tr>
-                      );
-                    })}
-
-                    {filteredCampaigns.length === 0 && (
-                      <tr>
-                        <td colSpan={8} className="p-12 text-center text-muted-foreground italic border-b border-border">
-                          No active drip plans found. Try changing your search or folder filters!
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           ) : (
@@ -533,7 +598,7 @@ export default function CampaignsListClient({
                   <div className="pt-2 flex justify-end">
                     <button
                       onClick={() => handleImportTemplate(tmpl)}
-                      className="px-4 py-1.5 bg-secondary text-secondary-foreground text-xs font-bold rounded-lg hover:bg-secondary/95 transition-all shadow-sm"
+                      className="px-4 py-1.5 bg-secondary text-secondary-foreground text-xs font-bold rounded-lg hover:bg-secondary/95 transition-all shadow-sm cursor-pointer"
                     >
                       📥 Import Plan to Active
                     </button>
@@ -551,6 +616,7 @@ export default function CampaignsListClient({
           campaignId={activeCampaign.id}
           campaignName={activeCampaign.name}
           initialSteps={activeCampaign.steps}
+          initialActive={activeCampaign.isActive}
           segments={segments}
           onClose={() => {
             setActiveEditorId(null);
@@ -617,7 +683,7 @@ export default function CampaignsListClient({
                     setEnrollCampaignId(null);
                     setSelectedLeadIds(new Set());
                   }}
-                  className="px-3 py-1.5 text-xs font-medium hover:bg-muted rounded transition-colors"
+                  className="px-3 py-1.5 text-xs font-medium hover:bg-muted rounded transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -625,7 +691,7 @@ export default function CampaignsListClient({
                   type="button"
                   disabled={isEnrolling || selectedLeadIds.size === 0}
                   onClick={executeEnrollment}
-                  className="px-4 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded hover:bg-primary/90 transition-colors shadow-lg disabled:opacity-50"
+                  className="px-4 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded hover:bg-primary/90 transition-colors shadow-lg disabled:opacity-50 cursor-pointer"
                 >
                   {isEnrolling ? 'Enrolling...' : `Enroll Selected (${selectedLeadIds.size})`}
                 </button>
@@ -651,20 +717,65 @@ export default function CampaignsListClient({
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Description</label>
-                <textarea name="description" rows={3} placeholder="Describe the target audience or drip strategy..." className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none" />
+                <textarea name="description" rows={2} placeholder="Describe the target audience or drip strategy..." className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none" />
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Plan Scope</label>
+                  <select name="scope" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                    <option value="COMPANY">Company Plan</option>
+                    <option value="PERSONAL">Personal Plan</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Target Lead Type</label>
+                  <select name="leadType" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                    <option value="BOTH">Both (Buyer & Seller)</option>
+                    <option value="BUYER">Buyer Leads Only</option>
+                    <option value="SELLER">Seller Leads Only</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Auto Apply Trigger</label>
+                <select 
+                  name="autoApplyTrigger" 
+                  value={createTrigger} 
+                  onChange={(e: any) => setCreateTrigger(e.target.value)}
+                  className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="NONE">Manual Enrollment Only</option>
+                  <option value="LEAD_CREATED">When Lead Created</option>
+                  <option value="ASSIGNMENT_CHANGED">When Lead Assigned</option>
+                  <option value="SEGMENT_MATCHED">When Lead Meets Segment Conditions</option>
+                </select>
+              </div>
+
+              {createTrigger === 'SEGMENT_MATCHED' && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Select Segment</label>
+                  <select name="autoApplyCriteria" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                    <option value="">-- Choose Segment --</option>
+                    {segments.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="flex justify-end gap-2 pt-4">
                 <button
                   type="button"
                   onClick={() => setIsAdding(false)}
-                  className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-md transition-colors"
+                  className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-md transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-md hover:bg-primary/90 transition-colors shadow-lg"
+                  className="px-6 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-md hover:bg-primary/90 transition-colors shadow-lg cursor-pointer"
                 >
                   Save & Setup Steps
                 </button>

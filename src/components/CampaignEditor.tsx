@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { updateCampaignStepsAction } from '@/lib/actions/campaign';
+import { updateCampaignStepsAction, toggleCampaignStatusAction } from '@/lib/actions/campaign';
 import toast from 'react-hot-toast';
 
 type DelayUnit = 'SECOND' | 'MINUTE' | 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
@@ -11,6 +11,7 @@ type CampaignStep = {
   type: 'EMAIL' | 'SMS' | 'CALL' | 'TASK';
   delayValue: number;
   delayUnit: DelayUnit;
+  title?: string;
   subject?: string;
   content: string;
 };
@@ -27,12 +28,14 @@ export default function CampaignEditor({
   campaignId,
   campaignName,
   initialSteps,
+  initialActive = true,
   segments = [],
   onClose,
 }: {
   campaignId: string;
   campaignName: string;
   initialSteps: string | null;
+  initialActive?: boolean;
   segments?: { id: string; name: string }[];
   onClose: () => void;
 }) {
@@ -74,12 +77,14 @@ export default function CampaignEditor({
               type: step.type,
               delayValue: step.delayDays,
               delayUnit: 'DAY',
+              title: step.title || '',
               subject: step.subject,
               content: step.content,
             };
           }
           return {
             ...step,
+            title: step.title || '',
             delayValue: step.delayValue ?? 1,
             delayUnit: step.delayUnit ?? 'DAY',
           };
@@ -89,6 +94,7 @@ export default function CampaignEditor({
     return [];
   });
 
+  const [isActive, setIsActive] = useState(initialActive);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleStepChange = (index: number, field: keyof CampaignStep, value: any) => {
@@ -103,6 +109,7 @@ export default function CampaignEditor({
       type,
       delayValue: 1,
       delayUnit: 'DAY',
+      title: '',
       subject: type === 'EMAIL' ? 'Follow-up Email' : undefined,
       content: type === 'EMAIL' ? 'Hi! Just wanted to follow up...' : type === 'SMS' ? 'Hi! Let me know if we can chat.' : 'Follow up with lead.',
     };
@@ -116,6 +123,7 @@ export default function CampaignEditor({
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      // 1. Save steps content
       const payload = {
         settings,
         items: steps,
@@ -123,10 +131,20 @@ export default function CampaignEditor({
       const res = await updateCampaignStepsAction(campaignId, JSON.stringify(payload));
       if (res && res.error) {
         toast.error(res.error);
-      } else {
-        toast.success('Campaign saved successfully!');
-        onClose();
+        setIsSaving(false);
+        return;
       }
+
+      // 2. Toggle active/paused status if modified
+      if (isActive !== initialActive) {
+        const statusRes = await toggleCampaignStatusAction(campaignId, isActive);
+        if (statusRes && statusRes.error) {
+          toast.error(statusRes.error);
+        }
+      }
+
+      toast.success('Campaign saved successfully!');
+      onClose();
     } catch (err) {
       toast.error('Failed to save campaign steps.');
     } finally {
@@ -163,8 +181,22 @@ export default function CampaignEditor({
               <h4 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4">Plan Settings</h4>
               
               <div className="space-y-4">
+                {/* Active / Paused Status Selection */}
+                <div className="space-y-1.5 pb-2">
+                  <label className="text-xs font-bold text-foreground">Campaign Status</label>
+                  <select
+                    value={isActive ? 'active' : 'paused'}
+                    onChange={(e) => setIsActive(e.target.value === 'active')}
+                    className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-primary focus:outline-none font-bold"
+                  >
+                    <option value="active">🟢 Active (Running)</option>
+                    <option value="paused">🔴 Paused (Deactivated)</option>
+                  </select>
+                  <p className="text-[10px] text-muted-foreground">Deactivated plans will pause triggers and automatic executions.</p>
+                </div>
+
                 {/* Scope */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 border-t border-border pt-4">
                   <label className="text-xs font-bold text-foreground">Plan Scope</label>
                   <select
                     value={settings.scope}
@@ -277,9 +309,10 @@ export default function CampaignEditor({
                         {index + 1}
                       </span>
                       <span className="font-extrabold text-xs text-foreground uppercase tracking-wide">
-                        {step.type === 'EMAIL' ? '✉️ DO Auto Email' :
-                         step.type === 'SMS' ? '💬 DO Auto Text' :
-                         step.type === 'CALL' ? '📞 DO Call Task' : '⚡ DO General Task'}
+                        {step.type === 'EMAIL' ? `✉️ DO Auto Email - "${step.title || 'Untitled Email'}"` :
+                         step.type === 'SMS' ? `💬 DO Auto Text - "${step.title || 'Untitled SMS'}"` :
+                         step.type === 'CALL' ? `📞 DO Call Task - "${step.title || 'Untitled Call'}"` : 
+                         `⚡ DO General Task - "${step.title || 'Untitled Task'}"`}
                       </span>
                     </div>
 
@@ -310,6 +343,18 @@ export default function CampaignEditor({
 
                   {/* Step Card Content form */}
                   <div className="p-4 space-y-3">
+                    {/* Action Step Name / Title Input */}
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-muted-foreground uppercase">Action Step Name / Title</label>
+                      <input
+                        type="text"
+                        value={step.title || ''}
+                        onChange={(e) => handleStepChange(index, 'title', e.target.value)}
+                        placeholder="e.g. Day 1 Welcome Text or Re-engagement Email"
+                        className="w-full bg-muted/10 border border-border rounded px-2.5 py-1 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                      />
+                    </div>
+
                     {step.type === 'EMAIL' && (
                       <>
                         <div className="space-y-1">
@@ -365,7 +410,7 @@ export default function CampaignEditor({
                   {/* Absolute delete button */}
                   <button
                     onClick={() => handleDeleteStep(index)}
-                    className="absolute top-2.5 right-36 md:right-32 text-xs text-red-400 hover:text-red-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-2.5 right-36 md:right-32 text-xs text-red-400 hover:text-red-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                   >
                     Delete Step
                   </button>
@@ -385,13 +430,13 @@ export default function CampaignEditor({
                 <div className="flex gap-2 justify-center">
                   <button
                     onClick={() => handleAddStep('EMAIL')}
-                    className="px-3 py-1 bg-primary text-primary-foreground font-bold rounded hover:bg-primary/95 text-[10px] uppercase shadow-sm"
+                    className="px-3 py-1 bg-primary text-primary-foreground font-bold rounded hover:bg-primary/95 text-[10px] uppercase shadow-sm cursor-pointer"
                   >
                     + Email Step
                   </button>
                   <button
                     onClick={() => handleAddStep('SMS')}
-                    className="px-3 py-1 bg-secondary text-secondary-foreground font-bold rounded hover:bg-secondary/95 text-[10px] uppercase shadow-sm"
+                    className="px-3 py-1 bg-secondary text-secondary-foreground font-bold rounded hover:bg-secondary/95 text-[10px] uppercase shadow-sm cursor-pointer"
                   >
                     + SMS Step
                   </button>
@@ -404,25 +449,25 @@ export default function CampaignEditor({
               <div className="flex gap-2 border border-border bg-background p-2 rounded-xl shadow-sm mb-6">
                 <button
                   onClick={() => handleAddStep('EMAIL')}
-                  className="px-3 py-1 bg-muted hover:bg-muted/80 border border-border rounded text-[10px] font-bold uppercase"
+                  className="px-3 py-1 bg-muted hover:bg-muted/80 border border-border rounded text-[10px] font-bold uppercase cursor-pointer"
                 >
                   + Email Step
                 </button>
                 <button
                   onClick={() => handleAddStep('SMS')}
-                  className="px-3 py-1 bg-muted hover:bg-muted/80 border border-border rounded text-[10px] font-bold uppercase"
+                  className="px-3 py-1 bg-muted hover:bg-muted/80 border border-border rounded text-[10px] font-bold uppercase cursor-pointer"
                 >
                   + SMS Step
                 </button>
                 <button
                   onClick={() => handleAddStep('CALL')}
-                  className="px-3 py-1 bg-muted hover:bg-muted/80 border border-border rounded text-[10px] font-bold uppercase"
+                  className="px-3 py-1 bg-muted hover:bg-muted/80 border border-border rounded text-[10px] font-bold uppercase cursor-pointer"
                 >
                   + Call Task
                 </button>
                 <button
                   onClick={() => handleAddStep('TASK')}
-                  className="px-3 py-1 bg-muted hover:bg-muted/80 border border-border rounded text-[10px] font-bold uppercase"
+                  className="px-3 py-1 bg-muted hover:bg-muted/80 border border-border rounded text-[10px] font-bold uppercase cursor-pointer"
                 >
                   + General Task
                 </button>
@@ -442,14 +487,14 @@ export default function CampaignEditor({
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-border hover:bg-muted rounded-lg text-xs font-medium transition-colors"
+              className="px-4 py-2 border border-border hover:bg-muted rounded-lg text-xs font-medium transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-6 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95 transition-all shadow-md disabled:opacity-50"
+              className="px-6 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95 transition-all shadow-md disabled:opacity-50 cursor-pointer"
             >
               {isSaving ? 'Saving Campaign...' : 'Save Drip Campaign'}
             </button>

@@ -11,6 +11,7 @@ import { AppRole, isAtLeastRole } from '@/lib/permissions';
 import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 import AddLeadModal from '@/components/AddLeadModal';
 import { seedSegmentsIfEmpty } from '@/lib/actions/segment';
+import { checkAndAutoEnrollLead } from '@/lib/campaign-processor';
 
 import { LeadTableClient } from '@/components/LeadTableClient';
 
@@ -86,6 +87,10 @@ async function addLead(formData: FormData) {
     }
 
     await Promise.all([syncContactToVectorStore(contact), syncLeadToVectorStore(lead, contact)]);
+    
+    // Check for auto-apply campaigns triggered by Lead Creation
+    await checkAndAutoEnrollLead(lead.id, 'LEAD_CREATED');
+
     return { success: true };
   } catch (error) {
     console.error('Failed to add lead:', error);

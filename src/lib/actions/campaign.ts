@@ -18,6 +18,11 @@ export async function createCampaignAction(formData: FormData) {
 
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
+  const scope = (formData.get('scope') as string) || 'COMPANY';
+  const leadType = (formData.get('leadType') as string) || 'BOTH';
+  const autoApplyTrigger = (formData.get('autoApplyTrigger') as string) || 'NONE';
+  const autoApplyCriteria = (formData.get('autoApplyCriteria') as string) || '';
+  const autoPauseOn = (formData.get('autoPauseOn') as string) || 'REPLY';
   const workspaceId = access.workspaceId;
 
   if (!name) {
@@ -33,11 +38,11 @@ export async function createCampaignAction(formData: FormData) {
         isActive: true,
         steps: JSON.stringify({
           settings: {
-            scope: 'COMPANY',
-            leadType: 'BOTH',
-            autoApplyTrigger: 'NONE',
-            autoApplyCriteria: '',
-            autoPauseOn: 'REPLY',
+            scope,
+            leadType,
+            autoApplyTrigger,
+            autoApplyCriteria,
+            autoPauseOn,
           },
           items: [
             {
@@ -45,6 +50,7 @@ export async function createCampaignAction(formData: FormData) {
               type: 'EMAIL',
               delayValue: 0,
               delayUnit: 'DAY',
+              title: 'Welcome to our Agency!',
               subject: 'Welcome to our Agency!',
               content: 'Hi! Thanks for reaching out. Let us know how we can help you find your dream home.',
             },
@@ -53,6 +59,7 @@ export async function createCampaignAction(formData: FormData) {
               type: 'SMS',
               delayValue: 1,
               delayUnit: 'DAY',
+              title: 'Welcome SMS follow up',
               content: 'Hi, just following up to see if you received our email yesterday? Let us know if you want to chat!',
             },
             {
@@ -60,6 +67,7 @@ export async function createCampaignAction(formData: FormData) {
               type: 'CALL',
               delayValue: 3,
               delayUnit: 'DAY',
+              title: 'Schedule intro call',
               content: 'Schedule follow up introduction call.',
             }
           ]
