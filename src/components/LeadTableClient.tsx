@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import AddTaskModal from './AddTaskModal';
 import { addTaskAction } from '@/lib/actions/task';
 import { bulkEnrollLeadsInCampaignAction } from '@/lib/actions/campaign';
-import { deleteLeadAction } from '@/lib/actions/lead';
+import { deleteLeadAction, importLeadsBulkAction } from '@/lib/actions/lead';
 import { addLeadsToSegmentBulkAction } from '@/lib/actions/segment';
 
 type LeadRow = {
@@ -22,6 +22,13 @@ type LeadRow = {
     lastName: string | null;
     email: string | null;
     phone: string | null;
+    address?: string | null;
+    additionalPhones?: string | null;
+    additionalEmails?: string | null;
+    spouseName?: string | null;
+    spousePhone?: string | null;
+    spouseEmail?: string | null;
+    familyMembers?: string | null;
   };
 };
 
@@ -48,6 +55,281 @@ export function LeadTableClient({
   const searchParams = useSearchParams();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSyncing, setIsSyncing] = useState(false);
+  const [activeWorkspace, setActiveWorkspace] = useState('');
+  const [activeAssignee, setActiveAssignee] = useState('');
+  const [activeCampaign, setActiveCampaign] = useState('');
+  const [activeSegment, setActiveSegment] = useState('');
+  const [isBulkActionPending, setIsBulkActionPending] = useState(false);
+
+  // CSV Import States
+  const [showCsvImportModal, setShowCsvImportModal] = useState(false);
+  const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
+  const [csvRows, setCsvRows] = useState<string[][]>([]);
+  const [fieldMappings, setFieldMappings] = useState<Record<string, string>>({});
+  const [importSegmentId, setImportSegmentId] = useState('');
+  const [importSegmentName, setImportSegmentName] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
+
+  // AI Intake States
+  const [showAiIntakeModal, setShowAiIntakeModal] = useState(false);
+  const [aiIntakeText, setAiIntakeText] = useState('');
+  const [isParsing, setIsParsing] = useState(false);
+  const [parsedLeadData, setParsedLeadData] = useState<any>(null);
+  const [aiSegmentId, setAiSegmentId] = useState('');
+  const [aiSegmentName, setAiSegmentName] = useState('');
+
+  const handleCsvFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (!text) return;
+
+      const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+      if (lines.length === 0) {
+        toast.error('The selected CSV file is empty.');
+        return;
+      }
+
+      const parseCsvLine = (line: string) => {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        result.push(current.trim());
+        return result;
+      };
+
+      const parsedHeaders = parseCsvLine(lines[0]);
+      const parsedRows = lines.slice(1).map(line => parseCsvLine(line));
+
+      setCsvHeaders(parsedHeaders);
+      setCsvRows(parsedRows);
+
+      const mappings: Record<string, string> = {};
+      const targetFields = [
+        'firstName', 'lastName', 'email', 'phone', 'type', 'source', 'tags', 'notes', 'address',
+        'additionalPhones', 'additionalEmails', 'spouseName', 'spousePhone', 'spouseEmail', 'familyMembers'
+      ];
+      
+      targetFields.forEach(field => {
+        const fieldLower = field.toLowerCase();
+        const matchedIdx = parsedHeaders.findIndex(header => {
+          const hLower = header.toLowerCase();
+          return hLower === fieldLower || 
+                 hLower.includes(fieldLower) || 
+                 (field === 'firstName' && (hLower.includes('first') || hLower.includes('fname') || hLower === 'name')) ||
+                 (field === 'lastName' && (hLower.includes('last') || hLower.includes('lname'))) ||
+                 (field === 'phone' && (hLower.includes('cell') || hLower.includes('mobile') || hLower.includes('tel') || hLower.includes('phone'))) ||
+                 (field === 'additionalPhones' && (hLower.includes('phone 2') || hLower.includes('phone2') || hLower.includes('other phone') || hLower.includes('secondary phone'))) ||
+                 (field === 'additionalEmails' && (hLower.includes('email 2') || hLower.includes('email2') || hLower.includes('other email') || hLower.includes('secondary email'))) ||
+                 (field === 'spouseName' && (hLower.includes('spouse name') || hLower.includes('spouse_name') || hLower.includes('partner') || hLower.includes('husband') || hLower.includes('wife'))) ||
+                 (field === 'spousePhone' && (hLower.includes('spouse phone') || hLower.includes('spouse cell'))) ||
+                 (field === 'spouseEmail' && hLower.includes('spouse email')) ||
+                 (field === 'familyMembers' && (hLower.includes('family') || hLower.includes('relative') || hLower.includes('child')));
+        });
+        if (matchedIdx !== -1) {
+          mappings[field] = String(matchedIdx);
+        } else {
+          mappings[field] = '';
+        }
+      });
+
+      setFieldMappings(mappings);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleImportSubmit = async () => {
+    if (isImporting) return;
+    setIsImporting(true);
+
+    try {
+      const leadsToImport = csvRows.map(row => {
+        const getVal = (field: string) => {
+          const idx = fieldMappings[field];
+          if (idx === '' || idx === undefined) return '';
+          return row[Number(idx)] || '';
+        };
+
+        return {
+          firstName: getVal('firstName') || 'Imported',
+          lastName: getVal('lastName'),
+          email: getVal('email'),
+          phone: getVal('phone'),
+          status: 'NEW',
+          type: (getVal('type').toUpperCase().includes('SELL') ? 'SELLER' : 'BUYER') as 'BUYER' | 'SELLER',
+          source: getVal('source') || 'CSV Import',
+          tags: getVal('tags'),
+          notes: getVal('notes'),
+          address: getVal('address'),
+          additionalPhones: getVal('additionalPhones'),
+          additionalEmails: getVal('additionalEmails'),
+          spouseName: getVal('spouseName'),
+          spousePhone: getVal('spousePhone'),
+          spouseEmail: getVal('spouseEmail'),
+          familyMembers: getVal('familyMembers'),
+        };
+      }).filter(l => l.firstName.trim().length > 0);
+
+      if (leadsToImport.length === 0) {
+        toast.error('No valid leads found to import.');
+        setIsImporting(false);
+        return;
+      }
+
+      const res = await importLeadsBulkAction(
+        leadsToImport,
+        importSegmentId || undefined,
+        importSegmentName || undefined
+      );
+
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success(`Successfully imported ${res.imported} leads!`);
+        setShowCsvImportModal(false);
+        setCsvHeaders([]);
+        setCsvRows([]);
+        setImportSegmentId('');
+        setImportSegmentName('');
+        router.refresh();
+      }
+    } catch (err) {
+      toast.error('Failed to import leads.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleExportCSV = () => {
+    if (initialLeads.length === 0) {
+      toast.error('No leads to export.');
+      return;
+    }
+
+    const headers = [
+      'First Name', 'Last Name', 'Email', 'Phone', 'Status', 'Type', 'Source', 'Tags', 'Address',
+      'Additional Phones', 'Additional Emails', 'Spouse Name', 'Spouse Phone', 'Spouse Email', 'Family Members'
+    ];
+    const csvRowsData = initialLeads.map(l => [
+      l.contact.firstName,
+      l.contact.lastName || '',
+      l.contact.email || '',
+      l.contact.phone || '',
+      l.status,
+      l.status === 'PREFORECLOSURE' ? 'SELLER' : 'BUYER',
+      l.source || '',
+      l.tags || '',
+      l.contact.address || '',
+      l.contact.additionalPhones ? (
+        l.contact.additionalPhones.startsWith('[') ? JSON.parse(l.contact.additionalPhones).join('; ') : l.contact.additionalPhones
+      ) : '',
+      l.contact.additionalEmails ? (
+        l.contact.additionalEmails.startsWith('[') ? JSON.parse(l.contact.additionalEmails).join('; ') : l.contact.additionalEmails
+      ) : '',
+      l.contact.spouseName || '',
+      l.contact.spousePhone || '',
+      l.contact.spouseEmail || '',
+      l.contact.familyMembers || ''
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...csvRowsData.map(row => row.map(val => `"${val.replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `crm_leads_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Leads exported successfully!');
+  };
+
+  const handleAiParse = async () => {
+    if (!aiIntakeText.trim()) return;
+    setIsParsing(true);
+    setParsedLeadData(null);
+
+    try {
+      const res = await fetch('/api/leads/ai-parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: aiIntakeText }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setParsedLeadData(data.data);
+        toast.success('Lead details parsed successfully by AI Agent!');
+      } else {
+        toast.error(data.error || 'Failed to parse text.');
+      }
+    } catch (err) {
+      toast.error('Failed to parse text via AI.');
+    } finally {
+      setIsParsing(false);
+    }
+  };
+
+  const handleAiImportSubmit = async () => {
+    if (!parsedLeadData) return;
+    setIsImporting(true);
+
+    try {
+      const res = await importLeadsBulkAction(
+        [
+          {
+            firstName: parsedLeadData.firstName || 'Imported',
+            lastName: parsedLeadData.lastName,
+            email: parsedLeadData.email,
+            phone: parsedLeadData.phone,
+            status: 'NEW',
+            type: parsedLeadData.type,
+            source: parsedLeadData.source || 'AI Ingestion',
+            tags: parsedLeadData.tags,
+            notes: parsedLeadData.notes,
+            address: parsedLeadData.address,
+          }
+        ],
+        aiSegmentId || undefined,
+        aiSegmentName || undefined
+      );
+
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success('Lead parsed and saved successfully!');
+        setShowAiIntakeModal(false);
+        setAiIntakeText('');
+        setParsedLeadData(null);
+        setAiSegmentId('');
+        setAiSegmentName('');
+        router.refresh();
+      }
+    } catch (err) {
+      toast.error('Failed to save lead.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -196,18 +478,37 @@ export function LeadTableClient({
       <div className="p-4 border-b border-border flex justify-between items-center bg-muted/5">
         <div className="flex gap-2">
            <button
-            onClick={handleImportFromQueue}
-            disabled={isSyncing}
-            className="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/20 text-xs font-bold rounded shadow-sm hover:bg-secondary/15 transition-colors disabled:opacity-50"
-          >
-            {isSyncing ? 'Syncing...' : '📥 Sync from Queue'}
-          </button>
-          <button
-            onClick={() => bulkAction('Import from Workflow')}
-            className="px-3 py-1.5 bg-background border border-border text-xs font-medium rounded shadow-sm hover:bg-muted transition-colors"
-          >
-            🔄 Sync from Workflow
-          </button>
+             onClick={handleImportFromQueue}
+             disabled={isSyncing}
+             className="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/20 text-xs font-bold rounded shadow-sm hover:bg-secondary/15 transition-colors disabled:opacity-50"
+           >
+             {isSyncing ? 'Syncing...' : '📥 Sync from Queue'}
+           </button>
+           <button
+             onClick={() => bulkAction('Import from Workflow')}
+             className="px-3 py-1.5 bg-background border border-border text-xs font-medium rounded shadow-sm hover:bg-muted transition-colors mr-2"
+           >
+             🔄 Sync from Workflow
+           </button>
+           <div className="h-6 w-[1px] bg-border mx-1 self-center"></div>
+           <button
+             onClick={() => setShowCsvImportModal(true)}
+             className="px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 text-xs font-bold rounded shadow-sm hover:bg-primary/15 transition-colors cursor-pointer"
+           >
+             📥 Import CSV
+           </button>
+           <button
+             onClick={handleExportCSV}
+             className="px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 text-xs font-bold rounded shadow-sm hover:bg-primary/15 transition-colors cursor-pointer"
+           >
+             📤 Export CSV
+           </button>
+           <button
+             onClick={() => setShowAiIntakeModal(true)}
+             className="px-3 py-1.5 bg-amber-500/10 text-amber-600 border border-amber-500/20 text-xs font-bold rounded shadow-sm hover:bg-amber-500/15 transition-colors cursor-pointer"
+           >
+             ✨ AI Lead Intake
+           </button>
         </div>
         
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -550,6 +851,394 @@ export function LeadTableClient({
           </Link>
         </div>
       </div>
+
+      {/* CSV Universal Import Modal */}
+      {showCsvImportModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-background border border-border shadow-2xl rounded-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
+              <div>
+                <h3 className="font-extrabold text-lg text-foreground">📥 Universal CSV Field Mapper</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Upload a CSV file and match your columns to CRM fields.</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setShowCsvImportModal(false);
+                  setCsvHeaders([]);
+                  setCsvRows([]);
+                }} 
+                className="text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+              {csvHeaders.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-border rounded-xl">
+                  <span className="text-3xl mb-2">📊</span>
+                  <p className="font-bold mb-1">Select a CSV File to Begin</p>
+                  <p className="text-muted-foreground mb-4">First row must contain header columns</p>
+                  <label className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/95 transition-all cursor-pointer shadow-sm">
+                    Choose CSV File
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleCsvFileSelect}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              ) : (
+                <>
+                  {/* Segment Options */}
+                  <div className="bg-muted/10 border border-border rounded-xl p-4 space-y-4">
+                    <h4 className="font-bold text-sm text-foreground">🏷️ Assign Imports to Segment</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">Choose Existing Segment</label>
+                        <select
+                          value={importSegmentId}
+                          onChange={(e) => {
+                            setImportSegmentId(e.target.value);
+                            setImportSegmentName('');
+                          }}
+                          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary"
+                        >
+                          <option value="">-- No Segment --</option>
+                          {segments.map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">OR Create New Segment Name</label>
+                        <input
+                          type="text"
+                          value={importSegmentName}
+                          onChange={(e) => {
+                            setImportSegmentName(e.target.value);
+                            setImportSegmentId('');
+                          }}
+                          placeholder="e.g. June Zillow Leads"
+                          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Universal Column Matching */}
+                  <div className="space-y-3">
+                    <h4 className="font-bold text-sm text-foreground">🔗 Map Columns to CRM Fields</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 bg-muted/5 border border-border p-4 rounded-xl">
+                      {[
+                        ['firstName', 'First Name * (Required)'],
+                        ['lastName', 'Last Name'],
+                        ['email', 'Email Address'],
+                        ['phone', 'Phone Number'],
+                        ['type', 'Lead Type (Buyer/Seller)'],
+                        ['source', 'Lead Source'],
+                        ['tags', 'Hashtags / Tags'],
+                        ['notes', 'Inquiry Message / Notes'],
+                        ['address', 'Property Address'],
+                      ].map(([fieldKey, labelName]) => (
+                        <div key={fieldKey} className="flex justify-between items-center gap-2 border-b border-border/40 pb-2">
+                          <span className="font-semibold text-muted-foreground">{labelName}</span>
+                          <select
+                            value={fieldMappings[fieldKey] || ''}
+                            onChange={(e) => setFieldMappings({ ...fieldMappings, [fieldKey]: e.target.value })}
+                            className="bg-background border border-border rounded px-2.5 py-1 text-xs focus:ring-1 focus:ring-primary max-w-[150px] md:max-w-[180px] truncate"
+                          >
+                            <option value="">-- Ignore Field --</option>
+                            {csvHeaders.map((header, idx) => (
+                              <option key={idx} value={String(idx)}>{header}</option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Preview Table */}
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-sm text-foreground">👁️ Preview Intake Data ({csvRows.length} Rows found)</h4>
+                    <div className="border border-border rounded-lg overflow-x-auto max-h-[150px] bg-background">
+                      <table className="w-full text-left text-[10px] divide-y divide-border">
+                        <thead className="bg-muted/40 font-bold uppercase text-muted-foreground">
+                          <tr>
+                            {csvHeaders.slice(0, 5).map((h, i) => (
+                              <th key={i} className="px-3 py-1.5">{h}</th>
+                            ))}
+                            {csvHeaders.length > 5 && <th className="px-3 py-1.5">...</th>}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/60">
+                          {csvRows.slice(0, 3).map((row, rowIdx) => (
+                            <tr key={rowIdx}>
+                              {row.slice(0, 5).map((val, valIdx) => (
+                                <td key={valIdx} className="px-3 py-1.5 text-muted-foreground font-mono">{val}</td>
+                              ))}
+                              {row.length > 5 && <td className="px-3 py-1.5 text-muted-foreground italic">...</td>}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {csvHeaders.length > 0 && (
+              <div className="p-4 border-t border-border bg-muted/20 flex justify-between items-center shrink-0">
+                <button
+                  onClick={() => {
+                    setCsvHeaders([]);
+                    setCsvRows([]);
+                  }}
+                  className="px-3 py-1.5 bg-muted border border-border text-xs rounded hover:bg-muted/80 cursor-pointer"
+                >
+                  Clear File
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setShowCsvImportModal(false);
+                      setCsvHeaders([]);
+                      setCsvRows([]);
+                      setImportSegmentId('');
+                      setImportSegmentName('');
+                    }}
+                    className="px-3 py-1.5 hover:bg-muted rounded text-xs cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleImportSubmit}
+                    disabled={isImporting}
+                    className="px-5 py-1.5 bg-primary text-primary-foreground font-bold rounded hover:bg-primary/90 text-xs shadow-md disabled:opacity-50 cursor-pointer"
+                  >
+                    {isImporting ? 'Importing Leads...' : `Confirm Import (${csvRows.length} Leads)`}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* AI Lead Intake Modal */}
+      {showAiIntakeModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-background border border-border shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
+              <div>
+                <h3 className="font-extrabold text-lg text-foreground">✨ AI Agent Lead Intake</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Paste any email text, Zillow/Realtor notification to extract details.</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setShowAiIntakeModal(false);
+                  setAiIntakeText('');
+                  setParsedLeadData(null);
+                  setAiSegmentId('');
+                  setAiSegmentName('');
+                }} 
+                className="text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto space-y-4 flex-1 text-xs">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase">Paste Unstructured Text</label>
+                <textarea
+                  value={aiIntakeText}
+                  onChange={(e) => setAiIntakeText(e.target.value)}
+                  placeholder="Paste Zillow/Realtor contact details or lead emails here..."
+                  rows={6}
+                  className="w-full bg-muted/10 border border-border rounded-xl px-3 py-2 focus:ring-1 focus:ring-primary focus:outline-none resize-none font-mono text-[11px]"
+                />
+              </div>
+
+              {!parsedLeadData ? (
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleAiParse}
+                    disabled={isParsing || !aiIntakeText.trim()}
+                    className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/95 text-xs shadow-md disabled:opacity-50 cursor-pointer"
+                  >
+                    {isParsing ? 'AI Parsing Info...' : '⚡ AI Extract Details'}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Segment Options */}
+                  <div className="bg-muted/10 border border-border rounded-xl p-4 space-y-4">
+                    <h4 className="font-bold text-sm text-foreground">🏷️ Assign AI Intake to Segment</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">Choose Existing Segment</label>
+                        <select
+                          value={aiSegmentId}
+                          onChange={(e) => {
+                            setAiSegmentId(e.target.value);
+                            setAiSegmentName('');
+                          }}
+                          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary"
+                        >
+                          <option value="">-- No Segment --</option>
+                          {segments.map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase">OR Create New Segment Name</label>
+                        <input
+                          type="text"
+                          value={aiSegmentName}
+                          onChange={(e) => {
+                            setAiSegmentName(e.target.value);
+                            setAiSegmentId('');
+                          }}
+                          placeholder="e.g. AI Intake Leads"
+                          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Structured Preview Form */}
+                  <div className="space-y-3 border border-border bg-muted/5 p-4 rounded-xl">
+                    <h4 className="font-bold text-sm text-foreground text-primary flex items-center gap-1">
+                      <span>✓</span> Extracted Structured Fields
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground">First Name</span>
+                        <input
+                          type="text"
+                          value={parsedLeadData.firstName || ''}
+                          onChange={(e) => setParsedLeadData({ ...parsedLeadData, firstName: e.target.value })}
+                          className="w-full bg-background border border-border rounded px-2.5 py-1 mt-0.5 font-bold"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Last Name</span>
+                        <input
+                          type="text"
+                          value={parsedLeadData.lastName || ''}
+                          onChange={(e) => setParsedLeadData({ ...parsedLeadData, lastName: e.target.value })}
+                          className="w-full bg-background border border-border rounded px-2.5 py-1 mt-0.5"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Email</span>
+                        <input
+                          type="email"
+                          value={parsedLeadData.email || ''}
+                          onChange={(e) => setParsedLeadData({ ...parsedLeadData, email: e.target.value })}
+                          className="w-full bg-background border border-border rounded px-2.5 py-1 mt-0.5"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Phone</span>
+                        <input
+                          type="text"
+                          value={parsedLeadData.phone || ''}
+                          onChange={(e) => setParsedLeadData({ ...parsedLeadData, phone: e.target.value })}
+                          className="w-full bg-background border border-border rounded px-2.5 py-1 mt-0.5"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Lead Type</span>
+                        <select
+                          value={parsedLeadData.type}
+                          onChange={(e) => setParsedLeadData({ ...parsedLeadData, type: e.target.value })}
+                          className="w-full bg-background border border-border rounded px-2.5 py-1 mt-0.5"
+                        >
+                          <option value="BUYER">BUYER</option>
+                          <option value="SELLER">SELLER</option>
+                        </select>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Source</span>
+                        <input
+                          type="text"
+                          value={parsedLeadData.source || ''}
+                          onChange={(e) => setParsedLeadData({ ...parsedLeadData, source: e.target.value })}
+                          className="w-full bg-background border border-border rounded px-2.5 py-1 mt-0.5"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Property Address</span>
+                      <input
+                        type="text"
+                        value={parsedLeadData.address || ''}
+                        onChange={(e) => setParsedLeadData({ ...parsedLeadData, address: e.target.value })}
+                        className="w-full bg-background border border-border rounded px-2.5 py-1 mt-0.5"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Tags</span>
+                      <input
+                        type="text"
+                        value={parsedLeadData.tags || ''}
+                        onChange={(e) => setParsedLeadData({ ...parsedLeadData, tags: e.target.value })}
+                        className="w-full bg-background border border-border rounded px-2.5 py-1 mt-0.5"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">Notes / Summary</span>
+                      <textarea
+                        value={parsedLeadData.notes || ''}
+                        onChange={(e) => setParsedLeadData({ ...parsedLeadData, notes: e.target.value })}
+                        rows={2}
+                        className="w-full bg-background border border-border rounded px-2.5 py-1 mt-0.5 resize-none"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {parsedLeadData && (
+              <div className="p-4 border-t border-border bg-muted/20 flex justify-between items-center shrink-0">
+                <button
+                  onClick={() => setParsedLeadData(null)}
+                  className="px-3 py-1.5 bg-muted border border-border text-xs rounded hover:bg-muted/80 cursor-pointer"
+                >
+                  Reparse Text
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setShowAiIntakeModal(false);
+                      setAiIntakeText('');
+                      setParsedLeadData(null);
+                      setAiSegmentId('');
+                      setAiSegmentName('');
+                    }}
+                    className="px-3 py-1.5 hover:bg-muted rounded text-xs cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAiImportSubmit}
+                    disabled={isImporting}
+                    className="px-5 py-1.5 bg-primary text-primary-foreground font-bold rounded hover:bg-primary/90 text-xs shadow-md disabled:opacity-50 cursor-pointer"
+                  >
+                    {isImporting ? 'Saving Lead...' : '✓ Approve & Import Lead'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

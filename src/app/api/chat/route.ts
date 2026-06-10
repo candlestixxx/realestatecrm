@@ -89,6 +89,65 @@ export async function POST(req: Request) {
           return { contacts };
         },
       },
+      createLead: {
+        description: 'Create a new lead/contact in the CRM.',
+        parameters: z.object({
+          firstName: z.string().describe('The first name of the contact.'),
+          lastName: z.string().optional().describe('The last name of the contact.'),
+          email: z.string().optional().describe('The email address of the contact.'),
+          phone: z.string().optional().describe('The phone number of the contact.'),
+          type: z.enum(['BUYER', 'SELLER']).optional().describe('Lead type (BUYER or SELLER).'),
+          source: z.string().optional().describe('Where the lead came from.'),
+          notes: z.string().optional().describe('Any initial notes or inquiry description.'),
+          tags: z.string().optional().describe('Comma-separated hashtags to apply.'),
+        }),
+        execute: async ({ firstName, lastName, email, phone, type, source, notes, tags }: { 
+          firstName: string; 
+          lastName?: string; 
+          email?: string; 
+          phone?: string; 
+          type?: 'BUYER' | 'SELLER'; 
+          source?: string;
+          notes?: string;
+          tags?: string;
+        }) => {
+          // create contact
+          const contact = await prisma.contact.create({
+            data: {
+              firstName,
+              lastName: lastName || null,
+              email: email || null,
+              phone: phone || null,
+              workspaceId: access.workspaceId,
+            },
+          });
+          // create lead
+          const lead = await prisma.lead.create({
+            data: {
+              status: 'NEW',
+              score: 70,
+              source: source || 'AI Assistant',
+              type: type || 'BUYER',
+              tags: tags || null,
+              workspaceId: access.workspaceId,
+              contactId: contact.id,
+              userId: access.userId,
+            },
+          });
+          if (notes) {
+            await prisma.activity.create({
+              data: {
+                type: 'NOTE',
+                content: `Note from AI Intake:\n"${notes}"`,
+                workspaceId: access.workspaceId,
+                userId: access.userId,
+                leadId: lead.id,
+              },
+            });
+          }
+          return { success: true, leadId: lead.id, name: `${firstName} ${lastName || ''}`.trim() };
+        },
+      },
       explainFeature: {
         description: 'Provide an explanation of how a specific CRM feature works.',
         parameters: z.object({

@@ -118,6 +118,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
             Email Settings
           </Link>
           <Link
+            href="/dashboard/settings/integrations"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Lead Integrations
+          </Link>
+          <Link
             href="/dashboard/help-center"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >

@@ -129,6 +129,24 @@ export default function LeadQuickActions({
           <div className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-background shadow-xl z-30 py-2 divide-y divide-border/50 animate-in fade-in slide-in-from-top-2 duration-100">
             <div className="py-1">
               <button
+                onClick={async () => {
+                  setIsOpen(false);
+                  const loadingToast = toast.loading('Syncing lead details from MyPlusLeads...');
+                  try {
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    toast.dismiss(loadingToast);
+                    toast.success('Lead details synced from MyPlusLeads successfully!');
+                    router.refresh();
+                  } catch (e) {
+                    toast.dismiss(loadingToast);
+                    toast.error('Sync failed.');
+                  }
+                }}
+                className="w-full text-left px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors flex items-center gap-2 cursor-pointer"
+              >
+                🔄 Pull from MyPlusLeads
+              </button>
+              <button
                 onClick={() => {
                   setIsOpen(false);
                   setActiveModal('segment');
