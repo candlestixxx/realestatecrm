@@ -69,7 +69,7 @@ export default function SidebarAIAssistant() {
         className="w-10 bg-muted/50 hover:bg-muted border-r border-border h-full flex flex-col items-center py-6 gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
       >
         <span className="text-lg">✨</span>
-        <span className="text-[10px] font-bold uppercase tracking-widest writing-vertical rotate-180 select-none">
+        <span className="text-[10px] font-bold uppercase tracking-widest [writing-mode:vertical-rl] select-none">
           AI Assistant
         </span>
       </button>
