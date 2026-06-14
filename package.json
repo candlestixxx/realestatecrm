@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "predev": "kill-port 3000",
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 3000 --webpack",
     "prebuild": "kill-port 3000",
     "build": "next build",
     "prestart": "kill-port 3000",

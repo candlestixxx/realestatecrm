@@ -8,6 +8,14 @@ import { revalidatePath } from 'next/cache';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 
 export async function seedSegmentsIfEmpty(workspaceId: string) {
+  const workspaceExists = await prisma.workspace.findUnique({
+    where: { id: workspaceId },
+  });
+  if (!workspaceExists) {
+    console.warn(`Workspace with ID ${workspaceId} does not exist. Skipping segment seeding.`);
+    return;
+  }
+
   const count = await prisma.segment.count({ where: { workspaceId } });
   if (count === 0) {
     await prisma.segment.createMany({
