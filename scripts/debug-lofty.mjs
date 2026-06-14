@@ -8,7 +8,7 @@ import { resolve } from 'path';
 
 const envPath = resolve(process.cwd(), '.env.local');
 const envText = readFileSync(envPath, 'utf8');
-const loftyKey = envText.split('\n').find(l => l.startsWith('LOFTY_API_KEY=')).spl...n('=');
+const loftyKey = envText.split('\n').find(l => l.startsWith('LOFTY_API_KEY=')).split('=')[1];
 
 const API = 'https://lofty.com/api/v1.0';
 const TAGS = ['CircleProspect', 'Shelby Twp'];

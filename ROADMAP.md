@@ -98,3 +98,6 @@
 - **Segmentation & Bulk Actions:** Overhauled lead management with bulk selection, dynamic pagination, and the "Workspace as Segment" orchestration.
 - **Workflow Visibility:** Added a workflow performance overview and AI assistant status to the main dashboard.
 - **Onboarding:** Integrated an interactive tour for new feature discovery.
+
+## Lofty.com Features
+- Additional accessible documentation or structured exports are required from Lofty.com to perfectly duplicate every specific menu item, button, and page.
