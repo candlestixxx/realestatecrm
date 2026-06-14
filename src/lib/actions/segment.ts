@@ -186,3 +186,34 @@ export async function addLeadsToSegmentBulkAction(leadIds: string[], segmentId: 
     return { error: 'An unexpected error occurred.' };
   }
 }
+
+export async function toggleSegmentPinAction(segmentId: string) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions.' };
+  }
+
+  try {
+    const segment = await prisma.segment.findUnique({
+      where: { id: segmentId, workspaceId: access.workspaceId },
+      select: { isPinned: true }
+    });
+
+    if (!segment) {
+      return { error: 'Segment not found.' };
+    }
+
+    await prisma.segment.update({
+      where: { id: segmentId, workspaceId: access.workspaceId },
+      data: { isPinned: !segment.isPinned },
+    });
+
+    revalidatePath('/dashboard/segments');
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to toggle segment pin:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
+}

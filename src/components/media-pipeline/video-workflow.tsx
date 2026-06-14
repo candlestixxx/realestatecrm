@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Video } from 'lucide-react';
 
-export function VideoWorkflow() {
+export function VideoWorkflow({ listingId }: { listingId?: string }) {
   const [selectedFormat, setSelectedFormat] = useState<'9:16' | '16:9'>('9:16');
 
   return (

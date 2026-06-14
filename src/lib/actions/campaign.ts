@@ -324,3 +324,25 @@ export async function deleteCampaignAction(campaignId: string) {
   }
 }
 
+export async function toggleCampaignAutoApplyAction(campaignId: string, autoApply: boolean) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions.' };
+  }
+
+  try {
+    await prisma.smartPlan.update({
+      where: { id: campaignId, workspaceId: access.workspaceId },
+      data: { autoApply },
+    });
+
+    revalidatePath('/dashboard/campaigns');
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to toggle campaign autoApply:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
+}
+

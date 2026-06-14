@@ -1,12 +1,71 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ImageVariant } from '@/lib/media-pipeline-state';
 import { Check, X, Image as ImageIcon, Wand2, MonitorPlay } from 'lucide-react';
 
-export function ImageWorkflow() {
+interface ImageWorkflowProps {
+  listingId?: string;
+}
+
+export function ImageWorkflow({ listingId }: ImageWorkflowProps) {
   const [variants, setVariants] = useState<ImageVariant[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [sourcePath, setSourcePath] = useState('\\\\excelserver\\WeichertShare\\1 LISTINGS\\2026 Listings\\123_Main_St');
+  const [address, setAddress] = useState('123 Main St');
+
+  useEffect(() => {
+    if (!listingId) return;
+
+    const loadWorkflow = async () => {
+      try {
+        const response = await fetch(`/api/workflows/marketing-media:${listingId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.found && data.snapshot?.draft) {
+            const draft = data.snapshot.draft;
+            if (draft.sourceFolderPath) {
+              setSourcePath(draft.sourceFolderPath);
+            }
+            if (draft.propertyAddress) {
+              setAddress(draft.propertyAddress);
+            }
+            // If we have synced socialCaption or assets, we can pre-populate mock variants
+            if (draft.socialCaption) {
+              setVariants([
+                {
+                  id: '1',
+                  sourceUrl: '/mock-source.jpg',
+                  generatedUrl: '/mock-day.jpg',
+                  stage: 'JUST_LISTED',
+                  ratio: '16:9',
+                  style: 'DAY',
+                  status: 'REVIEW',
+                  prompt: `Bright, luxury front exterior of ${draft.propertyAddress}, sunny day, blue sky.`,
+                  caption: draft.socialCaption,
+                },
+                {
+                  id: '2',
+                  sourceUrl: '/mock-source.jpg',
+                  generatedUrl: '/mock-night.jpg',
+                  stage: 'JUST_LISTED',
+                  ratio: '16:9',
+                  style: 'NIGHT',
+                  status: 'REVIEW',
+                  prompt: `Luxury front exterior of ${draft.propertyAddress}, twilight, warm glowing interior lights.`,
+                  caption: `${draft.socialCaption} - Evening edition.`,
+                }
+              ]);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load media pipeline workflow:', err);
+      }
+    };
+
+    loadWorkflow();
+  }, [listingId]);
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -21,8 +80,8 @@ export function ImageWorkflow() {
           ratio: '16:9',
           style: 'DAY',
           status: 'REVIEW',
-          prompt: 'Bright, luxury real estate front exterior, sunny day, blue sky, Michigan summer.',
-          caption: 'Just Listed! Beautiful new property ready for you.',
+          prompt: `Bright, luxury front exterior of ${address}, sunny day, blue sky.`,
+          caption: `Just Listed! Beautiful new property at ${address} ready for you.`,
         },
         {
           id: '2',
@@ -32,8 +91,8 @@ export function ImageWorkflow() {
           ratio: '16:9',
           style: 'NIGHT',
           status: 'REVIEW',
-          prompt: 'Luxury real estate front exterior, twilight, warm glowing interior lights, dark blue sky.',
-          caption: 'Evening elegance. Welcome home.',
+          prompt: `Luxury front exterior of ${address}, twilight, warm glowing interior lights.`,
+          caption: `Evening elegance at ${address}. Welcome home.`,
         }
       ]);
       setIsGenerating(false);
@@ -69,7 +128,7 @@ export function ImageWorkflow() {
           <label className="text-sm font-medium">Source Directory</label>
           <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground bg-background border border-border px-3 py-2 rounded-md">
             <MonitorPlay className="w-4 h-4" />
-            <span>\\\\excelserver\\WeichertShare\\1 LISTINGS\\2026 Listings\\123_Main_St</span>
+            <span>{sourcePath}</span>
           </div>
         </div>
 
