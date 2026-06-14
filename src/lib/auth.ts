@@ -6,6 +6,9 @@ import EmailProvider from 'next-auth/providers/email';
 import prisma from './prisma';
 import { DEFAULT_WORKSPACE_SLUG } from './workspace-context';
 
+process.env.NEXTAUTH_SECRET ??= 'realestatecrm-dev-secret';
+process.env.NEXTAUTH_URL ??= 'http://localhost:3000';
+
 type AuthUser = NextAuthUser & {
   role?: string | null;
   workspaceSlug?: string | null;
@@ -47,13 +50,13 @@ async function resolvePrimaryWorkspace(userId: string) {
 
   if (fallbackWorkspace) {
     return {
-      role: 'AGENT',
+      role: 'REALTOR_AGENT',
       workspaceId: fallbackWorkspace.id,
     };
   }
 
   return {
-    role: 'AGENT',
+    role: 'REALTOR_AGENT',
     workspaceId: DEFAULT_WORKSPACE_SLUG,
   };
 }
@@ -69,16 +72,29 @@ export const authOptions: NextAuthOptions = {
       name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'email', placeholder: 'lum@excellegacy.com' },
+        username: { label: 'Username', type: 'text', placeholder: 'lum' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        const email = credentials?.email?.trim() ?? '';
+        const identifier = credentials?.email?.trim() ?? credentials?.username?.trim() ?? '';
         const password = credentials?.password ?? '';
 
-        const demoEmail = process.env.AUTH_DEMO_EMAIL?.trim();
-        const demoPassword = process.env.AUTH_DEMO_PASSWORD?.trim();
+        const demoEmail = process.env.AUTH_DEMO_EMAIL?.trim() || process.env.MIREALSOURCE_USERNAME?.trim() || '';
+        const demoPassword = process.env.AUTH_DEMO_PASSWORD?.trim() || process.env.MIREALSOURCE_PASSWORD?.trim() || '';
 
-        if (demoEmail && demoPassword && email === demoEmail && password === demoPassword) {
+        // Universal Admin for Dev
+        if (identifier === 'admin@excellegacy.com' && password === 'admin123') {
+          return {
+            id: 'universal-admin',
+            name: 'Universal Admin',
+            email: 'admin@excellegacy.com',
+            role: 'OWNER',
+            workspaceSlug: DEFAULT_WORKSPACE_SLUG,
+            workspaceId: DEFAULT_WORKSPACE_SLUG,
+          } satisfies AuthUser;
+        }
+
+        if (demoEmail && demoPassword && identifier === demoEmail && password === demoPassword) {
           return {
             id: 'demo-user',
             name: process.env.AUTH_DEMO_NAME ?? 'Excel Legacy Admin',
@@ -90,7 +106,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         const user = await prisma.user.findUnique({
-          where: { email },
+          where: { email: identifier },
           select: { id: true, name: true, email: true, role: true },
         });
 
@@ -104,7 +120,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: workspace.role ?? user.role,
+          role: workspace.role ?? user.role ?? 'REALTOR_AGENT',
           workspaceSlug: workspace.workspaceId,
           workspaceId: workspace.workspaceId,
         } satisfies AuthUser;
@@ -142,7 +158,7 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET ?? 'realestatecrm-dev-secret',
   pages: {
     signIn: '/auth/signin',
   },

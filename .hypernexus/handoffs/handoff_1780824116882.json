@@ -1,0 +1,28 @@
+{
+  "version": "0.99.1",
+  "timestamp": 1780824116882,
+  "sessionId": "current",
+  "stats": {
+    "totalCount": 1,
+    "sessionCount": 0,
+    "workingCount": 1,
+    "longTermCount": 0,
+    "observationCount": 1,
+    "uniqueObservationCount": 1,
+    "promptCount": 0,
+    "sessionSummaryCount": 0,
+    "session": 0,
+    "working": 1,
+    "long_term": 0,
+    "user": 0,
+    "agent": 0,
+    "project": 1,
+    "discovery": 0,
+    "decision": 0,
+    "progress": 0,
+    "warning": 1,
+    "fix": 0
+  },
+  "recentContext": [],
+  "notes": "Automatic background handoff"
+}

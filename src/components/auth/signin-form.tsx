@@ -16,7 +16,7 @@ const errorMessages: Record<string, string> = {
 
 export function SignInForm({ error }: SignInFormProps) {
   const { status } = useSession();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -31,7 +31,7 @@ export function SignInForm({ error }: SignInFormProps) {
 
     try {
       await signIn('credentials', {
-        username,
+        email,
         password,
         callbackUrl: '/dashboard',
         redirect: true,
@@ -69,18 +69,18 @@ export function SignInForm({ error }: SignInFormProps) {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <label htmlFor="username" className="text-sm font-medium text-foreground">
-              Username or email
+            <label htmlFor="email" className="text-sm font-medium text-foreground">
+              Email
             </label>
             <input
-              id="username"
-              name="username"
-              type="text"
-              autoComplete="username"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               className="w-full rounded-2xl border border-border bg-muted/40 px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary"
-              placeholder="lum@excellegacy.com"
+              placeholder="jsmith@example.com"
               required
             />
           </div>

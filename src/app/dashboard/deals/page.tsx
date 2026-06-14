@@ -7,14 +7,24 @@ import { dealSchema } from '@/lib/validations/deal';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { syncDealToVectorStore } from '@/lib/rag';
 
+import { AppRole, isAtLeastRole } from '@/lib/permissions';
+
 async function addDeal(formData: FormData) {
   'use server';
+
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+  const workspaceId = access.workspaceId;
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions to add deals.' };
+  }
 
   const rawData = {
     title: formData.get('title'),
     value: formData.get('value'),
     stage: formData.get('stage'),
-    workspaceId: formData.get('workspaceId'),
+    workspaceId, // Override client value
     contactId: formData.get('contactId'),
   };
 
@@ -24,16 +34,19 @@ async function addDeal(formData: FormData) {
     return { error: validatedData.error.issues[0].message };
   }
 
-  const { title, value, stage, workspaceId, contactId } = validatedData.data;
-
-  const session = await getServerSession(authOptions);
-  const access = await requireWorkspaceAccess(session);
-
-  if (workspaceId !== access.workspaceId) {
-    return { error: 'Workspace access denied.' };
-  }
+  const { title, value, stage, contactId } = validatedData.data;
 
   try {
+    // Verify contact belongs to workspace
+    const contact = await prisma.contact.findFirst({
+      where: { id: contactId, workspaceId },
+      select: { firstName: true, lastName: true, email: true },
+    });
+
+    if (!contact) {
+      return { error: 'Contact not found in this workspace.' };
+    }
+
     const deal = await prisma.deal.create({
       data: {
         title,
@@ -43,13 +56,6 @@ async function addDeal(formData: FormData) {
         contactId,
       },
     });
-
-    const contact = contactId
-      ? await prisma.contact.findUnique({
-          where: { id: contactId },
-          select: { firstName: true, lastName: true, email: true },
-        })
-      : null;
 
     await syncDealToVectorStore(deal, contact);
   } catch (error) {
@@ -73,14 +79,19 @@ export default async function DealsPage() {
     },
   });
 
-  const workspaces = await prisma.workspace.findMany();
+  const workspaces = await prisma.workspace.findMany({
+    where: {
+      members: {
+        some: { userId: access.userId },
+      },
+    },
+  });
   const contacts = await prisma.contact.findMany({
     where: { workspaceId },
     orderBy: { firstName: 'asc' },
   });
 
   const stages = [
-    { id: 'PROSPECTING', label: 'Prospecting' },
     { id: 'QUALIFICATION', label: 'Qualification' },
     { id: 'PROPOSAL', label: 'Proposal/Showing' },
     { id: 'NEGOTIATION', label: 'Negotiation' },
@@ -128,7 +139,7 @@ export default async function DealsPage() {
                     >
                       <div className="flex justify-between items-start mb-2">
                         <Link
-                          href={`/deals/${deal.id}`}
+                          href={`/dashboard/deals/${deal.id}`}
                           className="font-medium text-sm group-hover:text-primary transition-colors"
                         >
                           {deal.title}

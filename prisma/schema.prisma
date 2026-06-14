@@ -1,9 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -12,102 +9,165 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String            @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?           @unique
   emailVerified DateTime?
   image         String?
-  role          String    @default("AGENT")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  workspaces    WorkspaceMember[]
-  leads         Lead[]
+  role          String            @default("AGENT")
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  activities    Activity[]
   contacts      Contact[]
   deals         Deal[]
-  workflows     WorkflowSession[]
-  activities    Activity[]
+  leads         Lead[]
   assignedTasks Task[]            @relation("TaskAssignee")
+  workflows     WorkflowSession[]
+  workspaces    WorkspaceMember[]
+  stakeholderIn DealStakeholder[]
 }
 
 model Workspace {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  members   WorkspaceMember[]
-  leads     Lead[]
-  contacts  Contact[]
-  deals     Deal[]
-  workflows WorkflowSession[]
-  Activity  Activity[]
+  id             String            @id @default(cuid())
+  name           String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  Activity       Activity[]
+  contacts       Contact[]
+  deals          Deal[]
+  leads          Lead[]
+  smartPlans     SmartPlan[]
+  workflows      WorkflowSession[]
+  members        WorkspaceMember[]
+  segments       Segment[]
+  agentWorkflows AgentWorkflow[]
+  agentLogs      AgentLog[]
+  landingPages   LandingPage[]
 }
 
 model WorkspaceMember {
-  id          String @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   workspaceId String
-  role        String @default("AGENT")
-
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  role        String    @default("AGENT")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, workspaceId])
 }
 
 model Contact {
-  id          String   @id @default(cuid())
-  firstName   String
-  lastName    String?
-  email       String?
-  phone       String?
-  workspaceId String
-  userId      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user      User?      @relation(fields: [userId], references: [id])
-  leads     Lead[]
-  deals     Deal[]
-  Activity  Activity[]
+  id               String     @id @default(cuid())
+  firstName        String
+  lastName         String?
+  email            String?
+  phone            String?
+  address          String?
+  workspaceId      String
+  userId           String?
+  additionalPhones String?   // JSON array of additional phones
+  additionalEmails String?   // JSON array of additional emails
+  spouseName       String?
+  spousePhone      String?
+  spouseEmail      String?
+  familyMembers    String?   // JSON array of family members
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  Activity         Activity[]
+  user             User?      @relation(fields: [userId], references: [id])
+  workspace        Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deals            Deal[]
+  leads            Lead[]
+  stakeholderIn    DealStakeholder[]
 }
 
 model Lead {
-  id          String   @id @default(cuid())
-  source      String?
-  status      String   @default("NEW")
-  score       Int?     @default(0)
-  workspaceId String
-  contactId   String
-  userId      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  id              String            @id @default(cuid())
+  type            String            @default("BUYER") // BUYER, SELLER, CLOSED
+  source          String?
+  status          String            @default("NEW") // Expanded statuses handled in UI logic
+  score           Int?              @default(0)
+  workspaceId     String
+  contactId       String
+  userId          String?
+  isAiAssisted    Boolean           @default(false)
+  socialProfiles  String?
+  publicRecords   String?
+  lastEnrichedAt  DateTime?
+  tags            String?           // Comma-separated hashtags
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  smartPlanId     String?
+  Activity        Activity[]
+  smartPlan       SmartPlan?        @relation(fields: [smartPlanId], references: [id])
   workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
   user            User?             @relation(fields: [userId], references: [id])
-  Activity        Activity[]
   WorkflowSession WorkflowSession[]
+  tasks           Task[]
+  searchAlerts    SearchAlert[]
+  segments        Segment[]         @relation("LeadSegments")
+  agentLogs       AgentLog[]
+}
+
+model SmartPlan {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  steps       String?   // JSON string of steps
+  isActive    Boolean   @default(true)
+  workspaceId String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  leads       Lead[]
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 model Deal {
-  id          String   @id @default(cuid())
-  title       String
-  value       Float?
-  stage       String   @default("LEAD")
-  workspaceId String
-  contactId   String
-  userId      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  user            User?             @relation(fields: [userId], references: [id])
+  id              String            @id @default(cuid())
+  title           String
+  value           Float?
+  stage           String            @default("LEAD")
+  workspaceId     String
+  contactId       String
+  userId          String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   Activity        Activity[]
+  user            User?             @relation(fields: [userId], references: [id])
+  contact         Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   WorkflowSession WorkflowSession[]
+  tasks           Task[]
+  stakeholders    DealStakeholder[]
+  requirements    DealRequirement[]
+}
+
+model DealStakeholder {
+  id          String    @id @default(cuid())
+  dealId      String
+  contactId   String?   
+  userId      String?   
+  role        String    // TITLE, LENDER, INSPECTOR, APPRAISER, CLIENT
+  permissions String    @default("VIEW_STATUS") // UPLOAD_DOCS, VIEW_STATUS, FULL_ACCESS
+  deal        Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id])
+  contact     Contact?  @relation(fields: [contactId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model DealRequirement {
+  id          String    @id @default(cuid())
+  dealId      String
+  title       String    
+  description String?
+  status      String    @default("PENDING") // PENDING (Red), IN_PROGRESS (Yellow), COMPLETED (Green)
+  assignedTo  String?   // Role string (e.g. TITLE) or specific User ID
+  isRequired  Boolean   @default(true)
+  deal        Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Task {
@@ -118,53 +178,52 @@ model Task {
   workspaceId  String
   dueDate      DateTime?
   assignedToId String?
+  leadId       String?
+  dealId       String?
+  triggerEmail Boolean   @default(false)
+  triggerSMS   Boolean   @default(false)
+  triggerCall  Boolean   @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-
-  assignedTo User? @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  assignedTo   User?     @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  lead         Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  deal         Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
 }
 
 model Activity {
-  id       String  @id @default(cuid())
-  type     String  @default("NOTE") // Note, Status Change, Email, Call
-  content  String
-  metadata String? // JSON string for additional context
-
-  workspaceId String
-  userId      String?
-
-  leadId    String?
-  dealId    String?
-  contactId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user      User?     @relation(fields: [userId], references: [id])
-  lead      Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  deal      Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  contact   Contact?  @relation(fields: [contactId], references: [id], onDelete: Cascade)
-}
-
-model WorkflowSession {
-  id     String @id @default(cuid())
-  type   String // e.g., 'OFFER_DRAFT', 'LISTING_ENTRY'
-  status String @default("DRAFT") // DRAFT, SUBMITTED, APPROVED
-  data   String // JSON payload of the workflow state
-
+  id          String    @id @default(cuid())
+  type        String    @default("NOTE")
+  content     String
+  metadata    String?
   workspaceId String
   userId      String?
   leadId      String?
   dealId      String?
+  contactId   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  contact     Contact?  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  deal        Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  lead        Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user      User?     @relation(fields: [userId], references: [id])
-  lead      Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  deal      Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+model WorkflowSession {
+  id          String    @id @default(cuid())
+  type        String
+  status      String    @default("DRAFT")
+  data        String
+  workspaceId String
+  userId      String?
+  leadId      String?
+  dealId      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deal        Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  lead        Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -173,4 +232,66 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model SearchAlert {
+  id          String   @id @default(cuid())
+  leadId      String
+  criteria    String   // JSON string: { city, minPrice, maxPrice, beds, baths }
+  type        String   // VIEW, SHOWING, OFFER
+  frequency   String   // INSTANT, DAILY, WEEKLY
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model Segment {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  filters     String?  // JSON string
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  leads       Lead[]   @relation("LeadSegments")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model AgentWorkflow {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  trigger     String   // e.g. "NEW_LEAD", "STATUS_CHANGE", "MANUAL"
+  actions     String   // JSON string
+  isActive    Boolean  @default(true)
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model AgentLog {
+  id          String   @id @default(cuid())
+  actionType  String   // SMS, EMAIL, STATUS_UPDATE, NOTE
+  details     String
+  leadId      String?
+  userId      String?
+  workspaceId String
+  createdAt   DateTime @default(now())
+  lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model LandingPage {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  subdomain   String?
+  blocks      String   // JSON string of page sections
+  ownerId     String?
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }

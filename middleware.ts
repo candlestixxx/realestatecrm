@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET ?? 'realestatecrm-dev-secret' });
 
   if (!token?.sub) {
     const signInUrl = new URL('/auth/signin', request.url);

@@ -21,22 +21,64 @@ async function main() {
     },
   });
 
-  // Create User
-  const user = await prisma.user.create({
+  // Create Users
+  const admin = await prisma.user.create({
     data: {
-      name: 'J Smith',
-      email: 'jsmith@example.com',
-      role: 'AGENT',
+      id: 'universal-admin',
+      name: 'Universal Admin',
+      email: 'admin@excellegacy.com',
+      role: 'OWNER',
     },
   });
 
-  // Link User to Workspace
-  await prisma.workspaceMember.create({
+  const hank = await prisma.user.create({
     data: {
-      userId: user.id,
-      workspaceId: workspace.id,
-      role: 'AGENT',
+      name: 'Hank Mendez',
+      email: 'hankrealtyexec@gmail.com',
+      role: 'BROKER',
     },
+  });
+
+  const harry = await prisma.user.create({
+    data: {
+      name: 'Harry Kourlos',
+      email: 'harryrealtyexec@gmail.com',
+      role: 'REALTOR_AGENT',
+    },
+  });
+
+  const don = await prisma.user.create({
+    data: {
+      name: 'Don Sobieski',
+      email: 'realtordon26@gmail.com',
+      role: 'REALTOR_AGENT',
+    },
+  });
+
+  // Link Users to Workspace
+  await prisma.workspaceMember.createMany({
+    data: [
+      {
+        userId: admin.id,
+        workspaceId: workspace.id,
+        role: 'OWNER',
+      },
+      {
+        userId: hank.id,
+        workspaceId: workspace.id,
+        role: 'BROKER',
+      },
+      {
+        userId: harry.id,
+        workspaceId: workspace.id,
+        role: 'REALTOR_AGENT',
+      },
+      {
+        userId: don.id,
+        workspaceId: workspace.id,
+        role: 'REALTOR_AGENT',
+      },
+    ],
   });
 
   // Create Contacts

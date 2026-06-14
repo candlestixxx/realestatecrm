@@ -4,52 +4,9 @@ import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 import AddTaskModal from '@/components/AddTaskModal';
-import { taskSchema } from '@/lib/validations/task';
+import { addTaskAction } from '@/lib/actions/task';
 import Link from 'next/link';
-
-async function addTask(formData: FormData) {
-  'use server';
-
-  const rawData = {
-    title: formData.get('title'),
-    description: formData.get('description'),
-    status: formData.get('status'),
-    workspaceId: formData.get('workspaceId'),
-    dueDate: formData.get('dueDate'),
-    assignedToId: formData.get('assignedToId'),
-  };
-
-  const session = await getServerSession(authOptions);
-  const access = await requireWorkspaceAccess(session);
-
-  if (rawData.workspaceId !== access.workspaceId) {
-    return { error: 'Workspace access denied.' };
-  }
-
-  const validatedData = taskSchema.safeParse(rawData);
-
-  if (!validatedData.success) {
-    return { error: validatedData.error.issues[0].message };
-  }
-
-  const { title, description, status, workspaceId, dueDate, assignedToId } = validatedData.data;
-
-  try {
-    await prisma.task.create({
-      data: {
-        title,
-        description: description || null,
-        status,
-        workspaceId,
-        dueDate: dueDate ? new Date(dueDate) : null,
-        assignedToId: assignedToId || null,
-      },
-    });
-  } catch (error) {
-    console.error('Failed to add task:', error);
-    return { error: 'An unexpected error occurred while saving.' };
-  }
-}
+import { AppRole, isAtLeastRole } from '@/lib/permissions';
 
 export default async function TasksPage(props: {
   searchParams?: Promise<{ status?: string; q?: string; page?: string }>;
@@ -85,8 +42,21 @@ export default async function TasksPage(props: {
     prisma.task.count({ where: whereClause }),
   ]);
 
-  const workspaces = await prisma.workspace.findMany();
-  const users = await prisma.user.findMany({ select: { id: true, name: true } });
+  const workspaces = await prisma.workspace.findMany({
+    where: {
+      members: {
+        some: { userId: access.userId },
+      },
+    },
+  });
+  const users = await prisma.user.findMany({
+    where: {
+      workspaces: {
+        some: { workspaceId },
+      },
+    },
+    select: { id: true, name: true },
+  });
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
@@ -97,7 +67,7 @@ export default async function TasksPage(props: {
           <p className="text-muted-foreground">Manage your daily to-dos and action items.</p>
         </div>
         <div className="flex gap-2">
-          <AddTaskModal addTaskAction={addTask} workspaces={workspaces} users={users} />
+          <AddTaskModal addTaskAction={addTaskAction} workspaces={workspaces} users={users} />
         </div>
       </div>
 
@@ -113,14 +83,6 @@ export default async function TasksPage(props: {
           <select
             name="status"
             defaultValue={statusFilter}
-            onChange={(e) => {
-              const form = e.target.form;
-              if (form) {
-                const pageInput = form.querySelector('input[name="page"]') as HTMLInputElement;
-                if (pageInput) pageInput.value = '1';
-                form.submit();
-              }
-            }}
             className="bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="ALL">All Statuses</option>
@@ -206,13 +168,13 @@ export default async function TasksPage(props: {
           </span>
           <div className="flex gap-2">
             <Link
-              href={`/tasks?q=${query}&status=${statusFilter}&page=${currentPage - 1}`}
+              href={`/dashboard/tasks?q=${query}&status=${statusFilter}&page=${currentPage - 1}`}
               className={`px-3 py-1 border border-border rounded hover:bg-muted transition-colors ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
             >
               Prev
             </Link>
             <Link
-              href={`/tasks?q=${query}&status=${statusFilter}&page=${currentPage + 1}`}
+              href={`/dashboard/tasks?q=${query}&status=${statusFilter}&page=${currentPage + 1}`}
               className={`px-3 py-1 border border-border rounded hover:bg-muted transition-colors ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
             >
               Next

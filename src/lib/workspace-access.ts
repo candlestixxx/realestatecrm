@@ -2,7 +2,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import type { Session } from 'next-auth';
 
 import prisma from './prisma';
-import { DEFAULT_WORKSPACE_SLUG } from './workspace-context';
+import { DEFAULT_WORKSPACE_SLUG, getActiveWorkspaceSlug } from './workspace-context';
 
 export class WorkspaceAccessError extends Error {
   statusCode: number;
@@ -24,7 +24,11 @@ export type WorkspaceAccess = {
 
 function isDemoIdentity(session?: Session | null) {
   const demoEmail = process.env.AUTH_DEMO_EMAIL?.trim();
-  return session?.user?.id === 'demo-user' || (demoEmail && session?.user?.email === demoEmail);
+  return (
+    session?.user?.id === 'demo-user' ||
+    session?.user?.id === 'universal-admin' ||
+    (demoEmail && session?.user?.email === demoEmail)
+  );
 }
 
 export async function resolveWorkspaceAccess(session?: Session | null): Promise<WorkspaceAccess | null> {
@@ -34,11 +38,13 @@ export async function resolveWorkspaceAccess(session?: Session | null): Promise<
     return null;
   }
 
+  const activeSlug = await getActiveWorkspaceSlug(session);
+
   if (isDemoIdentity(session)) {
     return {
       userId: user.id,
-      workspaceId: DEFAULT_WORKSPACE_SLUG,
-      workspaceSlug: DEFAULT_WORKSPACE_SLUG,
+      workspaceId: activeSlug,
+      workspaceSlug: activeSlug,
       workspaceRole: user.role ?? 'OWNER',
       isDemo: true,
     };
@@ -55,9 +61,6 @@ export async function resolveWorkspaceAccess(session?: Session | null): Promise<
             role: true,
             workspaceId: true,
           },
-          orderBy: {
-            workspaceId: 'asc',
-          },
         },
       },
     });
@@ -66,13 +69,15 @@ export async function resolveWorkspaceAccess(session?: Session | null): Promise<
       return null;
     }
 
-    const activeMembership = dbUser.workspaces[0];
+    // Check if user has access to the active slug
+    const membership = dbUser.workspaces.find(w => w.workspaceId === activeSlug) 
+      || dbUser.workspaces[0];
 
     return {
       userId: dbUser.id,
-      workspaceId: activeMembership.workspaceId,
-      workspaceSlug: activeMembership.workspaceId,
-      workspaceRole: activeMembership.role ?? dbUser.role ?? 'AGENT',
+      workspaceId: membership.workspaceId,
+      workspaceSlug: membership.workspaceId,
+      workspaceRole: membership.role ?? dbUser.role ?? 'REALTOR_AGENT',
       isDemo: false,
     };
   } catch (error) {

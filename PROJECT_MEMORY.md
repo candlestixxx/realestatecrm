@@ -1,5 +1,8 @@
 [PROJECT_MEMORY]
 
+## Core Objective
+To build a real estate CRM that is **as technical and data-dense as Lofty, but significantly simpler to use**. This simplicity is achieved by incorporating an **omnipresent AI Assistant** (Agentic Co-Pilot via Tool Calling) that helps users navigate features, execute bulk actions, and manage workflows seamlessly.
+
 ## Architecture & Technology Stack
 
 - **Framework:** Next.js 15+ (App Router, Turbopack enabled)
@@ -31,13 +34,46 @@
 
 ## Recent Architectural Decisions & Workarounds
 
+- **Role Hierarchy & Compliance Boundary (Project 02):** Established a formal role-based access control (RBAC) system.
+    - **Canonical Roles:** Defined `AppRole` enum (OWNER, BROKER, ASSOCIATE_BROKER, REALTOR_AGENT, OFFICE_MANAGER, ADMIN) in `src/lib/permissions.ts`.
+    - **Permission Matrix:** Created a mapping of roles to specific app permissions (e.g., `approve:listings`, `view:financials`), enforced via `hasPermission` and `isAtLeastRole` helpers.
+    - **Enforcement:** Applied role checks to server actions (`createActivityAction`, `addLead`, etc.) and filtered UI elements (dashboard metrics, team management list, activity forms) based on the user's active workspace role.
+    - **UI Identity:** Added role badges to all primary dashboard and detail views to provide clear feedback on the user's current authority level.
+
+- **Auth Hardening & Workspace Scoping (Project 01):** Rigorously enforced workspace isolation across all primary app surfaces. 
+    - **Server Actions:** Hardened `saveWorkflowSession`, `createActivityAction`, `addLead`, `addContact`, `addDeal`, and `addTask` to derive `workspaceId` directly from the authenticated session (`requireWorkspaceAccess`) rather than trusting client-supplied form values.
+    - **API Routes:** Restored session protection to `api/workflows/[workflowId]/route.ts` which was identified as a security regression.
+    - **UI Lists:** Scoped the `workspaces`, `users`, and `contacts` lists in the Dashboard and Modal components to only show data relevant to the authenticated user's active workspace.
+    - **Data Integrity:** Ensured entity lookups (Leads, Deals, Contacts) in detail views and linking actions use `findFirst` with both `id` and `workspaceId` to prevent cross-tenant data leakage.
+
 - **Workflow Engine Implementation:** Migrated upstream static workflow shells away from Local Storage. They are now deeply wired to the SQLite backend via the `WorkflowSession` model. Server actions parse `?sessionId` parameters from the URL to rehydrate drafts dynamically.
 - **Deal-Workflow Integration:** The `deals/[id]` detail view was expanded to query and list active `WorkflowSessions` associated with the deal. Users can launch new drafts (passing `?dealId=...` in the URL) directly from the Deal screen, successfully bridging the CRM core with the Workflow engine.
 - **Client Portal Scaffolding & Security:** Scaffolded the `(portal)` route group as a distinct environment. The Portal verifies the NextAuth session, matches the user's email against the `Contact` table, and exclusively renders their related Deals and Action Items.
 - **Phase 3 AI Scaffolding:** Introduced `AIChat.tsx` as a global layout component and wired it to `api/chat` using OpenAI streaming. An attempt to map `Vercel AI SDK` tools directly to Prisma queries was safely aborted and documented due to a volatile TypeScript mismatch between `ai@3.1.x` and the text stream return types.
 
+- **Workspace Orchestration & Segmentation (v0.44.0):** Overhauled the multi-tenancy model to support global workspace switching.
+    - **Global Switcher:** Implemented `WorkspaceSwitcher.tsx` using a secure cookie (`x-workspace-slug`) to persist the active segment across the entire dashboard.
+    - **Segmentation Mental Model:** Formalized "Workspaces" as "Segments/Lists" for lead grouping.
+    - **Persistence:** Created `setWorkspaceAction` to manage the cookie-based state on the server.
+
+- **Bulk Management & Dynamic UI (v0.44.0):** Significantly expanded the data management capabilities of the Leads module.
+    - **LeadTableClient:** Built a high-performance interactive table supporting individual and master-checkbox selection.
+    - **Dynamic Pagination:** Implemented server-side supported dynamic limits (10, 25, 50, 75, 100) controlled via URL parameters.
+    - **Bulk Actions Bar:** Created a conditional UI layer that appears upon lead selection, providing triggers for Segments, Workflows, and AI Drip campaigns.
+
+- **Dashboard Split View & AI Sync:** Enhanced the primary entry point to provide operational visibility.
+    - **Workflow Overview:** Integrated a real-time list of active `WorkflowSession` records onto the dashboard home.
+    - **Gemini Assistant Sync:** Added an AI status panel to track the readiness of the Gemini 2.5 Flash assistant for automated execution.
+    - **Onboarding System:** Implemented `OnboardingTour.tsx` to guide first-time users through the new segmentation and bulk workflow features.
+
+- **Lead Intelligence & Enrichment (v0.46.0):** Overhauled the Lead Profile into a multi-tab intelligence center.
+    - **Scraper Infrastructure:** Created `LeadIntelligence.tsx` featuring triggers for Social Media and Public Records scrapers (AI-simulated research).
+    - **Sync Choices:** Implemented "Sync from Queue" and "Sync from Workflow" actions on the main Leads page to centralize intake.
+    - **Bulk Segmentation:** Expanded the bulk action bar to include instant conversion to Deals, Smart Plans, and AI Assistance.
+    - **Bidirectional Links:** Connected Leads to active `WorkflowSession` records via a dedicated "Workflows" tab in the profile view.
+
 ## Roadmap & Future Directions
 
+- **AI Drip Execution (Twilio/SendGrid):** Wire up the backend logic to the "Start AI Drip" button to allow Gemini to dispatch actual SMS and Email follow-ups.
+- **Workflow Automation:** Expand the Bulk Action bar to support automated data mapping between selected leads and transaction workflows.
 - **Tool Calling Refinement (AI):** The immediate priority is executing a clean dependency audit for `ai` and `@ai-sdk/react` to allow server-side function calling (e.g., `prisma.lead.count()`) directly inside the `/api/chat` router.
-- **RAG Architecture Sync:** Implement the architectural blueprint defined in `docs/AI_RAG_STRATEGY.md` by hooking Prisma mutations (like new `Activity` entries) to a Vector database (Pinecone/Supabase) to give the LLM semantic context.
-- **Client Magic Links:** Replace standard credentials on the Portal with a NextAuth Email Provider logic for frictionless client onboarding.

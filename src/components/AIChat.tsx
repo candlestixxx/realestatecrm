@@ -13,7 +13,7 @@ export default function AIChat() {
       {
         id: '1',
         role: 'assistant',
-        content: 'Hello! I am Jules, your real estate AI assistant. How can I help you today?',
+        content: 'Hello! I am Gemini, your real estate AI assistant. How can I help you dominate your market today?',
       },
     ],
   });
@@ -32,27 +32,20 @@ export default function AIChat() {
           className="fixed bottom-6 right-6 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center hover:bg-primary/90 transition-transform hover:scale-105 z-50"
           aria-label="Open AI Assistant"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-            />
-          </svg>
+          <div className="text-xl">🤖</div>
         </button>
       )}
 
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-full max-w-sm sm:w-96 h-[500px] bg-background border border-border shadow-2xl rounded-xl flex flex-col z-50 overflow-hidden">
-          <div className="bg-muted/30 p-4 border-b border-border flex justify-between items-center">
+        <div className="fixed bottom-6 right-6 w-full max-w-sm sm:w-[450px] h-[600px] bg-background border border-border shadow-2xl rounded-2xl flex flex-col z-50 overflow-hidden">
+          <div className="bg-primary p-4 flex justify-between items-center text-primary-foreground">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-              <h3 className="font-bold text-sm">Jules AI Assistant</h3>
+              <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+              <h3 className="font-bold text-sm tracking-tight uppercase">Gemini AI Command Center</h3>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -65,34 +58,36 @@ export default function AIChat() {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/5">
             {messages.map((m) => (
               <div
                 key={m.id}
                 className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-muted/50 border border-border rounded-bl-none'}`}
+                  className={`max-w-[85%] rounded-2xl p-4 text-sm shadow-sm ${
+                    m.role === 'user' 
+                      ? 'bg-primary text-primary-foreground rounded-br-none' 
+                      : 'bg-white dark:bg-muted/30 border border-border rounded-bl-none'
+                  }`}
                 >
                   {m.content}
 
-                  {m.toolInvocations?.map((toolInvocation: { toolCallId: string; toolName: string; state?: string; }) => {
+                  {m.toolInvocations?.map((toolInvocation: any) => {
                     const toolCallId = toolInvocation.toolCallId;
 
                     if ('state' in toolInvocation && toolInvocation.state === 'result') {
                       return (
-                        <div key={toolCallId} className="mt-2 text-xs opacity-75 border border-border rounded p-2 bg-background/50">
-                          <span className="font-semibold block mb-1">Used CRM Tool: {toolInvocation.toolName}</span>
-                          <span className="text-muted-foreground">Successfully queried the database.</span>
+                        <div key={toolCallId} className="mt-3 text-[10px] bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-2 flex items-center gap-2">
+                          <span className="font-bold text-emerald-700 dark:text-emerald-400">COMMAND COMPLETE:</span>
+                          <span className="text-emerald-600 dark:text-emerald-500 uppercase tracking-tighter">{toolInvocation.toolName}</span>
                         </div>
                       );
                     } else {
                       return (
-                        <div key={toolCallId} className="mt-2 text-xs opacity-75 border border-border rounded p-2 bg-background/50">
-                          <span className="font-semibold block mb-1 items-center flex gap-2">
-                             <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
-                             Calling Tool: {toolInvocation.toolName}...
-                          </span>
+                        <div key={toolCallId} className="mt-3 text-[10px] bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-2 flex items-center gap-2 animate-pulse">
+                          <span className="font-bold text-amber-700 dark:text-amber-400">EXECUTING:</span>
+                          <span className="text-amber-600 dark:text-amber-500 uppercase tracking-tighter">{toolInvocation.toolName}...</span>
                         </div>
                       );
                     }

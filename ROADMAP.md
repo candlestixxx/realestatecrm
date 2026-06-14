@@ -1,5 +1,7 @@
 # Roadmap
 
+*Core Objective: Build a CRM with the technical depth of Lofty, simplified by an omnipresent AI Assistant (Agentic Co-Pilot).*
+
 ## Phase 1 — Foundation [ACCOMPLISHED]
 - [x] TypeScript repo scaffold
 - [x] Authentication and roles
@@ -10,16 +12,22 @@
 
 ## Phase 2 — Communication and workflow [IN PROGRESS]
 - [x] Leads, contacts, deals, and tasks
-- [ ] Email / SMS / call logging (Backend scaffolded, integration pending)
+- [x] Workspace as Segment / List model
+- [x] Bulk Lead Management & Dynamic Pagination
+- [x] Email / SMS / call logging (Forms and action infrastructure wired, timeline active)
 - [ ] Private and group chat
 - [x] Workflow engine (Foundation and initial drafts)
+- [x] Dashboard Workflow Performance Overview
 - [ ] Lead routing and follow-up automation
 - [x] Client portal foundation
 
 ## Phase 3 — AI and voice [IN PROGRESS]
 - [x] AI Assistant UI and Backend (AIChat)
 - [x] RAG (Retrieval-Augmented Generation) foundation, vector sync, and unification
+- [x] AI Assistant Sync (Gemini 2.0 Flash as default)
+- [x] **AI Tool Calling (Agentic Co-Pilot Execution)**
 - [ ] AI lead qualification
+- [ ] AI Drip Campaign Execution (SMS/Email)
 - [ ] Voice assistant
 - [ ] Speech provider selection
 - [ ] Conversational mode
@@ -81,5 +89,15 @@
 - [ ] Source provenance and review controls
 
 
-## 0.39.0 Update
-- Progress made on Activity logging (Phase 2), expanding communication features with specific Activity Types in forms.
+## 0.46.0 Update
+- **Lead Intelligence Center:** Multi-tab layout for Lead profile detailing social and public record AI scraper results.
+- **AI Tool Calling (Co-Pilot):** Integrated tool capabilities into the chatbot route using `gemini-2.0-flash-001`.
+- **Omnichannel Forms:** Wired SMS and Showing forms with fully integrated server actions logging to the activity timeline.
+
+## 0.45.0 Update
+- **Segmentation & Bulk Actions:** Overhauled lead management with bulk selection, dynamic pagination, and the "Workspace as Segment" orchestration.
+- **Workflow Visibility:** Added a workflow performance overview and AI assistant status to the main dashboard.
+- **Onboarding:** Integrated an interactive tour for new feature discovery.
+
+## Lofty.com Features
+- Additional accessible documentation or structured exports are required from Lofty.com to perfectly duplicate every specific menu item, button, and page.

@@ -3,17 +3,31 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
+import { AppRole, isAtLeastRole } from '@/lib/permissions';
 
 export default async function DashboardHome() {
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
   const workspaceId = access.workspaceId;
+  const userRole = access.workspaceRole;
 
-  const [leadCount, contactCount, taskCount, deals] = await Promise.all([
+  const [leadCount, contactCount, taskCount, deals, workspaceMembers, activeWorkflows] = await Promise.all([
     prisma.lead.count({ where: { workspaceId } }),
     prisma.contact.count({ where: { workspaceId } }),
     prisma.task.count({ where: { workspaceId, status: { not: 'DONE' } } }),
     prisma.deal.findMany({ where: { workspaceId, stage: { not: 'CLOSED_WON' } } }),
+    isAtLeastRole(userRole, AppRole.BROKER) || userRole === 'ADMIN'
+      ? prisma.workspaceMember.findMany({
+          where: { workspaceId },
+          include: { user: true },
+        })
+      : Promise.resolve([]),
+    prisma.workflowSession.findMany({
+      where: { workspaceId, status: { not: 'APPROVED' } },
+      orderBy: { updatedAt: 'desc' },
+      take: 5,
+      include: { user: true },
+    }),
   ]);
 
   const activePipelineValue = deals.reduce((sum, deal) => sum + (deal.value || 0), 0);
@@ -25,11 +39,17 @@ export default async function DashboardHome() {
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">Overview of your business and daily tasks.</p>
         </div>
+        <div className="flex items-center gap-2">
+          <span className="px-3 py-1 bg-secondary/20 text-secondary-foreground text-xs font-bold rounded-full border border-secondary/30 uppercase tracking-wider">
+            {userRole.replace('_', ' ')}
+          </span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* ... existing stats cards ... */}
         <Link
-          href="/leads?status=NEW"
+          href="/dashboard/leads?status=NEW"
           className="p-6 bg-background border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow block"
         >
           <div className="flex justify-between items-start">
@@ -57,7 +77,7 @@ export default async function DashboardHome() {
         </Link>
 
         <Link
-          href="/deals"
+          href="/dashboard/deals"
           className="p-6 bg-background border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow block"
         >
           <div className="flex justify-between items-start">
@@ -91,7 +111,7 @@ export default async function DashboardHome() {
         </Link>
 
         <Link
-          href="/tasks?status=TODO"
+          href="/dashboard/tasks?status=TODO"
           className="p-6 bg-background border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow block"
         >
           <div className="flex justify-between items-start">
@@ -119,7 +139,7 @@ export default async function DashboardHome() {
         </Link>
 
         <Link
-          href="/contacts"
+          href="/dashboard/contacts"
           className="p-6 bg-background border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow block"
         >
           <div className="flex justify-between items-start">
@@ -146,6 +166,111 @@ export default async function DashboardHome() {
           </div>
         </Link>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+        <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-border bg-muted/20 flex justify-between items-center">
+            <h2 className="text-lg font-bold">Active Workflows & Drip Campaigns</h2>
+            <Link href="/dashboard/workflows" className="text-primary hover:underline text-xs font-medium">
+              View All
+            </Link>
+          </div>
+          <div className="p-4">
+            {activeWorkflows.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">No active workflows found.</p>
+            ) : (
+              <div className="space-y-4">
+                {activeWorkflows.map((wf) => (
+                  <div key={wf.id} className="flex justify-between items-center p-3 border border-border rounded-lg bg-muted/5">
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-sm">{wf.type.replace('_', ' ')}</span>
+                      <span className="text-xs text-muted-foreground">Updated {new Date(wf.updatedAt).toLocaleDateString()}</span>
+                    </div>
+                    <span className="px-2 py-1 bg-secondary/10 text-secondary-foreground text-[10px] font-bold rounded-full uppercase tracking-tight">
+                      {wf.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-border bg-muted/20">
+            <h2 className="text-lg font-bold">AI Assistant / Gemini Sync</h2>
+            <p className="text-xs text-muted-foreground mt-1">Configure your default AI for drip campaigns and workflow execution.</p>
+          </div>
+          <div className="p-6 flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
+            <div>
+              <p className="font-medium">Gemini 2.5 Flash is Active</p>
+              <p className="text-sm text-muted-foreground mt-1">Ready to automate email/SMS follow-ups and analyze lead behavior.</p>
+            </div>
+            <button className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors">
+              Manage AI Integrations
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {workspaceMembers.length > 0 && (
+        <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden mt-8">
+          <div className="p-4 border-b border-border bg-muted/20 flex justify-between items-center">
+            <h2 className="text-xl font-bold">Team Management</h2>
+            <button className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-md hover:bg-primary/90 transition-colors">
+              + Invite Member
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
+                <tr>
+                  <th className="px-6 py-3 font-medium">Member</th>
+                  <th className="px-6 py-3 font-medium">Role</th>
+                  <th className="px-6 py-3 font-medium">Status</th>
+                  <th className="px-6 py-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {workspaceMembers.map((member) => (
+                  <tr key={member.id} className="hover:bg-muted/10 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-xs font-bold">
+                          {member.user.name?.[0] || 'U'}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{member.user.name || 'Unknown'}</span>
+                          <span className="text-xs text-muted-foreground">{member.user.email}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="px-2 py-1 bg-muted border border-border rounded text-[10px] font-bold uppercase tracking-tight">
+                        {member.role.replace('_', ' ')}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                        <span className="text-xs">Active</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button className="text-primary hover:underline text-xs font-medium">
+                        Manage
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ A modular, AI-powered real estate CRM and operating system for **Excel Legacy Re
 - [ROADMAP](docs/ROADMAP.md)
 - [PRD](docs/PRD.md)
 - [Technical Spec](docs/TECHNICAL_SPEC.md)
+- [User Guide: Segments & Bulk Actions](docs/USER_GUIDE_SEGMENTS.md)
 - [Project Memory / Architecture](PROJECT_MEMORY.md)
 - [Deployment](DEPLOY.md)
 - [Agent Handoff](HANDOFF.md)
