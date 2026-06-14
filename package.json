@@ -1,6 +1,6 @@
 {
   "name": "real-estate-crm",
-  "version": "0.46.1",
+  "version": "0.46.2",
   "private": true,
   "scripts": {
     "predev": "kill-port 3000",
