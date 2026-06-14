@@ -37,26 +37,24 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Luxury Black/Blue/Gold Theme - Dark Mode */
-    --background: #000000; /* Pure Black */
-    --foreground: #f8fafc; /* Light Slate */
+.dark {
+  /* Luxury Black/Blue/Gold Theme - Dark Mode */
+  --background: #000000; /* Pure Black */
+  --foreground: #f8fafc; /* Light Slate */
 
-    --primary: #0ea5e9; /* Light Blue for contrast */
-    --primary-foreground: #ffffff;
+  --primary: #0ea5e9; /* Light Blue for contrast */
+  --primary-foreground: #ffffff;
 
-    --secondary: #d4af37; /* Metallic Gold */
-    --secondary-foreground: #000000;
+  --secondary: #d4af37; /* Metallic Gold */
+  --secondary-foreground: #000000;
 
-    --accent: #1e293b; /* Slate 800 */
-    --accent-foreground: #ffffff;
+  --accent: #1e293b; /* Slate 800 */
+  --accent-foreground: #ffffff;
 
-    --muted: #0f172a; /* Slate 900 */
-    --muted-foreground: #94a3b8; /* Slate 400 */
+  --muted: #0f172a; /* Slate 900 */
+  --muted-foreground: #94a3b8; /* Slate 400 */
 
-    --border: #1e293b;
-  }
+  --border: #1e293b;
 }
 
 body {

@@ -9,6 +9,7 @@ import { DashboardHeaderActions } from '@/components/DashboardHeaderActions';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { WorkspaceSwitcher } from '@/components/WorkspaceSwitcher';
 import { OnboardingTour } from '@/components/OnboardingTour';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import prisma from '@/lib/prisma';
 import Script from 'next/script';
 import SidebarAIAssistant from '@/components/SidebarAIAssistant';
@@ -164,6 +165,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <CommandPalette />
             </div>
             <div className="flex items-center gap-4">
+              <ThemeToggle />
               <WorkspaceSwitcher workspaces={workspaces} activeSlug={access.workspaceSlug} />
               <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-secondary/15 text-secondary border border-secondary/30 uppercase tracking-wider">
                 {access.workspaceRole.replace('REALTOR_', '').replace('_', ' ')} Seat
