@@ -101,3 +101,14 @@
 
 ## Lofty.com Features
 - Additional accessible documentation or structured exports are required from Lofty.com to perfectly duplicate every specific menu item, button, and page.
+
+## Phase 11 — CRM Website Builder & Marketing Subsystems
+- [ ] Multi-tenant real estate website infrastructure.
+- [ ] RESO Web API integration for IDX / MLS data syncing.
+- [ ] Automated property page generation with SSR / ISR.
+- [ ] AI Chatbot Widget (WebSockets) embedded on agent websites for warm transfers.
+- [ ] Comprehensive lead capture forms mapped directly to CRM Leads.
+- [ ] SEO, Schema.org (JSON-LD), and Dynamic Sitemap infrastructure.
+- [ ] Google Tag Manager, GA4, and Ads Conversion tracking support.
+- [ ] Social Media Open Graph integrations and dynamic share widgets.
+- [ ] Headless CMS connection for localized real estate blogs.
