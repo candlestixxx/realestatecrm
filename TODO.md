@@ -54,3 +54,13 @@
 ## 0.39.0 Backlog Adjustments
 - [x] Fix Next.js 15 `searchParams` unwrap issue on the signin page.
 - [x] Implement Activity Type selector (`NOTE`, `CALL`, `EMAIL`, `SMS`, `MEETING`) in `AddActivityForm`.
+
+### Multi-Tenant Websites & Marketing
+- [ ] Scaffold `/(websites)` route group or secondary Next.js app for multi-tenant handling.
+- [ ] Build RESO Web API data sync cron job/webhook listener.
+- [ ] Configure `LandingPage` model to support full domain mapping / custom domains.
+- [ ] Build intent-triggered Lead Capture Modals (e.g., triggered on photo views).
+- [ ] Develop embeddable LLM-powered Chat Widget for agent sites.
+- [ ] Set up GTM / GA4 injection for dynamically provisioned sites.
+- [ ] Develop Server-Side tracking pipelines for Google Ads and Facebook CAPI.
+- [ ] Implement headless CMS adapter for Agent Blogs.

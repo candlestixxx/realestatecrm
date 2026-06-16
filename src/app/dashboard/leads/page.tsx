@@ -10,6 +10,7 @@ import { syncContactToVectorStore, syncLeadToVectorStore } from '@/lib/rag';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 import AddLeadModal from '@/components/AddLeadModal';
+import { MyPlusImportModal } from '@/components/MyPlusImportModal';
 import { seedSegmentsIfEmpty } from '@/lib/actions/segment';
 import { checkAndAutoEnrollLead } from '@/lib/campaign-processor';
 
@@ -173,7 +174,7 @@ export default async function LeadsPage(props: {
         some: { workspaceId },
       },
     },
-    select: { id: true, name: true },
+    select: { id: true, name: true, email: true },
   });
 
   const segments = await prisma.segment.findMany({
@@ -196,9 +197,7 @@ export default async function LeadsPage(props: {
           <p className="text-muted-foreground">Manage your incoming leads and prospects.</p>
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 bg-muted text-foreground font-medium rounded-md hover:bg-muted/80 transition-colors">
-            Import
-          </button>
+          <MyPlusImportModal />
           <AddLeadModal addLeadAction={addLead} workspaces={workspaces} />
         </div>
       </div>

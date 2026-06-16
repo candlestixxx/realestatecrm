@@ -95,6 +95,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
             Workflows
           </Link>
           <Link
+            href="/workflows/marketing-media"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Media Studio
+          </Link>
+          <Link
             href="/dashboard/sync-queue"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >

@@ -62,83 +62,106 @@ export async function sendMail({
     const region = config.awsRegion || process.env.AWS_REGION || 'us-east-1';
 
     if (!accessKey || !secretKey) {
-      throw new Error('AWS SES Access Key or Secret Key is missing.');
+      console.warn('AWS SES Access Key or Secret Key is missing. Falling back to Simulation.');
+      console.log(`[Email API] [SIMULATION-FALLBACK] Sending email to ${to}: Subject: "${subject}"`);
+      return { success: false, error: 'AWS SES Access Key or Secret Key is missing.' };
     }
 
-    const { SESClient, SendEmailCommand } = await import('@aws-sdk/client-ses');
-    const sesClient = new SESClient({
-      region,
-      credentials: {
-        accessKeyId: accessKey.trim(),
-        secretAccessKey: secretKey.trim(),
-      },
-    });
+    try {
+      const { SESClient, SendEmailCommand } = await import('@aws-sdk/client-ses');
+      const sesClient = new SESClient({
+        region,
+        credentials: {
+          accessKeyId: accessKey.trim(),
+          secretAccessKey: secretKey.trim(),
+        },
+      });
 
-    const command = new SendEmailCommand({
-      Destination: { ToAddresses: [to] },
-      Message: {
-        Body: { Text: { Data: message } },
-        Subject: { Data: subject },
-      },
-      Source: `Excel Legacy Realty <${config.fromEmail}>`,
-    });
+      const command = new SendEmailCommand({
+        Destination: { ToAddresses: [to] },
+        Message: {
+          Body: { Text: { Data: message } },
+          Subject: { Data: subject },
+        },
+        Source: `Excel Legacy Realty <${config.fromEmail}>`,
+      });
 
-    await sesClient.send(command);
-    return { success: true, mode: 'AWS_SES' };
+      await sesClient.send(command);
+      return { success: true, mode: 'AWS_SES' };
+    } catch (e) {
+      console.error('AWS SES send failed:', e);
+      return { success: false, error: e instanceof Error ? e.message : 'AWS SES send failed' };
+    }
   }
 
   if (config.provider === 'RESEND') {
     const apiKey = config.resendApiKey || process.env.RESEND_API_KEY;
     if (!apiKey) {
-      throw new Error('Resend API Key is missing.');
+      console.warn('Resend API Key is missing. Falling back to Simulation.');
+      console.log(`[Email API] [SIMULATION-FALLBACK] Sending email to ${to}: Subject: "${subject}"`);
+      return { success: false, error: 'Resend API Key is missing.' };
     }
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey.trim()}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: `Excel Legacy Realty <${config.fromEmail}>`,
-        to: [to],
-        subject: subject,
-        text: message,
-      }),
-    });
+    try {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey.trim()}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: `Excel Legacy Realty <${config.fromEmail}>`,
+          to: [to],
+          subject: subject,
+          text: message,
+        }),
+      });
 
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Resend API failed: ${res.statusText} - ${errText}`);
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error(`Resend API failed: ${res.statusText} - ${errText}`);
+        return { success: false, error: `Resend API failed: ${res.statusText} - ${errText}` };
+      }
+
+      return { success: true, mode: 'RESEND' };
+    } catch (e) {
+      console.error('Resend API error:', e);
+      return { success: false, error: e instanceof Error ? e.message : 'Resend API error' };
     }
-
-    return { success: true, mode: 'RESEND' };
   }
 
   if (config.provider === 'SMTP') {
     if (!config.smtpServer || !config.smtpUser || !config.smtpPass) {
-      throw new Error('SMTP Configuration is missing credentials.');
+      console.warn('SMTP Configuration is missing credentials. Falling back to Simulation.');
+      console.log(`[Email API] [SIMULATION-FALLBACK] Sending email to ${to}: Subject: "${subject}"`);
+      return { success: false, error: 'SMTP Configuration is missing credentials.' };
     }
 
-    const transporter = nodemailer.createTransport({
-      host: config.smtpServer,
-      port: config.smtpPort || 587,
-      secure: config.smtpPort === 465, // true for 465, false for other ports
-      auth: {
-        user: config.smtpUser.trim(),
-        pass: config.smtpPass.trim(),
-      },
-    });
+    try {
+      const transporter = nodemailer.createTransport({
+        host: config.smtpServer,
+        port: config.smtpPort || 587,
+        secure: config.smtpPort === 465, // true for 465, false for other ports
+        auth: {
+          user: config.smtpUser.trim(),
+          pass: config.smtpPass.trim(),
+        },
+      });
 
-    await transporter.sendMail({
-      from: `Excel Legacy Realty <${config.fromEmail}>`,
-      to,
-      subject,
-      text: message,
-    });
+      await transporter.sendMail({
+        from: `Excel Legacy Realty <${config.fromEmail}>`,
+        to,
+        subject,
+        text: message,
+      });
 
-    return { success: true, mode: 'SMTP' };
+      return { success: true, mode: 'SMTP' };
+    } catch (e) {
+      console.error('SMTP send failed:', e);
+      return { success: false, error: e instanceof Error ? e.message : 'SMTP send failed' };
+    }
   }
 
-  throw new Error('Unknown email provider configured.');
+  console.warn('Unknown email provider configured.');
+  return { success: false, error: 'Unknown email provider configured.' };
 }

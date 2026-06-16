@@ -116,6 +116,10 @@ model SmartPlan {
   description String?
   steps       String?   // JSON string of steps
   isActive    Boolean   @default(true)
+  scope       String    @default("INDIVIDUAL") // COMPANY or INDIVIDUAL
+  leadType    String    @default("Buyer")
+  duration    Int       @default(0)
+  autoApply   Boolean   @default(false)
   workspaceId String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -252,6 +256,7 @@ model Segment {
   description String?
   filters     String?  // JSON string
   workspaceId String
+  isPinned    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   leads       Lead[]   @relation("LeadSegments")

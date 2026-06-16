@@ -32,6 +32,14 @@ export default async function WorkflowsPage() {
       icon: '📷',
       status: 'Coming Soon',
     },
+    {
+      id: 'marketing-media',
+      title: 'Media Studio',
+      description: 'Generate branded property media, social captions, and sync with agent channels.',
+      href: '/workflows/marketing-media',
+      icon: '🎨',
+      status: 'Ready',
+    },
   ];
 
   return (

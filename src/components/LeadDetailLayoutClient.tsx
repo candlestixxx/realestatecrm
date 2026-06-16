@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { 
   Phone, Mail, MessageSquare, Plus, Trash2, Edit2, Sparkles, Check, 
   Settings, User, Clock, ArrowLeft, Calendar, MapPin, UserPlus, 
-  FileText, ChevronRight, X, Briefcase, Info
+  FileText, ChevronRight, X, Briefcase, Info, Bold, Italic, List, Pin, PinOff, Trash
 } from 'lucide-react';
 
 import LeadStatusSelector from './LeadStatusSelector';
@@ -20,6 +20,7 @@ import { deleteLeadAction, updateLeadContactDetailsAction } from '@/lib/actions/
 import { addLeadToSegmentAction } from '@/lib/actions/segment';
 import { addTaskAction } from '@/lib/actions/task';
 import { scheduleShowingAction } from '@/lib/actions/showing';
+import { deleteActivityAction, togglePinActivityAction } from '@/lib/actions/activity';
 
 type TaskData = {
   id: string;
@@ -33,6 +34,8 @@ type ActivityData = {
   id: string;
   type: string;
   content: string;
+  formattedContent: string | null;
+  isPinned: boolean;
   createdAt: Date | string;
 };
 
@@ -126,6 +129,26 @@ export default function LeadDetailLayoutClient({
   const [newDealStage, setNewDealStage] = useState('LEAD');
   const [isAddingDeal, setIsAddingDeal] = useState(false);
 
+  // Rich Text Formatting State
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isBullet, setIsBullet] = useState(false);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  const wrapSelection = (prefix: string, suffix: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = noteContent.substring(start, end);
+    const newText = noteContent.substring(0, start) + prefix + selected + suffix + noteContent.substring(end);
+    setNoteContent(newText);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+    }, 0);
+  };
+
   // Quick Showing State
   const [showAddShowing, setShowAddShowing] = useState(false);
   const [showingAddress, setShowingAddress] = useState(lead.contact.address || '');
@@ -135,6 +158,29 @@ export default function LeadDetailLayoutClient({
 
   // 3-dots dropdown state
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  React.useEffect(() => {
+    if (!showMoreDropdown) return;
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowMoreDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showMoreDropdown]);
+
+  // Close dropdown on Escape
+  React.useEffect(() => {
+    if (!showMoreDropdown) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowMoreDropdown(false);
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [showMoreDropdown]);
 
   // Segment State
   const [currentSegmentId, setCurrentSegmentId] = useState(() => {
@@ -193,8 +239,14 @@ export default function LeadDetailLayoutClient({
     if (!noteContent.trim()) return;
     setIsPostingNote(true);
 
+    // Build formatted content (simple markdown-like)
+    let formatted = noteContent;
+    if (isBold) formatted = '**' + formatted + '**';
+    if (isItalic) formatted = '*' + formatted + '*';
+
     const formData = new FormData();
     formData.append('content', noteContent);
+    formData.append('formattedContent', formatted !== noteContent ? formatted : '');
     formData.append('type', noteType);
     formData.append('workspaceId', lead.workspaceId as any);
     formData.append('leadId', lead.id);
@@ -206,12 +258,48 @@ export default function LeadDetailLayoutClient({
       } else {
         toast.success('Interaction logged successfully!');
         setNoteContent('');
+        setIsBold(false);
+        setIsItalic(false);
+        setIsBullet(false);
         router.refresh();
       }
     } catch {
       toast.error('Failed to log interaction.');
     } finally {
       setIsPostingNote(false);
+    }
+  };
+
+  const handleDeleteActivity = async (activityId: string) => {
+    if (!confirm('Delete this activity entry?')) return;
+    const formData = new FormData();
+    formData.append('activityId', activityId);
+    formData.append('leadId', lead.id);
+    try {
+      const res = await deleteActivityAction(formData);
+      if (res && res.error) toast.error(res.error);
+      else {
+        toast.success('Activity deleted.');
+        router.refresh();
+      }
+    } catch {
+      toast.error('Failed to delete.');
+    }
+  };
+
+  const handleTogglePin = async (activityId: string) => {
+    const formData = new FormData();
+    formData.append('activityId', activityId);
+    formData.append('leadId', lead.id);
+    try {
+      const res = await togglePinActivityAction(formData);
+      if (res && res.error) toast.error(res.error);
+      else {
+        toast.success(res?.isPinned ? 'Pinned to top' : 'Unpinned');
+        router.refresh();
+      }
+    } catch {
+      toast.error('Failed to update pin.');
     }
   };
 
@@ -403,10 +491,17 @@ export default function LeadDetailLayoutClient({
   };
 
   // Timeline events filter logic
-  const filteredActivities = lead.Activity.filter(act => {
-    if (timelineFilter === 'ALL') return true;
-    return act.type === timelineFilter;
-  });
+  const filteredActivities = lead.Activity
+    .filter(act => {
+      if (timelineFilter === 'ALL') return true;
+      if (timelineFilter === 'PINNED') return act.isPinned;
+      return act.type === timelineFilter;
+    })
+    .sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 select-none">
@@ -538,17 +633,17 @@ export default function LeadDetailLayoutClient({
                 </button>
 
                 {/* 3-dots Menu Button */}
-                <div className="relative inline-block">
+                <div className="relative inline-block" ref={dropdownRef}>
                   <button 
                     onClick={() => setShowMoreDropdown(!showMoreDropdown)}
-                    className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors cursor-pointer font-bold"
+                    className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors cursor-pointer font-black text-sm leading-none"
                     title="More options"
                   >
                     •••
                   </button>
                   
                   {showMoreDropdown && (
-                    <div className="absolute right-0 mt-1 w-64 bg-card border border-border rounded-xl shadow-xl z-30 text-left p-3 space-y-4 text-xs font-semibold overflow-y-auto max-h-[350px] scrollbar-thin">
+                    <div className="absolute right-0 mt-2 w-72 bg-background border-2 border-border rounded-2xl shadow-2xl z-[100] text-left p-4 space-y-4 text-xs font-semibold overflow-y-auto max-h-[450px]" style={{ backgroundColor: 'var(--background)', backdropFilter: 'none', opacity: 1 }}>
                       
                       <div>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider mb-1.5 border-b border-border/40 pb-1">Lead Nurturing</p>
@@ -875,19 +970,53 @@ export default function LeadDetailLayoutClient({
                       >
                         <option value="NOTE">📝 Internal Note</option>
                         <option value="CALL">📞 Phone Call</option>
-                        <option value="EMAIL">✉️ Email log</option>
-                        <option value="SMS">📱 SMS log</option>
+                        <option value="TEXT">💬 Text Message</option>
+                        <option value="EMAIL">✉️ Email</option>
                         <option value="SHOWING">🏡 Showing</option>
+                        <option value="DOCUMENT">📄 Log Document</option>
                       </select>
                     </div>
 
+                    {/* Rich Text Toolbar */}
+                    <div className="flex items-center gap-1 pb-1.5 border-b border-border/30">
+                      <button
+                        type="button"
+                        onClick={() => { setIsBold(!isBold); wrapSelection('**', '**'); }}
+                        className={`p-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${isBold ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:bg-muted'}`}
+                        title="Bold"
+                      >
+                        <Bold className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setIsItalic(!isItalic); wrapSelection('*', '*'); }}
+                        className={`p-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${isItalic ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:bg-muted'}`}
+                        title="Italic"
+                      >
+                        <Italic className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setIsBullet(!isBullet); wrapSelection('\n- ', ''); }}
+                        className={`p-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${isBullet ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:bg-muted'}`}
+                        title="Bullet List"
+                      >
+                        <List className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="mx-1 text-border">|</span>
+                      <span className="text-[10px] text-muted-foreground font-medium">Style your note</span>
+                    </div>
+
                     <textarea
+                      ref={textareaRef}
                       value={noteContent}
                       onChange={(e) => setNoteContent(e.target.value)}
                       placeholder={
                         noteType === 'CALL' ? 'Write summary of the phone call...' :
-                        noteType === 'SMS' ? 'Type SMS text message logged...' :
-                        noteType === 'EMAIL' ? 'Paste email conversation logs...' :
+                        noteType === 'TEXT' ? 'Type text message content...' :
+                        noteType === 'EMAIL' ? 'Paste email conversation...' :
+                        noteType === 'SHOWING' ? 'Property address and showing details...' :
+                        noteType === 'DOCUMENT' ? 'Document name and description...' :
                         'Write a note or copy remarks here...'
                       }
                       rows={3}
@@ -915,6 +1044,8 @@ export default function LeadDetailLayoutClient({
                         { id: 'EMAIL', label: 'Emails' },
                         { id: 'SMS', label: 'SMS' },
                         { id: 'SYSTEM', label: 'System' },
+                        { id: 'DOCUMENT', label: 'Docs' },
+                        { id: 'PINNED', label: '📌 Pinned' },
                       ].map(chip => (
                         <button
                           key={chip.id}
@@ -940,31 +1071,58 @@ export default function LeadDetailLayoutClient({
                       </div>
                     ) : (
                       filteredActivities.map((act) => (
-                        <div key={act.id} className="bg-card border border-border/60 rounded-xl p-4.5 shadow-xs flex gap-3.5 hover:border-border transition-colors">
+                        <div key={act.id} className={`bg-card border rounded-xl p-4 shadow-xs flex gap-3.5 transition-colors ${act.isPinned ? 'border-indigo-500/30 bg-indigo-500/[0.03]' : 'border-border/60 hover:border-border'}`}>
                           <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/15 mt-0.5">
                             <span className="text-sm">
                               {act.type === 'NOTE' ? '📝' : 
                                act.type === 'CALL' ? '📞' : 
                                act.type === 'EMAIL' ? '✉️' : 
                                act.type === 'SMS' ? '📱' : 
-                               act.type === 'SHOWING' ? '🏡' : '⚡'}
+                               act.type === 'SHOWING' ? '🏡' : 
+                               act.type === 'DOCUMENT' ? '📄' : '⚡'}
                             </span>
                           </div>
                           
                           <div className="flex-1 min-w-0">
                             <div className="flex justify-between items-start gap-2">
-                              <span className="font-extrabold text-sm text-foreground">
-                                {act.type === 'NOTE' ? 'Logged Note' : 
-                                 act.type === 'CALL' ? 'Phone Call Logged' : 
-                                 act.type === 'EMAIL' ? 'Email Conversation' : 
-                                 act.type === 'SMS' ? 'SMS Message Details' : 
-                                 act.type === 'SHOWING' ? 'Property Showing' : 'System Event'}
-                              </span>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-extrabold text-sm text-foreground">
+                                  {act.type === 'NOTE' ? 'Logged Note' : 
+                                   act.type === 'CALL' ? 'Phone Call Logged' : 
+                                   act.type === 'EMAIL' ? 'Email Conversation' : 
+                                   act.type === 'SMS' ? 'Text Message' : 
+                                   act.type === 'SHOWING' ? 'Property Showing' : 
+                                   act.type === 'DOCUMENT' ? 'Document Logged' : 'System Event'}
+                                </span>
+                                {act.isPinned && (
+                                  <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.5 rounded font-black uppercase flex items-center gap">
+                                    📌 Pinned
+                                  </span>
+                                )}
+                              </div>
                               <span className="text-[10px] text-muted-foreground whitespace-nowrap">{new Date(act.createdAt).toLocaleString()}</span>
                             </div>
                             <p className="text-xs text-muted-foreground mt-1.5 whitespace-pre-wrap leading-relaxed">
-                              {act.content}
+                              {act.formattedContent || act.content}
                             </p>
+                            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/20">
+                              <button
+                                onClick={() => handleTogglePin(act.id)}
+                                className={`text-[10px] font-bold flex items-center gap-1 px-2 py-0.5 rounded transition-colors cursor-pointer ${act.isPinned ? 'text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+                                title={act.isPinned ? 'Unpin' : 'Pin to top'}
+                              >
+                                {act.isPinned ? <PinOff className="w-3 h-3" /> : <Pin className="w-3 h-3" />}
+                                {act.isPinned ? 'Unpin' : 'Pin'}
+                              </button>
+                              <button
+                                onClick={() => handleDeleteActivity(act.id)}
+                                className="text-[10px] font-bold text-red-500 hover:text-red-400 flex items-center gap-1 px-2 py-0.5 rounded hover:bg-red-500/10 transition-colors cursor-pointer"
+                                title="Delete"
+                              >
+                                <Trash className="w-3 h-3" />
+                                Delete
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))

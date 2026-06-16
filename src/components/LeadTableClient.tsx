@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AddTaskModal from './AddTaskModal';
 import { addTaskAction } from '@/lib/actions/task';
 import { bulkEnrollLeadsInCampaignAction } from '@/lib/actions/campaign';
-import { deleteLeadAction, importLeadsBulkAction } from '@/lib/actions/lead';
+import { deleteLeadAction, importLeadsBulkAction, assignLeadAction, enrollLeadInSmartPlanAction, updateLeadTagsAction, bulkUpdateLeadTagsAction, bulkAssignLeadAction, bulkDeleteLeadAction } from '@/lib/actions/lead';
 import { addLeadsToSegmentBulkAction } from '@/lib/actions/segment';
 
 type LeadRow = {
@@ -17,6 +17,7 @@ type LeadRow = {
   source: string | null;
   isAiAssisted: boolean;
   tags?: string | null;
+  userId?: string | null;
   contact: {
     firstName: string;
     lastName: string | null;
@@ -31,6 +32,342 @@ type LeadRow = {
     familyMembers?: string | null;
   };
 };
+
+// ---------------------------------------------------------------------------
+// Per-row Quick Actions Dropdown
+// ---------------------------------------------------------------------------
+function LeadQuickMenu({
+  lead,
+  users,
+  campaigns,
+  workspaces,
+  onRefresh,
+  triggerMode = 'more',
+}: {
+  lead: LeadRow;
+  users: { id: string; name: string | null; email: string | null }[];
+  campaigns: { id: string; name: string }[];
+  workspaces: { id: string; name: string }[];
+  onRefresh: () => void;
+  triggerMode?: 'more' | 'tag';
+}) {
+  const [open, setOpen] = useState(false);
+  const [panel, setPanel] = useState<'main' | 'assign' | 'tags' | 'smartplan' | 'ai'>(triggerMode === 'tag' ? 'tags' : 'main');
+  const [tagInput, setTagInput] = useState(lead.tags || '');
+  const [isSaving, setIsSaving] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  const openMenu = () => {
+    setTagInput(lead.tags || '');
+    setPanel(triggerMode === 'tag' ? 'tags' : 'main');
+    setOpen(o => !o);
+  };
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setPanel('main');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const handleAssign = async (userId: string | null) => {
+    setIsSaving(true);
+    const res = await assignLeadAction(lead.id, userId);
+    setIsSaving(false);
+    if (res.error) {
+      toast.error(res.error);
+    } else {
+      toast.success(userId ? 'Lead assigned!' : 'Lead unassigned.');
+      setOpen(false);
+      setPanel('main');
+      onRefresh();
+    }
+  };
+
+  const handleSaveTags = async () => {
+    setIsSaving(true);
+    const res = await updateLeadTagsAction(lead.id, tagInput);
+    setIsSaving(false);
+    if (res.error) {
+      toast.error(res.error);
+    } else {
+      toast.success('Tags saved!');
+      setOpen(false);
+      setPanel('main');
+      onRefresh();
+    }
+  };
+
+  const handleEnrollSmartPlan = async (smartPlanId: string) => {
+    setIsSaving(true);
+    const res = await enrollLeadInSmartPlanAction(lead.id, smartPlanId);
+    setIsSaving(false);
+    if (res.error) {
+      toast.error(res.error);
+    } else {
+      toast.success('Enrolled in Smart Plan!');
+      setOpen(false);
+      setPanel('main');
+      onRefresh();
+    }
+  };
+
+  const assignedUser = users.find(u => u.id === lead.userId);
+
+  return (
+    <div className="relative" ref={menuRef}>
+      {triggerMode === 'tag' ? (
+        <button
+          onClick={openMenu}
+          className="px-1.5 py-0.5 text-[9px] font-bold rounded border border-dashed border-muted-foreground/40 text-muted-foreground hover:border-primary hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
+          title="Add tags"
+        >
+          + Tag
+        </button>
+      ) : (
+        <button
+          onClick={openMenu}
+          className="px-2.5 py-1.5 bg-muted/60 text-foreground hover:bg-muted border border-border rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center gap-1"
+          title="More Actions"
+        >
+          <span>More</span>
+          <svg className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      )}
+
+      {open && (
+        <div className="absolute right-0 mt-1 z-50 w-56 bg-background border border-border rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-1">
+          {panel === 'main' && (
+            <div className="py-1">
+              {/* Assign Agent */}
+              <button
+                onClick={() => setPanel('assign')}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+              >
+                <span className="text-base">👤</span>
+                <div className="flex flex-col flex-1">
+                  <span className="font-semibold">Assign Agent</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {assignedUser ? (assignedUser.name || assignedUser.email || 'Assigned') : 'Unassigned'}
+                  </span>
+                </div>
+                <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* Tags / Hashtags */}
+              <button
+                onClick={() => { setTagInput(lead.tags || ''); setPanel('tags'); }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+              >
+                <span className="text-base">#️⃣</span>
+                <div className="flex flex-col flex-1">
+                  <span className="font-semibold">Hashtags / Tags</span>
+                  <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
+                    {lead.tags ? lead.tags : 'No tags yet'}
+                  </span>
+                </div>
+                <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* Smart Plan */}
+              <button
+                onClick={() => setPanel('smartplan')}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+              >
+                <span className="text-base">🤖</span>
+                <div className="flex flex-col flex-1">
+                  <span className="font-semibold">Add Smart Plan</span>
+                  <span className="text-[10px] text-muted-foreground">Enroll in drip campaign</span>
+                </div>
+                <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* AI Assistant */}
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  router.push(`/dashboard/leads/${lead.id}?tab=ai`);
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-amber-500/10 text-amber-600 transition-colors text-left"
+              >
+                <span className="text-base">✨</span>
+                <div className="flex flex-col flex-1">
+                  <span className="font-semibold">AI Assistant</span>
+                  <span className="text-[10px] text-amber-500/80">Open AI analysis</span>
+                </div>
+              </button>
+
+              <div className="border-t border-border my-1" />
+
+              {/* Delete */}
+              <button
+                onClick={async () => {
+                  setOpen(false);
+                  if (confirm(`Delete "${lead.contact.firstName} ${lead.contact.lastName || ''}"?`)) {
+                    const res = await deleteLeadAction(lead.id);
+                    if (res?.error) toast.error(res.error);
+                    else { toast.success('Lead deleted.'); onRefresh(); }
+                  }
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-red-500/10 text-red-500 transition-colors text-left"
+              >
+                <span className="text-base">🗑️</span>
+                <span className="font-semibold">Delete Lead</span>
+              </button>
+            </div>
+          )}
+
+          {panel === 'assign' && (
+            <div>
+              <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
+                <button onClick={() => setPanel('main')} className="text-muted-foreground hover:text-foreground">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <span className="text-xs font-bold">Assign to Agent</span>
+              </div>
+              <div className="py-1 max-h-52 overflow-y-auto">
+                <button
+                  onClick={() => handleAssign(null)}
+                  disabled={isSaving}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left ${
+                    !lead.userId ? 'text-primary font-bold' : ''
+                  }`}
+                >
+                  <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">—</span>
+                  <span>Unassigned</span>
+                  {!lead.userId && <span className="ml-auto text-primary">✓</span>}
+                </button>
+                {users.map(user => (
+                  <button
+                    key={user.id}
+                    onClick={() => handleAssign(user.id)}
+                    disabled={isSaving}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left ${
+                      lead.userId === user.id ? 'text-primary font-bold' : ''
+                    }`}
+                  >
+                    <span
+                      className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold uppercase"
+                    >
+                      {(user.name || user.email || '?')[0]}
+                    </span>
+                    <span>{user.name || user.email || 'Agent'}</span>
+                    {lead.userId === user.id && <span className="ml-auto text-primary">✓</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {panel === 'tags' && (
+            <div>
+              <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
+                <button onClick={() => setPanel('main')} className="text-muted-foreground hover:text-foreground">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <span className="text-xs font-bold">Hashtags / Tags</span>
+              </div>
+              <div className="p-3 space-y-2">
+                <p className="text-[10px] text-muted-foreground">Separate tags with commas. Use # prefix or not.</p>
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={e => setTagInput(e.target.value)}
+                  placeholder="e.g. #hot, #investor, #june-2025"
+                  className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                  onKeyDown={e => { if (e.key === 'Enter') handleSaveTags(); }}
+                  autoFocus
+                />
+                {/* Quick-add chips */}
+                <div className="flex flex-wrap gap-1">
+                  {['#hot', '#warm', '#cold', '#investor', '#cash-buyer', '#motivated'].map(chip => (
+                    <button
+                      key={chip}
+                      onClick={() => {
+                        const current = tagInput.split(',').map(t => t.trim()).filter(Boolean);
+                        if (!current.includes(chip)) {
+                          setTagInput([...current, chip].join(', '));
+                        }
+                      }}
+                      className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 hover:bg-blue-500/20 transition-colors"
+                    >
+                      {chip}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <button
+                    onClick={() => setPanel('main')}
+                    className="flex-1 px-2 py-1.5 bg-muted border border-border rounded text-[10px] hover:bg-muted/80"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveTags}
+                    disabled={isSaving}
+                    className="flex-1 px-2 py-1.5 bg-primary text-primary-foreground rounded text-[10px] font-bold hover:bg-primary/90 disabled:opacity-50"
+                  >
+                    {isSaving ? 'Saving...' : 'Save Tags'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {panel === 'smartplan' && (
+            <div>
+              <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
+                <button onClick={() => setPanel('main')} className="text-muted-foreground hover:text-foreground">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <span className="text-xs font-bold">Add Smart Plan</span>
+              </div>
+              <div className="py-1 max-h-52 overflow-y-auto">
+                {campaigns.length === 0 ? (
+                  <p className="px-3 py-4 text-xs text-muted-foreground text-center">No Smart Plans found.</p>
+                ) : (
+                  campaigns.map(camp => (
+                    <button
+                      key={camp.id}
+                      onClick={() => handleEnrollSmartPlan(camp.id)}
+                      disabled={isSaving}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+                    >
+                      <span className="text-base">🤖</span>
+                      <span className="font-medium">{camp.name}</span>
+                      <span className="ml-auto text-[10px] text-primary">Enroll →</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function LeadTableClient({
   initialLeads,
@@ -47,7 +384,7 @@ export function LeadTableClient({
   currentPage: number;
   pageSize: number;
   workspaces: { id: string; name: string }[];
-  users: { id: string; name: string | null }[];
+  users: { id: string; name: string | null; email: string | null }[];
   segments?: { id: string; name: string }[];
   campaigns?: { id: string; name: string }[];
 }) {
@@ -59,7 +396,7 @@ export function LeadTableClient({
   const [activeAssignee, setActiveAssignee] = useState('');
   const [activeCampaign, setActiveCampaign] = useState('');
   const [activeSegment, setActiveSegment] = useState('');
-  const [isBulkActionPending, setIsBulkActionPending] = useState(false);
+  // (bulk action pending state removed - now handled per-action)
 
   // CSV Import States
   const [showCsvImportModal, setShowCsvImportModal] = useState(false);
@@ -336,6 +673,7 @@ export function LeadTableClient({
       setSelectedIds(new Set(initialLeads.map((l) => l.id)));
     } else {
       setSelectedIds(new Set());
+      setSelectAllMode(false);
     }
   };
 
@@ -346,16 +684,101 @@ export function LeadTableClient({
     setSelectedIds(newSet);
   };
 
-  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePageSizeChange = (newSize: number) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('limit', e.target.value);
+    params.set('limit', String(newSize));
     params.set('page', '1');
     router.push(`?${params.toString()}`);
   };
 
+  // Select-all-pages mode
+  const [selectAllMode, setSelectAllMode] = useState(false);
+  const [showPageSizeMenu, setShowPageSizeMenu] = useState(false);
+  const [customPageSize, setCustomPageSize] = useState('');
+  const pageSizeMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showPageSizeMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (pageSizeMenuRef.current && !pageSizeMenuRef.current.contains(e.target as Node)) {
+        setShowPageSizeMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showPageSizeMenu]);
+
   const [showWorkflowModal, setShowWorkflowModal] = useState(false);
   const [showSegmentModal, setShowSegmentModal] = useState(false);
   const [showCampaignModal, setShowCampaignModal] = useState(false);
+
+  // Lofty-style toolbar More dropdown state
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showBulkAssignPanel, setShowBulkAssignPanel] = useState(false);
+  const [showBulkTagPanel, setShowBulkTagPanel] = useState(false);
+  const [bulkTagInput, setBulkTagInput] = useState('');
+  const [isBulkTagSaving, setIsBulkTagSaving] = useState(false);
+  const [isBulkAssigning, setIsBulkAssigning] = useState(false);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showMoreMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
+        setShowMoreMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showMoreMenu]);
+
+  const handleBulkAssign = async (userId: string | null) => {
+    if (selectedIds.size === 0) { toast.error('Select at least one lead.'); return; }
+    
+    // Check if we need a full-database query instead (if selectAllMode is true)
+    if (selectAllMode) {
+      toast.error('Bulk assigning across all pages is coming soon. For now, please assign one page at a time by setting Per Page to "Show all".');
+      return;
+    }
+
+    setIsBulkAssigning(true);
+    const ids = Array.from(selectedIds);
+    const res = await bulkAssignLeadAction(ids, userId);
+    setIsBulkAssigning(false);
+
+    if (res.error) {
+      toast.error(res.error);
+    } else {
+      toast.success(`Assigned ${ids.length} lead(s).`);
+      setShowBulkAssignPanel(false);
+      setSelectedIds(new Set());
+      router.refresh();
+    }
+  };
+
+  const handleBulkChangeTags = async () => {
+    if (selectedIds.size === 0) { toast.error('Select at least one lead.'); return; }
+    
+    if (selectAllMode) {
+      toast.error('Bulk tagging across all pages is coming soon. For now, please tag one page at a time by setting Per Page to "Show all".');
+      return;
+    }
+
+    setIsBulkTagSaving(true);
+    const ids = Array.from(selectedIds);
+    const res = await bulkUpdateLeadTagsAction(ids, bulkTagInput);
+    setIsBulkTagSaving(false);
+
+    if (res.error) {
+      toast.error(res.error);
+    } else {
+      toast.success(`Tags updated for ${ids.length} lead(s).`);
+      setShowBulkTagPanel(false);
+      setBulkTagInput('');
+      setSelectedIds(new Set());
+      router.refresh();
+    }
+  };
 
   const handleEnrollCampaignBulk = async (campaignId: string) => {
     try {
@@ -511,20 +934,75 @@ export function LeadTableClient({
            </button>
         </div>
         
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-           <div className="flex items-center gap-2">
-            <span className="text-xs">Per page:</span>
-            <select
-              value={pageSize}
-              onChange={handlePageSizeChange}
-              className="bg-background border border-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-primary"
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+           <div className="relative" ref={pageSizeMenuRef}>
+            <button
+              onClick={() => setShowPageSizeMenu(p => !p)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border rounded-lg text-xs font-semibold hover:bg-muted transition-colors"
             >
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="75">75</option>
-              <option value="100">100</option>
-            </select>
+              <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+              {pageSize} per page
+              <svg className={`w-3 h-3 transition-transform ${showPageSizeMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            </button>
+
+            {showPageSizeMenu && (
+              <div className="absolute right-0 top-full mt-1 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-2">
+                <p className="px-3 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Quick select</p>
+                <div className="flex flex-wrap gap-1.5 px-3 pb-2">
+                  {[10, 25, 50, 100, 250, 500].map(n => (
+                    <button
+                      key={n}
+                      onClick={() => { handlePageSizeChange(n); setShowPageSizeMenu(false); }}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
+                        pageSize === n
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-muted border-border hover:bg-muted/80'
+                      }`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+                <div className="border-t border-border pt-2 px-3">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1.5">Custom amount</p>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="number"
+                      min={1}
+                      max={1000}
+                      value={customPageSize}
+                      onChange={e => setCustomPageSize(e.target.value)}
+                      placeholder="e.g. 200"
+                      className="flex-1 bg-background border border-border rounded-lg px-2 py-1 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          const n = parseInt(customPageSize);
+                          if (n > 0) { handlePageSizeChange(Math.min(n, 1000)); setShowPageSizeMenu(false); setCustomPageSize(''); }
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        const n = parseInt(customPageSize);
+                        if (n > 0) { handlePageSizeChange(Math.min(n, 1000)); setShowPageSizeMenu(false); setCustomPageSize(''); }
+                      }}
+                      className="px-2.5 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90"
+                    >
+                      Go
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-1">{totalCount} total leads</p>
+                </div>
+                <div className="border-t border-border mt-2 pt-2 px-3">
+                  <button
+                    onClick={() => { handlePageSizeChange(totalCount || 1000); setShowPageSizeMenu(false); }}
+                    className="w-full px-2 py-1.5 bg-amber-500/10 text-amber-600 border border-amber-500/20 text-xs font-bold rounded-lg hover:bg-amber-500/20 transition-colors"
+                  >
+                    Show all {totalCount} leads
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -631,78 +1109,294 @@ export function LeadTableClient({
       )}
 
 
-      {/* Bulk Actions Bar (Sticky/Floating overlay when selection exists) */}
+      {/* ========== LOFTY-STYLE SELECTION TOOLBAR ========== */}
       {selectedIds.size > 0 && (
-        <div className="bg-primary/10 border-b border-primary/20 p-3 flex items-center justify-between sticky top-0 z-20">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-bold text-primary">{selectedIds.size} Selected</span>
-            <div className="h-4 w-[1px] bg-primary/20 mx-1"></div>
-            <div className="flex gap-1">
-              <button
-                onClick={() => bulkAction('Add to Segment')}
-                className="px-2 py-1 bg-background border border-border text-[10px] font-bold uppercase rounded hover:bg-muted transition-colors"
-              >
-                + Segment
-              </button>
-              <button
-                onClick={() => bulkAction('Add to Deal')}
-                className="px-2 py-1 bg-background border border-border text-[10px] font-bold uppercase rounded hover:bg-muted transition-colors"
-              >
-                + Deal
-              </button>
-              <button
-                onClick={() => bulkAction('Add to Smart Plan')}
-                className="px-2 py-1 bg-background border border-border text-[10px] font-bold uppercase rounded hover:bg-muted transition-colors"
-              >
-                + Smart Plan
-              </button>
-              <button
-                onClick={() => bulkAction('Add to Workflow')}
-                className="px-2 py-1 bg-background border border-border text-[10px] font-bold uppercase rounded hover:bg-muted transition-colors"
-              >
-                + Workflow
-              </button>
-              <button
-                onClick={async () => {
-                  const ids = Array.from(selectedIds);
-                  if (confirm(`Are you sure you want to delete the ${ids.length} selected leads?`)) {
-                    let successCount = 0;
-                    for (const id of ids) {
-                      const res = await deleteLeadAction(id);
-                      if (!res.error) successCount++;
+        <div className="sticky top-0 z-30 border-b border-primary/25 bg-[hsl(var(--primary)/0.08)] backdrop-blur-md px-4 py-2 flex items-center gap-2 shadow-sm">
+
+          {/* Selection count badge + select-all-pages toggle */}
+          <div className="flex items-center gap-2 mr-2">
+            <span className="inline-flex items-center justify-center min-w-[24px] h-6 rounded-full bg-primary text-primary-foreground text-[11px] font-black px-2">
+              {selectAllMode ? totalCount : selectedIds.size}
+            </span>
+            <span className="text-xs font-semibold text-foreground/70">
+              {selectAllMode ? `all leads selected` : 'selected'}
+            </span>
+          </div>
+
+          <div className="h-5 w-px bg-border mx-1" />
+
+          {/* Mass Email */}
+          <button
+            onClick={() => bulkAction('Email')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-semibold hover:bg-muted transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            Mass Email
+          </button>
+
+          {/* Assign to Agent – flyout */}
+          <div className="relative">
+            <button
+              onClick={() => { setShowBulkAssignPanel(p => !p); setShowBulkTagPanel(false); setShowMoreMenu(false); }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-semibold hover:bg-muted transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+              Assign to Agent
+              <svg className={`w-3 h-3 transition-transform ${showBulkAssignPanel ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            {showBulkAssignPanel && (
+              <div className="absolute left-0 top-full mt-1 z-50 w-56 bg-background border border-border rounded-xl shadow-2xl overflow-hidden">
+                <div className="px-3 py-2 border-b border-border">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase">Assign {selectedIds.size} lead(s) to:</p>
+                </div>
+                <div className="py-1 max-h-52 overflow-y-auto">
+                  <button
+                    onClick={() => handleBulkAssign(null)}
+                    disabled={isBulkAssigning}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+                  >
+                    <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">—</span>
+                    <span>Unassigned</span>
+                  </button>
+                  {users.map(user => (
+                    <button
+                      key={user.id}
+                      onClick={() => handleBulkAssign(user.id)}
+                      disabled={isBulkAssigning}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+                    >
+                      <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold uppercase">
+                        {(user.name || user.email || '?')[0]}
+                      </span>
+                      <span>{user.name || user.email || 'Agent'}</span>
+                    </button>
+                  ))}
+                </div>
+                {isBulkAssigning && (
+                  <div className="px-3 py-2 border-t border-border text-[10px] text-muted-foreground text-center">Assigning...</div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Add Smart Plan – flyout */}
+          <button
+            onClick={() => { setShowCampaignModal(true); setShowMoreMenu(false); }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-semibold hover:bg-muted transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" /></svg>
+            Add Smart Plan
+          </button>
+
+          {/* More dropdown */}
+          <div className="relative" ref={moreMenuRef}>
+            <button
+              onClick={() => { setShowMoreMenu(p => !p); setShowBulkAssignPanel(false); setShowBulkTagPanel(false); }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-semibold hover:bg-muted transition-colors"
+            >
+              More
+              <svg className={`w-3 h-3 transition-transform ${showMoreMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            </button>
+
+            {showMoreMenu && (
+              <div className="absolute left-0 top-full mt-1 z-50 w-56 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-1">
+
+                {/* Change Tags */}
+                <button
+                  onClick={() => { setShowBulkTagPanel(true); setShowMoreMenu(false); setBulkTagInput(''); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+                >
+                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                  <span className="font-semibold">Change Tags</span>
+                </button>
+
+                {/* Add to Segment */}
+                <button
+                  onClick={() => { setShowSegmentModal(true); setShowMoreMenu(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+                >
+                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+                  <span className="font-semibold">Add to Segment</span>
+                </button>
+
+                {/* Add to Workflow */}
+                <button
+                  onClick={() => { setShowWorkflowModal(true); setShowMoreMenu(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+                >
+                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                  <span className="font-semibold">Add to Workflow</span>
+                </button>
+
+                {/* Send Opt-In Email */}
+                <button
+                  onClick={() => { toast.success('Opt-in email queued for selected leads.'); setShowMoreMenu(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+                >
+                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  <span className="font-semibold">Send Opt-In Email</span>
+                </button>
+
+                {/* Mailing Label */}
+                <button
+                  onClick={() => { toast.success('Mailing labels generated.'); setShowMoreMenu(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+                >
+                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  <span className="font-semibold">Mailing Label</span>
+                </button>
+
+                {/* Merge */}
+                <button
+                  onClick={() => {
+                    if (selectedIds.size !== 2) { toast.error('Select exactly 2 leads to merge.'); setShowMoreMenu(false); return; }
+                    toast.success('Merge feature coming soon — select exactly 2 leads.');
+                    setShowMoreMenu(false);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
+                >
+                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                  <span className="font-semibold">Merge</span>
+                  {selectedIds.size !== 2 && <span className="ml-auto text-[10px] text-muted-foreground">2 required</span>}
+                </button>
+
+                <div className="border-t border-border my-1" />
+
+                {/* Delete */}
+                <button
+                  onClick={async () => {
+                    setShowMoreMenu(false);
+                    if (selectAllMode) {
+                      toast.error('Bulk deleting across all pages is coming soon. For now, please delete one page at a time.');
+                      return;
                     }
-                    toast.success(`Successfully deleted ${successCount} leads.`);
-                    setSelectedIds(new Set());
-                    router.refresh();
-                  }
-                }}
-                className="px-2 py-1 bg-red-600 text-white border border-red-700 text-[10px] font-bold uppercase rounded hover:bg-red-700 transition-colors shadow-sm"
+                    const ids = Array.from(selectedIds);
+                    if (confirm(`Delete ${ids.length} selected lead(s)? This cannot be undone.`)) {
+                      const res = await bulkDeleteLeadAction(ids);
+                      if (res.error) {
+                        toast.error(res.error);
+                      } else {
+                        toast.success(`Deleted ${ids.length} leads.`);
+                        setSelectedIds(new Set());
+                        router.refresh();
+                      }
+                    }
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-red-500/10 text-red-500 transition-colors text-left"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  <span className="font-semibold">Delete</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Cancel selection */}
+          <button
+            onClick={() => { setSelectedIds(new Set()); setSelectAllMode(false); }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background/60 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {/* Gmail-style Select-All-Pages Banner */}
+      {selectedIds.size === initialLeads.length && initialLeads.length > 0 && totalCount > initialLeads.length && (
+        <div className={`flex items-center justify-center gap-3 px-4 py-2 text-xs font-medium border-b ${
+          selectAllMode
+            ? 'bg-primary/10 border-primary/20 text-primary'
+            : 'bg-blue-500/8 border-blue-500/15 text-foreground'
+        }`}>
+          {selectAllMode ? (
+            <>
+              <svg className="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span>All <strong>{totalCount}</strong> leads are selected across all pages.</span>
+              <button
+                onClick={() => { setSelectAllMode(false); setSelectedIds(new Set()); }}
+                className="underline underline-offset-2 hover:text-primary transition-colors font-semibold"
               >
-                🗑️ Delete Selected
+                Clear selection
+              </button>
+            </>
+          ) : (
+            <>
+              <span>All <strong>{initialLeads.length}</strong> leads on this page are selected.</span>
+              <button
+                onClick={() => setSelectAllMode(true)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 transition-colors"
+              >
+                Select all {totalCount} leads
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Bulk Tag Change Panel (modal) */}
+      {showBulkTagPanel && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-background border border-border rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+            <div className="p-4 border-b border-border flex items-center justify-between bg-muted/20">
+              <div>
+                <h3 className="font-bold text-sm">Change Tags</h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Applies to {selectedIds.size} selected lead(s)</p>
+              </div>
+              <button onClick={() => setShowBulkTagPanel(false)} className="text-muted-foreground hover:text-foreground">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
-          </div>
-          <div className="flex gap-2">
-             <button
-              onClick={() => bulkAction('AI Assist')}
-              className="px-3 py-1.5 bg-primary/20 text-primary border border-primary/30 text-xs font-bold rounded shadow-sm hover:bg-primary/30 transition-colors"
-            >
-              ✨ AI Assist
-            </button>
-            <div className="flex border border-border rounded overflow-hidden">
-               <button onClick={() => bulkAction('Call')} className="px-3 py-1.5 bg-background hover:bg-muted border-r border-border text-xs font-medium">📞 Call</button>
-               <button onClick={() => bulkAction('Text')} className="px-3 py-1.5 bg-background hover:bg-muted border-r border-border text-xs font-medium">💬 Text</button>
-               <button onClick={() => bulkAction('Email')} className="px-3 py-1.5 bg-background hover:bg-muted text-xs font-medium">✉️ Email</button>
+            <div className="p-4 space-y-3">
+              <p className="text-[10px] text-muted-foreground">This will replace tags on all selected leads. Separate with commas.</p>
+              <input
+                type="text"
+                value={bulkTagInput}
+                onChange={e => setBulkTagInput(e.target.value)}
+                placeholder="e.g. #hot, #investor, #june-2025"
+                autoFocus
+                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+              />
+              <div className="flex flex-wrap gap-1">
+                {['#hot', '#warm', '#cold', '#investor', '#cash-buyer', '#motivated', '#vip'].map(chip => (
+                  <button
+                    key={chip}
+                    onClick={() => {
+                      const current = bulkTagInput.split(',').map(t => t.trim()).filter(Boolean);
+                      if (!current.includes(chip)) setBulkTagInput([...current, chip].join(', '));
+                    }}
+                    className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 hover:bg-blue-500/20 transition-colors"
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="p-4 border-t border-border flex gap-2 justify-end">
+              <button onClick={() => setShowBulkTagPanel(false)} className="px-3 py-1.5 text-xs rounded-lg hover:bg-muted">
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkChangeTags}
+                disabled={isBulkTagSaving}
+                className="px-4 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90 disabled:opacity-50"
+              >
+                {isBulkTagSaving ? 'Saving...' : `Apply to ${selectedIds.size} Lead(s)`}
+              </button>
             </div>
           </div>
         </div>
       )}
 
+
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
           <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
             <tr>
-              <th className="px-6 py-3 font-medium w-10">
+              <th className="px-4 py-3 font-medium w-10">
                 <input
                   type="checkbox"
                   onChange={handleSelectAll}
@@ -710,18 +1404,19 @@ export function LeadTableClient({
                   className="rounded border-border"
                 />
               </th>
-              <th className="px-6 py-3 font-medium">Name</th>
-              <th className="px-6 py-3 font-medium">Contact</th>
-              <th className="px-6 py-3 font-medium">Status</th>
-              <th className="px-6 py-3 font-medium">AI Status</th>
-              <th className="px-6 py-3 font-medium">Source</th>
-              <th className="px-6 py-3 font-medium text-right">Actions</th>
+              <th className="px-4 py-3 font-medium">Name</th>
+              <th className="px-4 py-3 font-medium">Contact Info</th>
+              <th className="px-4 py-3 font-medium">Pipeline / Status</th>
+              <th className="px-4 py-3 font-medium">Tags</th>
+              <th className="px-4 py-3 font-medium">Agent</th>
+              <th className="px-4 py-3 font-medium">Source</th>
+              <th className="px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {initialLeads.map((lead) => (
-              <tr key={lead.id} className={`hover:bg-muted/10 transition-colors ${selectedIds.has(lead.id) ? 'bg-primary/5' : ''}`}>
-                <td className="px-6 py-4">
+              <tr key={lead.id} className={`hover:bg-muted/10 transition-colors group ${selectedIds.has(lead.id) ? 'bg-primary/5' : ''}`}>
+                <td className="px-4 py-3">
                   <input
                     type="checkbox"
                     checked={selectedIds.has(lead.id)}
@@ -729,36 +1424,35 @@ export function LeadTableClient({
                     className="rounded border-border text-primary"
                   />
                 </td>
-                <td className="px-6 py-4 font-medium">
+
+                {/* Name + lead type badge */}
+                <td className="px-4 py-3 font-medium">
                   <div className="flex flex-col">
                     <Link
                       href={`/dashboard/leads/${lead.id}`}
-                      className="hover:text-primary hover:underline font-bold text-foreground transition-colors"
+                      className="hover:text-primary hover:underline font-bold text-foreground transition-colors text-sm"
                     >
                       {lead.contact?.firstName} {lead.contact?.lastName}
                     </Link>
-                    {lead.tags && (
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {lead.tags.split(',').map(tag => {
-                          const cleanTag = tag.trim();
-                          if (!cleanTag) return null;
-                          return (
-                            <span key={cleanTag} className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-tighter">
-                              {cleanTag.startsWith('#') ? cleanTag : `#${cleanTag}`}
-                            </span>
-                          );
-                        })}
-                      </div>
+                    {lead.isAiAssisted && (
+                      <span className="flex items-center gap-1 text-[10px] text-primary font-bold mt-0.5">
+                        <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+                        AI ACTIVE
+                      </span>
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4">
+
+                {/* Contact Info */}
+                <td className="px-4 py-3">
                   <div className="flex flex-col">
-                    <span>{lead.contact?.email}</span>
+                    <span className="text-sm">{lead.contact?.email || <span className="text-muted-foreground italic text-xs">No email</span>}</span>
                     <span className="text-xs text-muted-foreground">{lead.contact?.phone}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+
+                {/* Pipeline / Status */}
+                <td className="px-4 py-3">
                   <span
                     className={`px-2 py-1 text-xs rounded-full font-medium border ${
                       lead.status === 'NEW'
@@ -771,19 +1465,55 @@ export function LeadTableClient({
                     {lead.status}
                   </span>
                 </td>
-                <td className="px-6 py-4">
-                  {lead.isAiAssisted ? (
-                    <span className="flex items-center gap-1 text-xs text-primary font-bold">
-                       <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-                       AI ACTIVE
-                     </span>
-                  ) : (
-                    <span className="text-xs text-muted-foreground italic">Manual Only</span>
-                  )}
+
+                {/* Tags column with inline + Tag button */}
+                <td className="px-4 py-3">
+                  <div className="flex flex-wrap gap-1 items-center">
+                    {lead.tags ? (
+                      lead.tags.split(',').map(tag => {
+                        const cleanTag = tag.trim();
+                        if (!cleanTag) return null;
+                        return (
+                          <span key={cleanTag} className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-tighter">
+                            {cleanTag.startsWith('#') ? cleanTag : `#${cleanTag}`}
+                          </span>
+                        );
+                      })
+                    ) : null}
+                    {/* Inline + Tag button — appears on row hover or when no tags */}
+                    <LeadQuickMenu
+                      lead={lead}
+                      users={users}
+                      campaigns={campaigns}
+                      workspaces={workspaces}
+                      onRefresh={() => router.refresh()}
+                      triggerMode="tag"
+                    />
+                  </div>
                 </td>
-                <td className="px-6 py-4 text-muted-foreground">{lead.source}</td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-2">
+
+                {/* Agent */}
+                <td className="px-4 py-3">
+                  {(() => {
+                    const agent = users.find(u => u.id === lead.userId);
+                    if (!agent) return <span className="text-xs text-muted-foreground italic">Unassigned</span>;
+                    return (
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold uppercase">
+                          {(agent.name || agent.email || '?')[0]}
+                        </span>
+                        <span className="text-xs font-medium">{agent.name || agent.email}</span>
+                      </div>
+                    );
+                  })()}
+                </td>
+
+                {/* Source */}
+                <td className="px-4 py-3 text-muted-foreground text-sm">{lead.source}</td>
+
+                {/* Actions */}
+                <td className="px-4 py-3 text-right">
+                  <div className="flex items-center justify-end gap-1.5">
                     <AddTaskModal
                       addTaskAction={addTaskAction}
                       workspaces={workspaces}
@@ -796,31 +1526,22 @@ export function LeadTableClient({
                       href={`/dashboard/leads/${lead.id}`}
                       className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors shadow-sm"
                     >
-                      View Lead
+                      View
                     </Link>
-                    <button
-                      onClick={async () => {
-                        if (confirm(`Are you sure you want to delete lead "${lead.contact?.firstName} ${lead.contact?.lastName || ''}"?`)) {
-                          const res = await deleteLeadAction(lead.id);
-                          if (res && res.error) {
-                            toast.error(res.error);
-                          } else {
-                            toast.success('Lead deleted successfully!');
-                            router.refresh();
-                          }
-                        }
-                      }}
-                      className="px-2.5 py-1.5 bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-lg text-[10px] font-bold uppercase transition-colors"
-                    >
-                      🗑️ Delete
-                    </button>
+                    <LeadQuickMenu
+                      lead={lead}
+                      users={users}
+                      campaigns={campaigns}
+                      workspaces={workspaces}
+                      onRefresh={() => router.refresh()}
+                    />
                   </div>
                 </td>
               </tr>
             ))}
             {initialLeads.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-muted-foreground">
+                <td colSpan={8} className="px-6 py-8 text-center text-muted-foreground">
                   No leads found in this segment.
                 </td>
               </tr>

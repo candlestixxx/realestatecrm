@@ -8,6 +8,14 @@ import { revalidatePath } from 'next/cache';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 
 export async function seedSegmentsIfEmpty(workspaceId: string) {
+  const workspaceExists = await prisma.workspace.findUnique({
+    where: { id: workspaceId },
+  });
+  if (!workspaceExists) {
+    console.warn(`Workspace with ID ${workspaceId} does not exist. Skipping segment seeding.`);
+    return;
+  }
+
   const count = await prisma.segment.count({ where: { workspaceId } });
   if (count === 0) {
     await prisma.segment.createMany({
@@ -175,6 +183,37 @@ export async function addLeadsToSegmentBulkAction(leadIds: string[], segmentId: 
     return { success: true };
   } catch (error) {
     console.error('Failed bulk adding leads to segment:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
+}
+
+export async function toggleSegmentPinAction(segmentId: string) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions.' };
+  }
+
+  try {
+    const segment = await prisma.segment.findUnique({
+      where: { id: segmentId, workspaceId: access.workspaceId },
+      select: { isPinned: true }
+    });
+
+    if (!segment) {
+      return { error: 'Segment not found.' };
+    }
+
+    await prisma.segment.update({
+      where: { id: segmentId, workspaceId: access.workspaceId },
+      data: { isPinned: !segment.isPinned },
+    });
+
+    revalidatePath('/dashboard/segments');
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to toggle segment pin:', error);
     return { error: 'An unexpected error occurred.' };
   }
 }
