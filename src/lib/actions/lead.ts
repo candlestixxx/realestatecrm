@@ -305,5 +305,162 @@ export async function importLeadsBulkAction(
     return { error: 'An unexpected error occurred during bulk import.' };
   }
 }
+export async function assignLeadAction(leadId: string, assigneeUserId: string | null) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
 
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions to reassign leads.' };
+  }
 
+  try {
+    const lead = await prisma.lead.findFirst({
+      where: { id: leadId, workspaceId: access.workspaceId },
+    });
+
+    if (!lead) {
+      return { error: 'Lead not found.' };
+    }
+
+    await prisma.$transaction([
+      prisma.lead.update({
+        where: { id: leadId },
+        data: { userId: assigneeUserId },
+      }),
+      prisma.activity.create({
+        data: {
+          type: 'SYSTEM',
+          content: assigneeUserId
+            ? `Lead reassigned to user ID: ${assigneeUserId}`
+            : 'Lead unassigned.',
+          workspaceId: access.workspaceId,
+          userId: access.userId,
+          leadId,
+        },
+      }),
+    ]);
+
+    revalidatePath('/dashboard/leads');
+    revalidatePath(`/dashboard/leads/${leadId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to assign lead:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
+}
+
+export async function enrollLeadInSmartPlanAction(leadId: string, smartPlanId: string) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions.' };
+  }
+
+  try {
+    const lead = await prisma.lead.findFirst({
+      where: { id: leadId, workspaceId: access.workspaceId },
+    });
+
+    if (!lead) {
+      return { error: 'Lead not found.' };
+    }
+
+    await prisma.$transaction([
+      prisma.lead.update({
+        where: { id: leadId },
+        data: { smartPlanId },
+      }),
+      prisma.activity.create({
+        data: {
+          type: 'SYSTEM',
+          content: `Enrolled in Smart Plan.`,
+          workspaceId: access.workspaceId,
+          userId: access.userId,
+          leadId,
+        },
+      }),
+    ]);
+
+    revalidatePath('/dashboard/leads');
+    revalidatePath(`/dashboard/leads/${leadId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to enroll lead in smart plan:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
+}
+
+export async function bulkUpdateLeadTagsAction(leadIds: string[], tags: string) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions to update tags.' };
+  }
+
+  try {
+    await prisma.lead.updateMany({
+      where: {
+        id: { in: leadIds },
+        workspaceId: access.workspaceId,
+      },
+      data: { tags: tags || null },
+    });
+
+    revalidatePath('/dashboard/leads');
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to bulk update tags:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
+}
+
+export async function bulkAssignLeadAction(leadIds: string[], userId: string | null) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.ADMIN)) {
+    return { error: 'Insufficient permissions to assign leads.' };
+  }
+
+  try {
+    await prisma.lead.updateMany({
+      where: {
+        id: { in: leadIds },
+        workspaceId: access.workspaceId,
+      },
+      data: { userId },
+    });
+
+    revalidatePath('/dashboard/leads');
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to bulk assign leads:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
+}
+
+export async function bulkDeleteLeadAction(leadIds: string[]) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.ADMIN)) {
+    return { error: 'Insufficient permissions to delete leads.' };
+  }
+
+  try {
+    await prisma.lead.deleteMany({
+      where: {
+        id: { in: leadIds },
+        workspaceId: access.workspaceId,
+      },
+    });
+
+    revalidatePath('/dashboard/leads');
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to bulk delete leads:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
+}

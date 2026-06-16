@@ -6,23 +6,22 @@ import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { syncActivityToVectorStore } from '@/lib/rag';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
-import { activitySchema } from '@/lib/validations/activity';
+import { activitySchema, activityActionSchema } from '@/lib/validations/activity';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 
 export async function createActivityAction(formData: FormData) {
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
 
-  // Enforcement: Office Manager or higher can log activities broadly
-  // Standard Agents can log activities they have access to
   if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
     return { error: 'Insufficient permissions to log activity.' };
   }
 
   const rawData = {
     content: formData.get('content'),
+    formattedContent: formData.get('formattedContent') || null,
     type: formData.get('type'),
-    workspaceId: access.workspaceId, // derive from session
+    workspaceId: access.workspaceId,
     leadId: formData.get('leadId'),
     dealId: formData.get('dealId'),
     contactId: formData.get('contactId'),
@@ -44,6 +43,7 @@ export async function createActivityAction(formData: FormData) {
     const activity = await prisma.activity.create({
       data: {
         content: data.content,
+        formattedContent: data.formattedContent || null,
         type: data.type,
         workspaceId: data.workspaceId,
         leadId: data.leadId || null,
@@ -56,50 +56,28 @@ export async function createActivityAction(formData: FormData) {
       data.leadId
         ? prisma.lead.findFirst({
             where: { id: data.leadId, workspaceId: access.workspaceId },
-            select: {
-              id: true,
-              source: true,
-              status: true,
-              score: true,
-            },
+            select: { id: true, source: true, status: true, score: true },
           })
         : Promise.resolve(null),
       data.dealId
         ? prisma.deal.findFirst({
             where: { id: data.dealId, workspaceId: access.workspaceId },
-            select: {
-              id: true,
-              title: true,
-              stage: true,
-              value: true,
-            },
+            select: { id: true, title: true, stage: true, value: true },
           })
         : Promise.resolve(null),
       data.contactId
         ? prisma.contact.findFirst({
             where: { id: data.contactId, workspaceId: access.workspaceId },
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
-              phone: true,
-            },
+            select: { id: true, firstName: true, lastName: true, email: true, phone: true },
           })
         : Promise.resolve(null),
     ]);
 
-    // If any entity was requested but not found in this workspace, abort
     if ((data.leadId && !lead) || (data.dealId && !deal) || (data.contactId && !contact)) {
       return { error: 'Record not found in the active workspace.' };
     }
 
-    await syncActivityToVectorStore({
-      activity,
-      lead,
-      deal,
-      contact,
-    });
+    await syncActivityToVectorStore({ activity, lead, deal, contact });
 
     const revalidateTargets = new Set<string>();
     if (data.leadId) revalidateTargets.add(`/dashboard/leads/${data.leadId}`);
@@ -114,5 +92,92 @@ export async function createActivityAction(formData: FormData) {
   } catch (error) {
     console.error('Failed to add activity:', error);
     return { error: 'An unexpected error occurred while saving.' };
+  }
+}
+
+export async function deleteActivityAction(formData: FormData) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions.' };
+  }
+
+  const rawData = {
+    activityId: formData.get('activityId'),
+    leadId: formData.get('leadId'),
+  };
+
+  const validatedData = activityActionSchema.safeParse(rawData);
+
+  if (!validatedData.success) {
+    return { error: validatedData.error.issues[0].message };
+  }
+
+  const data = validatedData.data;
+
+  try {
+    await prisma.activity.deleteMany({
+      where: {
+        id: data.activityId,
+        workspaceId: access.workspaceId,
+      },
+    });
+
+    if (data.leadId) {
+      revalidatePath(`/dashboard/leads/${data.leadId}`);
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to delete activity:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
+}
+
+export async function togglePinActivityAction(formData: FormData) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions.' };
+  }
+
+  const rawData = {
+    activityId: formData.get('activityId'),
+    leadId: formData.get('leadId'),
+  };
+
+  const validatedData = activityActionSchema.safeParse(rawData);
+
+  if (!validatedData.success) {
+    return { error: validatedData.error.issues[0].message };
+  }
+
+  const data = validatedData.data;
+
+  try {
+    const activity = await prisma.activity.findFirst({
+      where: { id: data.activityId, workspaceId: access.workspaceId },
+      select: { isPinned: true },
+    });
+
+    if (!activity) {
+      return { error: 'Activity not found.' };
+    }
+
+    await prisma.activity.update({
+      where: { id: data.activityId },
+      data: { isPinned: !activity.isPinned },
+    });
+
+    if (data.leadId) {
+      revalidatePath(`/dashboard/leads/${data.leadId}`);
+    }
+
+    return { success: true, isPinned: !activity.isPinned };
+  } catch (error) {
+    console.error('Failed to toggle pin:', error);
+    return { error: 'An unexpected error occurred.' };
   }
 }

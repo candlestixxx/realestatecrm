@@ -27,9 +27,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           position="bottom-right"
           toastOptions={{
             style: {
-              background: '#1a1a1a',
-              color: '#fff',
-              border: '1px solid #333',
+              background: 'var(--background)',
+              color: 'var(--foreground)',
+              border: '1px solid var(--border)',
             },
             success: {
               iconTheme: {
