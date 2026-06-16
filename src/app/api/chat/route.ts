@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       'You have deep access to the CRM data and can perform actions on behalf of the user. ' +
       'Be proactive, professional, and efficient. Use the context below to inform your responses.\n\n' +
       workspaceContext,
-    messages,
+    messages: messages as CoreMessage[],
     tools: {
       getLeadCount: {
         description: 'Get the total number of leads in the current workspace.',
@@ -167,5 +167,5 @@ export async function POST(req: Request) {
     } as any,
   });
 
-  return result.toTextStreamResponse();
+  return result.toAIStreamResponse();
 }

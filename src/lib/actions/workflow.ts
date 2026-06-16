@@ -55,7 +55,7 @@ export async function saveWorkflowSession(
       }
 
       await prisma.workflowSession.update({
-        where: { id: payload.existingSessionId, workspaceId: access.workspaceId },
+        where: { id: payload.existingSessionId },
         data: {
           data: payload.data,
           status: 'DRAFT',

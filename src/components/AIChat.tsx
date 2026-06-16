@@ -76,7 +76,7 @@ export default function AIChat() {
                   {m.toolInvocations?.map((toolInvocation: any) => {
                     const toolCallId = toolInvocation.toolCallId;
 
-                    if (toolInvocation.state === 'result') {
+                    if ('state' in toolInvocation && toolInvocation.state === 'result') {
                       return (
                         <div key={toolCallId} className="mt-3 text-[10px] bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-2 flex items-center gap-2">
                           <span className="font-bold text-emerald-700 dark:text-emerald-400">COMMAND COMPLETE:</span>
