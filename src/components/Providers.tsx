@@ -12,6 +12,9 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
     if (typeof args[0] === 'string' && args[0].includes('Encountered a script tag')) {
       return;
     }
+    if (typeof args[0] === 'string' && args[0].includes('DialogContent requires a DialogTitle')) {
+      return;
+    }
     originalError.apply(console, args);
   };
 }

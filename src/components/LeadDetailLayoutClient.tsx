@@ -18,7 +18,7 @@ import CommunicationsHub from './CommunicationsHub';
 import { createDealAction } from '@/lib/actions/deal';
 import { deleteLeadAction, updateLeadContactDetailsAction } from '@/lib/actions/lead';
 import { addLeadToSegmentAction } from '@/lib/actions/segment';
-import { addTaskAction } from '@/lib/actions/task';
+import { addTaskAction, updateTaskAction, deleteTaskAction, toggleTaskStatusAction } from '@/lib/actions/task';
 import { scheduleShowingAction } from '@/lib/actions/showing';
 import { deleteActivityAction, togglePinActivityAction } from '@/lib/actions/activity';
 
@@ -120,7 +120,17 @@ export default function LeadDetailLayoutClient({
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskDesc, setNewTaskDesc] = useState('');
   const [newTaskDueDate, setNewTaskDueDate] = useState('');
+  const [newTaskDueTime, setNewTaskDueTime] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
+
+  // Edit Task State
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editTaskTitle, setEditTaskTitle] = useState('');
+  const [editTaskDesc, setEditTaskDesc] = useState('');
+  const [editTaskDueDate, setEditTaskDueDate] = useState('');
+  const [editTaskDueTime, setEditTaskDueTime] = useState('');
+  const [editTaskStatus, setEditTaskStatus] = useState('TODO');
+  const [isUpdatingTask, setIsUpdatingTask] = useState(false);
 
   // Quick Deal State
   const [showAddDeal, setShowAddDeal] = useState(false);
@@ -315,6 +325,7 @@ export default function LeadDetailLayoutClient({
       formData.append('status', 'TODO');
       formData.append('leadId', lead.id);
       if (newTaskDueDate) formData.append('dueDate', newTaskDueDate);
+      if (newTaskDueTime) formData.append('dueTime', newTaskDueTime);
 
       const res = await addTaskAction(formData);
 
@@ -325,6 +336,7 @@ export default function LeadDetailLayoutClient({
         setNewTaskTitle('');
         setNewTaskDesc('');
         setNewTaskDueDate('');
+        setNewTaskDueTime('');
         setShowAddTask(false);
         router.refresh();
       }
@@ -333,6 +345,81 @@ export default function LeadDetailLayoutClient({
     } finally {
       setIsAddingTask(false);
     }
+  };
+
+  const handleUpdateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editTaskTitle.trim() || !editingTaskId) return;
+    setIsUpdatingTask(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('taskId', editingTaskId);
+      formData.append('title', editTaskTitle);
+      if (editTaskDesc) formData.append('description', editTaskDesc);
+      formData.append('status', editTaskStatus);
+      if (editTaskDueDate) formData.append('dueDate', editTaskDueDate);
+      if (editTaskDueTime) formData.append('dueTime', editTaskDueTime);
+      formData.append('leadId', lead.id);
+
+      const res = await updateTaskAction(formData);
+      if (res && res.error) toast.error(res.error);
+      else {
+        toast.success('Task updated!');
+        setEditingTaskId(null);
+        router.refresh();
+      }
+    } catch {
+      toast.error('Failed to update task.');
+    } finally {
+      setIsUpdatingTask(false);
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm('Delete this task?')) return;
+    const formData = new FormData();
+    formData.append('taskId', taskId);
+    formData.append('leadId', lead.id);
+    try {
+      const res = await deleteTaskAction(formData);
+      if (res && res.error) toast.error(res.error);
+      else {
+        toast.success('Task deleted.');
+        router.refresh();
+      }
+    } catch {
+      toast.error('Failed to delete task.');
+    }
+  };
+
+  const handleToggleTask = async (taskId: string) => {
+    const formData = new FormData();
+    formData.append('taskId', taskId);
+    formData.append('leadId', lead.id);
+    try {
+      const res = await toggleTaskStatusAction(formData);
+      if (res && res.error) toast.error(res.error);
+      else router.refresh();
+    } catch {
+      toast.error('Failed to update task status.');
+    }
+  };
+
+  const openEditTask = (task: TaskData) => {
+    setEditingTaskId(task.id);
+    setEditTaskTitle(task.title);
+    setEditTaskDesc(task.description || '');
+    if (task.dueDate) {
+      const d = new Date(task.dueDate);
+      setEditTaskDueDate(d.toISOString().split('T')[0]);
+      const timeStr = d.toTimeString().split(' ')[0].substring(0, 5);
+      setEditTaskDueTime(timeStr === '00:00' ? '' : timeStr);
+    } else {
+      setEditTaskDueDate('');
+      setEditTaskDueTime('');
+    }
+    setEditTaskStatus(task.status);
   };
 
   const handleCreateDeal = async (e: React.FormEvent) => {
@@ -909,7 +996,7 @@ export default function LeadDetailLayoutClient({
                   R
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-black text-foreground truncate">Excel Legacy Realty Team</span>
+                  <span className="text-xs font-black text-foreground truncate">Excel Legacy Realty Group</span>
                   <span className="text-[10px] text-muted-foreground">Workspace Owner</span>
                 </div>
               </div>
@@ -1164,12 +1251,26 @@ export default function LeadDetailLayoutClient({
                           rows={2}
                           className="w-full bg-background border border-border/60 rounded px-2.5 py-1 text-xs focus:outline-none resize-none"
                         />
-                        <input
-                          type="date"
-                          value={newTaskDueDate}
-                          onChange={(e) => setNewTaskDueDate(e.target.value)}
-                          className="w-full bg-background border border-border/60 rounded px-2.5 py-1 text-xs focus:outline-none"
-                        />
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[9px] font-bold text-muted-foreground uppercase block mb-0.5">Date</label>
+                            <input
+                              type="date"
+                              value={newTaskDueDate}
+                              onChange={(e) => setNewTaskDueDate(e.target.value)}
+                              className="w-full bg-background border border-border/60 rounded px-2 py-1 text-xs focus:outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[9px] font-bold text-muted-foreground uppercase block mb-0.5">Time</label>
+                            <input
+                              type="time"
+                              value={newTaskDueTime}
+                              onChange={(e) => setNewTaskDueTime(e.target.value)}
+                              className="w-full bg-background border border-border/60 rounded px-2 py-1 text-xs focus:outline-none"
+                            />
+                          </div>
+                        </div>
                         <div className="flex justify-end gap-1.5">
                           <button
                             type="button"
@@ -1194,12 +1295,12 @@ export default function LeadDetailLayoutClient({
                         <p className="text-xs text-muted-foreground text-center py-6">No pending follow-ups or tasks.</p>
                       ) : (
                         lead.tasks.map(task => (
-                          <div key={task.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-start gap-2">
+                          <div key={task.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-start gap-2 group">
                             <input 
                               type="checkbox" 
-                              className="mt-0.5 w-4 h-4 rounded border-border" 
+                              className="mt-0.5 w-4 h-4 rounded border-border cursor-pointer" 
                               checked={task.status === 'DONE'} 
-                              readOnly 
+                              onChange={() => handleToggleTask(task.id)}
                             />
                             <div className="flex-1 min-w-0">
                               <p className={`font-bold text-xs leading-snug truncate ${task.status === 'DONE' ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
@@ -1211,11 +1312,85 @@ export default function LeadDetailLayoutClient({
                               {task.dueDate && (
                                 <span className="inline-block mt-1.5 text-[8px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1 rounded font-bold">
                                   📅 {new Date(task.dueDate).toLocaleDateString()}
+                                  {(() => {
+                                    const hrs = new Date(task.dueDate).getHours();
+                                    const mins = new Date(task.dueDate).getMinutes();
+                                    if (hrs === 0 && mins === 0) return '';
+                                    const ampm = hrs >= 12 ? 'pm' : 'am';
+                                    const h12 = hrs % 12 || 12;
+                                    return ` ${h12}:${mins.toString().padStart(2, '0')}${ampm}`;
+                                  })()}
                                 </span>
                               )}
+                              {/* Edit/Delete buttons - show on hover */}
+                              <div className="flex items-center gap-2 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={() => openEditTask(task)}
+                                  className="text-[9px] font-bold text-muted-foreground hover:text-foreground px-1.5 py-0.5 hover:bg-muted rounded transition-colors cursor-pointer"
+                                >
+                                  ✏️ Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteTask(task.id)}
+                                  className="text-[9px] font-bold text-red-500 hover:text-red-400 px-1.5 py-0.5 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
+                                >
+                                  🗑️ Delete
+                                </button>
+                              </div>
                             </div>
                           </div>
                         ))
+                      )}
+
+                      {/* Edit Task Modal */}
+                      {editingTaskId && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                          <div className="bg-card border border-border max-w-sm w-full rounded-2xl p-5 shadow-xl space-y-4">
+                            <div className="flex justify-between items-center border-b border-border/50 pb-2">
+                              <h4 className="font-bold text-sm text-foreground">✏️ Edit Task</h4>
+                              <button onClick={() => setEditingTaskId(null)} className="p-1 hover:bg-muted rounded text-muted-foreground">
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                            <form onSubmit={handleUpdateTask} className="space-y-3">
+                              <input type="text" required value={editTaskTitle} onChange={(e) => setEditTaskTitle(e.target.value)}
+                                className="w-full bg-background border border-border rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                                placeholder="Task title" />
+                              <textarea value={editTaskDesc} onChange={(e) => setEditTaskDesc(e.target.value)}
+                                rows={2} className="w-full bg-background border border-border rounded px-3 py-2 text-xs focus:outline-none resize-none"
+                                placeholder="Description (optional)" />
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <label className="text-[9px] font-bold text-muted-foreground uppercase block mb-0.5">Date</label>
+                                  <input type="date" value={editTaskDueDate} onChange={(e) => setEditTaskDueDate(e.target.value)}
+                                    className="w-full bg-background border border-border rounded px-2 py-1.5 text-xs focus:outline-none" />
+                                </div>
+                                <div>
+                                  <label className="text-[9px] font-bold text-muted-foreground uppercase block mb-0.5">Time</label>
+                                  <input type="time" value={editTaskDueTime} onChange={(e) => setEditTaskDueTime(e.target.value)}
+                                    className="w-full bg-background border border-border rounded px-2 py-1.5 text-xs focus:outline-none" />
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-[9px] font-bold text-muted-foreground uppercase block mb-0.5">Status</label>
+                                <select value={editTaskStatus} onChange={(e) => setEditTaskStatus(e.target.value)}
+                                  className="w-full bg-background border border-border rounded px-2 py-1.5 text-xs focus:outline-none">
+                                  <option value="TODO">To Do</option>
+                                  <option value="IN_PROGRESS">In Progress</option>
+                                  <option value="DONE">Done</option>
+                                </select>
+                              </div>
+                              <div className="flex justify-end gap-2 pt-1">
+                                <button type="button" onClick={() => setEditingTaskId(null)}
+                                  className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:bg-muted rounded-lg">Cancel</button>
+                                <button type="submit" disabled={isUpdatingTask}
+                                  className="px-3.5 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg shadow">
+                                  {isUpdatingTask ? 'Saving...' : 'Save Changes'}
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>

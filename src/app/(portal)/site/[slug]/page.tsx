@@ -44,7 +44,7 @@ export default async function PublicLandingPage(props: PageProps) {
       {
         id: 'header',
         type: 'HEADER',
-        title: `${agent.name} - Excel Legacy Realty Team`,
+        title: `${agent.name} - Excel Legacy Realty Group`,
         subtitle: `Connect directly with ${agent.name} (${agent.role}) for custom property marketing, listings sync, and virtual walkthroughs.`,
       },
       {

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'RealEstateCRM | Excel Legacy Realty Team',
+  title: 'RealEstateCRM | Excel Legacy Realty Group',
   description:
     'A modular TypeScript real estate operating system with workflow shells for offers, listings, and future MLS-connected automation.',
 };

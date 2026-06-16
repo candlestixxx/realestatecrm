@@ -44,7 +44,7 @@ export default function Home() {
               </div>
               <div className="space-y-3">
                 <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
-                  Excel Legacy Realty Team
+                  Excel Legacy Realty Group
                   <span className="block text-secondary">Command Center</span>
                 </h1>
                 <p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">

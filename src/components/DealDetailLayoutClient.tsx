@@ -163,7 +163,7 @@ export default function DealDetailLayoutClient({
     });
 
     const defaultMsgs = [
-      { id: 'msg-1', text: 'Hi Darrell! I just set up the shared portal. You can upload the inspection report directly to the vault here once received.', senderName: 'Excel Legacy Realty Team', senderRole: 'AGENT', createdAt: new Date(Date.now() - 3600000 * 2).toISOString() },
+      { id: 'msg-1', text: 'Hi Darrell! I just set up the shared portal. You can upload the inspection report directly to the vault here once received.', senderName: 'Excel Legacy Realty Group', senderRole: 'AGENT', createdAt: new Date(Date.now() - 3600000 * 2).toISOString() },
       { id: 'msg-2', text: 'Got it! The inspector is scheduled for tomorrow at 2 PM. I will upload it as soon as I get it.', senderName: deal.contact.firstName, senderRole: 'CLIENT', createdAt: new Date(Date.now() - 3600000).toISOString() },
       { id: 'msg-3', text: 'Pre-approval verified. Appraisal order has been placed on our end.', senderName: 'Sarah Jenkins (Lender)', senderRole: 'LENDER', createdAt: new Date(Date.now() - 1800000).toISOString() },
     ];
