@@ -98,3 +98,13 @@ export async function requireWorkspaceAccess(session?: Session | null) {
 
   return access;
 }
+
+export async function requireWorkspaceRole(session: Session | null, role: string) {
+  const access = await requireWorkspaceAccess(session);
+  
+  if (access.workspaceRole !== role && access.workspaceRole !== 'OWNER' && access.workspaceRole !== 'ADMIN') {
+    throw new WorkspaceAccessError('Insufficient permissions for this action.', 403);
+  }
+
+  return access;
+}
