@@ -5,12 +5,22 @@ if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = `file:${path.resolve(process.cwd(), 'prisma', 'dev.db')}`;
 }
 
-const libsql = createClient({
-  url: `${process.env.TURSO_DATABASE_URL || 'file:./prisma/dev.db'}`,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-})
+let adapter: any = null;
 
-const adapter = new PrismaLibSQL(libsql as any)
+// Only use the libSQL adapter when a Turso database URL is configured
+if (process.env.TURSO_DATABASE_URL) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { PrismaLibSQL } = require('@prisma/adapter-libsql');
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { createClient } = require('@libsql/client');
+
+  const libsql = createClient({
+    url: process.env.TURSO_DATABASE_URL,
+    authToken: process.env.TURSO_AUTH_TOKEN,
+  });
+
+  adapter = new PrismaLibSQL(libsql as any);
+}
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined

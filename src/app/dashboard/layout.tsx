@@ -25,6 +25,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     console.error('Failed processing due drip campaigns in layout:', e);
   }
 
+  const access = await requireWorkspaceAccess(session);
+
   const workspaces = await prisma.workspace.findMany({
     where: {
       members: {
