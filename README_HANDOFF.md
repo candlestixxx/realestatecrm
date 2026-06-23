@@ -8,7 +8,7 @@ This platform acts as both an internal Customer Relationship Management (CRM) to
 ### Core Systems
 1. **CRM Dashboard:** Complete management suite for Deals, Leads, Contacts, and Workflow Pipelines.
 2. **AI & Automation:** Seamless integration with OpenAI / Vercel AI SDK for Chat Widgets, conversational logic, and data synchronization.
-3. **Multi-Tenant Architecture:** A unique `/(websites)/[domain]` route group managed by a custom Next.js `src/proxy.ts` middleware. Agents can design custom Landing Pages inside the CRM, which dynamically deploy on customized subdomains.
+3. **Multi-Tenant Architecture:** A unique `/(websites)/[domain]` route group managed by a custom Next.js `src/proxy.ts` middleware. Agents can design custom Landing Pages inside the CRM, which dynamically deploy on customized subdomains. Includes a WYSIWYG Web Canvas Drag-and-Drop Editor via Dnd-kit.
 4. **Integration Testing:** Verified sync pipelines with Lofty and MyPlus data bridges using Node's native test runner (`node:test`).
 
 ### Deployment Instructions
@@ -19,7 +19,7 @@ The application includes a `deploy.sh` script to streamline deployment to produc
 npm ci --legacy-peer-deps
 npx prisma db push
 npm run build
-npm start &
+npm run start &
 ```
 
 ### Environment Variables
