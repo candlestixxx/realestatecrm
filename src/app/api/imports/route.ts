@@ -61,7 +61,15 @@ export async function POST(req: NextRequest) {
       const fs = await import('node:fs/promises');
       const path = await import('node:path');
 
-      const fullPath = path.default.resolve(process.cwd(), csvPath);
+      // SANITIZE: Prevent Path Traversal (LFI)
+      const sanitizedName = path.default.basename(csvPath);
+      const safeDataDir = path.default.join(process.cwd(), 'data');
+      const fullPath = path.default.join(safeDataDir, sanitizedName);
+
+      // Ensure the resolved path remains inside the 'data' directory boundaries
+      if (!fullPath.startsWith(safeDataDir)) {
+        return NextResponse.json({ error: 'Invalid path traversal detected.' }, { status: 403 });
+      }
 
       try {
         const text = await fs.readFile(fullPath, 'utf8');
