@@ -34,7 +34,7 @@ export default async function IntegrationsPage() {
           Connect MyPlusLeads and link your real estate portal profiles to automatically intake leads.
         </p>
       </div>
-      
+
       {workspaceId ? (
         <MyPlusLeadsSettingsForm initialData={integrationData} workspaceId={workspaceId} />
       ) : (

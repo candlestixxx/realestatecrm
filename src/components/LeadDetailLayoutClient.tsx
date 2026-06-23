@@ -1165,7 +1165,7 @@ export default function LeadDetailLayoutClient({
                                act.type === 'CALL' ? '📞' : 
                                act.type === 'EMAIL' ? '✉️' : 
                                act.type === 'SMS' ? '📱' : 
-                               act.type === 'SHOWING' ? '🏡' : 
+                               act.type === 'SHOWING' ? '🏡' :
                                act.type === 'DOCUMENT' ? '📄' : '⚡'}
                             </span>
                           </div>
@@ -1174,11 +1174,11 @@ export default function LeadDetailLayoutClient({
                             <div className="flex justify-between items-start gap-2">
                               <div className="flex items-center gap-2 flex-wrap">
                                 <span className="font-extrabold text-sm text-foreground">
-                                  {act.type === 'NOTE' ? 'Logged Note' : 
-                                   act.type === 'CALL' ? 'Phone Call Logged' : 
-                                   act.type === 'EMAIL' ? 'Email Conversation' : 
-                                   act.type === 'SMS' ? 'Text Message' : 
-                                   act.type === 'SHOWING' ? 'Property Showing' : 
+                                  {act.type === 'NOTE' ? 'Logged Note' :
+                                   act.type === 'CALL' ? 'Phone Call Logged' :
+                                   act.type === 'EMAIL' ? 'Email Conversation' :
+                                   act.type === 'SMS' ? 'Text Message' :
+                                   act.type === 'SHOWING' ? 'Property Showing' :
                                    act.type === 'DOCUMENT' ? 'Document Logged' : 'System Event'}
                                 </span>
                                 {act.isPinned && (
@@ -1298,7 +1298,7 @@ export default function LeadDetailLayoutClient({
                           <div key={task.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-start gap-2 group">
                             <input 
                               type="checkbox" 
-                              className="mt-0.5 w-4 h-4 rounded border-border cursor-pointer" 
+                              className="mt-0.5 w-4 h-4 rounded border-border cursor-pointer"
                               checked={task.status === 'DONE'} 
                               onChange={() => handleToggleTask(task.id)}
                             />

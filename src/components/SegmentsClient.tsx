@@ -3,28 +3,28 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { 
-  Pin, 
-  PinOff, 
-  Trash2, 
-  Mail, 
-  MessageSquare, 
-  Sparkles, 
-  ArrowLeft, 
-  Search, 
-  UserPlus, 
-  UserMinus, 
+import {
+  Pin,
+  PinOff,
+  Trash2,
+  Mail,
+  MessageSquare,
+  Sparkles,
+  ArrowLeft,
+  Search,
+  UserPlus,
+  UserMinus,
   X,
   Volume2,
   Bookmark,
   ChevronRight
 } from 'lucide-react';
 import MassOutreachModal from './MassOutreachModal';
-import { 
-  toggleSegmentPinAction, 
-  deleteSegmentAction, 
-  addLeadToSegmentAction, 
-  removeLeadFromSegmentAction 
+import {
+  toggleSegmentPinAction,
+  deleteSegmentAction,
+  addLeadToSegmentAction,
+  removeLeadFromSegmentAction
 } from '@/lib/actions/segment';
 import CreateSegmentModal from './CreateSegmentModal';
 
@@ -78,7 +78,7 @@ export default function SegmentsClient({
   const [searchTerm, setSearchTerm] = useState('');
   const [leadSearchTerm, setLeadSearchTerm] = useState('');
   const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([]);
-  
+
   // Modals state
   const [isSmsOpen, setIsSmsOpen] = useState(false);
   const [isSmartPlanOpen, setIsSmartPlanOpen] = useState(false);
@@ -90,7 +90,7 @@ export default function SegmentsClient({
   const activeSegment = segments.find(s => s.id === selectedSegmentId);
 
   // Filtered segments (based on search)
-  const filteredSegments = segments.filter(s => 
+  const filteredSegments = segments.filter(s =>
     s.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -202,12 +202,12 @@ export default function SegmentsClient({
   // Leads in active segment filtered by lead search input
   const filteredActiveLeads = activeSegment?.leads.filter(l => {
     const fullName = `${l.contact.firstName} ${l.contact.lastName || ''}`.toLowerCase();
-    return fullName.includes(leadSearchTerm.toLowerCase()) || 
+    return fullName.includes(leadSearchTerm.toLowerCase()) ||
            (l.contact.email && l.contact.email.toLowerCase().includes(leadSearchTerm.toLowerCase()));
   }) || [];
 
   // Leads in workspace NOT in the active segment
-  const potentialLeads = allLeads.filter(l => 
+  const potentialLeads = allLeads.filter(l =>
     !activeSegment?.leads.some(al => al.id === l.id)
   );
 
@@ -244,7 +244,7 @@ export default function SegmentsClient({
                     <Pin className="w-3.5 h-3.5 text-white" />
                   </div>
                 )}
-                
+
                 <div className="space-y-2 mt-4">
                   <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
                     {seg.isPinned ? '📌 Featured List' : 'Segment List'}
@@ -380,7 +380,7 @@ export default function SegmentsClient({
               <ArrowLeft className="w-4 h-4" />
               Back to Segments
             </button>
-            
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
               <div>
                 <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
@@ -546,7 +546,7 @@ export default function SegmentsClient({
                   {filteredActiveLeads.length === 0 && (
                     <tr>
                       <td colSpan={7} className="text-center py-8 text-muted-foreground">
-                        No leads found in this segment list. Click "Add Lead to List" above to connect prospects.
+                        No leads found in this segment list. Click &quot;Add Lead to List&quot; above to connect prospects.
                       </td>
                     </tr>
                   )}

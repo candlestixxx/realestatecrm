@@ -99,10 +99,12 @@ export async function requireWorkspaceAccess(session?: Session | null) {
   return access;
 }
 
-export async function requireWorkspaceRole(session: Session | null, role: string) {
+import { hasPermission, type UserRole } from './roles';
+
+export async function requireWorkspaceRole(session: Session | null | undefined, requiredRole: UserRole) {
   const access = await requireWorkspaceAccess(session);
-  
-  if (access.workspaceRole !== role && access.workspaceRole !== 'OWNER' && access.workspaceRole !== 'ADMIN') {
+
+  if (!hasPermission(access.workspaceRole, requiredRole)) {
     throw new WorkspaceAccessError('Insufficient permissions for this action.', 403);
   }
 

@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     await requireWorkspaceAccess(session);
 
     const body = await request.json().catch(() => ({}));
-    
+
     // Trigger the integrated media pipeline directly
     const result = await AutomationTriggerService.triggerPipeline({
       event: body.event || 'manual',

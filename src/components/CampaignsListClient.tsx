@@ -11,12 +11,12 @@ import {
 } from '@/lib/actions/campaign';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { 
-  FolderPlus, 
-  Search, 
-  Eye, 
-  Settings, 
-  Trash2, 
+import {
+  FolderPlus,
+  Search,
+  Eye,
+  Settings,
+  Trash2,
   Sparkles,
   Layers,
   Clock,
@@ -258,14 +258,14 @@ export default function CampaignsListClient({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4 bg-background">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-black text-foreground tracking-tight">Smart Plans</h1>
-          
+
           {/* Tabs switch */}
           <div className="bg-muted/50 border border-border p-1 rounded-lg flex items-center">
             <button
               onClick={() => setActiveTab('plans')}
               className={`px-4 py-1 text-xs font-bold rounded-md transition-all ${
                 activeTab === 'plans' 
-                  ? 'bg-background text-primary shadow-sm border border-border/30' 
+                  ? 'bg-background text-primary shadow-sm border border-border/30'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -275,7 +275,7 @@ export default function CampaignsListClient({
               onClick={() => setActiveTab('library')}
               className={`px-4 py-1 text-xs font-bold rounded-md transition-all ${
                 activeTab === 'library' 
-                  ? 'bg-background text-primary shadow-sm border border-border/30' 
+                  ? 'bg-background text-primary shadow-sm border border-border/30'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -314,7 +314,7 @@ export default function CampaignsListClient({
                 onClick={() => setSelectedFolder('all')}
                 className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold flex items-center justify-between transition-colors ${
                   selectedFolder === 'all' 
-                    ? 'bg-primary/10 text-primary border border-primary/20' 
+                    ? 'bg-primary/10 text-primary border border-primary/20'
                     : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                 }`}
               >
@@ -335,7 +335,7 @@ export default function CampaignsListClient({
                     onClick={() => setSelectedFolder(folder)}
                     className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
                       selectedFolder === folder 
-                        ? 'bg-secondary/15 text-secondary border border-secondary/20 font-bold' 
+                        ? 'bg-secondary/15 text-secondary border border-secondary/20 font-bold'
                         : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                     }`}
                   >
@@ -354,8 +354,8 @@ export default function CampaignsListClient({
                     key={i}
                     onClick={() => setSelectedFolder(folder)}
                     className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
-                      selectedFolder === folder 
-                        ? 'bg-secondary/15 text-secondary border border-secondary/20 font-bold' 
+                      selectedFolder === folder
+                        ? 'bg-secondary/15 text-secondary border border-secondary/20 font-bold'
                         : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                     }`}
                   >
@@ -400,7 +400,7 @@ export default function CampaignsListClient({
 
         {/* Right Side: Tab Contents (Plans or Library) */}
         <div className="lg:col-span-3 space-y-4">
-          
+
           {/* TAB 1: ACTIVE PLANS TABLE VIEW (Screenshot 2) */}
           {activeTab === 'plans' && (
             <div className="space-y-4">
@@ -505,8 +505,8 @@ export default function CampaignsListClient({
                             </td>
                             <td className="p-3">
                               <span className={`px-2 py-0.5 border rounded uppercase text-[9px] font-bold ${
-                                c.scope === 'COMPANY' 
-                                  ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' 
+                                c.scope === 'COMPANY'
+                                  ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
                                   : 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20'
                               }`}>
                                 {scopeText}
@@ -606,12 +606,12 @@ export default function CampaignsListClient({
                         {tmpl.description}
                       </p>
                     </div>
-                    
+
                     {/* Visual icons grid representing SMS, Email, Tasks sequence */}
                     <div className="bg-muted/10 border border-border/40 p-3 rounded-xl flex items-center gap-3">
                       <div className="flex items-center gap-1.5">
                         {tmpl.steps.map((s, sIdx) => (
-                          <span 
+                          <span
                             key={sIdx}
                             className={`p-1.5 rounded-lg border flex items-center justify-center ${
                               s.type === 'EMAIL' ? 'bg-blue-500/10 text-blue-500 border-blue-500/25' :

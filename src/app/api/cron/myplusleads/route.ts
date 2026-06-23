@@ -40,13 +40,13 @@ export async function GET(request: Request) {
 
         // 3. Process Listings
         let processedCount = 0;
-        let newLastID = integration.lastID;
+        const newLastID = integration.lastID;
 
         for (const listing of res.listings) {
           // Check if contact already exists by email or phone
           const phone = listing.contact1?.phone1 || '';
           const email = listing.contact1?.email || '';
-          
+
           let contactId = null;
 
           // Attempt to find existing contact
@@ -111,7 +111,7 @@ export async function GET(request: Request) {
         if (res.result.lastID && res.result.lastID !== integration.lastID) {
           await prisma.myPlusLeadsIntegration.update({
             where: { id: integration.id },
-            data: { 
+            data: {
               lastID: res.result.lastID,
               lastSyncAt: new Date()
             },
