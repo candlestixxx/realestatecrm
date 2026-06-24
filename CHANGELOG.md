@@ -287,3 +287,10 @@
 - **Repository Sync:** Intelligently merged `origin/main` upstream features (MyPlusLeads backend modules, Roles configuration) into the active working tree.
 - **Conflict Resolution:** Handled complex Prisma configuration changes and React hook theme implementations, ensuring 0 functionality regressions.
 - **Node Test Module Fixes:** Addressed missing path extensions in integration tests and re-established native ESM loader success.
+
+## [0.46.4] - Repository Merge Reconciliation & Sync Infrastructure
+- **Forward Merge (jules branch):** Integrated routing/security fixes, multi-tenant websites scaffold (agent site chat widget, domain routing), RESO API module, role definitions, and E2E API tests into main.
+- **Stash Reconciliation:** Applied pending MyPlus sync improvements (cron route lastID fix, webhook auto-segmentation, sync scheduler, AgentProfileModal, CommunicationsHub enhancements).
+- **Reverse Merge (all branches):** Updated `jules-*`, `rag-consolidation-cleanup`, and `rag-consolidation-cleanup-17409520208133646924` feature branches with the latest main.
+- **Gitignore Cleanup:** Added patterns for `tsconfig.tsbuildinfo`, `dev.db*` backups, and `*.tsbuildinfo` artifacts.
+- **Documentation:** Synced ROADME, TODO, CHANGELOG with reconciled feature state.
