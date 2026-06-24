@@ -158,7 +158,6 @@ export class TwilioService {
 
     twiml.dial().number(
       {
-
         statusCallbackEvent: ["completed"],
       },
       transferTo
@@ -230,6 +229,38 @@ export class TwilioService {
     twiml.redirect(`${process.env.BASE_URL}/api/twilio/gather?retry=true`)
 
     return twiml.toString()
+  }
+
+  // ─── Send SMS ─────────────────────────────────────────────
+
+  async sendSms(params: {
+    to: string;
+    from: string;
+    body: string;
+    campaignId?: string;
+    leadId?: string;
+    organizationId: string;
+  }): Promise<string> {
+    if (!this.client) {
+        throw new Error("Twilio credentials not configured.");
+    }
+
+    const message = await this.client.messages.create({
+      body: params.body,
+      from: params.from,
+      to: params.to
+    });
+
+    await prisma.activity.create({
+      data: {
+        workspaceId: params.organizationId,
+        type: 'SMS',
+        content: `Sent SMS: ${params.body}`,
+        leadId: params.leadId || null
+      }
+    });
+
+    return message.sid;
   }
 
   private async getOrgId(agentId: string): Promise<string> {
