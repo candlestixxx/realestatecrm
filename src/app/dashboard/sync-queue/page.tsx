@@ -100,7 +100,7 @@ export default function SyncQueuePage() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial async load for client-only queue data.
+
     fetchQueue();
   }, [fetchQueue]);
 

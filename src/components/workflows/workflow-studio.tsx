@@ -442,7 +442,7 @@ export function WorkflowStudio({
     }, 1000);
 
     return clearAutosaveTimer;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [dirty, draft, hydrated]);
 
   async function handleAction(id: WorkflowActionId) {

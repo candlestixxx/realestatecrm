@@ -40,7 +40,7 @@ export async function GET(request: Request) {
 
         // 3. Process Listings
         let processedCount = 0;
-        let newLastID = integration.lastID;
+        const newLastID = integration.lastID;
 
         for (const listing of res.listings) {
           // Check if contact already exists by email or phone

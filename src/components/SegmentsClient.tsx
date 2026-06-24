@@ -546,7 +546,7 @@ export default function SegmentsClient({
                   {filteredActiveLeads.length === 0 && (
                     <tr>
                       <td colSpan={7} className="text-center py-8 text-muted-foreground">
-                        No leads found in this segment list. Click "Add Lead to List" above to connect prospects.
+                        No leads found in this segment list. Click &quot;Add Lead to List&quot; above to connect prospects.
                       </td>
                     </tr>
                   )}

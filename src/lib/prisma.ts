@@ -9,9 +9,9 @@ let adapter: any = null;
 
 // Only use the libSQL adapter when a Turso database URL is configured
 if (process.env.TURSO_DATABASE_URL) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { PrismaLibSQL } = require('@prisma/adapter-libsql');
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createClient } = require('@libsql/client');
 
   const libsql = createClient({
