@@ -15,7 +15,7 @@ function encodePassword(password: string): string {
  */
 export async function authenticate(email: string, passwordRaw: string): Promise<string> {
   const password = encodePassword(passwordRaw);
-  
+
   const res = await fetch(`${API_BASE}/authenticate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

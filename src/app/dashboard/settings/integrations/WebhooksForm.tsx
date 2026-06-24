@@ -16,7 +16,7 @@ export function WebhooksForm() {
     // Determine host on client side
     if (typeof window !== 'undefined') {
       setWebhookBase(window.location.origin);
-      
+
       // Load saved mock settings
       setZillowProfile(localStorage.getItem('zillow_profile_url') || 'https://www.zillow.com/profile/agent-john-smith');
       setRealtorProfile(localStorage.getItem('realtor_profile_url') || 'https://www.realtor.com/realestateagents/john-smith');
@@ -28,7 +28,7 @@ export function WebhooksForm() {
     localStorage.setItem('zillow_profile_url', zillowProfile);
     localStorage.setItem('realtor_profile_url', realtorProfile);
     localStorage.setItem('homes_profile_url', homesProfile);
-    
+
     toast.success('Agent profiles saved successfully!');
   };
 
@@ -99,7 +99,7 @@ export function WebhooksForm() {
           <h3 className="font-extrabold text-base border-b border-border/60 pb-2 flex items-center gap-2">
             👤 Agent Portal Profiles
           </h3>
-          
+
           <div className="space-y-4 text-xs">
             <div className="space-y-1">
               <label className="font-bold text-muted-foreground uppercase text-[10px]">Zillow Agent Profile URL</label>
