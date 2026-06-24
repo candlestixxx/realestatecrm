@@ -396,6 +396,21 @@ export function LeadTableClient({
   const [activeAssignee, setActiveAssignee] = useState('');
   const [activeCampaign, setActiveCampaign] = useState('');
   const [activeSegment, setActiveSegment] = useState('');
+  
+  // Restore and save page limit (pageSize) in localStorage to preserve selection on back navigation
+  useEffect(() => {
+    const urlLimit = searchParams.get('limit');
+    if (urlLimit) {
+      localStorage.setItem('crm_leads_page_size', urlLimit);
+    } else {
+      const savedLimit = localStorage.getItem('crm_leads_page_size');
+      if (savedLimit && savedLimit !== String(pageSize)) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('limit', savedLimit);
+        router.replace(`?${params.toString()}`);
+      }
+    }
+  }, [searchParams, pageSize, router]);
   // (bulk action pending state removed - now handled per-action)
 
   // CSV Import States
