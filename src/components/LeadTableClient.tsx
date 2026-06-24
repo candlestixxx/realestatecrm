@@ -734,7 +734,7 @@ export function LeadTableClient({
 
   const handleBulkAssign = async (userId: string | null) => {
     if (selectedIds.size === 0) { toast.error('Select at least one lead.'); return; }
-    
+
     // Check if we need a full-database query instead (if selectAllMode is true)
     if (selectAllMode) {
       toast.error('Bulk assigning across all pages is coming soon. For now, please assign one page at a time by setting Per Page to "Show all".');
@@ -758,7 +758,7 @@ export function LeadTableClient({
 
   const handleBulkChangeTags = async () => {
     if (selectedIds.size === 0) { toast.error('Select at least one lead.'); return; }
-    
+
     if (selectAllMode) {
       toast.error('Bulk tagging across all pages is coming soon. For now, please tag one page at a time by setting Per Page to "Show all".');
       return;

@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  serverExternalPackages: ['libsql', '@libsql/client', '@prisma/adapter-libsql'],
 };
 
 export default nextConfig;

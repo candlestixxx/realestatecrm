@@ -10,7 +10,7 @@ export function DashboardHeaderActions() {
   const router = useRouter();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     setMounted(true);
     
     const handleClickOutside = (event: MouseEvent) => {

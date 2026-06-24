@@ -57,18 +57,26 @@ export async function POST(req: NextRequest) {
   switch (action) {
     case 'importCsvFromPath': {
       const { csvPath, listType } = body as { csvPath: string; listType: string };
-      
+
       const fs = await import('node:fs/promises');
       const path = await import('node:path');
-      
-      const fullPath = path.default.resolve(process.cwd(), csvPath);
-      
+
+      // SANITIZE: Prevent Path Traversal (LFI)
+      const sanitizedName = path.default.basename(csvPath);
+      const safeDataDir = path.default.join(process.cwd(), 'data');
+      const fullPath = path.default.join(safeDataDir, sanitizedName);
+
+      // Ensure the resolved path remains inside the 'data' directory boundaries
+      if (!fullPath.startsWith(safeDataDir)) {
+        return NextResponse.json({ error: 'Invalid path traversal detected.' }, { status: 403 });
+      }
+
       try {
         const text = await fs.readFile(fullPath, 'utf8');
-        
+
         // Parse and import using the shared CSV parser logic
         const { importCsvAction } = await import('@/lib/actions/imports');
-        
+
         // Create a FormData-like structure
         const formData = new FormData();
         const blob = new Blob([text], { type: 'text/csv' });
@@ -76,9 +84,9 @@ export async function POST(req: NextRequest) {
         const file = new File([blob], fileName, { type: 'text/csv' });
         formData.append('file', file);
         formData.append('listType', listType || 'Expired');
-        
+
         const result = await importCsvAction(formData);
-        
+
         // Log to import history
         const historyPath = path.default.join(process.cwd(), 'data', 'import-history.json');
         let history: any[] = [];
@@ -88,7 +96,7 @@ export async function POST(req: NextRequest) {
         } catch {
           history = [];
         }
-        
+
         history.push({
           timestamp: new Date().toISOString(),
           listType: listType || 'Expired',
@@ -99,9 +107,9 @@ export async function POST(req: NextRequest) {
           errors: result.errors?.length || 0,
           status: result.imported > 0 ? 'success' : 'empty',
         });
-        
+
         await fs.writeFile(historyPath, JSON.stringify(history, null, 2), 'utf8');
-        
+
         return NextResponse.json(result);
       } catch (err) {
         return NextResponse.json({

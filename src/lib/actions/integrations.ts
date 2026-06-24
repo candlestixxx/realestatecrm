@@ -54,11 +54,11 @@ export async function manualSyncMyPlusLeadsAction() {
   // To manually trigger the sync, we can just call our own API route locally.
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const res = await fetch(`${appUrl}/api/cron/myplusleads`);
-  
+
   if (!res.ok) {
     throw new Error('Manual sync failed');
   }
-  
+
   revalidatePath('/dashboard/leads');
   revalidatePath('/dashboard/settings/integrations');
   return await res.json();
