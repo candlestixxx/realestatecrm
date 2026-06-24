@@ -51,3 +51,6 @@ data/
 metamcp.db
 audit*.jsonl
 dev.db
+dev.db*
+tsconfig.tsbuildinfo
+*.tsbuildinfo

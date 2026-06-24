@@ -5,34 +5,20 @@ if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = `file:${path.resolve(process.cwd(), 'prisma', 'dev.db')}`;
 }
 
-let adapter: any = null;
+const prismaClientSingleton = () => new PrismaClient();
 
-// Only use the libSQL adapter when a Turso database URL is configured
-if (process.env.TURSO_DATABASE_URL) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { PrismaLibSQL } = require('@prisma/adapter-libsql');
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { createClient } = require('@libsql/client');
-
-  const libsql = createClient({
-    url: process.env.TURSO_DATABASE_URL,
-    authToken: process.env.TURSO_AUTH_TOKEN,
-  });
-
-  adapter = new PrismaLibSQL(libsql as any);
+declare global {
+  var __prismaClient: PrismaClient | undefined;
 }
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+export function getPrismaClient() {
+  if (!globalThis.__prismaClient) {
+    globalThis.__prismaClient = prismaClientSingleton();
+  }
+
+  return globalThis.__prismaClient;
 }
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    adapter,
-    log: ['query', 'info', 'warn', 'error'],
-  })
+const prisma = globalThis.__prismaClient ?? getPrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
-
-export default prisma
+export default prisma;

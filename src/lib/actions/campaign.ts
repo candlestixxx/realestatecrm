@@ -345,4 +345,3 @@ export async function toggleCampaignAutoApplyAction(campaignId: string, autoAppl
     return { error: 'An unexpected error occurred.' };
   }
 }
-

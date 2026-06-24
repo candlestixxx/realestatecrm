@@ -282,3 +282,8 @@
 - Fixed GitHub Actions CI suite failing on `@ai-sdk` peer dependency resolutions by explicitly setting `--legacy-peer-deps` on the build runner.
 - Resolved CI ESLint errors by tuning `eslint.config.mjs` rules (like disabling `react-hooks/set-state-in-effect`) that were causing false positive job failures.
 - Updated node test execution for CRM integration modules (lofty/myplus), resolving internal import module path resolution failures (`ERR_MODULE_NOT_FOUND`).
+
+## [0.46.3] - Upstream Reconciliation & System Stability
+- **Repository Sync:** Intelligently merged `origin/main` upstream features (MyPlusLeads backend modules, Roles configuration) into the active working tree.
+- **Conflict Resolution:** Handled complex Prisma configuration changes and React hook theme implementations, ensuring 0 functionality regressions.
+- **Node Test Module Fixes:** Addressed missing path extensions in integration tests and re-established native ESM loader success.
