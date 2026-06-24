@@ -11,7 +11,16 @@ export default async function DashboardHome() {
   const workspaceId = access.workspaceId;
   const userRole = access.workspaceRole;
 
-  const [leadCount, contactCount, taskCount, deals, workspaceMembers, activeWorkflows] = await Promise.all([
+  const [
+    leadCount,
+    contactCount,
+    taskCount,
+    deals,
+    workspaceMembers,
+    activeWorkflows,
+    myPlusIntegration,
+    activeAgentWorkflowsCount
+  ] = await Promise.all([
     prisma.lead.count({ where: { workspaceId } }),
     prisma.contact.count({ where: { workspaceId } }),
     prisma.task.count({ where: { workspaceId, status: { not: 'DONE' } } }),
@@ -27,6 +36,12 @@ export default async function DashboardHome() {
       orderBy: { updatedAt: 'desc' },
       take: 5,
       include: { user: true },
+    }),
+    prisma.myPlusLeadsIntegration.findFirst({
+      where: { workspaceId },
+    }),
+    prisma.agentWorkflow.count({
+      where: { workspaceId, isActive: true },
     }),
   ]);
 
@@ -165,6 +180,69 @@ export default async function DashboardHome() {
             </div>
           </div>
         </Link>
+      </div>
+
+      {/* Automations & Sync Status Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        {/* MyPlus Leads Sync Card */}
+        <div className="bg-background border border-border rounded-xl shadow-sm p-5 flex flex-col justify-between hover:border-primary/30 transition-all">
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Lead Capture Sync</span>
+              <h3 className="text-sm font-bold text-foreground">MyPlusLeads Integration</h3>
+              <p className="text-xs text-muted-foreground">Automatically pulls expired listings, FSBO, and foreclosure leads hourly.</p>
+            </div>
+            <div className="p-2 bg-primary/10 rounded-lg text-primary text-xs font-black">
+              ⚡
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-border/40 flex items-center justify-between text-[11px]">
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full ${myPlusIntegration?.isActive ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/30'}`}></span>
+              <span className="font-semibold">{myPlusIntegration?.isActive ? 'Auto-Sync Active' : 'Not Connected'}</span>
+            </div>
+            {myPlusIntegration?.lastSyncAt && (
+              <span className="text-muted-foreground">Last checked: {new Date(myPlusIntegration.lastSyncAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            )}
+          </div>
+          <div className="mt-4">
+            <Link
+              href="/dashboard/settings/integrations"
+              className="block text-center py-2 bg-muted/65 text-foreground hover:bg-muted text-xs font-semibold rounded-lg border border-border"
+            >
+              Configure Integration & Webhooks
+            </Link>
+          </div>
+        </div>
+
+        {/* AI Agent Studio Card */}
+        <div className="bg-background border border-border rounded-xl shadow-sm p-5 flex flex-col justify-between hover:border-primary/30 transition-all">
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Autonomous Agents</span>
+              <h3 className="text-sm font-bold text-foreground">AI Agent Studio</h3>
+              <p className="text-xs text-muted-foreground">Listens to database updates and executes autonomous agent workflows.</p>
+            </div>
+            <div className="p-2 bg-primary/10 rounded-lg text-primary text-xs font-black">
+              🤖
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-border/40 flex items-center justify-between text-[11px]">
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full ${activeAgentWorkflowsCount > 0 ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/30'}`}></span>
+              <span className="font-semibold">{activeAgentWorkflowsCount} Agent Workflows Online</span>
+            </div>
+            <span className="text-muted-foreground">Monitoring triggers</span>
+          </div>
+          <div className="mt-4">
+            <Link
+              href="/dashboard/agent-studio"
+              className="block text-center py-2 bg-muted/65 text-foreground hover:bg-muted text-xs font-semibold rounded-lg border border-border"
+            >
+              Open AI Agent Studio
+            </Link>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
