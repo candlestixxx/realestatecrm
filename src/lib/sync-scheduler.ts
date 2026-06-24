@@ -1,17 +1,18 @@
 // ─── Local MyPlus Sync Scheduler ───────────────────────────────────────────
 //
-// Runs inside the Next.js dev server. Every 15 minutes between 4:00-7:00 AM,
-// it triggers the MyPlus Leads sync if an active integration is configured.
+// Runs inside the Next.js dev server. Triggers MyPlus Leads sync:
+// - Every 15 minutes between 4:00-7:00 AM (high-frequency morning drop window)
+// - Every 1 hour during the rest of the day to fetch straggler leads periodically
 //
 // Imported in: src/app/dashboard/layout.tsx (runs server-side)
 // ───────────────────────────────────────────────────────────────────────────
 
 const SYNC_WINDOW_START = 4;  // 4:00 AM
-const SYNC_WINDOW_END = 7;    // 7:00 AM (last sync at 6:59)
+const SYNC_WINDOW_END = 7;    // 7:00 AM
 const CHECK_INTERVAL_MS = 15 * 60 * 1000; // every 15 minutes
 
 let schedulerStarted = false;
-let lastSyncDate: string | null = null;
+let lastSyncTimeMs = 0;
 
 /**
  * Start the local sync scheduler.
@@ -21,17 +22,23 @@ export function startSyncScheduler() {
   if (schedulerStarted) return;
   schedulerStarted = true;
 
-  console.log('[MyPlus Scheduler] Started — will sync between 4-7 AM daily');
+  console.log('[MyPlus Scheduler] Started — morning drops synced (4-7 AM) and stragglers synced hourly');
 
   const tick = async () => {
     try {
       const now = new Date();
       const hour = now.getHours();
-      const today = now.toISOString().split('T')[0];
+      const nowMs = now.getTime();
 
-      // Only run between 4-7 AM and only once per day
-      if (hour >= SYNC_WINDOW_START && hour < SYNC_WINDOW_END && lastSyncDate !== today) {
-        console.log(`[MyPlus Scheduler] Time window hit (${hour}:00). Triggering sync...`);
+      const isMorningWindow = hour >= SYNC_WINDOW_START && hour < SYNC_WINDOW_END;
+      const timeSinceLastSync = nowMs - lastSyncTimeMs;
+      const oneHourMs = 60 * 60 * 1000;
+
+      // Run sync if:
+      // A) In the morning window (runs every 15 mins to capture morning drop immediately)
+      // B) Outside morning window, but at least 1 hour has elapsed since last sync (to fetch stragglers)
+      if (isMorningWindow || timeSinceLastSync >= oneHourMs) {
+        console.log(`[MyPlus Scheduler] Triggering sync (isMorningWindow: ${isMorningWindow}, lastSync: ${lastSyncTimeMs > 0 ? new Date(lastSyncTimeMs).toLocaleTimeString() : 'never'})...`);
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const cronSecret = process.env.CRON_SECRET;
@@ -48,7 +55,7 @@ export function startSyncScheduler() {
 
         const data = await res.json();
         console.log(`[MyPlus Scheduler] Sync result: ${data.message || JSON.stringify(data)}`);
-        lastSyncDate = today;
+        lastSyncTimeMs = nowMs;
       }
     } catch (err: any) {
       // Silently ignore errors (server might not be ready, etc.)

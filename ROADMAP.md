@@ -89,6 +89,11 @@
 - [ ] Source provenance and review controls
 
 
+## 0.46.5 Update
+- **MyPlusLeads Scheduler:** Optimized MyPlusLeads cron sync frequency (every 15 mins morning drop, hourly check rest of the day).
+- **Lead Detail Quick Edit:** Added visual sidebar quick-edit trigger for phone/email management.
+- **Categorized Multi-Phone/Email:** Supported Cell Phone 1/2/3, Work, Home, and other types with primary auto-selection.
+
 ## 0.46.0 Update
 - **Lead Intelligence Center:** Multi-tab layout for Lead profile detailing social and public record AI scraper results.
 - **AI Tool Calling (Co-Pilot):** Integrated tool capabilities into the chatbot route using `gemini-2.0-flash-001`.

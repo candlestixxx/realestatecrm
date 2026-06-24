@@ -43,7 +43,8 @@ model Workspace {
   agentWorkflows AgentWorkflow[]
   agentLogs      AgentLog[]
   landingPages   LandingPage[]
-  propertyListings PropertyListing[]
+  propertyListings       PropertyListing[]
+  myPlusLeadsIntegrations MyPlusLeadsIntegration[]
 }
 
 model WorkspaceMember {
@@ -304,6 +305,22 @@ model LandingPage {
 // ==========================================
 // Phase 12 - Listing & MLS Integration
 // ==========================================
+
+model MyPlusLeadsIntegration {
+  id          String   @id @default(cuid())
+  email       String
+  password    String
+  lastID      String?
+  isActive    Boolean  @default(true)
+  lastSyncAt  DateTime?
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, email])
+}
 
 model PropertyListing {
   id              String   @id @default(cuid())

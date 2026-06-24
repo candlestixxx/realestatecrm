@@ -14,13 +14,14 @@ type CampaignStep = {
   title?: string;
   subject?: string;
   content: string;
+  assignee?: string;
 };
 
 type CampaignSettings = {
   scope: string; // COMPANY | PERSONAL
   leadType: string; // BUYER | SELLER | BOTH
-  autoApplyTrigger: 'NONE' | 'LEAD_CREATED' | 'ASSIGNMENT_CHANGED' | 'SEGMENT_MATCHED';
-  autoApplyCriteria: string; // segmentId or other tags
+  autoApplyTrigger: string; // NONE | LEAD_CREATED | ASSIGNMENT_CHANGED | SEGMENT_MATCHED | TAG_ADDED | STAGE_CHANGED | LEAD_TRANSFERRED
+  autoApplyCriteria: string; // segmentId, tag name, or pipeline stage
   autoPauseOn: 'REPLY' | 'STAGE_CHANGE' | 'NONE';
 };
 
@@ -232,8 +233,11 @@ export default function CampaignEditor({
                     className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
                   >
                     <option value="NONE">Manual Enrollment Only</option>
-                    <option value="LEAD_CREATED">When Lead Created</option>
-                    <option value="ASSIGNMENT_CHANGED">When Lead Assignment Changed</option>
+                    <option value="LEAD_CREATED">When Lead Created / Comes In</option>
+                    <option value="ASSIGNMENT_CHANGED">When Lead Assigned / Reassigned</option>
+                    <option value="LEAD_TRANSFERRED">When Lead Transferred</option>
+                    <option value="TAG_ADDED">When Specific Tag / Hashtag Added</option>
+                    <option value="STAGE_CHANGED">When Pipeline Stage Changes</option>
                     <option value="SEGMENT_MATCHED">When Lead Meets Segment Conditions</option>
                   </select>
                 </div>
@@ -252,6 +256,53 @@ export default function CampaignEditor({
                         <option key={s.id} value={s.id}>{s.name}</option>
                       ))}
                     </select>
+                  </div>
+                )}
+
+                {settings.autoApplyTrigger === 'TAG_ADDED' && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-foreground">Target Tag Name (e.g. preforeclosure)</label>
+                    <input
+                      type="text"
+                      required
+                      value={settings.autoApplyCriteria}
+                      onChange={(e) => setSettings({ ...settings, autoApplyCriteria: e.target.value })}
+                      placeholder="e.g. expired, preforeclosure"
+                      className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                    />
+                  </div>
+                )}
+
+                {settings.autoApplyTrigger === 'STAGE_CHANGED' && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-foreground">Select Target Stage</label>
+                    <select
+                      value={settings.autoApplyCriteria}
+                      onChange={(e) => setSettings({ ...settings, autoApplyCriteria: e.target.value })}
+                      className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                    >
+                      <option value="">-- Choose Stage --</option>
+                      <option value="NEW">New Lead</option>
+                      <option value="CONTACTED">Contacted</option>
+                      <option value="QUALIFIED">Qualified</option>
+                      <option value="PREFORECLOSURE">Preforeclosure</option>
+                      <option value="UNDER_CONTRACT">Under Contract / Pending</option>
+                      <option value="CLOSED">Closed Deal</option>
+                    </select>
+                  </div>
+                )}
+
+                {settings.autoApplyTrigger === 'LEAD_TRANSFERRED' && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-foreground">Transferred Office / Agent Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={settings.autoApplyCriteria}
+                      onChange={(e) => setSettings({ ...settings, autoApplyCriteria: e.target.value })}
+                      placeholder="e.g. Excel Office A, Agent Mendez"
+                      className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                    />
                   </div>
                 )}
 
@@ -405,6 +456,19 @@ export default function CampaignEditor({
                         />
                       </div>
                     )}
+
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-muted-foreground uppercase">Assigned To (Stakeholder Target)</label>
+                      <select
+                        value={step.assignee || 'AGENT'}
+                        onChange={(e) => handleStepChange(index, 'assignee', e.target.value)}
+                        className="w-full bg-muted/10 border border-border rounded px-2.5 py-1 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
+                      >
+                        <option value="AGENT">Agent (Internal CRM User)</option>
+                        <option value="CLIENT">Client (Lead / Contact)</option>
+                        <option value="BOTH">Both (Agent Task & Client Notification)</option>
+                      </select>
+                    </div>
                   </div>
 
                   {/* Absolute delete button */}

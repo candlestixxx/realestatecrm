@@ -24,6 +24,23 @@ export async function createSearchAlertAction(formData: FormData) {
   const type = (formData.get('type') as string) || 'VIEW'; // VIEW, SHOWING, OFFER
   const frequency = (formData.get('frequency') as string) || 'DAILY'; // INSTANT, DAILY, WEEKLY
 
+  const shapeType = (formData.get('shapeType') as string) || 'none';
+  const shapeCoordinatesRaw = formData.get('shapeCoordinates') as string | null;
+  const circleRadius = formData.get('circleRadius') ? Number(formData.get('circleRadius')) : null;
+
+  const notifyEmail = formData.get('notifyEmail') === 'true';
+  const notifySms = formData.get('notifySms') === 'true';
+  const notifyPortal = formData.get('notifyPortal') === 'true';
+
+  let shapeCoordinates = null;
+  if (shapeCoordinatesRaw) {
+    try {
+      shapeCoordinates = JSON.parse(shapeCoordinatesRaw);
+    } catch (e) {
+      console.error('Failed to parse shape coordinates:', e);
+    }
+  }
+
   if (!leadId) {
     return { error: 'Lead ID is required.' };
   }
@@ -43,6 +60,16 @@ export async function createSearchAlertAction(formData: FormData) {
       maxPrice,
       beds,
       baths,
+      channels: {
+        email: notifyEmail,
+        sms: notifySms,
+        portal: notifyPortal,
+      },
+      shape: {
+        type: shapeType,
+        coordinates: shapeCoordinates,
+        radius: circleRadius,
+      },
     });
 
     await prisma.searchAlert.create({

@@ -33,6 +33,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     console.error('Failed processing due drip campaigns in layout:', e);
   }
 
+  const access = await requireWorkspaceAccess(session);
+
   const workspaces = await prisma.workspace.findMany({
     where: {
       members: {
@@ -201,7 +203,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <AIChat />
       <OnboardingTour />
       <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&libraries=places`}
+        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&libraries=places,drawing`}
         strategy="afterInteractive"
       />
     </div>

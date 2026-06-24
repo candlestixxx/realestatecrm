@@ -40,14 +40,14 @@ export default function LeadTagsEditor({
   };
 
   const handleAddTag = async () => {
-    const cleanTag = newTagInput.trim().replace(/^#/, '');
+    const cleanTag = newTagInput.trim();
     if (!cleanTag) {
       setIsAdding(false);
       return;
     }
 
     if (tagsList.includes(cleanTag)) {
-      toast.error('Hashtag already exists.');
+      toast.error('Tag already exists.');
       setNewTagInput('');
       setIsAdding(false);
       return;
@@ -56,7 +56,7 @@ export default function LeadTagsEditor({
     const nextList = [...tagsList, cleanTag];
     const ok = await saveTags(nextList);
     if (ok) {
-      toast.success(`Added hashtag: #${cleanTag}`);
+      toast.success(`Added tag: ${cleanTag}`);
       setNewTagInput('');
       setIsAdding(false);
     }
@@ -66,7 +66,7 @@ export default function LeadTagsEditor({
     const nextList = tagsList.filter(t => t !== tagToDelete);
     const ok = await saveTags(nextList);
     if (ok) {
-      toast.success(`Removed hashtag: #${tagToDelete}`);
+      toast.success(`Removed tag: ${tagToDelete}`);
     }
   };
 
@@ -81,7 +81,7 @@ export default function LeadTagsEditor({
             key={tag}
             className="flex items-center gap-1 pl-2 pr-1.5 py-0.5 text-[10px] font-bold rounded-lg bg-primary/10 text-primary border border-primary/20 uppercase tracking-tighter"
           >
-            <span>#{tag}</span>
+            <span>{tag}</span>
             <button
               onClick={() => handleDeleteTag(tag)}
               disabled={isSaving}

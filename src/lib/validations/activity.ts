@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const activitySchema = z.object({
   content: z.string().min(1, 'Content cannot be empty'),
   formattedContent: z.string().optional().nullable(),
-  type: z.enum(['NOTE', 'CALL', 'EMAIL', 'SMS', 'SHOWING', 'DOCUMENT', 'MEETING', 'STATUS_CHANGE']).default('NOTE'),
+  type: z.enum(['NOTE', 'CALL', 'EMAIL', 'SMS', 'SHOWING', 'DOCUMENT', 'MEETING', 'STATUS_CHANGE', 'MARKET_SNAPSHOT', 'VALUATION_REPORT']).default('NOTE'),
   workspaceId: z.string().min(1, 'Workspace is required'),
   leadId: z.string().optional().nullable(),
   dealId: z.string().optional().nullable(),

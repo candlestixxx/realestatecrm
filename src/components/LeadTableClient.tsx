@@ -586,12 +586,22 @@ export function LeadTableClient({
       l.source || '',
       l.tags || '',
       l.contact.address || '',
-      l.contact.additionalPhones ? (
-        l.contact.additionalPhones.startsWith('[') ? JSON.parse(l.contact.additionalPhones).join('; ') : l.contact.additionalPhones
-      ) : '',
-      l.contact.additionalEmails ? (
-        l.contact.additionalEmails.startsWith('[') ? JSON.parse(l.contact.additionalEmails).join('; ') : l.contact.additionalEmails
-      ) : '',
+      l.contact.additionalPhones ? (() => {
+        try {
+          const parsed = JSON.parse(l.contact.additionalPhones);
+          return Array.isArray(parsed) ? parsed.map((p: any) => typeof p === 'string' ? p : `${p.label || 'Alt'}: ${p.value}`).join('; ') : l.contact.additionalPhones;
+        } catch {
+          return l.contact.additionalPhones;
+        }
+      })() : '',
+      l.contact.additionalEmails ? (() => {
+        try {
+          const parsed = JSON.parse(l.contact.additionalEmails);
+          return Array.isArray(parsed) ? parsed.map((e: any) => typeof e === 'string' ? e : `${e.label || 'Alt'}: ${e.value}`).join('; ') : l.contact.additionalEmails;
+        } catch {
+          return l.contact.additionalEmails;
+        }
+      })() : '',
       l.contact.spouseName || '',
       l.contact.spousePhone || '',
       l.contact.spouseEmail || '',
@@ -1490,7 +1500,7 @@ export function LeadTableClient({
                         if (!cleanTag) return null;
                         return (
                           <span key={cleanTag} className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-tighter">
-                            {cleanTag.startsWith('#') ? cleanTag : `#${cleanTag}`}
+                            {cleanTag}
                           </span>
                         );
                       })

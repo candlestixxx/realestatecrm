@@ -1,5 +1,12 @@
 # CHANGELOG.md
 
+## [0.46.5] - MyPlusLeads Hourly Sync Optimization & Lead Quick Actions
+
+- **MyPlusLeads Scheduler Enhancements:** Updated `src/lib/sync-scheduler.ts` to query MyPlusLeads every 15 minutes during the morning drop window (4:00 AM - 7:00 AM) and hourly for the remainder of the day, ensuring straggler leads are imported periodically.
+- **Lead Detail Quick Actions:** Added a compact "Quick Edit" modal next to the Phone and Email list headers in the detailed lead view sidebar.
+- **Dynamic Contact Formatting:** Upgraded database parsing of additional phones and emails, supporting labels such as Cell Phone 1/2/3, Home, Work, and Other, and ensuring the first item in the list is automatically saved as the primary contact number.
+
+
 ## [0.46.0] - Lead Intelligence & AI Assistant Tool Calling
 
 - **Lead Profile Intelligence Center:** Overhauled the Lead Profile layout into a multi-tab interface with research actions for social media profiles and public records.

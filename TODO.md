@@ -25,6 +25,9 @@
 - [x] Feature Expansion: Task deadlines and assignment.
 - [x] UI Polish: Add comprehensive tooltips, labels, and descriptions to all CRM views and forms.
 - [x] Global Search: Implement a Command Palette (`cmdk`) for cross-entity searching.
+- [x] Multi-phone and email support with custom categorization labels (Cell, Home, Work, etc.) and primary auto-selection.
+- [x] Optimize MyPlusLeads cron sync to run periodically (hourly check and high-frequency morning window).
+
 
 ### Workflow Engine
 - [x] Workflow Session model and backend persistence.

@@ -1,6 +1,6 @@
 {
   "name": "real-estate-crm",
-  "version": "0.46.4",
+  "version": "0.46.5",
   "private": true,
   "scripts": {
     "predev": "kill-port 3000",
@@ -17,7 +17,8 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "sync:myplus": "tsx scripts/sync-myplusleads.ts"
   },
   "prisma": {
     "seed": "node prisma/seed.mjs"

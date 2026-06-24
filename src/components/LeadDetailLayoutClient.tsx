@@ -145,6 +145,17 @@ export default function LeadDetailLayoutClient({
   const [isBullet, setIsBullet] = useState(false);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
+  // Market Snapshot & Homeowner Valuation states
+  const [showMarketSnapshotModal, setShowMarketSnapshotModal] = useState(false);
+  const [snapshotCity, setSnapshotCity] = useState('');
+  const [snapshotFrequency, setSnapshotFrequency] = useState('WEEKLY');
+  const [isSubmittingSnapshot, setIsSubmittingSnapshot] = useState(false);
+
+  const [showValuationModal, setShowValuationModal] = useState(false);
+  const [valuationAddress, setValuationAddress] = useState(lead.contact.address || '');
+  const [valuationFrequency, setValuationFrequency] = useState('MONTHLY');
+  const [isSubmittingValuation, setIsSubmittingValuation] = useState(false);
+
   const wrapSelection = (prefix: string, suffix: string) => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -216,20 +227,31 @@ export default function LeadDetailLayoutClient({
   const [editSpousePhone, setEditSpousePhone] = useState(lead.contact.spousePhone || '');
   const [editSpouseEmail, setEditSpouseEmail] = useState(lead.contact.spouseEmail || '');
 
+  // Quick edit phone numbers and email addresses states
+  const [isEditingPhonesEmails, setIsEditingPhonesEmails] = useState(false);
+  const [quickPhones, setQuickPhones] = useState<{ value: string; label: string }[]>([]);
+  const [quickEmails, setQuickEmails] = useState<{ value: string; label: string }[]>([]);
+
   // Secondary contact data parsing
-  const secondaryPhones: string[] = (() => {
+  const secondaryPhones: { value: string; label: string }[] = (() => {
     try {
       const parsed = lead.contact.additionalPhones ? JSON.parse(lead.contact.additionalPhones) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      return Array.isArray(parsed) ? parsed.map((p: any) => {
+        if (typeof p === 'string') return { value: p, label: 'Cell Phone 1' };
+        return { value: p.value || '', label: p.label || 'Cell Phone 1' };
+      }) : [];
     } catch {
       return [];
     }
   })();
 
-  const secondaryEmails: string[] = (() => {
+  const secondaryEmails: { value: string; label: string }[] = (() => {
     try {
       const parsed = lead.contact.additionalEmails ? JSON.parse(lead.contact.additionalEmails) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      return Array.isArray(parsed) ? parsed.map((e: any) => {
+        if (typeof e === 'string') return { value: e, label: 'Personal Email' };
+        return { value: e.value || '', label: e.label || 'Personal Email' };
+      }) : [];
     } catch {
       return [];
     }
@@ -243,6 +265,63 @@ export default function LeadDetailLayoutClient({
       return [];
     }
   })();
+
+  const handleCreateMarketSnapshot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!snapshotCity) return;
+    setIsSubmittingSnapshot(true);
+    const content = `Scheduled automated Market Snapshot for ${snapshotCity} (${snapshotFrequency.toLowerCase()} updates)`;
+
+    const formData = new FormData();
+    formData.append('content', content);
+    formData.append('type', 'MARKET_SNAPSHOT');
+    formData.append('workspaceId', lead.workspaceId);
+    formData.append('leadId', lead.id);
+
+    try {
+      const res = await addActivityAction(formData);
+      if (res && res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success('Market snapshot configured and scheduled!');
+        setShowMarketSnapshotModal(false);
+        setSnapshotCity('');
+        router.refresh();
+      }
+    } catch {
+      toast.error('Failed to configure market snapshot.');
+    } finally {
+      setIsSubmittingSnapshot(false);
+    }
+  };
+
+  const handleCreateValuationReport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!valuationAddress) return;
+    setIsSubmittingValuation(true);
+    const content = `Configured automated monthly CMA Homeowner Valuation Report for: ${valuationAddress} (Frequency: ${valuationFrequency.toLowerCase()})`;
+
+    const formData = new FormData();
+    formData.append('content', content);
+    formData.append('type', 'VALUATION_REPORT');
+    formData.append('workspaceId', lead.workspaceId);
+    formData.append('leadId', lead.id);
+
+    try {
+      const res = await addActivityAction(formData);
+      if (res && res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success('Valuation report scheduled!');
+        setShowValuationModal(false);
+        router.refresh();
+      }
+    } catch {
+      toast.error('Failed to configure valuation report.');
+    } finally {
+      setIsSubmittingValuation(false);
+    }
+  };
 
   const handlePostNote = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -535,6 +614,58 @@ export default function LeadDetailLayoutClient({
     }
   };
 
+  const openPhonesEmailsEditor = () => {
+    const phonesList = [];
+    phonesList.push({ value: lead.contact.phone || '', label: 'Cell Phone 1' });
+    secondaryPhones.forEach(p => {
+      phonesList.push({ value: p.value, label: p.label });
+    });
+
+    const emailsList = [];
+    emailsList.push({ value: lead.contact.email || '', label: 'Work Email' });
+    secondaryEmails.forEach(e => {
+      emailsList.push({ value: e.value, label: e.label });
+    });
+
+    setQuickPhones(phonesList);
+    setQuickEmails(emailsList);
+    setIsEditingPhonesEmails(true);
+  };
+
+  const handleUpdatePhonesEmails = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const primaryPhone = quickPhones[0]?.value || '';
+      const primaryEmail = quickEmails[0]?.value || '';
+
+      const additionalPhonesList = quickPhones.slice(1).filter(p => p.value);
+      const additionalEmailsList = quickEmails.slice(1).filter(e => e.value);
+
+      const res = await updateLeadContactDetailsAction(lead.id, {
+        firstName: lead.contact.firstName,
+        lastName: lead.contact.lastName || undefined,
+        address: lead.contact.address || undefined,
+        spouseName: lead.contact.spouseName || undefined,
+        spousePhone: lead.contact.spousePhone || undefined,
+        spouseEmail: lead.contact.spouseEmail || undefined,
+        phone: primaryPhone || undefined,
+        email: primaryEmail || undefined,
+        additionalPhones: additionalPhonesList as any,
+        additionalEmails: additionalEmailsList as any,
+      });
+
+      if (res && res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success('Lead phones and emails updated successfully!');
+        setIsEditingPhonesEmails(false);
+        router.refresh();
+      }
+    } catch {
+      toast.error('Failed to update phone numbers and email addresses.');
+    }
+  };
+
   const handleUpdateContactDetails = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -591,7 +722,7 @@ export default function LeadDetailLayoutClient({
     });
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 select-none">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Top Breadcrumb & Prev/Next Bar */}
       <div className="flex items-center justify-between gap-4 py-1.5 px-4 bg-card/65 backdrop-blur border border-border/60 rounded-xl shadow-sm">
         <div className="flex items-center gap-4">
@@ -763,8 +894,24 @@ export default function LeadDetailLayoutClient({
                       <div>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider mb-1.5 border-b border-border/40 pb-1">Social Media</p>
                         <div className="grid grid-cols-1 gap-1">
-                          <a href="https://facebook.com" target="_blank" rel="noreferrer" onClick={() => setShowMoreDropdown(false)} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold block">📘 Find on Facebook</a>
-                          <a href="https://linkedin.com" target="_blank" rel="noreferrer" onClick={() => setShowMoreDropdown(false)} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold block">👔 Find on LinkedIn</a>
+                          <a 
+                            href={`https://www.facebook.com/search/top/?q=${encodeURIComponent(lead.contact.firstName + ' ' + (lead.contact.lastName || ''))}`}
+                            target="_blank" 
+                            rel="noreferrer" 
+                            onClick={() => setShowMoreDropdown(false)} 
+                            className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold block text-blue-500 hover:text-blue-600 transition-colors"
+                          >
+                            📘 Find on Facebook
+                          </a>
+                          <a 
+                            href={`https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(lead.contact.firstName + ' ' + (lead.contact.lastName || ''))}`}
+                            target="_blank" 
+                            rel="noreferrer" 
+                            onClick={() => setShowMoreDropdown(false)} 
+                            className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold block text-sky-600 hover:text-sky-700 transition-colors"
+                          >
+                            👔 Find on LinkedIn
+                          </a>
                         </div>
                       </div>
 
@@ -874,14 +1021,22 @@ export default function LeadDetailLayoutClient({
               
               {/* Phones List */}
               <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Phone Numbers</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Phone Numbers</span>
+                  <button 
+                    onClick={openPhonesEmailsEditor}
+                    className="text-[10px] text-primary hover:underline font-bold cursor-pointer"
+                  >
+                    ✏️ Quick Edit
+                  </button>
+                </div>
                 <div className="space-y-1.5 font-bold">
                   {lead.contact.phone ? (
                     <div className="flex items-center justify-between text-foreground">
                       <span className="flex items-center gap-1.5">
                         <Phone className="w-3.5 h-3.5 text-muted-foreground" /> {lead.contact.phone}
                       </span>
-                      <span className="text-[9px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded font-black uppercase">Primary</span>
+                      <span className="text-[9px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded font-black uppercase">Primary (Cell Phone 1)</span>
                     </div>
                   ) : (
                     <span className="text-muted-foreground italic">No primary phone</span>
@@ -889,9 +1044,9 @@ export default function LeadDetailLayoutClient({
                   {secondaryPhones.map((ph, idx) => (
                     <div key={idx} className="flex items-center justify-between text-foreground">
                       <span className="flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-muted-foreground/60" /> {ph}
+                        <Phone className="w-3.5 h-3.5 text-muted-foreground/60" /> {ph.value}
                       </span>
-                      <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-black uppercase">Alt {idx + 1}</span>
+                      <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-black uppercase">{ph.label || `Alt ${idx + 1}`}</span>
                     </div>
                   ))}
                 </div>
@@ -899,13 +1054,22 @@ export default function LeadDetailLayoutClient({
 
               {/* Emails List */}
               <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Email Addresses</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Email Addresses</span>
+                  <button 
+                    onClick={openPhonesEmailsEditor}
+                    className="text-[10px] text-primary hover:underline font-bold cursor-pointer"
+                  >
+                    ✏️ Quick Edit
+                  </button>
+                </div>
                 <div className="space-y-1.5 font-semibold">
                   {lead.contact.email ? (
                     <div className="flex items-center justify-between text-foreground">
                       <span className="flex items-center gap-1.5 truncate">
                         <Mail className="w-3.5 h-3.5 text-muted-foreground" /> {lead.contact.email}
                       </span>
+                      <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-black uppercase">Work Email</span>
                     </div>
                   ) : (
                     <span className="text-muted-foreground italic">No primary email</span>
@@ -913,8 +1077,9 @@ export default function LeadDetailLayoutClient({
                   {secondaryEmails.map((em, idx) => (
                     <div key={idx} className="flex items-center justify-between text-foreground">
                       <span className="flex items-center gap-1.5 truncate">
-                        <Mail className="w-3.5 h-3.5 text-muted-foreground/60" /> {em}
+                        <Mail className="w-3.5 h-3.5 text-muted-foreground/60" /> {em.value}
                       </span>
+                      <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-black uppercase">{em.label || `Alt ${idx + 1}`}</span>
                     </div>
                   ))}
                 </div>
@@ -1764,11 +1929,20 @@ export default function LeadDetailLayoutClient({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 border border-border/60 rounded-xl space-y-2 bg-muted/10">
                     <h4 className="font-extrabold text-sm text-foreground flex items-center gap-1.5">
-                      📊 Market Snapshots <span className="text-[9.5px] bg-muted border border-border px-1.5 py-0.5 rounded font-black text-muted-foreground uppercase">None Sent</span>
+                      📊 Market Snapshots{' '}
+                      {lead.Activity.filter((a) => a.type === 'MARKET_SNAPSHOT').length > 0 ? (
+                        <span className="text-[9.5px] bg-green-500/10 border border-green-500/20 px-1.5 py-0.5 rounded font-black text-green-500 uppercase">
+                          Active / Scheduled ({lead.Activity.filter((a) => a.type === 'MARKET_SNAPSHOT').length})
+                        </span>
+                      ) : (
+                        <span className="text-[9.5px] bg-muted border border-border px-1.5 py-0.5 rounded font-black text-muted-foreground uppercase">
+                          None Sent
+                        </span>
+                      )}
                     </h4>
                     <p className="text-xs text-muted-foreground">Send real-time neighborhood metrics, pricing comps, and local trends dynamically.</p>
                     <button 
-                      onClick={() => toast.success('Neighborhood market snapshot scheduled!')}
+                      onClick={() => setShowMarketSnapshotModal(true)}
                       className="text-xs font-bold text-primary hover:underline cursor-pointer"
                     >
                       + Create New Market Snapshot
@@ -1777,11 +1951,20 @@ export default function LeadDetailLayoutClient({
 
                   <div className="p-4 border border-border/60 rounded-xl space-y-2 bg-muted/10">
                     <h4 className="font-extrabold text-sm text-foreground flex items-center gap-1.5">
-                      📈 Homeowner Valuation Reports <span className="text-[9.5px] bg-muted border border-border px-1.5 py-0.5 rounded font-black text-muted-foreground uppercase">None Sent</span>
+                      📈 Homeowner Valuation Reports{' '}
+                      {lead.Activity.filter((a) => a.type === 'VALUATION_REPORT').length > 0 ? (
+                        <span className="text-[9.5px] bg-green-500/10 border border-green-500/20 px-1.5 py-0.5 rounded font-black text-green-500 uppercase">
+                          Active / Scheduled ({lead.Activity.filter((a) => a.type === 'VALUATION_REPORT').length})
+                        </span>
+                      ) : (
+                        <span className="text-[9.5px] bg-muted border border-border px-1.5 py-0.5 rounded font-black text-muted-foreground uppercase">
+                          None Sent
+                        </span>
+                      )}
                     </h4>
                     <p className="text-xs text-muted-foreground">Automated monthly CMA equity updates and property valuation metrics.</p>
                     <button 
-                      onClick={() => toast.success('Valuation report scheduled!')}
+                      onClick={() => setShowValuationModal(true)}
                       className="text-xs font-bold text-primary hover:underline cursor-pointer"
                     >
                       + Set Up Valuation Reports
@@ -1934,6 +2117,182 @@ export default function LeadDetailLayoutClient({
         </div>
       )}
 
+      {/* MODAL: Quick Edit Phones & Emails */}
+      {isEditingPhonesEmails && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-card border border-border max-w-lg w-full rounded-2xl p-6 shadow-xl space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center border-b border-border/50 pb-2">
+              <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
+                📞 Manage Phones & Emails
+              </h3>
+              <button 
+                onClick={() => setIsEditingPhonesEmails(false)}
+                className="p-1 hover:bg-muted rounded text-muted-foreground cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdatePhonesEmails} className="space-y-4">
+              {/* Phone Numbers Section */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Phone Numbers</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (quickPhones.length >= 10) {
+                        toast.error('Maximum of 10 phone numbers allowed.');
+                        return;
+                      }
+                      setQuickPhones([...quickPhones, { value: '', label: `Cell Phone ${Math.min(quickPhones.length + 1, 3)}` }]);
+                    }}
+                    className="text-[10px] text-primary hover:underline font-bold cursor-pointer"
+                  >
+                    + Add Phone
+                  </button>
+                </div>
+                
+                <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+                  {quickPhones.map((ph, idx) => (
+                    <div key={idx} className="flex gap-2 items-center">
+                      <select
+                        value={ph.label}
+                        onChange={(e) => {
+                          const updated = [...quickPhones];
+                          updated[idx].label = e.target.value;
+                          setQuickPhones(updated);
+                        }}
+                        className="bg-background border border-border rounded px-2 py-1 text-xs font-semibold focus:outline-none"
+                      >
+                        <option value="Cell Phone 1">Cell Phone 1</option>
+                        <option value="Cell Phone 2">Cell Phone 2</option>
+                        <option value="Cell Phone 3">Cell Phone 3</option>
+                        <option value="Home Phone">Home Phone</option>
+                        <option value="Work Phone">Work Phone</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      <input
+                        type="text"
+                        value={ph.value}
+                        placeholder={idx === 0 ? "Primary Phone (First)" : `Phone Number #${idx + 1}`}
+                        onChange={(e) => {
+                          const updated = [...quickPhones];
+                          updated[idx].value = e.target.value;
+                          setQuickPhones(updated);
+                        }}
+                        className={`flex-1 bg-background border border-border rounded px-3 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary ${idx === 0 ? "font-bold text-primary border-primary/45" : ""}`}
+                      />
+                      {idx > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setQuickPhones(quickPhones.filter((_, i) => i !== idx));
+                          }}
+                          className="text-xs text-red-500 hover:text-red-600 font-bold px-1"
+                        >
+                          ✕
+                        </button>
+                      )}
+                      {idx === 0 && (
+                        <span className="text-[9px] text-emerald-400 bg-emerald-500/10 px-1 py-0.5 rounded font-black uppercase">Primary</span>
+                      )}
+                    </div>
+                  ))}
+                  {quickPhones.length === 0 && (
+                    <p className="text-xs text-muted-foreground italic">No phone numbers. Click "+ Add Phone" to add one.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Emails Section */}
+              <div className="space-y-2 pt-2 border-t border-border/40">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Email Addresses</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (quickEmails.length >= 10) {
+                        toast.error('Maximum of 10 email addresses allowed.');
+                        return;
+                      }
+                      setQuickEmails([...quickEmails, { value: '', label: 'Personal Email' }]);
+                    }}
+                    className="text-[10px] text-primary hover:underline font-bold cursor-pointer"
+                  >
+                    + Add Email
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+                  {quickEmails.map((em, idx) => (
+                    <div key={idx} className="flex gap-2 items-center">
+                      <select
+                        value={em.label}
+                        onChange={(e) => {
+                          const updated = [...quickEmails];
+                          updated[idx].label = e.target.value;
+                          setQuickEmails(updated);
+                        }}
+                        className="bg-background border border-border rounded px-2 py-1 text-xs font-semibold focus:outline-none"
+                      >
+                        <option value="Work Email">Work Email</option>
+                        <option value="Personal Email">Personal Email</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      <input
+                        type="email"
+                        value={em.value}
+                        placeholder={idx === 0 ? "Primary Email (First)" : `Email Address #${idx + 1}`}
+                        onChange={(e) => {
+                          const updated = [...quickEmails];
+                          updated[idx].value = e.target.value;
+                          setQuickEmails(updated);
+                        }}
+                        className={`flex-1 bg-background border border-border rounded px-3 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary ${idx === 0 ? "font-bold text-primary border-primary/45" : ""}`}
+                      />
+                      {idx > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setQuickEmails(quickEmails.filter((_, i) => i !== idx));
+                          }}
+                          className="text-xs text-red-500 hover:text-red-600 font-bold px-1"
+                        >
+                          ✕
+                        </button>
+                      )}
+                      {idx === 0 && (
+                        <span className="text-[9px] text-emerald-400 bg-emerald-500/10 px-1 py-0.5 rounded font-black uppercase">Primary</span>
+                      )}
+                    </div>
+                  ))}
+                  {quickEmails.length === 0 && (
+                    <p className="text-xs text-muted-foreground italic">No email addresses. Click "+ Add Email" to add one.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-border/40">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingPhonesEmails(false)}
+                  className="px-3.5 py-2 text-xs font-bold text-muted-foreground hover:bg-muted rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg shadow cursor-pointer"
+                >
+                  Save Phones & Emails
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* MODAL: Add Family Member */}
       {showAddFamily && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
@@ -2013,6 +2372,131 @@ export default function LeadDetailLayoutClient({
                   className="px-3.5 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg shadow"
                 >
                   Add Family
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* MODAL: Configure Market Snapshot */}
+      {showMarketSnapshotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-card border border-border max-w-md w-full rounded-2xl p-6 shadow-xl space-y-4">
+            <div className="flex justify-between items-center border-b border-border/50 pb-2">
+              <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
+                📊 Configure Neighborhood Market Snapshot
+              </h3>
+              <button 
+                onClick={() => setShowMarketSnapshotModal(false)}
+                className="p-1 hover:bg-muted rounded text-muted-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateMarketSnapshot} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Target City / Neighborhood *</label>
+                <input 
+                  type="text"
+                  required
+                  value={snapshotCity}
+                  onChange={(e) => setSnapshotCity(e.target.value)}
+                  placeholder="e.g. Troy, MI"
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Update Frequency</label>
+                <select
+                  value={snapshotFrequency}
+                  onChange={(e) => setSnapshotFrequency(e.target.value)}
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="WEEKLY">Weekly Updates</option>
+                  <option value="BIWEEKLY">Bi-Weekly Updates</option>
+                  <option value="MONTHLY">Monthly Updates</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-border/40">
+                <button
+                  type="button"
+                  onClick={() => setShowMarketSnapshotModal(false)}
+                  className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingSnapshot}
+                  className="px-6 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-lg disabled:opacity-50"
+                >
+                  {isSubmittingSnapshot ? 'Scheduling...' : 'Schedule Snapshot'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Configure Homeowner Valuation */}
+      {showValuationModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-card border border-border max-w-md w-full rounded-2xl p-6 shadow-xl space-y-4">
+            <div className="flex justify-between items-center border-b border-border/50 pb-2">
+              <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
+                📈 Configure Homeowner Valuation Report
+              </h3>
+              <button 
+                onClick={() => setShowValuationModal(false)}
+                className="p-1 hover:bg-muted rounded text-muted-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateValuationReport} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Property Address *</label>
+                <input 
+                  type="text"
+                  required
+                  value={valuationAddress}
+                  onChange={(e) => setValuationAddress(e.target.value)}
+                  placeholder="e.g. 123 Pine St, Troy, MI"
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Valuation Frequency</label>
+                <select
+                  value={valuationFrequency}
+                  onChange={(e) => setValuationFrequency(e.target.value)}
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="MONTHLY">Monthly CMA Reports</option>
+                  <option value="BIMONTHLY">Bi-Monthly CMA Reports</option>
+                  <option value="QUARTERLY">Quarterly CMA Reports</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-border/40">
+                <button
+                  type="button"
+                  onClick={() => setShowValuationModal(false)}
+                  className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingValuation}
+                  className="px-6 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-lg disabled:opacity-50"
+                >
+                  {isSubmittingValuation ? 'Scheduling...' : 'Schedule Report'}
                 </button>
               </div>
             </form>
