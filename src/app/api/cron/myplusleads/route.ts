@@ -108,11 +108,12 @@ export async function GET(request: Request) {
         }
 
         // Update the integration with the new lastID and sync time
-        if (res.result.lastID && res.result.lastID !== integration.lastID) {
+        const returnedLastID = res.result.lastID ? String(res.result.lastID) : null;
+        if (returnedLastID && returnedLastID !== integration.lastID) {
           await prisma.myPlusLeadsIntegration.update({
             where: { id: integration.id },
             data: { 
-              lastID: res.result.lastID,
+              lastID: returnedLastID,
               lastSyncAt: new Date()
             },
           });

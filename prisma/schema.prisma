@@ -43,6 +43,7 @@ model Workspace {
   agentWorkflows AgentWorkflow[]
   agentLogs      AgentLog[]
   landingPages   LandingPage[]
+  propertyListings PropertyListing[]
 }
 
 model WorkspaceMember {
@@ -299,4 +300,34 @@ model LandingPage {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+// ==========================================
+// Phase 12 - Listing & MLS Integration
+// ==========================================
+
+model PropertyListing {
+  id              String   @id @default(cuid())
+  mlsNumber       String?  @unique
+  address         String
+  city            String?
+  state           String?
+  zip             String?
+  price           Float?
+  bedrooms        Int?
+  bathroomsFull   Int?
+  bathroomsHalf   Int?
+  squareFeet      Int?
+  yearBuilt       Int?
+  propertyType    String?  // SingleFamily, Condo, MultiFamily
+  status          String   @default("ACTIVE") // ACTIVE, PENDING, SOLD
+  description     String?
+  images          String?  // JSON Array of image URLs
+  virtualTourUrl  String?
+  agentId         String?  // Link back to a user if it's their listing
+  workspaceId     String
+  source          String   @default("MANUAL") // MANUAL, RESO, MYPLUS
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
