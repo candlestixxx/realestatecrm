@@ -3,23 +3,20 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { sendSmsAction } from '@/lib/actions/sms';
 
-export default function SmsForm({ leadId, phone }: { leadId?: string; phone?: string | null }) {
+export default function SmsForm({ leadId, phone }: { leadId: string; phone?: string | null }) {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
-  const [customPhone, setCustomPhone] = useState(phone || '');
-
-  const targetPhone = phone || customPhone;
 
   const handleTwilioSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!targetPhone) {
-      toast.error('No phone number entered.');
+    if (!phone) {
+      toast.error('No phone number attached to this lead.');
       return;
     }
     setIsSending(true);
     const formData = new FormData();
-    if (leadId) formData.append('leadId', leadId);
-    formData.append('phone', targetPhone);
+    formData.append('leadId', leadId);
+    formData.append('phone', phone);
     formData.append('message', message);
 
     try {
@@ -38,12 +35,12 @@ export default function SmsForm({ leadId, phone }: { leadId?: string; phone?: st
   };
 
   const handleNativeSend = () => {
-    if (!targetPhone) {
-      toast.error('No phone number entered.');
+    if (!phone) {
+      toast.error('No phone number attached to this lead.');
       return;
     }
     // Open OS default SMS client
-    const smsUrl = `sms:${targetPhone}${targetPhone.includes('@') ? '' : `?body=${encodeURIComponent(message)}`}`;
+    const smsUrl = `sms:${phone}${phone.includes('@') ? '' : `?body=${encodeURIComponent(message)}`}`;
     window.location.href = smsUrl;
     toast.success('Opening native SMS client...');
   };
@@ -53,33 +50,19 @@ export default function SmsForm({ leadId, phone }: { leadId?: string; phone?: st
       <h3 className="text-sm font-bold flex items-center gap-2">
          <span className="text-primary">📱</span> Draft SMS Message
       </h3>
-
-      {!phone && (
-        <div className="mb-2">
-          <label className="text-[10px] text-muted-foreground uppercase font-bold block mb-1">Recipient Phone</label>
-          <input
-            type="text"
-            value={customPhone}
-            onChange={(e) => setCustomPhone(e.target.value)}
-            placeholder="Enter phone number..."
-            className="w-full p-2.5 bg-background border border-border rounded-md text-sm focus:ring-1 focus:ring-primary focus:outline-none"
-          />
-        </div>
-      )}
-
       <textarea 
         name="message"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         className="w-full h-24 p-3 bg-background border border-border rounded-md text-sm focus:ring-1 focus:ring-primary focus:outline-none" 
-        placeholder={targetPhone ? `Type message to ${targetPhone}...` : "Type message here..."}
-        disabled={!targetPhone}
+        placeholder={phone ? `Type message to ${phone}...` : "No phone number available"}
+        disabled={!phone}
         required
       ></textarea>
       <div className="flex flex-wrap gap-2 justify-end">
         <button 
           onClick={handleNativeSend}
-          disabled={!targetPhone || !message.trim()}
+          disabled={!phone || !message.trim()}
           className="px-3 py-2 bg-secondary text-secondary-foreground font-bold text-xs rounded-md disabled:opacity-50 hover:bg-secondary/90 transition-colors flex items-center gap-1.5"
           type="button"
           title="Send text using your personal phone connected to this device"
@@ -88,7 +71,7 @@ export default function SmsForm({ leadId, phone }: { leadId?: string; phone?: st
         </button>
         <button 
           onClick={handleTwilioSend}
-          disabled={!targetPhone || isSending || !message.trim()}
+          disabled={!phone || isSending || !message.trim()}
           className="px-3 py-2 bg-primary text-primary-foreground font-bold text-xs rounded-md disabled:opacity-50 hover:bg-primary/90 transition-colors"
           type="button"
         >

@@ -25,11 +25,6 @@ pnpm-debug.log*
 /data/rag-outbox.json
 /data/vector-index.json
 
-# AI tool session data
-.hypernexus/
-.hypernexus-session.json
-.hypernexus_startup_marker
-
 # Python
 __pycache__/
 *.pyc
@@ -51,6 +46,7 @@ data/
 metamcp.db
 audit*.jsonl
 dev.db
-dev.db*
-tsconfig.tsbuildinfo
-*.tsbuildinfo
+
+# Release packages
+*.tar.gz
+*.zip
