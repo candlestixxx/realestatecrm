@@ -2200,7 +2200,7 @@ export default function LeadDetailLayoutClient({
                     </div>
                   ))}
                   {quickPhones.length === 0 && (
-                    <p className="text-xs text-muted-foreground italic">No phone numbers. Click "+ Add Phone" to add one.</p>
+                    <p className="text-xs text-muted-foreground italic">No phone numbers. Click &quot;+ Add Phone&quot; to add one.</p>
                   )}
                 </div>
               </div>
@@ -2268,7 +2268,7 @@ export default function LeadDetailLayoutClient({
                     </div>
                   ))}
                   {quickEmails.length === 0 && (
-                    <p className="text-xs text-muted-foreground italic">No email addresses. Click "+ Add Email" to add one.</p>
+                    <p className="text-xs text-muted-foreground italic">No email addresses. Click &quot;+ Add Email&quot; to add one.</p>
                   )}
                 </div>
               </div>
