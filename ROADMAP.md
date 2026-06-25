@@ -126,3 +126,5 @@
 - [ ] Develop Advanced IDX Search capabilities directly embeddable via the builder.
 - [ ] Incorporate Lead Capture popups (forced registration walls) based on viewing parameters.
 - [ ] Synchronize all landing page and form data automatically with the core CRM pipeline.
+- [x] Migrate local vector synchronization fallback to a hosted Pinecone database before production launch.
+- [x] Hosted Vector Migration completed. Pinecone auto-detection is active via env vars (`PINECONE_API_KEY`).
