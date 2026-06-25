@@ -6,7 +6,7 @@ import { submitLandingPageLeadAction } from '@/lib/actions/website';
 
 type LandingPageBlock = {
   id: string;
-  type: 'HEADER' | 'VIDEO' | 'PROPERTY' | 'LEAD_CAPTURE' | 'LINKS' | 'SETTINGS';
+  type: 'HEADER' | 'VIDEO' | 'PROPERTY' | 'LEAD_CAPTURE' | 'LINKS' | 'SETTINGS' | 'GALLERY';
   title?: string;
   subtitle?: string;
   videoUrl?: string;
@@ -27,6 +27,11 @@ type LandingPageBlock = {
   customVideoUrl?: string;
   videoType?: 'YOUTUBE' | 'UPLOAD';
   image?: string;
+  // property specs
+  sqft?: number;
+  lotSize?: number;
+  yearBuilt?: number;
+  images?: string[];
 };
 
 export default function LandingPagePortalClient({
@@ -208,24 +213,36 @@ export default function LandingPagePortalClient({
                     )}
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                     <div className="bg-slate-950 border border-slate-900 p-3 rounded-xl">
-                      <span className="block text-xl md:text-2xl font-bold text-slate-200">
-                        {block.beds || 0}
+                      <span className="block text-xl font-bold text-slate-200">
+                        {block.beds || 3}
                       </span>
                       <span className="text-[10px] text-slate-500 uppercase font-bold">Beds</span>
                     </div>
                     <div className="bg-slate-950 border border-slate-900 p-3 rounded-xl">
-                      <span className="block text-xl md:text-2xl font-bold text-slate-200">
-                        {block.baths || 0}
+                      <span className="block text-xl font-bold text-slate-200">
+                        {block.baths || 1}
                       </span>
-                      <span className="text-[10px] text-slate-500 uppercase font-bold">Baths</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-bold">Bath</span>
                     </div>
                     <div className="bg-slate-950 border border-slate-900 p-3 rounded-xl">
-                      <span className="block text-xl md:text-2xl font-bold text-slate-200">
-                        ACTIVE
+                      <span className="block text-xl font-bold text-slate-200">
+                        {block.sqft || 935}
                       </span>
-                      <span className="text-[10px] text-slate-500 uppercase font-bold">MLS Status</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-bold">SqFt</span>
+                    </div>
+                    <div className="bg-slate-950 border border-slate-900 p-3 rounded-xl">
+                      <span className="block text-xl font-bold text-slate-200">
+                        {block.lotSize ? block.lotSize.toLocaleString() : '6,098'}
+                      </span>
+                      <span className="text-[10px] text-slate-500 uppercase font-bold">Lot Size</span>
+                    </div>
+                    <div className="bg-slate-950 border border-slate-900 p-3 rounded-xl">
+                      <span className="block text-xl font-bold text-slate-200">
+                        {block.yearBuilt || 1940}
+                      </span>
+                      <span className="text-[10px] text-slate-500 uppercase font-bold">Year Built</span>
                     </div>
                   </div>
 
@@ -234,6 +251,36 @@ export default function LandingPagePortalClient({
                       {block.remarks}
                     </p>
                   )}
+                </div>
+              );
+
+            case 'GALLERY':
+              const galleryImages = block.images || [
+                '/toscana_listing.png',
+                '/manchester_listing.png',
+                '/greenview_listing.png',
+                '/toscana_listing.png',
+                '/manchester_listing.png',
+                '/greenview_listing.png',
+                '/toscana_listing.png',
+                '/manchester_listing.png'
+              ];
+              return (
+                <div key={block.id} className="space-y-4">
+                  <h3 className="text-lg font-bold text-slate-200 text-left tracking-wider uppercase border-b border-slate-800 pb-2">
+                    {block.title || 'GALLERY'}
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {galleryImages.map((img, i) => (
+                      <div key={i} className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow shadow-black">
+                        <img
+                          src={img}
+                          alt={`Gallery photo ${i + 1}`}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               );
 

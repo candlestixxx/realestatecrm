@@ -7,7 +7,7 @@ import { createLandingPageAction, updateLandingPageBlocksAction, deleteLandingPa
 
 type LandingPageBlock = {
   id: string;
-  type: 'HEADER' | 'VIDEO' | 'PROPERTY' | 'LEAD_CAPTURE' | 'LINKS' | 'SETTINGS';
+  type: 'HEADER' | 'VIDEO' | 'PROPERTY' | 'LEAD_CAPTURE' | 'LINKS' | 'SETTINGS' | 'GALLERY';
   title?: string;
   subtitle?: string;
   videoUrl?: string;
@@ -18,7 +18,7 @@ type LandingPageBlock = {
   remarks?: string;
   ctaText?: string;
   links?: { label: string; href: string }[];
-  // settings block options
+  // settings
   pageStyle?: string;
   leadSource?: string;
   leadType?: string;
@@ -28,6 +28,21 @@ type LandingPageBlock = {
   customVideoUrl?: string;
   videoType?: 'YOUTUBE' | 'UPLOAD';
   image?: string;
+  // property specs
+  sqft?: number;
+  lotSize?: number;
+  yearBuilt?: number;
+  images?: string[];
+  // lead privacy
+  allowClosePrior?: boolean;
+  leadOwnership?: string;
+  assignmentMethod?: string;
+  assignedAgent?: string;
+  tags?: string[];
+  notes?: string;
+  sendWelcomeEmail?: boolean;
+  sendWelcomeText?: boolean;
+  seoTitle?: string;
 };
 
 type LandingPageData = {
@@ -77,11 +92,14 @@ export default function WebsitesClient({
   const [selectedTypeFilter, setSelectedTypeFilter] = useState('All');
   
   // Left builder settings tab
-  const [builderTab, setBuilderTab] = useState<'basic' | 'media' | 'registration' | 'blocks'>('basic');
+  const [builderTab, setBuilderTab] = useState<'basic' | 'popup' | 'seo' | 'media' | 'blocks'>('basic');
 
   // Video uploading simulator
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const [uploadedVideoDuration, setUploadedVideoDuration] = useState<number | null>(null);
+
+  // Tags simulation state
+  const [tagInput, setTagInput] = useState('');
 
   const router = useRouter();
 
@@ -145,7 +163,6 @@ export default function WebsitesClient({
         if (found) {
           handleEditPage(found);
         } else {
-          // fallback if page not immediately indexed in local array
           window.location.reload();
         }
       }
@@ -174,7 +191,7 @@ export default function WebsitesClient({
     }
   };
 
-  const handleAddBlock = (type: LandingPageBlock['type']) => {
+  const handleAddBlock = (type: LandingPageBlock['type'], insertAt?: number) => {
     const newBlock: LandingPageBlock = {
       id: Math.random().toString(36).substring(7),
       type,
@@ -191,19 +208,56 @@ export default function WebsitesClient({
       newBlock.price = 385000;
       newBlock.beds = 4;
       newBlock.baths = 3;
+      newBlock.sqft = 2200;
+      newBlock.lotSize = 7500;
+      newBlock.yearBuilt = 2015;
       newBlock.remarks = 'Bright open floor plan with custom lighting, updated deck, and spacious rooms.';
     } else if (type === 'LEAD_CAPTURE') {
       newBlock.ctaText = 'Claim Free Market Assessment Report';
     } else if (type === 'LINKS') {
       newBlock.title = 'Useful Marketing Links';
       newBlock.links = [{ label: 'View Virtual Tour Brochure', href: '#' }];
+    } else if (type === 'GALLERY') {
+      newBlock.title = 'GALLERY';
+      newBlock.images = [
+        '/toscana_listing.png',
+        '/manchester_listing.png',
+        '/greenview_listing.png',
+        '/toscana_listing.png',
+        '/manchester_listing.png',
+        '/greenview_listing.png',
+        '/toscana_listing.png',
+        '/manchester_listing.png'
+      ];
     }
 
-    setBlocks([...blocks, newBlock]);
+    if (insertAt !== undefined) {
+      const updated = [...blocks];
+      updated.splice(insertAt, 0, newBlock);
+      setBlocks(updated);
+    } else {
+      setBlocks([...blocks, newBlock]);
+    }
+    toast.success(`${type} block added!`);
   };
 
   const handleRemoveBlock = (index: number) => {
     setBlocks(blocks.filter((_, idx) => idx !== index));
+    toast.success('Block removed from canvas.');
+  };
+
+  const handleMoveBlock = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === blocks.length - 1) return;
+    
+    const targetIdx = direction === 'up' ? index - 1 : index + 1;
+    const updated = [...blocks];
+    const temp = updated[index];
+    updated[index] = updated[targetIdx];
+    updated[targetIdx] = temp;
+    
+    setBlocks(updated);
+    toast.success('Block order updated.');
   };
 
   const handleBlockChange = (index: number, field: keyof LandingPageBlock, value: any) => {
@@ -237,7 +291,6 @@ export default function WebsitesClient({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check size limit (e.g. 50MB)
     if (file.size > 50 * 1024 * 1024) {
       toast.error('File size exceeds the 50MB limit.');
       return;
@@ -247,7 +300,6 @@ export default function WebsitesClient({
     toast('Analyzing video duration...', { icon: '⏳' });
 
     setTimeout(() => {
-      // Simulate random video duration between 10 and 80 seconds
       const simulatedDuration = Math.floor(Math.random() * 70) + 10;
       setIsUploadingVideo(false);
 
@@ -258,7 +310,6 @@ export default function WebsitesClient({
         setUploadedVideoDuration(simulatedDuration);
         toast.success(`Success! Video (${simulatedDuration}s) uploaded and optimized.`);
         
-        // Update the Settings block customVideoUrl field
         const settingsIdx = blocks.findIndex(b => b.type === 'SETTINGS');
         if (settingsIdx !== -1) {
           handleBlockChange(settingsIdx, 'customVideoUrl', '/mock-videos/listing-preview.mp4');
@@ -270,7 +321,7 @@ export default function WebsitesClient({
 
   const editingPage = landingPages.find((p) => p.id === editingPageId);
 
-  // Extract settings from the editing page's blocks
+  // Extract settings
   const settingsBlock = blocks.find(b => b.type === 'SETTINGS') || {
     pageStyle: 'With simple header, no footer',
     leadSource: 'Website',
@@ -280,6 +331,15 @@ export default function WebsitesClient({
     youtubeUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     customVideoUrl: '',
     videoType: 'YOUTUBE',
+    allowClosePrior: false,
+    leadOwnership: 'Company',
+    assignmentMethod: 'Directly Assign',
+    assignedAgent: 'Excel Legacy Realty Team',
+    tags: ['Troy', 'Via Toscana'],
+    notes: '',
+    sendWelcomeEmail: true,
+    sendWelcomeText: false,
+    seoTitle: 'Rare Find! Beautiful Troy Home Hits MLS',
   };
 
   const updateSettingsField = (field: keyof LandingPageBlock, value: any) => {
@@ -287,7 +347,6 @@ export default function WebsitesClient({
     if (settingsIdx !== -1) {
       handleBlockChange(settingsIdx, field, value);
     } else {
-      // Create settings block if missing
       const newSettings: LandingPageBlock = {
         id: 'settings',
         type: 'SETTINGS',
@@ -297,28 +356,62 @@ export default function WebsitesClient({
     }
   };
 
-  // Find listing/header/property data for preview
-  const propertyBlock = blocks.find(b => b.type === 'PROPERTY') || {
+  // Find listing/header/property data for preview and real-time editing
+  const propertyBlockIdx = blocks.findIndex(b => b.type === 'PROPERTY');
+  const propertyBlock = propertyBlockIdx !== -1 ? blocks[propertyBlockIdx] : {
     address: '6026 Via Toscana Street, Troy, MI 48085',
     price: 649725,
     beds: 4,
     baths: 3,
+    sqft: 2850,
+    lotSize: 8500,
+    yearBuilt: 2018,
     remarks: 'Stunning luxury colonial home in Troy, Michigan. Features gorgeous open layout, premium chef kitchen, custom deck, and beautifully landscaped yard.',
     image: '/toscana_listing.png'
   };
 
-  const headerBlock = blocks.find(b => b.type === 'HEADER') || {
+  const headerBlockIdx = blocks.findIndex(b => b.type === 'HEADER');
+  const headerBlock = headerBlockIdx !== -1 ? blocks[headerBlockIdx] : {
     title: '6026 Via Toscana Street',
     subtitle: 'Premium MLS Synced Listing'
+  };
+
+  const galleryBlockIdx = blocks.findIndex(b => b.type === 'GALLERY');
+  const galleryBlock = galleryBlockIdx !== -1 ? blocks[galleryBlockIdx] : {
+    title: 'GALLERY',
+    images: [
+      '/toscana_listing.png',
+      '/manchester_listing.png',
+      '/greenview_listing.png',
+      '/toscana_listing.png',
+      '/manchester_listing.png',
+      '/greenview_listing.png',
+      '/toscana_listing.png',
+      '/manchester_listing.png'
+    ]
   };
 
   const filteredPages = landingPages.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.slug.toLowerCase().includes(searchQuery.toLowerCase());
     if (selectedTypeFilter === 'All') return matchesSearch;
-    if (selectedTypeFilter === 'MLS') return matchesSearch && (p.slug.endsWith('-promo') || p.title.includes('Promotion') || p.title.includes('Via Toscana') || p.title.includes('Manchester') || p.title.includes('Greenview'));
-    if (selectedTypeFilter === 'Custom') return matchesSearch && !(p.slug.endsWith('-promo') || p.title.includes('Promotion'));
+    if (selectedTypeFilter === 'MLS') return matchesSearch && (p.slug.endsWith('-promo') || p.title.includes('Promotion') || p.title.includes('Via Toscana') || p.title.includes('Manchester') || p.title.includes('Greenview') || p.title.includes('Alvina'));
+    if (selectedTypeFilter === 'Custom') return matchesSearch && !(p.slug.endsWith('-promo') || p.title.includes('Promotion') || p.title.includes('Alvina'));
     return matchesSearch;
   });
+
+  const handleAddTag = () => {
+    if (!tagInput.trim()) return;
+    const currentTags = settingsBlock.tags || [];
+    if (!currentTags.includes(tagInput.trim())) {
+      updateSettingsField('tags', [...currentTags, tagInput.trim()]);
+    }
+    setTagInput('');
+  };
+
+  const handleRemoveTag = (t: string) => {
+    const currentTags = settingsBlock.tags || [];
+    updateSettingsField('tags', currentTags.filter(item => item !== t));
+  };
 
   return (
     <div className="space-y-6">
@@ -442,7 +535,7 @@ export default function WebsitesClient({
                   </thead>
                   <tbody className="divide-y divide-border/60">
                     {filteredPages.map((page) => {
-                      const isMls = page.slug.endsWith('-promo') || page.title.includes('Promotion') || page.title.includes('Via Toscana') || page.title.includes('Manchester') || page.title.includes('Greenview');
+                      const isMls = page.slug.endsWith('-promo') || page.title.includes('Promotion') || page.title.includes('Via Toscana') || page.title.includes('Manchester') || page.title.includes('Greenview') || page.title.includes('Alvina');
                       
                       // Calculate mockup page metrics
                       const baseSeed = page.title.charCodeAt(0) + page.title.charCodeAt(page.title.length - 1);
@@ -561,38 +654,46 @@ export default function WebsitesClient({
               </div>
 
               {/* Navigation Tabs inside Side Panel */}
-              <div className="flex border-b border-border text-[11px] font-semibold bg-muted/15">
+              <div className="flex border-b border-border text-[11px] font-semibold bg-muted/15 overflow-x-auto">
                 <button
                   onClick={() => setBuilderTab('basic')}
-                  className={`flex-1 text-center py-2.5 border-b-2 transition-colors ${
+                  className={`flex-1 min-w-[70px] text-center py-2.5 border-b-2 transition-colors ${
                     builderTab === 'basic' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Basic Info
                 </button>
                 <button
+                  onClick={() => setBuilderTab('popup')}
+                  className={`flex-1 min-w-[90px] text-center py-2.5 border-b-2 transition-colors ${
+                    builderTab === 'popup' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Pop-up Rules
+                </button>
+                <button
+                  onClick={() => setBuilderTab('seo')}
+                  className={`flex-1 min-w-[50px] text-center py-2.5 border-b-2 transition-colors ${
+                    builderTab === 'seo' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  SEO
+                </button>
+                <button
                   onClick={() => setBuilderTab('media')}
-                  className={`flex-1 text-center py-2.5 border-b-2 transition-colors ${
+                  className={`flex-1 min-w-[80px] text-center py-2.5 border-b-2 transition-colors ${
                     builderTab === 'media' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Video & Media
                 </button>
                 <button
-                  onClick={() => setBuilderTab('registration')}
-                  className={`flex-1 text-center py-2.5 border-b-2 transition-colors ${
-                    builderTab === 'registration' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Registration
-                </button>
-                <button
                   onClick={() => setBuilderTab('blocks')}
-                  className={`flex-1 text-center py-2.5 border-b-2 transition-colors ${
+                  className={`flex-1 min-w-[85px] text-center py-2.5 border-b-2 transition-colors ${
                     builderTab === 'blocks' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Page Blocks
+                  Canvas Blocks
                 </button>
               </div>
 
@@ -602,43 +703,6 @@ export default function WebsitesClient({
                 {/* 1. Basic Info Panel */}
                 {builderTab === 'basic' && (
                   <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase text-muted-foreground">Landing Page Title</label>
-                      <input
-                        type="text"
-                        value={editingPage.title}
-                        disabled
-                        className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2 text-xs focus:outline-none cursor-not-allowed"
-                      />
-                      <span className="text-[9px] text-muted-foreground">Title is tied to initialized template metadata.</span>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase text-muted-foreground">URL Slug Path</label>
-                      <div className="flex rounded-lg border border-border overflow-hidden text-xs">
-                        <span className="bg-muted px-2.5 py-2 text-muted-foreground select-none">/site/</span>
-                        <input
-                          type="text"
-                          value={editingPage.slug}
-                          disabled
-                          className="flex-1 bg-muted/40 px-3 py-2 focus:outline-none cursor-not-allowed"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase text-muted-foreground">Page Styling</label>
-                      <select
-                        value={settingsBlock.pageStyle}
-                        onChange={(e) => updateSettingsField('pageStyle', e.target.value)}
-                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none"
-                      >
-                        <option value="With simple header, no footer">With simple header, no footer</option>
-                        <option value="With full navigation menu & dark footer">With full navigation menu & dark footer</option>
-                        <option value="Clean overlay style (Glassmorphic layout)">Clean overlay style (Glassmorphic layout)</option>
-                      </select>
-                    </div>
-
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-bold uppercase text-muted-foreground">Lead Source Name</label>
@@ -663,134 +727,126 @@ export default function WebsitesClient({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase text-muted-foreground">Connected MLS Property Address</label>
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground">MLS Listing Address</label>
                       <input
                         type="text"
                         value={propertyBlock.address || ''}
-                        disabled
-                        className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2 text-xs focus:outline-none cursor-not-allowed"
+                        onChange={(e) => {
+                          if (propertyBlockIdx !== -1) {
+                            handleBlockChange(propertyBlockIdx, 'address', e.target.value);
+                          }
+                        }}
+                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none"
                       />
-                      <span className="text-[9px] text-muted-foreground">Automatically synced through Excel Legacy MLS seats.</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. Video & Media Panel */}
-                {builderTab === 'media' && (
-                  <div className="space-y-5">
-                    <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-3.5 space-y-2">
-                      <h4 className="font-bold text-xs text-blue-400">Media Customization Options</h4>
-                      <p className="text-[10px] text-slate-400 leading-tight">
-                        Increase conversion rates by adding walk-through media. You can either embed a YouTube/Vimeo video link or upload a custom short clip.
-                      </p>
                     </div>
 
-                    {/* Media Type Toggle */}
-                    <div className="flex gap-4 items-center">
-                      <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
-                        <input
-                          type="radio"
-                          name="videoType"
-                          checked={settingsBlock.videoType === 'YOUTUBE'}
-                          onChange={() => updateSettingsField('videoType', 'YOUTUBE')}
-                          className="text-primary focus:ring-0"
-                        />
-                        YouTube Link
-                      </label>
-                      <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
-                        <input
-                          type="radio"
-                          name="videoType"
-                          checked={settingsBlock.videoType === 'UPLOAD'}
-                          onChange={() => updateSettingsField('videoType', 'UPLOAD')}
-                          className="text-primary focus:ring-0"
-                        />
-                        Direct Upload (Up to 60s)
-                      </label>
-                    </div>
-
-                    {settingsBlock.videoType === 'YOUTUBE' ? (
+                    {/* Editable Specs Grid */}
+                    <div className="grid grid-cols-3 gap-3">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold uppercase text-muted-foreground">YouTube Embed URL</label>
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground">Price ($)</label>
                         <input
-                          type="text"
-                          value={settingsBlock.youtubeUrl || ''}
+                          type="number"
+                          value={propertyBlock.price || 0}
                           onChange={(e) => {
-                            updateSettingsField('youtubeUrl', e.target.value);
-                            // Also sync down to the layout VIDEO block if it exists
-                            const videoIdx = blocks.findIndex(b => b.type === 'VIDEO');
-                            if (videoIdx !== -1) {
-                              handleBlockChange(videoIdx, 'videoUrl', e.target.value);
+                            if (propertyBlockIdx !== -1) {
+                              handleBlockChange(propertyBlockIdx, 'price', Number(e.target.value));
                             }
                           }}
-                          placeholder="e.g., https://www.youtube.com/embed/dQw4w9WgXcQ"
-                          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none"
+                          className="w-full bg-background border border-border rounded-lg px-2.5 py-2 text-xs focus:outline-none"
                         />
-                        <span className="text-[9px] text-muted-foreground">Ensure to use the embeddable (/embed/...) structure.</span>
                       </div>
-                    ) : (
-                      <div className="space-y-3.5">
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold uppercase text-muted-foreground">Upload Video (Up to 60 Seconds / Max 50MB)</label>
-                          <div className="border-2 border-dashed border-border/80 hover:border-primary/50 rounded-2xl p-6 text-center cursor-pointer transition-all bg-muted/10 relative">
-                            <input
-                              type="file"
-                              accept="video/*"
-                              onChange={simulateVideoUpload}
-                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                              disabled={isUploadingVideo}
-                            />
-                            {isUploadingVideo ? (
-                              <div className="space-y-2">
-                                <div className="animate-spin text-xl">⏳</div>
-                                <p className="text-xs font-semibold">Uploading and checking video length...</p>
-                                <div className="w-24 h-1 bg-border mx-auto rounded-full overflow-hidden">
-                                  <div className="h-full bg-primary animate-progress-bar w-1/2"></div>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="space-y-2">
-                                <div className="text-2xl text-muted-foreground">📁</div>
-                                <p className="text-xs font-semibold text-foreground">Click to upload video file</p>
-                                <p className="text-[9px] text-muted-foreground">MP4, WebM or MOV up to 60s length (Max 50MB)</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {uploadedVideoDuration !== null && (
-                          <div className="flex items-center gap-2 text-[10px] bg-green-500/10 text-green-500 border border-green-500/20 px-3 py-2 rounded-lg">
-                            <span>✅</span>
-                            <span>Simulated verification: <strong>{uploadedVideoDuration} seconds</strong> video successfully validated.</span>
-                          </div>
-                        )}
-
-                        {settingsBlock.customVideoUrl && (
-                          <div className="p-3 bg-muted/40 border border-border rounded-xl space-y-2">
-                            <div className="flex items-center justify-between text-[10px]">
-                              <span className="font-bold text-foreground">Active Uploaded File:</span>
-                              <span className="text-muted-foreground font-semibold">listing-preview.mp4</span>
-                            </div>
-                            <video src={settingsBlock.customVideoUrl} className="w-full h-24 object-cover rounded bg-black" controls muted />
-                          </div>
-                        )}
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground">Beds</label>
+                        <input
+                          type="number"
+                          value={propertyBlock.beds || 3}
+                          onChange={(e) => {
+                            if (propertyBlockIdx !== -1) {
+                              handleBlockChange(propertyBlockIdx, 'beds', Number(e.target.value));
+                            }
+                          }}
+                          className="w-full bg-background border border-border rounded-lg px-2.5 py-2 text-xs focus:outline-none"
+                        />
                       </div>
-                    )}
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground">Bath</label>
+                        <input
+                          type="number"
+                          value={propertyBlock.baths || 1}
+                          onChange={(e) => {
+                            if (propertyBlockIdx !== -1) {
+                              handleBlockChange(propertyBlockIdx, 'baths', Number(e.target.value));
+                            }
+                          }}
+                          className="w-full bg-background border border-border rounded-lg px-2.5 py-2 text-xs focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground">SqFt</label>
+                        <input
+                          type="number"
+                          value={propertyBlock.sqft || 935}
+                          onChange={(e) => {
+                            if (propertyBlockIdx !== -1) {
+                              handleBlockChange(propertyBlockIdx, 'sqft', Number(e.target.value));
+                            }
+                          }}
+                          className="w-full bg-background border border-border rounded-lg px-2.5 py-2 text-xs focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground">Lot Size</label>
+                        <input
+                          type="number"
+                          value={propertyBlock.lotSize || 6098}
+                          onChange={(e) => {
+                            if (propertyBlockIdx !== -1) {
+                              handleBlockChange(propertyBlockIdx, 'lotSize', Number(e.target.value));
+                            }
+                          }}
+                          className="w-full bg-background border border-border rounded-lg px-2.5 py-2 text-xs focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground">Year Built</label>
+                        <input
+                          type="number"
+                          value={propertyBlock.yearBuilt || 1940}
+                          onChange={(e) => {
+                            if (propertyBlockIdx !== -1) {
+                              handleBlockChange(propertyBlockIdx, 'yearBuilt', Number(e.target.value));
+                            }
+                          }}
+                          className="w-full bg-background border border-border rounded-lg px-2.5 py-2 text-xs focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Remarks Editor */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground">Remarks / Description</label>
+                      <textarea
+                        value={propertyBlock.remarks || ''}
+                        rows={4}
+                        onChange={(e) => {
+                          if (propertyBlockIdx !== -1) {
+                            handleBlockChange(propertyBlockIdx, 'remarks', e.target.value);
+                          }
+                        }}
+                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none resize-none leading-relaxed"
+                      />
+                    </div>
                   </div>
                 )}
 
-                {/* 3. Registration Trigger Rules Panel */}
-                {builderTab === 'registration' && (
+                {/* 2. Pop-up Rules Tab */}
+                {builderTab === 'popup' && (
                   <div className="space-y-5">
-                    <div className="bg-primary/5 border border-primary/10 rounded-xl p-3.5 space-y-2">
-                      <h4 className="font-bold text-xs text-primary">Inbound Registration Rules</h4>
-                      <p className="text-[10px] text-slate-400 leading-tight">
-                        Configure when custom landing page visitors are prompted to submit their contact info to register as a lead.
-                      </p>
-                    </div>
-
                     <div className="space-y-3.5">
-                      <label className="text-[10px] font-bold uppercase text-muted-foreground block">How To Trigger Lead Capture Form</label>
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground block">How To Trigger Registration</label>
                       
                       <div className="space-y-2.5">
                         <label className="flex items-center gap-2.5 text-xs font-semibold cursor-pointer">
@@ -802,7 +858,7 @@ export default function WebsitesClient({
                             onChange={(e) => updateSettingsField('registrationTrigger', e.target.value)}
                             className="text-primary focus:ring-0"
                           />
-                          Never require registration (Open layout)
+                          Never require registration
                         </label>
 
                         <label className="flex items-center gap-2.5 text-xs font-semibold cursor-pointer">
@@ -834,7 +890,7 @@ export default function WebsitesClient({
                     {settingsBlock.registrationTrigger === 'Require registration based on Browsing Time' && (
                       <div className="space-y-3 pt-3 border-t border-border/50">
                         <div className="flex justify-between items-center text-xs">
-                          <span className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">Pop-up after browsing for seconds</span>
+                          <span className="font-bold text-muted-foreground uppercase text-[10px]">Pop-up after browsing for seconds</span>
                           <span className="font-extrabold text-primary text-sm">{settingsBlock.browsingTime || 8}s</span>
                         </div>
                         <input
@@ -845,16 +901,267 @@ export default function WebsitesClient({
                           onChange={(e) => updateSettingsField('browsingTime', parseInt(e.target.value))}
                           className="w-full h-1.5 bg-border rounded-lg appearance-none cursor-pointer accent-primary"
                         />
-                        <div className="flex justify-between text-[9px] text-slate-500 font-semibold">
-                          <span>3s (Immediate)</span>
-                          <span>60s (Delayed)</span>
+                      </div>
+                    )}
+
+                    <div className="space-y-3.5 pt-3 border-t border-border/50">
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground block">Allow pop-up to be closed prior to registration</label>
+                      <div className="flex gap-4 items-center">
+                        <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                          <input
+                            type="radio"
+                            name="allowClosePrior"
+                            checked={settingsBlock.allowClosePrior === true}
+                            onChange={() => updateSettingsField('allowClosePrior', true)}
+                            className="text-primary focus:ring-0"
+                          />
+                          Yes
+                        </label>
+                        <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                          <input
+                            type="radio"
+                            name="allowClosePrior"
+                            checked={settingsBlock.allowClosePrior === false || settingsBlock.allowClosePrior === undefined}
+                            onChange={() => updateSettingsField('allowClosePrior', false)}
+                            className="text-primary focus:ring-0"
+                          />
+                          No
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Lead Privacy and Assignment */}
+                    <div className="space-y-3.5 pt-3 border-t border-border/50">
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground block">Lead Privacy & Assignment</label>
+                      
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground block">Lead Ownership</label>
+                        <select
+                          value={settingsBlock.leadOwnership || 'Company'}
+                          onChange={(e) => updateSettingsField('leadOwnership', e.target.value)}
+                          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none"
+                        >
+                          <option value="Company">Company</option>
+                          <option value="Agent (Private)">Agent (Private)</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground block">Assignment Method</label>
+                        <select
+                          value={settingsBlock.assignmentMethod || 'Directly Assign'}
+                          onChange={(e) => updateSettingsField('assignmentMethod', e.target.value)}
+                          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none"
+                        >
+                          <option value="Directly Assign">Directly Assign</option>
+                          <option value="Round Robin">Round Robin / Pool</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground block">Assign to Agent</label>
+                        <select
+                          value={settingsBlock.assignedAgent || 'Excel Legacy Realty Team'}
+                          onChange={(e) => updateSettingsField('assignedAgent', e.target.value)}
+                          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none"
+                        >
+                          <option value="Excel Legacy Realty Team">Excel Legacy Realty Team</option>
+                          <option value="Hank Mendez">Hank Mendez</option>
+                          <option value="Harry Kourlos">Harry Kourlos</option>
+                          <option value="Don Sobieski">Don Sobieski</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Additional Actions: Tags & Notes */}
+                    <div className="space-y-3.5 pt-3 border-t border-border/50">
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground block">Additional Actions</label>
+                      
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground block">Lead Tags</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Add Tag..."
+                            value={tagInput}
+                            onChange={(e) => setTagInput(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddTag(); } }}
+                            className="flex-1 bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleAddTag}
+                            className="px-3 bg-muted border border-border text-xs rounded-lg font-bold"
+                          >
+                            Add
+                          </button>
                         </div>
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {(settingsBlock.tags || []).map((t: string) => (
+                            <span key={t} className="text-[10px] bg-primary/10 text-primary border border-primary/20 rounded px-2 py-0.5 font-bold flex items-center gap-1">
+                              {t}
+                              <button type="button" onClick={() => handleRemoveTag(t)} className="text-red-500 font-extrabold">×</button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-bold uppercase text-muted-foreground block">Internal Staff Note</label>
+                        <textarea
+                          placeholder="Note content..."
+                          value={settingsBlock.notes || ''}
+                          rows={2}
+                          onChange={(e) => updateSettingsField('notes', e.target.value)}
+                          className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none resize-none"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-2 pt-1.5 text-xs font-semibold">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settingsBlock.sendWelcomeEmail !== false}
+                            onChange={(e) => updateSettingsField('sendWelcomeEmail', e.target.checked)}
+                            className="rounded text-primary focus:ring-0"
+                          />
+                          Send Welcome Email
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settingsBlock.sendWelcomeText === true}
+                            onChange={(e) => updateSettingsField('sendWelcomeText', e.target.checked)}
+                            className="rounded text-primary focus:ring-0"
+                          />
+                          Send Welcome Text
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. SEO Tab */}
+                {builderTab === 'seo' && (
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground">Meta Page Title</label>
+                      <input
+                        type="text"
+                        value={settingsBlock.seoTitle || ''}
+                        onChange={(e) => updateSettingsField('seoTitle', e.target.value)}
+                        placeholder="e.g. Beautiful Troy Home for Sale"
+                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground">Meta Page Description</label>
+                      <textarea
+                        placeholder="Meta description content..."
+                        rows={3}
+                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none resize-none"
+                        defaultValue="Check out this hot live listing synced directly from the MLS search indices. Schedule private walk-through alerts."
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground">SEO Keywords</label>
+                      <input
+                        type="text"
+                        placeholder="troy listing, mls synced page, real estate agent"
+                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. Video & Media Panel */}
+                {builderTab === 'media' && (
+                  <div className="space-y-5">
+                    <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-3.5 space-y-2">
+                      <h4 className="font-bold text-xs text-blue-400">Media Customization Options</h4>
+                      <p className="text-[10px] text-slate-400 leading-tight">
+                        Increase conversion rates by adding walk-through media. You can either embed a YouTube/Vimeo video link or upload a custom short clip.
+                      </p>
+                    </div>
+
+                    <div className="flex gap-4 items-center">
+                      <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                        <input
+                          type="radio"
+                          name="videoType"
+                          checked={settingsBlock.videoType === 'YOUTUBE'}
+                          onChange={() => updateSettingsField('videoType', 'YOUTUBE')}
+                          className="text-primary focus:ring-0"
+                        />
+                        YouTube Link
+                      </label>
+                      <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                        <input
+                          type="radio"
+                          name="videoType"
+                          checked={settingsBlock.videoType === 'UPLOAD'}
+                          onChange={() => updateSettingsField('videoType', 'UPLOAD')}
+                          className="text-primary focus:ring-0"
+                        />
+                        Direct Upload (Up to 60s)
+                      </label>
+                    </div>
+
+                    {settingsBlock.videoType === 'YOUTUBE' ? (
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase text-muted-foreground">YouTube Embed URL</label>
+                        <input
+                          type="text"
+                          value={settingsBlock.youtubeUrl || ''}
+                          onChange={(e) => {
+                            updateSettingsField('youtubeUrl', e.target.value);
+                            const videoIdx = blocks.findIndex(b => b.type === 'VIDEO');
+                            if (videoIdx !== -1) {
+                              handleBlockChange(videoIdx, 'videoUrl', e.target.value);
+                            }
+                          }}
+                          placeholder="e.g., https://www.youtube.com/embed/dQw4w9WgXcQ"
+                          className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:outline-none"
+                        />
+                      </div>
+                    ) : (
+                      <div className="space-y-3.5">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold uppercase text-muted-foreground">Upload Video (Up to 60 Seconds / Max 50MB)</label>
+                          <div className="border-2 border-dashed border-border/80 hover:border-primary/50 rounded-2xl p-6 text-center cursor-pointer transition-all bg-muted/10 relative">
+                            <input
+                              type="file"
+                              accept="video/*"
+                              onChange={simulateVideoUpload}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                              disabled={isUploadingVideo}
+                            />
+                            {isUploadingVideo ? (
+                              <div className="space-y-2">
+                                <div className="animate-spin text-xl">⏳</div>
+                                <p className="text-xs font-semibold">Uploading and checking video length...</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-2">
+                                <div className="text-2xl text-muted-foreground">📁</div>
+                                <p className="text-xs font-semibold text-foreground">Click to upload video file</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {uploadedVideoDuration !== null && (
+                          <div className="flex items-center gap-2 text-[10px] bg-green-500/10 text-green-500 border border-green-500/20 px-3 py-2 rounded-lg">
+                            <span>✅</span>
+                            <span>Simulated verification: <strong>{uploadedVideoDuration} seconds</strong> video successfully validated.</span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* 4. Page Blocks Canvas Ordering */}
+                {/* 5. Page Blocks Canvas Ordering */}
                 {builderTab === 'blocks' && (
                   <div className="space-y-4">
                     <p className="text-[10px] text-muted-foreground leading-relaxed border-b border-border/50 pb-2">
@@ -863,18 +1170,37 @@ export default function WebsitesClient({
 
                     <div className="space-y-2">
                       {blocks.map((block, idx) => {
-                        if (block.type === 'SETTINGS') return null; // hide page config block from list
+                        if (block.type === 'SETTINGS') return null;
                         return (
-                          <div key={block.id} className="flex items-center justify-between p-2.5 border border-border bg-muted/10 rounded-xl text-xs font-medium">
-                            <span className="text-[10px] font-bold text-primary uppercase">
-                              {idx}: {block.type}
-                            </span>
-                            <button
-                              onClick={() => handleRemoveBlock(idx)}
-                              className="text-[10px] text-red-500 font-bold hover:underline"
-                            >
-                              Remove
-                            </button>
+                          <div key={block.id} className="flex items-center justify-between p-2.5 border border-border bg-muted/10 rounded-xl text-xs font-semibold">
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-primary uppercase">
+                              <span>🧱</span>
+                              <span>Block {idx}: {block.type}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                disabled={idx <= 1} // setting block is idx 0
+                                onClick={() => handleMoveBlock(idx, 'up')}
+                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                              >
+                                🔼
+                              </button>
+                              <button
+                                type="button"
+                                disabled={idx === blocks.length - 1}
+                                onClick={() => handleMoveBlock(idx, 'down')}
+                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                              >
+                                🔽
+                              </button>
+                              <button
+                                onClick={() => handleRemoveBlock(idx)}
+                                className="text-[10px] text-red-500 font-bold hover:underline ml-1"
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </div>
                         );
                       })}
@@ -900,10 +1226,10 @@ export default function WebsitesClient({
                         ➕ Property Block
                       </button>
                       <button
-                        onClick={() => handleAddBlock('LEAD_CAPTURE')}
+                        onClick={() => handleAddBlock('GALLERY')}
                         className="py-2 border border-border hover:bg-primary/5 hover:text-primary rounded-lg text-center text-[10px] font-bold"
                       >
-                        ➕ Form Block
+                        ➕ Gallery Block
                       </button>
                     </div>
                   </div>
@@ -944,7 +1270,7 @@ export default function WebsitesClient({
             </div>
 
             {/* Simulated Live Web Page Frame */}
-            <div className="w-full border border-border rounded-2xl shadow-2xl overflow-hidden bg-slate-950 text-slate-100 flex flex-col h-[650px] relative">
+            <div className="w-full border border-border rounded-2xl shadow-2xl overflow-hidden bg-slate-950 text-slate-100 flex flex-col h-[780px] relative">
               
               {/* Browser Mock Navigation Bar */}
               <div className="bg-slate-900 border-b border-slate-800 p-3.5 flex items-center justify-between text-[11px] font-medium text-slate-400">
@@ -964,102 +1290,219 @@ export default function WebsitesClient({
               {/* Web Page View Area */}
               <div className="flex-1 overflow-y-auto p-6 space-y-6 relative" style={{ scrollBehavior: 'smooth' }}>
                 
-                {/* Header Render */}
-                <div className="text-center py-6 border-b border-slate-900 space-y-2">
-                  <h1 className="text-3xl font-black bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent tracking-tight">
-                    {headerBlock.title}
-                  </h1>
-                  <p className="text-xs text-slate-400 font-medium max-w-md mx-auto leading-relaxed">
-                    {headerBlock.subtitle}
-                  </p>
-                </div>
-
-                {/* Property Detail Render */}
-                <div className="bg-slate-900/40 border border-slate-850 rounded-xl p-5 space-y-4 backdrop-blur-sm relative overflow-hidden">
-                  
-                  {/* Visual listing badge and photos */}
-                  <div className="relative h-44 rounded-lg overflow-hidden bg-slate-950 border border-slate-800">
-                    <img
-                      src={propertyBlock.image || '/toscana_listing.png'}
-                      alt="Listing Image"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-3 left-3 bg-slate-950/70 border border-slate-800 text-slate-100 font-extrabold text-xs px-2.5 py-1 rounded shadow-lg backdrop-blur-sm">
-                      {propertyBlock.price ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(propertyBlock.price) : '$649,725'}
-                    </div>
+                {/* Header Links simulation */}
+                <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-900 pb-3">
+                  <div className="flex gap-4">
+                    <span>OVERVIEW</span>
+                    <span>DETAIL</span>
+                    <span>SCHOOL</span>
+                    <span>CONTACT</span>
                   </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-850 pb-3">
-                    <div>
-                      <span className="text-[9px] bg-primary/20 text-primary border border-primary/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
-                        MLS Live Listing
-                      </span>
-                      <h3 className="font-extrabold text-base text-slate-100 mt-1">{propertyBlock.address}</h3>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3 text-center text-xs font-semibold">
-                    <div className="bg-slate-950/40 border border-slate-850 p-2 rounded-lg">
-                      <span className="block text-sm font-black text-slate-200">{propertyBlock.beds || 4}</span>
-                      <span className="text-[9px] text-slate-500 uppercase">Bedrooms</span>
-                    </div>
-                    <div className="bg-slate-950/40 border border-slate-850 p-2 rounded-lg">
-                      <span className="block text-sm font-black text-slate-200">{propertyBlock.baths || 3}</span>
-                      <span className="text-[9px] text-slate-500 uppercase">Bathrooms</span>
-                    </div>
-                    <div className="bg-slate-950/40 border border-slate-850 p-2 rounded-lg">
-                      <span className="block text-sm font-black text-slate-200">ACTIVE</span>
-                      <span className="text-[9px] text-slate-500 uppercase">MLS Status</span>
-                    </div>
-                  </div>
-
-                  <p className="text-[11px] text-slate-400 leading-normal italic">
-                    {propertyBlock.remarks}
-                  </p>
-                </div>
-
-                {/* Video Block Render */}
-                <div className="space-y-2">
-                  <h3 className="font-bold text-xs text-slate-300 text-center uppercase tracking-wider">Property Media Presentation</h3>
-                  {settingsBlock.videoType === 'UPLOAD' && settingsBlock.customVideoUrl ? (
-                    <div className="aspect-video w-full rounded-xl overflow-hidden border border-slate-850 bg-black shadow-lg">
-                      <video src={settingsBlock.customVideoUrl} controls muted className="w-full h-full object-cover" />
-                    </div>
-                  ) : (
-                    <div className="aspect-video w-full rounded-xl overflow-hidden border border-slate-850 bg-black shadow-lg">
-                      <iframe
-                        src={settingsBlock.youtubeUrl || 'https://www.youtube.com/embed/dQw4w9WgXcQ'}
-                        title="Walkthrough Video"
-                        className="w-full h-full"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  )}
-                </div>
-
-                {/* Lead Capture Form Render */}
-                <div className="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-xl p-5 space-y-4">
-                  <div className="text-center space-y-1">
-                    <h3 className="font-bold text-sm text-slate-100">Claim Free Assessment Details</h3>
-                    <p className="text-[10px] text-slate-500">Provide details below to schedule an interactive video walk-through session.</p>
-                  </div>
-                  <div className="space-y-2.5">
-                    <div className="grid grid-cols-2 gap-3">
-                      <input disabled placeholder="First Name" className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-[11px] focus:outline-none cursor-default" />
-                      <input disabled placeholder="Last Name" className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-[11px] focus:outline-none cursor-default" />
-                    </div>
-                    <input disabled placeholder="Email Address" className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-[11px] focus:outline-none cursor-default" />
-                    <button className="w-full py-2 bg-primary text-primary-foreground font-bold text-xs rounded shadow-lg select-none">
-                      Register to Connect
-                    </button>
+                  <div className="flex items-center gap-1.5 text-slate-200">
+                    <span>🏠</span>
+                    <span>Excel Legacy Realty Team</span>
                   </div>
                 </div>
+
+                {blocks.map((block, idx) => {
+                  if (block.type === 'SETTINGS') return null;
+
+                  return (
+                    <div key={block.id} className="relative group/canvas border-2 border-transparent hover:border-primary/40 rounded-xl p-2 transition-all">
+                      
+                      {/* Action overlays on hover over preview blocks */}
+                      <div className="absolute top-2 right-2 z-50 opacity-0 group-hover/canvas:opacity-100 transition-opacity flex items-center gap-1 bg-slate-900/90 border border-slate-800 rounded-lg p-1.5 shadow-lg">
+                        <button
+                          onClick={() => handleMoveBlock(idx, 'up')}
+                          disabled={idx <= 1}
+                          className="p-1 bg-slate-950 hover:bg-slate-850 rounded text-slate-200 text-xs disabled:opacity-20"
+                          title="Move block up"
+                        >
+                          🔼
+                        </button>
+                        <button
+                          onClick={() => handleMoveBlock(idx, 'down')}
+                          disabled={idx === blocks.length - 1}
+                          className="p-1 bg-slate-950 hover:bg-slate-850 rounded text-slate-200 text-xs disabled:opacity-20"
+                          title="Move block down"
+                        >
+                          🔽
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (block.type === 'PROPERTY') setBuilderTab('basic');
+                            else if (block.type === 'VIDEO') setBuilderTab('media');
+                            else setBuilderTab('blocks');
+                          }}
+                          className="p-1 bg-slate-950 hover:bg-slate-850 rounded text-slate-200 text-xs"
+                          title="Configure Block"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() => handleRemoveBlock(idx)}
+                          className="p-1 bg-red-950 hover:bg-red-900 rounded text-red-400 text-xs"
+                          title="Delete Block"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+
+                      {/* Header Block Render */}
+                      {block.type === 'HEADER' && (
+                        <div className="text-center py-6 border-b border-slate-900 space-y-2">
+                          <h1 className="text-3xl font-black bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent tracking-tight">
+                            {block.title || headerBlock.title}
+                          </h1>
+                          <p className="text-xs text-slate-400 font-medium max-w-md mx-auto leading-relaxed">
+                            {block.subtitle || headerBlock.subtitle}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Property Detail Render */}
+                      {block.type === 'PROPERTY' && (
+                        <div className="bg-slate-900/40 border border-slate-850 rounded-xl p-5 space-y-4 backdrop-blur-sm relative overflow-hidden">
+                          
+                          <div className="relative h-48 rounded-lg overflow-hidden bg-slate-950 border border-slate-800">
+                            <img
+                              src={propertyBlock.image || '/manchester_listing.png'}
+                              alt="Listing Image"
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute top-3 left-3 bg-slate-950/70 border border-slate-800 text-slate-100 font-extrabold text-xs px-2.5 py-1 rounded shadow-lg backdrop-blur-sm">
+                              {propertyBlock.price ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(propertyBlock.price) : '$139,320'}
+                            </div>
+                            <div className="absolute bottom-3 left-3 bg-slate-950/80 border border-slate-800 px-2 py-0.5 rounded text-[10px] font-bold text-slate-200">
+                              Single Family Home
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-850 pb-3">
+                            <div>
+                              <span className="text-[9px] bg-primary/20 text-primary border border-primary/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse">
+                                Live MLS Connected
+                              </span>
+                              <h3 className="font-extrabold text-base text-slate-100 mt-1">{propertyBlock.address}</h3>
+                            </div>
+                          </div>
+
+                          {/* 5-Column specification display */}
+                          <div className="grid grid-cols-5 gap-2.5 text-center text-xs font-bold">
+                            <div className="bg-slate-950/40 border border-slate-850 p-2.5 rounded-lg flex flex-col justify-between">
+                              <span className="block text-base font-black text-slate-100">{propertyBlock.beds || 3}</span>
+                              <span className="text-[9px] text-slate-500 uppercase font-bold mt-1">Beds</span>
+                            </div>
+                            <div className="bg-slate-950/40 border border-slate-850 p-2.5 rounded-lg flex flex-col justify-between">
+                              <span className="block text-base font-black text-slate-100">{propertyBlock.baths || 1}</span>
+                              <span className="text-[9px] text-slate-500 uppercase font-bold mt-1">Bath</span>
+                            </div>
+                            <div className="bg-slate-950/40 border border-slate-850 p-2.5 rounded-lg flex flex-col justify-between">
+                              <span className="block text-base font-black text-slate-100">{propertyBlock.sqft || 935}</span>
+                              <span className="text-[9px] text-slate-500 uppercase font-bold mt-1">SqFt</span>
+                            </div>
+                            <div className="bg-slate-950/40 border border-slate-850 p-2.5 rounded-lg flex flex-col justify-between">
+                              <span className="block text-base font-black text-slate-100">{propertyBlock.lotSize ? propertyBlock.lotSize.toLocaleString() : '6,098'}</span>
+                              <span className="text-[9px] text-slate-500 uppercase font-bold mt-1">Lot Size</span>
+                            </div>
+                            <div className="bg-slate-950/40 border border-slate-850 p-2.5 rounded-lg flex flex-col justify-between">
+                              <span className="block text-base font-black text-slate-100">{propertyBlock.yearBuilt || 1940}</span>
+                              <span className="text-[9px] text-slate-500 uppercase font-bold mt-1">Year Built</span>
+                            </div>
+                          </div>
+
+                          <p className="text-[11px] text-slate-400 leading-relaxed italic">
+                            {propertyBlock.remarks}
+                          </p>
+                          <p className="text-[9px] text-slate-500 font-bold border-t border-slate-850/50 pt-2">
+                            Listed by Real Estate One Inc-Shelby
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Video Block Render */}
+                      {block.type === 'VIDEO' && (
+                        <div className="space-y-2">
+                          {settingsBlock.videoType === 'UPLOAD' && settingsBlock.customVideoUrl ? (
+                            <div className="aspect-video w-full rounded-xl overflow-hidden border border-slate-850 bg-black shadow-lg">
+                              <video src={settingsBlock.customVideoUrl} controls muted className="w-full h-full object-cover" />
+                            </div>
+                          ) : settingsBlock.youtubeUrl ? (
+                            <div className="aspect-video w-full rounded-xl overflow-hidden border border-slate-850 bg-black shadow-lg">
+                              <iframe
+                                src={settingsBlock.youtubeUrl || 'https://www.youtube.com/embed/dQw4w9WgXcQ'}
+                                title="Walkthrough Video"
+                                className="w-full h-full"
+                                allowFullScreen
+                              ></iframe>
+                            </div>
+                          ) : (
+                            <div className="border-2 border-dashed border-slate-800 rounded-xl p-8 text-center text-xs text-slate-500 flex flex-col items-center justify-center gap-2">
+                              <span>🎥</span>
+                              <p className="font-semibold">No Data. Please double-click to configure the Video block.</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* GALLERY Block Render */}
+                      {block.type === 'GALLERY' && (
+                        <div className="space-y-4 pt-2">
+                          <h3 className="text-sm font-black text-slate-300 tracking-wider uppercase text-left border-b border-slate-900 pb-2">
+                            {block.title || 'GALLERY'}
+                          </h3>
+                          <div className="grid grid-cols-4 gap-2">
+                            {(block.images || []).map((img, i) => (
+                              <div key={i} className="aspect-[4/3] rounded-lg overflow-hidden bg-slate-900 border border-slate-850">
+                                <img
+                                  src={img}
+                                  alt={`Grid item ${i}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Lead Capture Form Render */}
+                      {block.type === 'LEAD_CAPTURE' && (
+                        <div className="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-xl p-5 space-y-4">
+                          <div className="text-center space-y-1">
+                            <h3 className="font-bold text-sm text-slate-100">{block.ctaText || 'Register to Connect'}</h3>
+                            <p className="text-[10px] text-slate-500">Provide details below to schedule an interactive video walkthrough session.</p>
+                          </div>
+                          <div className="space-y-2.5">
+                            <div className="grid grid-cols-2 gap-3">
+                              <input disabled placeholder="First Name" className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-[11px] focus:outline-none cursor-default" />
+                              <input disabled placeholder="Last Name" className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-[11px] focus:outline-none cursor-default" />
+                            </div>
+                            <input disabled placeholder="Email Address" className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-[11px] focus:outline-none cursor-default" />
+                            <button className="w-full py-2 bg-primary text-primary-foreground font-bold text-xs rounded shadow-lg select-none">
+                              Register to Connect
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Mid-canvas "+ Add Block" Insertion Point */}
+                      <div className="absolute -bottom-3 left-0 right-0 flex justify-center opacity-0 hover:opacity-100 focus-within:opacity-100 transition-opacity z-50">
+                        <button
+                          type="button"
+                          onClick={() => handleAddBlock('GALLERY', idx + 1)}
+                          className="px-3 py-1 bg-primary text-primary-foreground font-black border-2 border-slate-950 text-[9px] rounded-full uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-black/80 transform hover:scale-105 transition-transform"
+                        >
+                          ➕ Add Block Here
+                        </button>
+                      </div>
+
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Floating Chatbot Assistant "Lynn" Mockup */}
               <div className="absolute bottom-6 right-6 z-40 space-y-2 max-w-[280px]">
-                
-                {/* Speech Bubble */}
                 <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-2xl space-y-1 animate-in slide-in-from-bottom-3 duration-300">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[10px] bg-primary/20 text-primary border border-primary/20 px-1.5 py-0.5 rounded font-bold">
@@ -1068,13 +1511,11 @@ export default function WebsitesClient({
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping"></span>
                   </div>
                   <p className="text-[11px] text-slate-200 leading-tight">
-                    Hey there! I&apos;m Lynn, your personal real estate assistant. Are you looking to tour this property?
+                    Hey there! I&apos;m Lynn, your personal real estate assistant. Are you looking to buy, or just exploring your options? Let m...
                   </p>
                 </div>
-
-                {/* Avatar Icon */}
                 <div className="flex justify-end">
-                  <div className="w-11 h-11 rounded-full bg-primary border-2 border-slate-800 shadow-2xl flex items-center justify-center font-bold text-primary-foreground cursor-pointer hover:scale-105 transition-transform">
+                  <div className="w-11 h-11 rounded-full bg-primary border-2 border-slate-800 shadow-2xl flex items-center justify-center font-bold text-primary-foreground">
                     👩‍💼
                   </div>
                 </div>
@@ -1086,50 +1527,84 @@ export default function WebsitesClient({
         </div>
       )}
 
-      {/* Page creation modal */}
+      {/* Add new page modal */}
       {isCreating && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-card rounded-2xl border border-border shadow-2xl p-6 w-full max-w-md animate-in zoom-in-95 duration-200">
-            <h3 className="font-extrabold text-lg mb-2">Create Marketing Landing Page</h3>
-            <p className="text-xs text-muted-foreground mb-4">Launch a visual real estate lead-capture website with custom templates and options.</p>
+          <div className="bg-card rounded-2xl border border-border shadow-2xl p-6 w-full max-w-lg animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center pb-3 border-b border-border mb-4">
+              <h3 className="font-extrabold text-base text-foreground">ADD NEW LANDING PAGE</h3>
+              <button onClick={() => setIsCreating(false)} className="text-muted-foreground hover:text-foreground font-black text-lg">×</button>
+            </div>
 
             <form action={handleCreatePage} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Select Page Template</label>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  {templates.map(tpl => (
-                    <button
-                      key={tpl.id}
-                      type="button"
-                      onClick={() => setSelectedTemplate(tpl.id)}
-                      className={`px-3 py-2 border rounded-lg font-semibold text-left transition-all ${
-                        selectedTemplate === tpl.id
-                          ? 'border-primary bg-primary/5 text-primary'
-                          : 'border-border hover:bg-muted/10 text-muted-foreground'
-                      }`}
-                    >
-                      {tpl.name}
-                    </button>
-                  ))}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Page Name *</label>
+                  <input required name="title" placeholder="New Page(6)" defaultValue="New Page(6)" className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1">
+                    Lead Source *
+                    <span className="text-muted-foreground cursor-help" title="Identifies lead conversion sources.">❓</span>
+                  </label>
+                  <input required name="leadSource" defaultValue="Website" placeholder="Website" className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Page Title</label>
-                <input required name="title" placeholder="e.g. 123 Elm St Virtual Tour" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">URL *</label>
+                <div className="flex rounded-lg border border-border overflow-hidden text-sm">
+                  <span className="bg-muted px-3 py-2 text-muted-foreground select-none">excellegacyrealtyteam.com</span>
+                  <input required name="slug" defaultValue="/new-page6" placeholder="/new-page6" className="flex-1 bg-background px-3 py-2 focus:outline-none" />
+                </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">URL Slug</label>
-                <input required name="slug" placeholder="e.g. 123-elm-street" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block">Property Type</label>
+                <div className="flex gap-6 items-center pt-1">
+                  <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer">
+                    <input
+                      type="radio"
+                      name="propertyType"
+                      value="for-sale"
+                      defaultChecked
+                      className="text-primary focus:ring-0"
+                    />
+                    For Sale
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer">
+                    <input
+                      type="radio"
+                      name="propertyType"
+                      value="for-sold"
+                      className="text-primary focus:ring-0"
+                    />
+                    For Sold
+                  </label>
+                </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Custom Subdomain mapping (Optional)</label>
-                <input name="subdomain" placeholder="e.g. walktours.excellegacy.com" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
+              <div className="space-y-2.5">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Property Address *</label>
+                  <button
+                    type="button"
+                    onClick={() => toast('Direct address autocompletion synced through MLS seats!')}
+                    className="text-xs text-primary font-bold hover:underline"
+                  >
+                    ➕ Add Manual Listing
+                  </button>
+                </div>
+                <input
+                  required
+                  name="address"
+                  placeholder="Enter street address and select a property"
+                  defaultValue="3547 Alvina Avenue, Warren, MI 48091"
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none"
+                />
               </div>
 
-              <div className="flex justify-end gap-2 pt-4">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setIsCreating(false)}
@@ -1141,7 +1616,7 @@ export default function WebsitesClient({
                   type="submit"
                   className="px-6 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-md hover:bg-primary/90 transition-colors shadow-lg"
                 >
-                  Initialize Canvas
+                  Save
                 </button>
               </div>
             </form>

@@ -14,8 +14,28 @@ export default async function AgentWebsitesPage() {
     where: { workspaceId },
   });
 
-  if (listings.length === 0) {
+  if (listings.length < 4) {
     const mockListingsData = [
+      {
+        mlsNumber: 'MLS-3547',
+        address: '3547 Alvina Avenue',
+        city: 'Warren',
+        state: 'MI',
+        zip: '48091',
+        price: 139320,
+        bedrooms: 3,
+        bathroomsFull: 1,
+        bathroomsHalf: 0,
+        squareFeet: 935,
+        yearBuilt: 1940,
+        propertyType: 'SingleFamily',
+        status: 'ACTIVE',
+        description: "Don't miss this charming Warren bungalow that's full of character and value! This well-maintained home offers comfortable living with a functional floor plan and numerous possibilities for first-time buyers, down-sizers, or investors. Outside you'll appreciate the large backyard, perfect for entertaining, gardening, pets, or simply relaxing. Conveniently located near shopping, restaurants, schools, parks, and major expressways, making commuting a breeze. Whether you're looking for your next home or a great investment opportunity, this property offers affordability, convenience, and endless potential.",
+        images: JSON.stringify(['/manchester_listing.png']),
+        workspaceId,
+        agentId: access.userId,
+        source: 'RESO',
+      },
       {
         mlsNumber: 'MLS-6026',
         address: '6026 Via Toscana Street',
@@ -135,6 +155,21 @@ export default async function AgentWebsitesPage() {
           type: 'VIDEO',
           videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
           title: 'Watch the Property Walkthrough Video',
+        },
+        {
+          id: 'gallery',
+          type: 'GALLERY',
+          title: 'GALLERY',
+          images: [
+            '/manchester_listing.png',
+            '/toscana_listing.png',
+            '/greenview_listing.png',
+            '/manchester_listing.png',
+            '/toscana_listing.png',
+            '/greenview_listing.png',
+            '/manchester_listing.png',
+            '/toscana_listing.png'
+          ],
         },
         {
           id: 'leadCapture',
