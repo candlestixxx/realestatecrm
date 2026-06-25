@@ -457,14 +457,14 @@ export default function WebsitesClient({
                               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                               <div>
                                 <a
-                                  href={`/portal/site/${page.slug}`}
+                                  href={`/site/${page.slug}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="font-semibold text-primary hover:underline block max-w-xs truncate"
                                 >
                                   {page.title}
                                 </a>
-                                <span className="text-[10px] text-muted-foreground">/portal/site/{page.slug}</span>
+                                <span className="text-[10px] text-muted-foreground">/site/{page.slug}</span>
                               </div>
                             </div>
                           </td>
@@ -501,7 +501,7 @@ export default function WebsitesClient({
                                 <span>⚙️</span> Edit
                               </button>
                               <a
-                                href={`/portal/site/${page.slug}`}
+                                href={`/site/${page.slug}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="p-1.5 hover:bg-muted rounded text-foreground font-semibold flex items-center gap-1 border border-border/50"
@@ -616,7 +616,7 @@ export default function WebsitesClient({
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold uppercase text-muted-foreground">URL Slug Path</label>
                       <div className="flex rounded-lg border border-border overflow-hidden text-xs">
-                        <span className="bg-muted px-2.5 py-2 text-muted-foreground select-none">/portal/site/</span>
+                        <span className="bg-muted px-2.5 py-2 text-muted-foreground select-none">/site/</span>
                         <input
                           type="text"
                           value={editingPage.slug}
@@ -954,7 +954,7 @@ export default function WebsitesClient({
                   <span className="w-2.5 h-2.5 bg-green-500/80 rounded-full"></span>
                 </div>
                 <div className="bg-slate-950/80 border border-slate-850 px-3 py-1 rounded-md w-72 truncate text-center select-all select-none">
-                  excellegacyrealtyteam.com/portal/site/{editingPage.slug}
+                  excellegacyrealtyteam.com/site/{editingPage.slug}
                 </div>
                 <span className="text-[10px] text-green-400 font-bold border border-green-500/20 px-2 py-0.5 rounded bg-green-500/10">
                   SECURE
