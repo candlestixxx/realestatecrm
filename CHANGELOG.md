@@ -301,3 +301,7 @@
 - **Reverse Merge (all branches):** Updated `jules-*`, `rag-consolidation-cleanup`, and `rag-consolidation-cleanup-17409520208133646924` feature branches with the latest main.
 - **Gitignore Cleanup:** Added patterns for `tsconfig.tsbuildinfo`, `dev.db*` backups, and `*.tsbuildinfo` artifacts.
 - **Documentation:** Synced ROADME, TODO, CHANGELOG with reconciled feature state.
+
+## [0.46.6] - AI Drip Execution
+- Added `listCampaigns` and `enrollInCampaign` tools to the Gemini AI chatbot logic (`src/app/api/chat/route.ts`).
+- Gemini can now automatically list and enroll leads into Drip Campaigns to dispatch live SMS/emails as part of agent workflow automation.

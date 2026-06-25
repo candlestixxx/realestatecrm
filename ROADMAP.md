@@ -27,7 +27,7 @@
 - [x] AI Assistant Sync (Gemini 2.0 Flash as default)
 - [x] **AI Tool Calling (Agentic Co-Pilot Execution)**
 - [ ] AI lead qualification
-- [ ] AI Drip Campaign Execution (SMS/Email)
+- [x] AI Drip Campaign Execution (SMS/Email)
 - [ ] Voice assistant
 - [ ] Speech provider selection
 - [ ] Conversational mode
