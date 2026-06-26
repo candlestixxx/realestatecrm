@@ -45,6 +45,7 @@ model Workspace {
   landingPages   LandingPage[]
   propertyListings       PropertyListing[]
   myPlusLeadsIntegrations MyPlusLeadsIntegration[]
+  voiceSettings  VoiceSettings?
 }
 
 model WorkspaceMember {
@@ -347,4 +348,18 @@ model PropertyListing {
   updatedAt       DateTime @updatedAt
 
   workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model VoiceSettings {
+  id                String   @id @default(cuid())
+  provider          String   @default("SIMULATION") // OPENAI, ELEVENLABS, SIMULATION
+  elevenLabsApiKey  String?
+  elevenLabsVoiceId String?
+  openAiApiKey      String?
+  openAiVoiceId     String?  @default("alloy")
+  workspaceId       String   @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  workspace         Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }

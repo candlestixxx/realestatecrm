@@ -56,7 +56,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
-          {/* CRM Core */}
           <Link
             href="/dashboard"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
@@ -87,60 +86,42 @@ export default async function DashboardLayout({ children }: { children: React.Re
           >
             Tasks
           </Link>
-
-          {/* Marketing & Content */}
-          <div className="pt-2 mt-2 border-t border-border/20">
-            <span className="px-3 text-[9px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-              Marketing & CMS
-            </span>
-            <Link
-              href="/dashboard/campaigns"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Campaigns
-            </Link>
-            <Link
-              href="/dashboard/agent-websites"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Websites & Landing Pages
-            </Link>
-            <Link
-              href="/workflows/marketing-media"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Media Studio
-            </Link>
-          </div>
-
-          {/* Automations & Wizards */}
-          <div className="pt-2 mt-2 border-t border-border/20">
-            <span className="px-3 text-[9px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-              Automations
-            </span>
-            <Link
-              href="/dashboard/agent-studio"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Agent Studio (AI)
-            </Link>
-            <Link
-              href="/dashboard/workflows"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Workflows (Wizards)
-            </Link>
-          </div>
-
-          {/* Support */}
-          <div className="pt-2 mt-2 border-t border-border/20">
-            <Link
-              href="/dashboard/help-center"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Help Center
-            </Link>
-          </div>
+          <Link
+            href="/dashboard/campaigns"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Campaigns
+          </Link>
+          <Link
+            href="/dashboard/agent-studio"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Agent Studio
+          </Link>
+          <Link
+            href="/dashboard/workflows"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Workflows
+          </Link>
+          <Link
+            href="/workflows/marketing-media"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Media Studio
+          </Link>
+          <Link
+            href="/dashboard/agent-websites"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Agent Websites
+          </Link>
+          <Link
+            href="/dashboard/help-center"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Help Center
+          </Link>
 
           {/* Grouped Settings section */}
           <div className="pt-4 mt-4 border-t border-border/40">
@@ -159,6 +140,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-xs"
               >
                 Email Settings
+              </Link>
+              <Link
+                href="/dashboard/settings/voice"
+                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-xs"
+              >
+                Voice & Speech
               </Link>
               <Link
                 href="/dashboard/sync-queue"

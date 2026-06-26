@@ -91,18 +91,6 @@ export default function CommunicationsHub({
     );
   }
 
-  if (!leadId) {
-    return (
-      <div className="bg-background border border-border rounded-xl shadow-sm p-6 min-h-[400px] flex flex-col justify-center items-center text-center">
-        <span className="text-4xl mb-3">📱</span>
-        <h2 className="text-sm font-black text-foreground uppercase tracking-wider">Communications Hub</h2>
-        <p className="text-xs text-muted-foreground max-w-xs mt-2">
-          Select a lead or open a lead detail page to send SMS, draft emails, or schedule video calls.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="w-96 border-l border-border h-full bg-card flex flex-col transition-all duration-300 shadow-sm shrink-0 overflow-y-auto">
       {/* Header */}

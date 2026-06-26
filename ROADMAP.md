@@ -27,9 +27,9 @@
 - [x] AI Assistant Sync (Gemini 2.0 Flash as default)
 - [x] **AI Tool Calling (Agentic Co-Pilot Execution)**
 - [ ] AI lead qualification
-- [ ] AI Drip Campaign Execution (SMS/Email)
+- [x] AI Drip Campaign Execution (SMS/Email)
 - [ ] Voice assistant
-- [ ] Speech provider selection
+- [x] Speech provider selection
 - [ ] Conversational mode
 - [ ] Learning and memory controls
 - [ ] CRM timeline writeback from voice sessions
@@ -126,3 +126,6 @@
 - [ ] Develop Advanced IDX Search capabilities directly embeddable via the builder.
 - [ ] Incorporate Lead Capture popups (forced registration walls) based on viewing parameters.
 - [ ] Synchronize all landing page and form data automatically with the core CRM pipeline.
+- [x] Migrate local vector synchronization fallback to a hosted Pinecone database before production launch.
+- [x] Hosted Vector Migration completed. Pinecone auto-detection is active via env vars (`PINECONE_API_KEY`).
+- [x] Speech provider selection (OpenAI / ElevenLabs) UI and config framework implemented via Voice Settings dashboard.

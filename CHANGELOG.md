@@ -301,3 +301,13 @@
 - **Reverse Merge (all branches):** Updated `jules-*`, `rag-consolidation-cleanup`, and `rag-consolidation-cleanup-17409520208133646924` feature branches with the latest main.
 - **Gitignore Cleanup:** Added patterns for `tsconfig.tsbuildinfo`, `dev.db*` backups, and `*.tsbuildinfo` artifacts.
 - **Documentation:** Synced ROADME, TODO, CHANGELOG with reconciled feature state.
+
+## [0.46.6] - AI Drip Execution
+- Added `listCampaigns` and `enrollInCampaign` tools to the Gemini AI chatbot logic (`src/app/api/chat/route.ts`).
+- Gemini can now automatically list and enroll leads into Drip Campaigns to dispatch live SMS/emails as part of agent workflow automation.
+
+## [0.47.0] - Voice & Speech Provider Selection
+- Implemented `VoiceSettingsClient` and `VoiceSettingsPage` under `/dashboard/settings/voice` to manage STT/TTS credentials.
+- Added foundational configuration support (`src/lib/voice-config.ts`) allowing users to easily toggle between OpenAI, ElevenLabs, and Simulation modes for VoiceForge pipelines.
+- Migrated Voice settings storage to Prisma SQLite (`VoiceSettings` model) ensuring proper multi-tenant workspace isolation.
+- Hardened server-side component security by properly masking API keys before hydration to the client payload.

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { submitLandingPageLeadAction } from '@/lib/actions/website';
 
 type LandingPageBlock = {
   id: string;
-  type: 'HEADER' | 'VIDEO' | 'PROPERTY' | 'LEAD_CAPTURE' | 'LINKS' | 'SETTINGS' | 'GALLERY';
+  type: 'HEADER' | 'VIDEO' | 'PROPERTY' | 'LEAD_CAPTURE' | 'LINKS';
   title?: string;
   subtitle?: string;
   videoUrl?: string;
@@ -17,21 +17,6 @@ type LandingPageBlock = {
   remarks?: string;
   ctaText?: string;
   links?: { label: string; href: string }[];
-  // settings
-  pageStyle?: string;
-  leadSource?: string;
-  leadType?: string;
-  registrationTrigger?: string;
-  browsingTime?: number;
-  youtubeUrl?: string;
-  customVideoUrl?: string;
-  videoType?: 'YOUTUBE' | 'UPLOAD';
-  image?: string;
-  // property specs
-  sqft?: number;
-  lotSize?: number;
-  yearBuilt?: number;
-  images?: string[];
 };
 
 export default function LandingPagePortalClient({
@@ -45,7 +30,6 @@ export default function LandingPagePortalClient({
 }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showGateOverlay, setShowGateOverlay] = useState(false);
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -60,37 +44,6 @@ export default function LandingPagePortalClient({
       return [];
     }
   })();
-
-  // Extract settings
-  const settingsBlock = blocks.find(b => b.type === 'SETTINGS') || {
-    pageStyle: 'With simple header, no footer',
-    leadSource: 'Website',
-    leadType: 'Buyer',
-    registrationTrigger: 'Require registration based on Browsing Time',
-    browsingTime: 8,
-    youtubeUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    customVideoUrl: '',
-    videoType: 'YOUTUBE',
-  };
-
-  // Implement registration trigger logic
-  useEffect(() => {
-    if (isSubmitted) return;
-
-    if (settingsBlock.registrationTrigger === 'Require registration based on Browsing Time') {
-      const delay = (settingsBlock.browsingTime || 8) * 1000;
-      const timer = setTimeout(() => {
-        setShowGateOverlay(true);
-      }, delay);
-      return () => clearTimeout(timer);
-    } else if (settingsBlock.registrationTrigger === 'Require registration based on Page Views') {
-      // Prompt gate on load
-      const timer = setTimeout(() => {
-        setShowGateOverlay(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [settingsBlock.registrationTrigger, settingsBlock.browsingTime, isSubmitted]);
 
   const handleSubmitLead = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +67,6 @@ export default function LandingPagePortalClient({
       } else {
         toast.success('Information submitted successfully! Thank you.');
         setIsSubmitted(true);
-        setShowGateOverlay(false);
       }
     } catch {
       toast.error('Could not submit information. Please try again.');
@@ -124,15 +76,14 @@ export default function LandingPagePortalClient({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans relative">
-
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
       {/* Visual Blocks Render */}
       <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-12 space-y-12">
         {blocks.map((block) => {
           switch (block.type) {
             case 'HEADER':
               return (
-                <div key={block.id} className="text-center space-y-4 py-8 border-b border-slate-900">
+                <div key={block.id} className="text-center space-y-4 py-8 border-b border-slate-800">
                   <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
                     {block.title || 'Featured Property Showcase'}
                   </h1>
@@ -143,9 +94,6 @@ export default function LandingPagePortalClient({
               );
 
             case 'VIDEO':
-              const isUploadVideo = settingsBlock.videoType === 'UPLOAD';
-              const videoSrc = isUploadVideo ? (settingsBlock.customVideoUrl || block.videoUrl) : (settingsBlock.youtubeUrl || block.videoUrl);
-
               return (
                 <div key={block.id} className="space-y-4">
                   {block.title && (
@@ -153,23 +101,15 @@ export default function LandingPagePortalClient({
                       {block.title}
                     </h2>
                   )}
-                  {videoSrc ? (
-                    <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-slate-900 shadow-2xl bg-black">
-                      {isUploadVideo ? (
-                        <video
-                          src={videoSrc}
-                          controls
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      ) : (
-                        <iframe
-                          src={videoSrc}
-                          title="Virtual Tour Video"
-                          className="absolute inset-0 w-full h-full"
-                          allowFullScreen
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        ></iframe>
-                      )}
+                  {block.videoUrl ? (
+                    <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-black">
+                      <iframe
+                        src={block.videoUrl}
+                        title="Virtual Tour Video"
+                        className="absolute inset-0 w-full h-full"
+                        allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      ></iframe>
                     </div>
                   ) : (
                     <div className="aspect-video w-full rounded-2xl border-2 border-dashed border-slate-800 flex items-center justify-center text-slate-500 italic text-sm">
@@ -181,18 +121,7 @@ export default function LandingPagePortalClient({
 
             case 'PROPERTY':
               return (
-                <div key={block.id} className="bg-slate-900/50 border border-slate-900 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl backdrop-blur-sm">
-                  {/* Property Photos Banner */}
-                  {(block.image || block.image === '') && (
-                    <div className="h-64 rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
-                      <img
-                        src={block.image || '/toscana_listing.png'}
-                        alt="Property Main View"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-
+                <div key={block.id} className="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl backdrop-blur-sm">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
                     <div>
                       <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
@@ -213,36 +142,24 @@ export default function LandingPagePortalClient({
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
-                    <div className="bg-slate-950 border border-slate-900 p-3 rounded-xl">
-                      <span className="block text-xl font-bold text-slate-200">
-                        {block.beds || 3}
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="bg-slate-900 border border-slate-800/50 p-3 rounded-xl">
+                      <span className="block text-xl md:text-2xl font-bold text-slate-200">
+                        {block.beds || 0}
                       </span>
                       <span className="text-[10px] text-slate-500 uppercase font-bold">Beds</span>
                     </div>
-                    <div className="bg-slate-950 border border-slate-900 p-3 rounded-xl">
-                      <span className="block text-xl font-bold text-slate-200">
-                        {block.baths || 1}
+                    <div className="bg-slate-900 border border-slate-800/50 p-3 rounded-xl">
+                      <span className="block text-xl md:text-2xl font-bold text-slate-200">
+                        {block.baths || 0}
                       </span>
-                      <span className="text-[10px] text-slate-500 uppercase font-bold">Bath</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-bold">Baths</span>
                     </div>
-                    <div className="bg-slate-950 border border-slate-900 p-3 rounded-xl">
-                      <span className="block text-xl font-bold text-slate-200">
-                        {block.sqft || 935}
+                    <div className="bg-slate-900 border border-slate-800/50 p-3 rounded-xl">
+                      <span className="block text-xl md:text-2xl font-bold text-slate-200">
+                        MLS
                       </span>
-                      <span className="text-[10px] text-slate-500 uppercase font-bold">SqFt</span>
-                    </div>
-                    <div className="bg-slate-950 border border-slate-900 p-3 rounded-xl">
-                      <span className="block text-xl font-bold text-slate-200">
-                        {block.lotSize ? block.lotSize.toLocaleString() : '6,098'}
-                      </span>
-                      <span className="text-[10px] text-slate-500 uppercase font-bold">Lot Size</span>
-                    </div>
-                    <div className="bg-slate-950 border border-slate-900 p-3 rounded-xl">
-                      <span className="block text-xl font-bold text-slate-200">
-                        {block.yearBuilt || 1940}
-                      </span>
-                      <span className="text-[10px] text-slate-500 uppercase font-bold">Year Built</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-bold">Sync Active</span>
                     </div>
                   </div>
 
@@ -254,39 +171,9 @@ export default function LandingPagePortalClient({
                 </div>
               );
 
-            case 'GALLERY':
-              const galleryImages = block.images || [
-                '/toscana_listing.png',
-                '/manchester_listing.png',
-                '/greenview_listing.png',
-                '/toscana_listing.png',
-                '/manchester_listing.png',
-                '/greenview_listing.png',
-                '/toscana_listing.png',
-                '/manchester_listing.png'
-              ];
-              return (
-                <div key={block.id} className="space-y-4">
-                  <h3 className="text-lg font-bold text-slate-200 text-left tracking-wider uppercase border-b border-slate-800 pb-2">
-                    {block.title || 'GALLERY'}
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {galleryImages.map((img, i) => (
-                      <div key={i} className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow shadow-black">
-                        <img
-                          src={img}
-                          alt={`Gallery photo ${i + 1}`}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-
             case 'LEAD_CAPTURE':
               return (
-                <div key={block.id} className="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-900 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
+                <div key={block.id} className="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
                   <div className="text-center space-y-1">
                     <h3 className="text-lg md:text-xl font-bold text-slate-200">
                       {block.ctaText || 'Connect with Our Agents'}
@@ -312,7 +199,7 @@ export default function LandingPagePortalClient({
                             type="text"
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-primary"
+                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:ring-1 focus:ring-primary"
                           />
                         </div>
                         <div className="space-y-1.5">
@@ -321,7 +208,7 @@ export default function LandingPagePortalClient({
                             type="text"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none"
+                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -334,7 +221,7 @@ export default function LandingPagePortalClient({
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none"
+                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none"
                           />
                         </div>
                         <div className="space-y-1.5">
@@ -343,7 +230,7 @@ export default function LandingPagePortalClient({
                             type="text"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none"
+                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -353,7 +240,7 @@ export default function LandingPagePortalClient({
                         <select
                           value={type}
                           onChange={(e) => setType(e.target.value as any)}
-                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none"
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none"
                         >
                           <option value="BUYER">I Want to Buy / Virtual Tour</option>
                           <option value="SELLER">I Want to List / Sell Property</option>
@@ -379,85 +266,9 @@ export default function LandingPagePortalClient({
       </div>
 
       {/* Footer */}
-      <footer className="py-6 border-t border-slate-900 text-center text-xs text-slate-600 bg-slate-950">
+      <footer className="py-6 border-t border-slate-900 text-center text-xs text-slate-600">
         © 2026 Excel Legacy Realty. All rights reserved. Equal Housing Opportunity.
       </footer>
-
-      {/* Interactive Registration Gate Overlay */}
-      {showGateOverlay && !isSubmitted && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md space-y-4">
-            <div className="text-center space-y-1">
-              <span className="text-3xl block">🔑</span>
-              <h3 className="font-extrabold text-lg text-slate-100">Unlock Full Property Information</h3>
-              <p className="text-xs text-slate-400 leading-tight">
-                To continue viewing virtual tours, pricing disclosures, and remarks, please register.
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmitLead} className="space-y-3.5">
-              <div className="space-y-1">
-                <label className="text-[9px] font-bold uppercase text-slate-400">First Name *</label>
-                <input
-                  required
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[9px] font-bold uppercase text-slate-400">Email Address *</label>
-                <input
-                  required
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-2.5 bg-primary text-primary-foreground font-bold rounded-lg text-xs hover:bg-primary/95 transition-all shadow-lg"
-              >
-                {isSubmitting ? 'Registering...' : 'Register to Unlock Access'}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowGateOverlay(false)}
-                className="w-full py-2 text-[10px] text-slate-500 font-bold hover:text-slate-400"
-              >
-                Continue Browsing (Mock Preview Mode)
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Floating Chat Assistant */}
-      <div className="fixed bottom-6 right-6 z-40 space-y-2 max-w-[280px]">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-2xl space-y-1 animate-in slide-in-from-bottom-3 duration-300">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] bg-primary/20 text-primary border border-primary/20 px-1.5 py-0.5 rounded font-bold">
-              Personal Assistant
-            </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping"></span>
-          </div>
-          <p className="text-[11px] text-slate-200 leading-tight">
-            Hey there! I&apos;m Lynn, your personal assistant. Reach out if you have any questions or want to schedule a walkthrough tour!
-          </p>
-        </div>
-        <div className="flex justify-end">
-          <div className="w-12 h-12 rounded-full bg-primary border-2 border-slate-800 shadow-2xl flex items-center justify-center font-bold text-xl text-primary-foreground">
-            👩‍💼
-          </div>
-        </div>
-      </div>
-
     </div>
   );
 }
