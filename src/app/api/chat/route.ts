@@ -167,5 +167,5 @@ export async function POST(req: Request) {
     } as any,
   });
 
-  return result.toDataStreamResponse();
+  return result.toAIStreamResponse();
 }

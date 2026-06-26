@@ -1,4 +1,3 @@
-import { hasPermission, type UserRole } from './roles';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import type { Session } from 'next-auth';
 
@@ -100,7 +99,7 @@ export async function requireWorkspaceAccess(session?: Session | null) {
   return access;
 }
 
-
+import { hasPermission, type UserRole } from './roles';
 
 export async function requireWorkspaceRole(session: Session | null | undefined, requiredRole: UserRole) {
   const access = await requireWorkspaceAccess(session);
