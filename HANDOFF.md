@@ -1,6 +1,6 @@
-# Session Handoff - v0.47.0 Voice Provider Framework
+# Session Handoff - v0.47.0 Voice Provider Logic
 
-Successfully implemented the foundational configuration UI and database mapping for the VoiceForge pipeline.
+Successfully implemented the foundational configuration UI, database mapping, and backend abstractions for the VoiceForge pipeline.
 
 ### Completed Operations in this Session
 1. **Speech Provider Selection UI**:
@@ -16,10 +16,12 @@ Successfully implemented the foundational configuration UI and database mapping 
    - Bumped project version to `0.47.0` and correctly synced `package-lock.json` dependency graphs via `npm install --legacy-peer-deps`.
    - Marked "Speech provider selection" as completed in the active roadmap and backlog tasks.
    - Pre-commit builds (`npm run build`), linting (`npm run lint`), and E2E integration tests all passed cleanly.
+3. **VoiceForge Integration**:
+   - Created `src/lib/voice.ts` implementing the core `synthesizeSpeech` action which maps the configured VoiceProvider to live API outputs for OpenAI and ElevenLabs.
 
 ### Next Steps for Successor Models
-- **Voice Assistant (VoiceForge Pipeline)**: Build the actual backend logic in `src/lib/voice.ts` that will read the selected configuration from `getVoiceConfig(workspaceId)` and execute STT/TTS calls.
 - **Conversational Mode**: Wire the Voice Assistant module to the `AIChat.tsx` floating widget to allow agents to click a microphone icon and converse naturally.
+- **Speech-to-Text**: Complete the `transcribeSpeech` implementation in `src/lib/voice.ts` using Whisper or another remote STT provider.
 - **Evaluate Drizzle ORM**: Assess migrating Prisma to Drizzle for robust edge compatibility.
 
 ### Critical Database Migration Update

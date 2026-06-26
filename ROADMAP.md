@@ -28,7 +28,7 @@
 - [x] **AI Tool Calling (Agentic Co-Pilot Execution)**
 - [ ] AI lead qualification
 - [x] AI Drip Campaign Execution (SMS/Email)
-- [ ] Voice assistant
+- [x] Voice assistant
 - [x] Speech provider selection
 - [ ] Conversational mode
 - [ ] Learning and memory controls

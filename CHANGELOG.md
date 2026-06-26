@@ -311,3 +311,4 @@
 - Added foundational configuration support (`src/lib/voice-config.ts`) allowing users to easily toggle between OpenAI, ElevenLabs, and Simulation modes for VoiceForge pipelines.
 - Migrated Voice settings storage to Prisma SQLite (`VoiceSettings` model) ensuring proper multi-tenant workspace isolation.
 - Hardened server-side component security by properly masking API keys before hydration to the client payload.
+- **VoiceForge Pipeline Base:** Created `src/lib/voice.ts` containing foundational STT/TTS abstractions that read configuration dynamically from `getVoiceConfig(workspaceId)`, supporting Simulation, OpenAI, and ElevenLabs API integration streams.
