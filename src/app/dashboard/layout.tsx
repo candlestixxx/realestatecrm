@@ -12,19 +12,11 @@ import { OnboardingTour } from '@/components/OnboardingTour';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import prisma from '@/lib/prisma';
 import Script from 'next/script';
-import CommunicationsHub from '@/components/CommunicationsHub';
+import SidebarAIAssistant from '@/components/SidebarAIAssistant';
 import { processDueCampaignTasks } from '@/lib/campaign-processor';
-import { startSyncScheduler } from '@/lib/sync-scheduler';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
-
-  // Start MyPlusLeads background sync scheduler if not already started
-  try {
-    startSyncScheduler();
-  } catch (e) {
-    console.error('Failed to start sync scheduler:', e);
-  }
 
   // Auto-process any pending drip campaign steps that are now due
   try {
@@ -32,8 +24,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
   } catch (e) {
     console.error('Failed processing due drip campaigns in layout:', e);
   }
-
-  const access = await requireWorkspaceAccess(session);
 
   const workspaces = await prisma.workspace.findMany({
     where: {
@@ -56,7 +46,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
-          {/* CRM Core */}
           <Link
             href="/dashboard"
             className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
@@ -87,87 +76,65 @@ export default async function DashboardLayout({ children }: { children: React.Re
           >
             Tasks
           </Link>
-
-          {/* Marketing & Content */}
-          <div className="pt-2 mt-2 border-t border-border/20">
-            <span className="px-3 text-[9px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-              Marketing & CMS
+          <Link
+            href="/dashboard/campaigns"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Campaigns
+          </Link>
+          <Link
+            href="/dashboard/agent-studio"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Agent Studio
+          </Link>
+          <Link
+            href="/dashboard/workflows"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Workflows
+          </Link>
+          <Link
+            href="/workflows/marketing-media"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Media Studio
+          </Link>
+          <Link
+            href="/dashboard/sync-queue"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              ↗ Sync Queue
+              <span className="text-[10px] px-1.5 py-0.5 bg-primary/20 text-primary rounded-full font-medium">
+                MyPlus → Lofty
+              </span>
             </span>
-            <Link
-              href="/dashboard/campaigns"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Campaigns
-            </Link>
-            <Link
-              href="/dashboard/agent-websites"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Websites & Landing Pages
-            </Link>
-            <Link
-              href="/workflows/marketing-media"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Media Studio
-            </Link>
-          </div>
-
-          {/* Automations & Wizards */}
-          <div className="pt-2 mt-2 border-t border-border/20">
-            <span className="px-3 text-[9px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
-              Automations
-            </span>
-            <Link
-              href="/dashboard/agent-studio"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Agent Studio (AI)
-            </Link>
-            <Link
-              href="/dashboard/workflows"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Workflows (Wizards)
-            </Link>
-          </div>
-
-          {/* Support */}
-          <div className="pt-2 mt-2 border-t border-border/20">
-            <Link
-              href="/dashboard/help-center"
-              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Help Center
-            </Link>
-          </div>
-
-          {/* Grouped Settings section */}
-          <div className="pt-4 mt-4 border-t border-border/40">
-            <span className="px-3 text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-2">
-              ⚙️ Settings
-            </span>
-            <div className="space-y-1 pl-2">
-              <Link
-                href="/dashboard/settings/integrations"
-                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-xs"
-              >
-                Lead Integrations
-              </Link>
-              <Link
-                href="/dashboard/settings/email"
-                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-xs"
-              >
-                Email Settings
-              </Link>
-              <Link
-                href="/dashboard/sync-queue"
-                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-xs"
-              >
-                Sync Queue
-              </Link>
-            </div>
-          </div>
+          </Link>
+          <Link
+            href="/dashboard/agent-websites"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Agent Websites
+          </Link>
+          <Link
+            href="/dashboard/settings/email"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Email Settings
+          </Link>
+          <Link
+            href="/dashboard/settings/integrations"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Lead Integrations
+          </Link>
+          <Link
+            href="/dashboard/help-center"
+            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Help Center
+          </Link>
         </nav>
         <div className="p-4 border-t border-border">
           <div className="mb-4 text-[10px] text-muted-foreground uppercase tracking-widest text-center">
@@ -216,13 +183,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </header>
         <div className="flex-1 flex overflow-hidden">
           <div className="flex-1 overflow-auto p-6">{children}</div>
-          <CommunicationsHub />
+          <SidebarAIAssistant />
         </div>
       </main>
       <AIChat />
       <OnboardingTour />
       <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&libraries=places,drawing`}
+        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&libraries=places`}
         strategy="afterInteractive"
       />
     </div>
