@@ -197,13 +197,11 @@ model Task {
 }
 
 model Activity {
-  id               String    @id @default(cuid())
-  type             String    @default("NOTE")
-  content          String
-  formattedContent String?
-  isPinned         Boolean   @default(false)
-  metadata         String?
-  workspaceId      String
+  id          String    @id @default(cuid())
+  type        String    @default("NOTE")
+  content     String
+  metadata    String?
+  workspaceId String
   userId      String?
   leadId      String?
   dealId      String?
