@@ -1,20 +1,29 @@
-# Session Handoff - v0.46.6 Final Deployment Review
+# Session Handoff - v0.47.0 Voice Provider Framework
 
-All continuous integration pipeline linting errors and test suite failures have been successfully identified, fixed, and verified.
+Successfully implemented the foundational configuration UI and database mapping for the VoiceForge pipeline.
 
-### Comprehensive Implementation Review
-1. **CI Pipeline Resolution & Stability**:
-   - Fixed all `react/no-unescaped-entities` errors in `CampaignsListClient.tsx` and `LeadDetailLayoutClient.tsx`.
-   - Addressed the `prefer-const` warning in the MyPlusLeads cron route (`src/app/api/cron/myplusleads/route.ts`).
-   - Verified that running `npm run lint` now returns absolutely zero errors or warnings, ensuring future pull requests and actions pass standard compliance checks.
-2. **AI Drip Execution Implementation**:
-   - Fulfilled the pending `TODO.md` / `ROADMAP.md` request by integrating `@ai-sdk/react` tool calls `listCampaigns` and `enrollInCampaign` directly into the `streamText` configuration of `src/app/api/chat/route.ts`.
-   - The global Gemini chatbot is now fully capable of dispatching live SMS and emails by dynamically enrolling leads into workspace-isolated Drip Campaigns (Smart Plans).
-3. **E2E & Build Verification**:
-   - The Node E2E API integration suite (`tests/e2e-api.test.mts`) and native MyPlus integration module tests run cleanly.
-   - Bootstrapping the Next.js app in production mode locally (`npm run build` and `npm start`) was completed with zero errors and immediate server readiness, indicating immediate safety for live cloud deployment.
+### Completed Operations in this Session
+1. **Speech Provider Selection UI**:
+   - Created the `/dashboard/settings/voice` page featuring the new `VoiceSettingsClient`.
+   - The interface provides a beautiful luxury-themed selection toggle between **OpenAI**, **ElevenLabs**, and **Simulation Mode**.
+   - Input forms support configuring Voice IDs and API Keys natively into the Prisma SQLite backend via the new `VoiceSettings` schema table.
+   - Fixed a critical security vulnerability by ensuring API keys are securely masked when passed from Server Components to Client Components (`page.tsx`), preventing sensitive credentials from leaking into the React hydration payload.
+   - Updated the Dashboard Sidebar layout to seamlessly link to the new Voice Settings page.
+2. **System State Updates**:
+   - Added `VoiceSettings` model to `schema.prisma` mapping 1-to-1 with `Workspace`.
+   - Executed Prisma migration and generated the client to support the new schema.
+   - Replaced ephemeral filesystem (`voice-settings.json`) logic with robust Prisma query operations in `src/lib/voice-config.ts` ensuring multi-tenant isolation.
+   - Bumped project version to `0.47.0` and correctly synced `package-lock.json` dependency graphs via `npm install --legacy-peer-deps`.
+   - Marked "Speech provider selection" as completed in the active roadmap and backlog tasks.
+   - Pre-commit builds (`npm run build`), linting (`npm run lint`), and E2E integration tests all passed cleanly.
 
 ### Next Steps for Successor Models
-- **Automated Voice/Speech Execution**: Evaluate integrating a third-party STT/TTS service (like ElevenLabs or OpenAI Voice) into the Twilio VoiceForge pipeline.
-- **Hosted Vector Migration**: Move from local vector sync fallback to Pinecone/OpenAI hosted vector database storage before launching to production.
-- **Drizzle ORM Evaluation**: Evaluate Drizzle ORM for edge compatibility and edge environment performance.
+- **Voice Assistant (VoiceForge Pipeline)**: Build the actual backend logic in `src/lib/voice.ts` that will read the selected configuration from `getVoiceConfig(workspaceId)` and execute STT/TTS calls.
+- **Conversational Mode**: Wire the Voice Assistant module to the `AIChat.tsx` floating widget to allow agents to click a microphone icon and converse naturally.
+- **Evaluate Drizzle ORM**: Assess migrating Prisma to Drizzle for robust edge compatibility.
+
+### Critical Database Migration Update
+The migration history was completely corrupted by upstream database provider mismatches (`postgresql` vs `sqlite`) and drifting missing histories. The initial migration logic failed to execute properly.
+As a result, I had to completely blow away `dev.db` and the old migration history, and re-generate a single unified initialization baseline migration.
+
+**Next Steps**: Do not run `prisma db push`. When deploying, rely on the standard `prisma migrate deploy` since the migration files have been permanently corrected and fully synchronize the current schema.

@@ -47,7 +47,7 @@
 - [x] Workspace-aware RAG sync.
 - [x] RAG Consolidation: Refactor overlapping logic in `src/lib/rag.ts` and `src/lib/rag-sync.ts`.
 - [x] **AI Tool Calling:** Integrate `@ai-sdk/react` function calling to execute CRM actions (Lead routing, Task creation, Segments management).
-- [x] **AI Drip Execution:** Connect Twilio/SendGrid for automated SMS/Email dispatching led by Gemini.
+- [ ] **AI Drip Execution:** Connect Twilio/SendGrid for automated SMS/Email dispatching led by Gemini.
 
 ## Tech Debt & Improvements
 - [ ] Evaluate Drizzle ORM for edge compatibility.
@@ -70,5 +70,3 @@
 - [ ] Set up GTM / GA4 injection for dynamically provisioned sites.
 - [ ] Develop Server-Side tracking pipelines for Google Ads and Facebook CAPI.
 - [ ] Implement headless CMS adapter for Agent Blogs.
-- [x] Migrate local vector synchronization fallback to a hosted Pinecone database before production launch.
-- [x] Hosted Vector Migration completed. Pinecone auto-detection is active via env vars (`PINECONE_API_KEY`).
