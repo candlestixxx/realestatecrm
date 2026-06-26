@@ -106,7 +106,7 @@ export default async function LeadsPage(props: {
   const query = searchParams?.q || '';
   const statusFilter = searchParams?.status || 'ALL';
   const currentPage = Math.max(1, Number(searchParams?.page) || 1);
-  const pageSize = Math.max(1, Math.min(1000, Number(searchParams?.limit) || 10));
+  const pageSize = Math.max(10, Math.min(100, Number(searchParams?.limit) || 10));
 
   const session = await getServerSession(authOptions);
   const access = (await resolveWorkspaceAccess(session)) ?? {
