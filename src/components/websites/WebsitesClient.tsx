@@ -90,7 +90,7 @@ export default function WebsitesClient({
   const [isSaving, setIsSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTypeFilter, setSelectedTypeFilter] = useState('All');
-  
+
   // Left builder settings tab
   const [builderTab, setBuilderTab] = useState<'basic' | 'popup' | 'seo' | 'media' | 'blocks'>('basic');
 
@@ -249,13 +249,13 @@ export default function WebsitesClient({
   const handleMoveBlock = (index: number, direction: 'up' | 'down') => {
     if (direction === 'up' && index === 0) return;
     if (direction === 'down' && index === blocks.length - 1) return;
-    
+
     const targetIdx = direction === 'up' ? index - 1 : index + 1;
     const updated = [...blocks];
     const temp = updated[index];
     updated[index] = updated[targetIdx];
     updated[targetIdx] = temp;
-    
+
     setBlocks(updated);
     toast.success('Block order updated.');
   };
@@ -309,7 +309,7 @@ export default function WebsitesClient({
       } else {
         setUploadedVideoDuration(simulatedDuration);
         toast.success(`Success! Video (${simulatedDuration}s) uploaded and optimized.`);
-        
+
         const settingsIdx = blocks.findIndex(b => b.type === 'SETTINGS');
         if (settingsIdx !== -1) {
           handleBlockChange(settingsIdx, 'customVideoUrl', '/mock-videos/listing-preview.mp4');
@@ -536,7 +536,7 @@ export default function WebsitesClient({
                   <tbody className="divide-y divide-border/60">
                     {filteredPages.map((page) => {
                       const isMls = page.slug.endsWith('-promo') || page.title.includes('Promotion') || page.title.includes('Via Toscana') || page.title.includes('Manchester') || page.title.includes('Greenview') || page.title.includes('Alvina');
-                      
+
                       // Calculate mockup page metrics
                       const baseSeed = page.title.charCodeAt(0) + page.title.charCodeAt(page.title.length - 1);
                       const views = (baseSeed % 40) + 5;
@@ -632,7 +632,7 @@ export default function WebsitesClient({
       {/* Visual Block Layout Builder (Split Screen) */}
       {activeTab === 'builder' && editingPage && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           {/* Controls Side Panel: Col Span 5 */}
           <div className="lg:col-span-5 space-y-6">
             <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
@@ -699,7 +699,7 @@ export default function WebsitesClient({
 
               {/* Tab Content Panels */}
               <div className="p-5 space-y-5">
-                
+
                 {/* 1. Basic Info Panel */}
                 {builderTab === 'basic' && (
                   <div className="space-y-4">
@@ -847,7 +847,7 @@ export default function WebsitesClient({
                   <div className="space-y-5">
                     <div className="space-y-3.5">
                       <label className="text-[10px] font-bold uppercase text-muted-foreground block">How To Trigger Registration</label>
-                      
+
                       <div className="space-y-2.5">
                         <label className="flex items-center gap-2.5 text-xs font-semibold cursor-pointer">
                           <input
@@ -933,7 +933,7 @@ export default function WebsitesClient({
                     {/* Lead Privacy and Assignment */}
                     <div className="space-y-3.5 pt-3 border-t border-border/50">
                       <label className="text-[10px] font-bold uppercase text-muted-foreground block">Lead Privacy & Assignment</label>
-                      
+
                       <div className="space-y-2">
                         <label className="text-[9px] font-bold uppercase text-muted-foreground block">Lead Ownership</label>
                         <select
@@ -976,7 +976,7 @@ export default function WebsitesClient({
                     {/* Additional Actions: Tags & Notes */}
                     <div className="space-y-3.5 pt-3 border-t border-border/50">
                       <label className="text-[10px] font-bold uppercase text-muted-foreground block">Additional Actions</label>
-                      
+
                       <div className="space-y-2">
                         <label className="text-[9px] font-bold uppercase text-muted-foreground block">Lead Tags</label>
                         <div className="flex gap-2">
@@ -1271,7 +1271,7 @@ export default function WebsitesClient({
 
             {/* Simulated Live Web Page Frame */}
             <div className="w-full border border-border rounded-2xl shadow-2xl overflow-hidden bg-slate-950 text-slate-100 flex flex-col h-[780px] relative">
-              
+
               {/* Browser Mock Navigation Bar */}
               <div className="bg-slate-900 border-b border-slate-800 p-3.5 flex items-center justify-between text-[11px] font-medium text-slate-400">
                 <div className="flex items-center gap-1.5">
@@ -1289,7 +1289,7 @@ export default function WebsitesClient({
 
               {/* Web Page View Area */}
               <div className="flex-1 overflow-y-auto p-6 space-y-6 relative" style={{ scrollBehavior: 'smooth' }}>
-                
+
                 {/* Header Links simulation */}
                 <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-900 pb-3">
                   <div className="flex gap-4">
@@ -1309,7 +1309,7 @@ export default function WebsitesClient({
 
                   return (
                     <div key={block.id} className="relative group/canvas border-2 border-transparent hover:border-primary/40 rounded-xl p-2 transition-all">
-                      
+
                       {/* Action overlays on hover over preview blocks */}
                       <div className="absolute top-2 right-2 z-50 opacity-0 group-hover/canvas:opacity-100 transition-opacity flex items-center gap-1 bg-slate-900/90 border border-slate-800 rounded-lg p-1.5 shadow-lg">
                         <button
@@ -1363,7 +1363,7 @@ export default function WebsitesClient({
                       {/* Property Detail Render */}
                       {block.type === 'PROPERTY' && (
                         <div className="bg-slate-900/40 border border-slate-850 rounded-xl p-5 space-y-4 backdrop-blur-sm relative overflow-hidden">
-                          
+
                           <div className="relative h-48 rounded-lg overflow-hidden bg-slate-950 border border-slate-800">
                             <img
                               src={propertyBlock.image || '/manchester_listing.png'}

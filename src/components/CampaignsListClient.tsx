@@ -885,7 +885,7 @@ export default function CampaignsListClient({
                               )}
                             </div>
                             <p className="text-[10px] text-muted-foreground line-clamp-1 italic bg-muted/20 px-2 py-0.5 rounded border border-border/10">
-                              "{step.content}"
+                              &quot;{step.content}&quot;
                             </p>
                           </div>
                           

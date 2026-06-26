@@ -152,8 +152,8 @@ model Deal {
 model DealStakeholder {
   id          String    @id @default(cuid())
   dealId      String
-  contactId   String?   
-  userId      String?   
+  contactId   String?
+  userId      String?
   role        String    // TITLE, LENDER, INSPECTOR, APPRAISER, CLIENT
   permissions String    @default("VIEW_STATUS") // UPLOAD_DOCS, VIEW_STATUS, FULL_ACCESS
   deal        Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
@@ -166,7 +166,7 @@ model DealStakeholder {
 model DealRequirement {
   id          String    @id @default(cuid())
   dealId      String
-  title       String    
+  title       String
   description String?
   status      String    @default("PENDING") // PENDING (Red), IN_PROGRESS (Yellow), COMPLETED (Green)
   assignedTo  String?   // Role string (e.g. TITLE) or specific User ID
@@ -197,11 +197,13 @@ model Task {
 }
 
 model Activity {
-  id          String    @id @default(cuid())
-  type        String    @default("NOTE")
-  content     String
-  metadata    String?
-  workspaceId String
+  id               String    @id @default(cuid())
+  type             String    @default("NOTE")
+  content          String
+  formattedContent String?
+  isPinned         Boolean   @default(false)
+  metadata         String?
+  workspaceId      String
   userId      String?
   leadId      String?
   dealId      String?

@@ -119,7 +119,7 @@ export default async function AgentWebsitesPage() {
   for (const listing of listings) {
     const slug = listing.address.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-promo';
     const hasPage = landingPages.some(page => page.slug === slug || page.title.includes(listing.address));
-    
+
     if (!hasPage) {
       const defaultBlocks = [
         {
@@ -197,4 +197,3 @@ export default async function AgentWebsitesPage() {
     </div>
   );
 }
-
