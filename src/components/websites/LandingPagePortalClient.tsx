@@ -125,7 +125,7 @@ export default function LandingPagePortalClient({
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans relative">
-      
+
       {/* Visual Blocks Render */}
       <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-12 space-y-12">
         {blocks.map((block) => {
@@ -425,7 +425,7 @@ export default function LandingPagePortalClient({
               >
                 {isSubmitting ? 'Registering...' : 'Register to Unlock Access'}
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => setShowGateOverlay(false)}

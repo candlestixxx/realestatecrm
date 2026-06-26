@@ -48,7 +48,7 @@ export async function createLandingPageAction(formData: FormData) {
       videoType: 'YOUTUBE',
     };
 
-    let defaultBlocks = [settingsBlock];
+    const defaultBlocks = [settingsBlock];
 
     if (template === 'feature-listing') {
       defaultBlocks.push(
@@ -294,4 +294,3 @@ export async function deleteLandingPageAction(landingPageId: string) {
     return { error: 'An unexpected error occurred while deleting.' };
   }
 }
-
