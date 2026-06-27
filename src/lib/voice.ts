@@ -71,8 +71,7 @@ export async function synthesizeSpeech(workspaceId: string, text: string): Promi
   throw new Error('Unknown Voice Provider configured.');
 }
 
-// Placeholder for future STT (Speech-to-Text) functionality (e.g. Whisper)
-export async function transcribeSpeech(workspaceId: string, audioBuffer: Buffer): Promise<string> {
+export async function transcribeSpeech(workspaceId: string, audioBuffer: Buffer, mimeType: string = 'audio/webm'): Promise<string> {
   const config = await getVoiceConfig(workspaceId);
 
   if (config.provider === 'SIMULATION') {
@@ -80,6 +79,33 @@ export async function transcribeSpeech(workspaceId: string, audioBuffer: Buffer)
     return "This is a simulated transcription of the audio.";
   }
 
-  // Implementation for real OpenAI Whisper / AssemblyAI would go here
-  throw new Error('STT Transcribe not yet fully implemented for remote providers.');
+  // Currently we use OpenAI Whisper for both OPENAI and ELEVENLABS setups since ElevenLabs is only TTS
+  const openAiApiKey = config.openAiApiKey || process.env.OPENAI_API_KEY?.trim();
+  if (!openAiApiKey) {
+    throw new Error('OpenAI API key is missing for STT (Whisper) pipeline.');
+  }
+
+  const formData = new FormData();
+  const ext = mimeType.split('/')[1] || 'webm';
+
+  // Convert Node Buffer to a File/Blob that fetch can send via FormData
+  const blob = new Blob([audioBuffer], { type: mimeType });
+  formData.append('file', blob, `audio.${ext}`);
+  formData.append('model', 'whisper-1');
+
+  const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${openAiApiKey}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`OpenAI STT Failed: ${err}`);
+  }
+
+  const json = await response.json();
+  return json.text;
 }
