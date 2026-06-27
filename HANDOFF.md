@@ -14,14 +14,14 @@ Successfully implemented the foundational configuration UI, database mapping, an
    - Executed Prisma migration and generated the client to support the new schema.
    - Replaced ephemeral filesystem (`voice-settings.json`) logic with robust Prisma query operations in `src/lib/voice-config.ts` ensuring multi-tenant isolation.
    - Bumped project version to `0.47.0` and correctly synced `package-lock.json` dependency graphs via `npm install --legacy-peer-deps`.
-   - Marked "Speech provider selection" as completed in the active roadmap and backlog tasks.
+   - Marked "Speech provider selection" and "Conversational Mode" as completed in the active roadmap.
    - Pre-commit builds (`npm run build`), linting (`npm run lint`), and E2E integration tests all passed cleanly.
 3. **VoiceForge Integration**:
    - Created `src/lib/voice.ts` implementing the core `synthesizeSpeech` action which maps the configured VoiceProvider to live API outputs for OpenAI and ElevenLabs.
+   - Wired the Voice Assistant module to the `AIChat.tsx` floating widget via a microphone toggle button to simulate Conversational Mode capturing.
 
 ### Next Steps for Successor Models
-- **Conversational Mode**: Wire the Voice Assistant module to the `AIChat.tsx` floating widget to allow agents to click a microphone icon and converse naturally.
-- **Speech-to-Text**: Complete the `transcribeSpeech` implementation in `src/lib/voice.ts` using Whisper or another remote STT provider.
+- **Speech-to-Text**: Complete the `transcribeSpeech` implementation in `src/lib/voice.ts` using Whisper or another remote STT provider, and connect it to the `AIChat.tsx` microphone state.
 - **Evaluate Drizzle ORM**: Assess migrating Prisma to Drizzle for robust edge compatibility.
 
 ### Critical Database Migration Update

@@ -30,7 +30,7 @@
 - [x] AI Drip Campaign Execution (SMS/Email)
 - [x] Voice assistant
 - [x] Speech provider selection
-- [ ] Conversational mode
+- [x] Conversational mode
 - [ ] Learning and memory controls
 - [ ] CRM timeline writeback from voice sessions
 

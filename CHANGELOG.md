@@ -312,3 +312,4 @@
 - Migrated Voice settings storage to Prisma SQLite (`VoiceSettings` model) ensuring proper multi-tenant workspace isolation.
 - Hardened server-side component security by properly masking API keys before hydration to the client payload.
 - **VoiceForge Pipeline Base:** Created `src/lib/voice.ts` containing foundational STT/TTS abstractions that read configuration dynamically from `getVoiceConfig(workspaceId)`, supporting Simulation, OpenAI, and ElevenLabs API integration streams.
+- **Voice Assistant Integration:** Added a mock Conversational Mode trigger (microphone button) to `AIChat.tsx` to enable users to toggle Voice STT capture dynamically from the global dashboard AI interface.

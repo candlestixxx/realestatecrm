@@ -2,9 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useChat } from '@ai-sdk/react';
+import { Mic, MicOff } from 'lucide-react';
 
 export default function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isVoiceMode, setIsVoiceMode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
@@ -123,6 +125,13 @@ export default function AIChat() {
                 className="flex-1 bg-muted/30 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 disabled={isLoading}
               />
+              <button
+                type="button"
+                onClick={() => setIsVoiceMode(!isVoiceMode)}
+                className={`p-2 rounded-md transition-colors ${isVoiceMode ? 'bg-red-500/20 text-red-500' : 'bg-muted/50 text-muted-foreground hover:bg-muted'}`}
+              >
+                {isVoiceMode ? <MicOff className="w-4 h-4 animate-pulse" /> : <Mic className="w-4 h-4" />}
+              </button>
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
