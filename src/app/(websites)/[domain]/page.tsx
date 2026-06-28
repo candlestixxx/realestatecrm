@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { AgentSiteChatWidget } from '@/components/websites/AgentSiteChatWidget';
+import { LeadCaptureModal } from '@/components/websites/LeadCaptureModal';
 
 export default async function TenantWebsitePage({ params }: { params: Promise<{ domain: string }> }) {
   const { domain } = await params;
@@ -108,6 +109,7 @@ export default async function TenantWebsitePage({ params }: { params: Promise<{ 
       })}
 
       <AgentSiteChatWidget tenantName={tenantSite.title} />
+      <LeadCaptureModal tenantName={tenantSite.title} />
     </div>
   );
 }
