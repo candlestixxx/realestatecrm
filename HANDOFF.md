@@ -18,10 +18,14 @@ Successfully implemented the foundational configuration UI, database mapping, an
    - Pre-commit builds (`npm run build`), linting (`npm run lint`), and E2E integration tests all passed cleanly.
 3. **VoiceForge Integration**:
    - Created `src/lib/voice.ts` implementing the core `synthesizeSpeech` action which maps the configured VoiceProvider to live API outputs for OpenAI and ElevenLabs.
-   - Wired the Voice Assistant module to the `AIChat.tsx` floating widget via a microphone toggle button to simulate Conversational Mode capturing.
+   - Implemented real-time `transcribeSpeech` using the OpenAI Whisper API.
+   - Wired the Voice Assistant module to the `AIChat.tsx` floating widget utilizing `MediaRecorder` to capture microphone audio blobs, push them to the new `/api/chat/voice` route for processing, and stream back generated TTS audio via `/api/chat/tts`.
+4. **Tenant Site Custom Domains**:
+   - Upgraded the `LandingPage` Prisma schema with a `customDomain` mapping and successfully created and deployed the migration script.
+   - Refactored Next.js `middleware.ts` to natively rewrite incoming subdomains and custom hostnames securely to the `/(websites)/[domain]` dynamic router, maintaining strict tenant separation.
 
 ### Next Steps for Successor Models
-- **Speech-to-Text**: Complete the `transcribeSpeech` implementation in `src/lib/voice.ts` using Whisper or another remote STT provider, and connect it to the `AIChat.tsx` microphone state.
+- **Intent-Triggered Lead Capture Modals**: Develop the frontend pop-ups and backend webhooks to trigger Lead Capture models (e.g., when a user views a property photo on the custom `LandingPage` sites).
 - **Evaluate Drizzle ORM**: Assess migrating Prisma to Drizzle for robust edge compatibility.
 
 ### Critical Database Migration Update
