@@ -8,7 +8,10 @@ export default async function middleware(req: NextRequest) {
   // 1. Multi-Tenant Handling (No auth required for public visitors)
   const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1');
   const mainDomain = process.env.NEXT_PUBLIC_APP_URL?.replace('https://', '')?.replace('http://', '') || 'localhost:3000';
-  const isMainDomain = hostname === mainDomain || isLocalhost;
+  const isMainDomain = hostname === mainDomain || (isLocalhost && !hostname.includes('.localhost'));
+
+  // Allow testing subdomains locally, e.g., site.localhost:3000
+  const isCustomDomain = !isMainDomain;
 
   // Identify internal routes that should NOT be treated as tenant sites
   const isInternalRoute = url.pathname.startsWith('/api') ||
@@ -17,8 +20,9 @@ export default async function middleware(req: NextRequest) {
                           url.pathname.startsWith('/site') ||
                           url.pathname === '/favicon.ico';
 
-  if (!isMainDomain && !isInternalRoute) {
+  if (isCustomDomain && !isInternalRoute) {
     // Rewrite to the websites dynamic route group
+    // The [domain] folder will capture the hostname
     return NextResponse.rewrite(new URL(`/${hostname}${url.pathname}`, req.url));
   }
 

@@ -296,6 +296,7 @@ model LandingPage {
   slug        String   @unique
   title       String
   subdomain   String?
+  customDomain String? @unique
   blocks      String   // JSON string of page sections
   ownerId     String?
   workspaceId String
