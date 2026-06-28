@@ -61,11 +61,11 @@
 ### Multi-Tenant Websites & Marketing
 - [x] Scaffold `/(websites)` route group or secondary Next.js app for multi-tenant handling.
 - [x] Build RESO Web API data sync cron job/webhook listener.
-- [ ] Configure `LandingPage` model to support full domain mapping / custom domains.
+- [x] Configure `LandingPage` model to support full domain mapping / custom domains.
 - [ ] Build intent-triggered Lead Capture Modals (e.g., triggered on photo views).
 - [x] Develop embeddable LLM-powered Chat Widget for agent sites.
 - [x] Build RESO Web API data sync cron job/webhook listener.
-- [ ] Configure `LandingPage` model to support full domain mapping / custom domains.
+- [x] Configure `LandingPage` model to support full domain mapping / custom domains.
 - [ ] Build intent-triggered Lead Capture Modals (e.g., triggered on photo views).
 - [ ] Set up GTM / GA4 injection for dynamically provisioned sites.
 - [ ] Develop Server-Side tracking pipelines for Google Ads and Facebook CAPI.

@@ -8,6 +8,7 @@ export default async function TenantWebsitePage({ params }: { params: Promise<{ 
   const tenantSite = await prisma.landingPage.findFirst({
     where: {
       OR: [
+        { customDomain: domain },
         { subdomain: domain },
         { slug: domain }
       ]
