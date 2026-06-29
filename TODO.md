@@ -67,8 +67,8 @@
 - [x] Build RESO Web API data sync cron job/webhook listener.
 - [x] Configure `LandingPage` model to support full domain mapping / custom domains.
 - [x] Build intent-triggered Lead Capture Modals (e.g., triggered on photo views).
-- [ ] Set up GTM / GA4 injection for dynamically provisioned sites.
-- [ ] Develop Server-Side tracking pipelines for Google Ads and Facebook CAPI.
+- [x] Set up GTM / GA4 injection for dynamically provisioned sites.
+- [x] Develop Server-Side tracking pipelines for Google Ads and Facebook CAPI.
 - [ ] Implement headless CMS adapter for Agent Blogs.
 - [x] Migrate local vector synchronization fallback to a hosted Pinecone database before production launch.
 - [x] Hosted Vector Migration completed. Pinecone auto-detection is active via env vars (`PINECONE_API_KEY`).
