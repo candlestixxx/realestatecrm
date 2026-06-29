@@ -1,0 +1,2 @@
+- RAG uses a fallback Pinecone / OpenAI Hosted Vector Db before launch.
+- Integrated AI drip action execution tools (enrollInCampaign and listCampaigns) directly into API routes.

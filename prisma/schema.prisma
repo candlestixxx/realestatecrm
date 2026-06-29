@@ -45,6 +45,7 @@ model Workspace {
   landingPages   LandingPage[]
   propertyListings       PropertyListing[]
   myPlusLeadsIntegrations MyPlusLeadsIntegration[]
+  voiceSettings  VoiceSettings?
 }
 
 model WorkspaceMember {
@@ -197,13 +198,11 @@ model Task {
 }
 
 model Activity {
-  id               String    @id @default(cuid())
-  type             String    @default("NOTE")
-  content          String
-  formattedContent String?
-  isPinned         Boolean   @default(false)
-  metadata         String?
-  workspaceId      String
+  id          String    @id @default(cuid())
+  type        String    @default("NOTE")
+  content     String
+  metadata    String?
+  workspaceId String
   userId      String?
   leadId      String?
   dealId      String?
@@ -297,6 +296,9 @@ model LandingPage {
   slug        String   @unique
   title       String
   subdomain   String?
+  customDomain String? @unique
+  gtmId       String?  // Google Tag Manager ID (e.g. GTM-XXXXXX)
+  fbPixelId   String?  // Facebook Pixel ID
   blocks      String   // JSON string of page sections
   ownerId     String?
   workspaceId String
@@ -349,4 +351,18 @@ model PropertyListing {
   updatedAt       DateTime @updatedAt
 
   workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model VoiceSettings {
+  id                String   @id @default(cuid())
+  provider          String   @default("SIMULATION") // OPENAI, ELEVENLABS, SIMULATION
+  elevenLabsApiKey  String?
+  elevenLabsVoiceId String?
+  openAiApiKey      String?
+  openAiVoiceId     String?  @default("alloy")
+  workspaceId       String   @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  workspace         Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }

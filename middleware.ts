@@ -1,40 +1,60 @@
-import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-const AUTH_PAGES = ['/auth/signin'];
-const PROTECTED_PATH_PREFIXES = ['/dashboard', '/contacts', '/deals', '/leads', '/tasks', '/portal', '/workflows'];
-const PROTECTED_API_PREFIXES = ['/api/chat', '/api/crm-records', '/api/workflows'];
+export default async function middleware(req: NextRequest) {
+  const url = req.nextUrl;
+  const hostname = req.headers.get('host') || '';
 
-function isProtectedPath(pathname: string) {
-  return (
-    PROTECTED_PATH_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)) ||
-    PROTECTED_API_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
-  );
-}
+  // 1. Multi-Tenant Handling (No auth required for public visitors)
+  const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1');
+  const mainDomain = process.env.NEXT_PUBLIC_APP_URL?.replace('https://', '')?.replace('http://', '') || 'localhost:3000';
+  const isMainDomain = hostname === mainDomain || (isLocalhost && !hostname.includes('.localhost'));
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  // Allow testing subdomains locally, e.g., site.localhost:3000
+  const isCustomDomain = !isMainDomain;
 
-  if (AUTH_PAGES.includes(pathname)) {
-    return NextResponse.next();
+  // Identify internal routes that should NOT be treated as tenant sites
+  const isInternalRoute = url.pathname.startsWith('/api') ||
+                          url.pathname.startsWith('/_next') ||
+                          url.pathname.startsWith('/auth') ||
+                          url.pathname.startsWith('/site') ||
+                          url.pathname === '/favicon.ico';
+
+  if (isCustomDomain && !isInternalRoute) {
+    // Rewrite to the websites dynamic route group
+    // The [domain] folder will capture the hostname
+    return NextResponse.rewrite(new URL(`/${hostname}${url.pathname}`, req.url));
   }
 
-  if (!isProtectedPath(pathname)) {
-    return NextResponse.next();
-  }
+  // 2. CRM Auth Protection (Only for main domain)
+  // Re-implement basic route protection here because we replaced withAuth wrapper
+  const isProtectedRoute = url.pathname.startsWith('/dashboard') ||
+                           url.pathname.startsWith('/portal') ||
+                           url.pathname.startsWith('/workflows');
 
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET ?? 'realestatecrm-dev-secret' });
-
-  if (!token?.sub) {
-    const signInUrl = new URL('/auth/signin', request.url);
-    signInUrl.searchParams.set('callbackUrl', request.url);
-    return NextResponse.redirect(signInUrl);
+  if (isProtectedRoute) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET ?? 'realestatecrm-dev-secret' });
+    if (!token) {
+      const signInUrl = new URL('/auth/signin', req.url);
+      signInUrl.searchParams.set('callbackUrl', req.url);
+      return NextResponse.redirect(signInUrl);
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/contacts/:path*', '/deals/:path*', '/leads/:path*', '/tasks/:path*', '/portal/:path*', '/workflows/:path*', '/api/chat', '/api/chat/:path*', '/api/crm-records/:path*', '/api/workflows/:path*', '/auth/signin'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - auth/signin (sign in page)
+     * Note: We removed the negative lookahead for root '$' and 'site' so that multi-tenant root paths correctly match
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|auth/signin).*)',
+  ],
 };

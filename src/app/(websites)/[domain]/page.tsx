@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { AgentSiteChatWidget } from '@/components/websites/AgentSiteChatWidget';
+import { LeadCaptureModal } from '@/components/websites/LeadCaptureModal';
+import { PhotoGalleryWithIntent } from '@/components/websites/PhotoGalleryWithIntent';
 
 export default async function TenantWebsitePage({ params }: { params: Promise<{ domain: string }> }) {
   const { domain } = await params;
@@ -8,6 +10,7 @@ export default async function TenantWebsitePage({ params }: { params: Promise<{ 
   const tenantSite = await prisma.landingPage.findFirst({
     where: {
       OR: [
+        { customDomain: domain },
         { subdomain: domain },
         { slug: domain }
       ]
@@ -52,6 +55,9 @@ export default async function TenantWebsitePage({ params }: { params: Promise<{ 
                     <span>{block.baths} Baths</span>
                   </div>
                   <p className="text-muted-foreground leading-relaxed pt-2">{block.remarks}</p>
+                </div>
+                <div className="flex-1">
+                  <PhotoGalleryWithIntent images={block.images || ['/placeholder.jpg', '/placeholder-2.jpg', '/placeholder-3.jpg', '/placeholder-4.jpg']} />
                 </div>
               </div>
             </section>
@@ -107,6 +113,7 @@ export default async function TenantWebsitePage({ params }: { params: Promise<{ 
       })}
 
       <AgentSiteChatWidget tenantName={tenantSite.title} />
+      <LeadCaptureModal tenantName={tenantSite.title} />
     </div>
   );
 }

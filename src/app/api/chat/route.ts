@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import { buildChatContext } from '@/lib/rag';
 import prisma from '@/lib/prisma';
+import { enrollLeadInCampaignAction } from '@/lib/actions/campaign';
 import { z } from 'zod';
 
 export const maxDuration = 30;
@@ -32,6 +33,28 @@ export async function POST(req: Request) {
       workspaceContext,
     messages: messages as CoreMessage[],
     tools: {
+      listCampaigns: {
+        description: 'List available Drip Campaigns (Smart Plans) in the workspace.',
+        parameters: z.object({}),
+        execute: async () => {
+          const campaigns = await prisma.smartPlan.findMany({
+            where: { workspaceId: access.workspaceId, isActive: true },
+            select: { id: true, name: true, description: true }
+          });
+          return { campaigns };
+        },
+      },
+      enrollInCampaign: {
+        description: 'Enroll a lead into a Drip Campaign (Smart Plan) to dispatch live SMS/emails.',
+        parameters: z.object({
+          leadId: z.string().describe('The ID of the lead to enroll.'),
+          campaignId: z.string().describe('The ID of the campaign to enroll them in.'),
+        }),
+        execute: async ({ leadId, campaignId }: { leadId: string, campaignId: string }) => {
+          const res = await enrollLeadInCampaignAction(leadId, campaignId);
+          return res;
+        },
+      },
       getLeadCount: {
         description: 'Get the total number of leads in the current workspace.',
         parameters: z.object({
@@ -167,5 +190,5 @@ export async function POST(req: Request) {
     } as any,
   });
 
-  return result.toDataStreamResponse();
+  return result.toAIStreamResponse();
 }

@@ -1354,40 +1354,9 @@ export default function LeadDetailLayoutClient({
                               </div>
                               <span className="text-[10px] text-muted-foreground whitespace-nowrap">{new Date(act.createdAt).toLocaleString()}</span>
                             </div>
-                            {act.type === 'NOTE' ? (() => {
-                              const parsed = parseMyPlusLeadsNote(act.content);
-                              if (parsed.isParsed) {
-                                return (
-                                  <div className="mt-2 space-y-2 text-xs">
-                                    {Object.keys(parsed.details).length > 0 && (
-                                      <div className="grid grid-cols-2 gap-2.5 bg-muted/40 border border-border/60 rounded-xl p-3 font-semibold text-[11px]">
-                                        {Object.entries(parsed.details).map(([key, val]) => (
-                                          <div key={key} className="flex flex-col">
-                                            <span className="text-[9px] text-muted-foreground uppercase font-black tracking-wider">{key}</span>
-                                            <span className="text-foreground font-extrabold mt-0.5">{val}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                    {parsed.remarks && (
-                                      <div className="bg-amber-500/[0.03] border border-amber-500/10 rounded-xl p-3">
-                                        <span className="text-[9px] text-amber-400 uppercase font-black tracking-wider block mb-1">Remarks / Sync Notes</span>
-                                        <p className="text-foreground leading-relaxed italic font-medium">"{parsed.remarks}"</p>
-                                      </div>
-                                    )}
-                                  </div>
-                                );
-                              }
-                              return (
-                                <p className="text-xs text-muted-foreground mt-1.5 whitespace-pre-wrap leading-relaxed font-medium">
-                                  {act.formattedContent || act.content}
-                                </p>
-                              );
-                            })() : (
-                              <p className="text-xs text-muted-foreground mt-1.5 whitespace-pre-wrap leading-relaxed font-medium">
-                                {act.formattedContent || act.content}
-                              </p>
-                            )}
+                            <p className="text-xs text-muted-foreground mt-1.5 whitespace-pre-wrap leading-relaxed">
+                              {act.formattedContent || act.content}
+                            </p>
                             <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/20">
                               <button
                                 onClick={() => handleTogglePin(act.id)}
