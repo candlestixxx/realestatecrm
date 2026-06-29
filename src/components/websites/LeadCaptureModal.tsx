@@ -41,11 +41,21 @@ export function LeadCaptureModal({ tenantName, triggerDelayMs = 15000, triggerSc
       }
     };
 
+    // Trigger on explicit intent events (like photo gallery clicks)
+    const handleIntentEvent = (e: Event) => {
+      if (!hasTriggered) {
+        setIsOpen(true);
+        setHasTriggered(true);
+      }
+    };
+
+    window.addEventListener('lead-capture-intent', handleIntentEvent);
     window.addEventListener('scroll', handleScroll);
 
     return () => {
       clearTimeout(timer);
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('lead-capture-intent', handleIntentEvent);
     };
   }, [hasTriggered, triggerDelayMs, triggerScrollPercent]);
 

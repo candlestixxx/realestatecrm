@@ -297,6 +297,8 @@ model LandingPage {
   title       String
   subdomain   String?
   customDomain String? @unique
+  gtmId       String?  // Google Tag Manager ID (e.g. GTM-XXXXXX)
+  fbPixelId   String?  // Facebook Pixel ID
   blocks      String   // JSON string of page sections
   ownerId     String?
   workspaceId String
