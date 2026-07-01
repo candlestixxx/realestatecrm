@@ -78,6 +78,169 @@ type LeadData = {
   WorkflowSession: any[];
 };
 
+function parseMyPlusLeadsNote(content: string) {
+  const lines = content.split('\n');
+  const details: Record<string, string> = {};
+  let remarks = '';
+  let inRemarks = false;
+  let hasPlusFields = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    // Check for remarks block
+    if (trimmed.toLowerCase().startsWith('remarks:')) {
+      remarks = trimmed.substring(8).trim();
+      inRemarks = true;
+      hasPlusFields = true;
+      continue;
+    }
+
+    // Parse standard key-value pairs like key: val
+    const match = trimmed.match(/^([^:]+):\s*(.*)$/);
+    if (match && !inRemarks) {
+      const key = match[1].trim();
+      const val = match[2].trim();
+      // Allow key names containing letters, numbers, and spaces up to 25 chars
+      if (key.length < 25 && /^[A-Za-z0-9\s]+$/.test(key) && !key.toLowerCase().startsWith('http')) {
+        details[key] = val;
+        hasPlusFields = true;
+      } else {
+        remarks += (remarks ? '\n' : '') + trimmed;
+      }
+    } else {
+      remarks += (remarks ? '\n' : '') + trimmed;
+    }
+  }
+
+  return {
+    isParsed: hasPlusFields,
+    details,
+    remarks: remarks.trim()
+  };
+}
+
+function extractPhonesFromNotes(activities: any[]) {
+  const phones: { value: string; label: string; isDnc?: boolean }[] = [];
+  const phoneNumbersSet = new Set<string>();
+
+  for (const act of activities) {
+    if (!act.content) continue;
+    const lines = act.content.split('\n');
+    const tempPhones: Record<string, { value: string; label: string; lineType?: string; dnc?: boolean }> = {};
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      
+      const phoneMatch = trimmed.match(/Contact\s*(\d+)\s*Phone\s*(\d+):\s*([\d\+\-\(\)\s]+)/i);
+      if (phoneMatch) {
+        const contactNum = phoneMatch[1];
+        const phoneNum = phoneMatch[2];
+        let val = phoneMatch[3].trim();
+        const rawDigits = val.replace(/[^\d]/g, '');
+        if (rawDigits.length === 10) {
+          val = `+1 (${rawDigits.substring(0, 3)}) ${rawDigits.substring(3, 6)}-${rawDigits.substring(6)}`;
+        }
+        const key = `c${contactNum}p${phoneNum}`;
+        tempPhones[key] = {
+          value: val,
+          label: `Contact ${contactNum} Phone ${phoneNum}`,
+          dnc: false
+        };
+        continue;
+      }
+
+      const typeMatch = trimmed.match(/Contact\s*(\d+)\s*Phone\s*(\d+)\s*Line\s*Type:\s*(\w+)/i);
+      if (typeMatch) {
+        const contactNum = typeMatch[1];
+        const phoneNum = typeMatch[2];
+        const lineType = typeMatch[3].trim();
+        const key = `c${contactNum}p${phoneNum}`;
+        if (tempPhones[key]) {
+          tempPhones[key].lineType = lineType;
+        }
+        continue;
+      }
+
+      const dncMatch = trimmed.match(/Contact\s*(\d+)\s*Phone\s*(\d+)\s*DNC:\s*(\w+)/i);
+      if (dncMatch) {
+        const contactNum = dncMatch[1];
+        const phoneNum = dncMatch[2];
+        const isDnc = dncMatch[3].trim().toLowerCase() === 'true';
+        const key = `c${contactNum}p${phoneNum}`;
+        if (tempPhones[key]) {
+          tempPhones[key].dnc = isDnc;
+        }
+        continue;
+      }
+    }
+
+    for (const item of Object.values(tempPhones)) {
+      const cleanVal = item.value.replace(/[^\d]/g, '');
+      const cmpVal = cleanVal.startsWith('1') ? cleanVal.substring(1) : cleanVal;
+      if (cmpVal && !phoneNumbersSet.has(cmpVal)) {
+        phoneNumbersSet.add(cmpVal);
+        let displayLabel = `Cell ${phones.length + 2}`;
+        if (item.lineType) {
+          displayLabel = `Alt Cell (${item.lineType === 'M' ? 'Cell' : item.lineType === 'O' ? 'Office' : item.lineType})`;
+        }
+        phones.push({
+          value: item.value,
+          label: displayLabel,
+          isDnc: item.dnc
+        });
+      }
+    }
+  }
+
+  return phones;
+}
+
+function groupMyPlusLeadsDetails(details: Record<string, string>) {
+  const contactsMap: Record<string, { name: string; phones: Record<string, { number: string; lineType?: string; dnc?: boolean }> }> = {};
+  let lastOwnershipTransferDate = details['Last Ownership Transfer Date'] || details['last ownership transfer date'] || null;
+
+  for (const [key, val] of Object.entries(details)) {
+    const phoneMatch = key.match(/Contact\s*(\d+)\s*Phone\s*(\d+)/i);
+    if (phoneMatch) {
+      const contactNum = phoneMatch[1];
+      const phoneNum = phoneMatch[2];
+      
+      if (!contactsMap[contactNum]) {
+        contactsMap[contactNum] = { name: `Contact ${contactNum}`, phones: {} };
+      }
+      
+      const phoneKey = `phone_${phoneNum}`;
+      if (!contactsMap[contactNum].phones[phoneKey]) {
+        contactsMap[contactNum].phones[phoneKey] = { number: '' };
+      }
+
+      if (key.toLowerCase().endsWith('line type')) {
+        contactsMap[contactNum].phones[phoneKey].lineType = val;
+      } else if (key.toLowerCase().endsWith('dnc')) {
+        contactsMap[contactNum].phones[phoneKey].dnc = val.toLowerCase() === 'true';
+      } else {
+        let phoneVal = val;
+        const digits = val.replace(/[^\d]/g, '');
+        if (digits.length === 10) {
+          phoneVal = `+1 (${digits.substring(0, 3)}) ${digits.substring(3, 6)}-${digits.substring(6)}`;
+        }
+        contactsMap[contactNum].phones[phoneKey].number = phoneVal;
+      }
+    }
+  }
+
+  return {
+    lastOwnershipTransferDate,
+    contacts: Object.entries(contactsMap).map(([num, c]) => ({
+      num,
+      name: c.name,
+      phones: Object.values(c.phones).filter(p => p.number)
+    }))
+  };
+}
+
 export default function LeadDetailLayoutClient({
   lead,
   campaigns,
@@ -232,17 +395,34 @@ export default function LeadDetailLayoutClient({
   const [quickPhones, setQuickPhones] = useState<{ value: string; label: string }[]>([]);
   const [quickEmails, setQuickEmails] = useState<{ value: string; label: string }[]>([]);
 
-  // Secondary contact data parsing
-  const secondaryPhones: { value: string; label: string }[] = (() => {
+  const secondaryPhones: { value: string; label: string; isDnc?: boolean }[] = (() => {
+    const list: { value: string; label: string; isDnc?: boolean }[] = [];
     try {
       const parsed = lead.contact.additionalPhones ? JSON.parse(lead.contact.additionalPhones) : [];
-      return Array.isArray(parsed) ? parsed.map((p: any) => {
-        if (typeof p === 'string') return { value: p, label: 'Cell Phone 1' };
-        return { value: p.value || '', label: p.label || 'Cell Phone 1' };
-      }) : [];
-    } catch {
-      return [];
-    }
+      if (Array.isArray(parsed)) {
+        parsed.forEach((p: any) => {
+          if (typeof p === 'string') list.push({ value: p, label: 'Cell Phone 1' });
+          else list.push({ value: p.value || '', label: p.label || 'Cell Phone 1' });
+        });
+      }
+    } catch {}
+
+    const extracted = extractPhonesFromNotes(lead.Activity);
+    extracted.forEach(ph => {
+      const cleanVal = ph.value.replace(/[^\d]/g, '');
+      const cmpVal = cleanVal.startsWith('1') ? cleanVal.substring(1) : cleanVal;
+      const isDup = list.some(item => {
+        const itemClean = item.value.replace(/[^\d]/g, '');
+        const itemCmp = itemClean.startsWith('1') ? itemClean.substring(1) : itemClean;
+        return itemCmp === cmpVal;
+      }) || (lead.contact.phone && lead.contact.phone.replace(/[^\d]/g, '').endsWith(cmpVal));
+
+      if (!isDup) {
+        list.push(ph);
+      }
+    });
+
+    return list;
   })();
 
   const secondaryEmails: { value: string; label: string }[] = (() => {
@@ -1020,7 +1200,7 @@ export default function LeadDetailLayoutClient({
             <div className="space-y-4 pt-1 text-xs">
               
               {/* Phones List */}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Phone Numbers</span>
                   <button 
@@ -1030,25 +1210,42 @@ export default function LeadDetailLayoutClient({
                     ✏️ Quick Edit
                   </button>
                 </div>
-                <div className="space-y-1.5 font-bold">
+                <div className="space-y-1 font-semibold">
                   {lead.contact.phone ? (
-                    <div className="flex items-center justify-between text-foreground">
+                    <div className="flex items-center justify-between text-foreground py-1 border-b border-border/40">
                       <span className="flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-muted-foreground" /> {lead.contact.phone}
+                        <span className="text-muted-foreground text-xs" title="Valid Number">🛡️</span>
+                        <span className="font-extrabold text-[12px]">{lead.contact.phone}</span>
+                        <span className="text-[10px] text-muted-foreground font-normal">(Valid Number)</span>
                       </span>
-                      <span className="text-[9px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded font-black uppercase">Primary (Cell Phone 1)</span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-[9px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded font-black uppercase">Primary</span>
+                        {(lead.contact.phone.toLowerCase().includes('dnc') || lead.tags?.toLowerCase().includes('dnc')) && (
+                          <span className="text-[9px] text-rose-400 bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 rounded font-black uppercase">DNC</span>
+                        )}
+                      </div>
                     </div>
                   ) : (
-                    <span className="text-muted-foreground italic">No primary phone</span>
+                    <span className="text-muted-foreground italic text-xs block py-1">No primary phone</span>
                   )}
-                  {secondaryPhones.map((ph, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-foreground">
-                      <span className="flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-muted-foreground/60" /> {ph.value}
-                      </span>
-                      <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-black uppercase">{ph.label || `Alt ${idx + 1}`}</span>
-                    </div>
-                  ))}
+                  {secondaryPhones.map((ph, idx) => {
+                    const isDnc = ph.isDnc || ph.label.toLowerCase().includes('dnc') || ph.value.toLowerCase().includes('dnc');
+                    return (
+                      <div key={idx} className="flex items-center justify-between text-foreground py-1 border-b border-border/40">
+                        <span className="flex items-center gap-1.5">
+                          <span className="text-muted-foreground/60 text-xs" title="Valid Number">🛡️</span>
+                          <span className="font-extrabold text-[12px]">{ph.value}</span>
+                          <span className="text-[10px] text-muted-foreground/60 font-normal">(Valid Number)</span>
+                        </span>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <span className="text-[9px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-black uppercase text-center block max-w-[90px] truncate">{ph.label || `Alt ${idx + 1}`}</span>
+                          {isDnc && (
+                            <span className="text-[9px] text-rose-400 bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 rounded font-black uppercase">DNC</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1093,7 +1290,9 @@ export default function LeadDetailLayoutClient({
                 </div>
                 <div>
                   <span className="text-[10px] text-muted-foreground uppercase font-black block">Reg Date</span>
-                  <span className="font-bold text-foreground">{new Date(lead.createdAt).toLocaleDateString()}</span>
+                  <span className="font-bold text-foreground" title={new Date(lead.createdAt).toLocaleString()}>
+                    {new Date(lead.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                  </span>
                 </div>
               </div>
 
@@ -1354,9 +1553,71 @@ export default function LeadDetailLayoutClient({
                               </div>
                               <span className="text-[10px] text-muted-foreground whitespace-nowrap">{new Date(act.createdAt).toLocaleString()}</span>
                             </div>
+<<<<<<< Updated upstream
                             <p className="text-xs text-muted-foreground mt-1.5 whitespace-pre-wrap leading-relaxed">
                               {act.formattedContent || act.content}
                             </p>
+=======
+                            {act.type === 'NOTE' ? (() => {
+                              const parsed = parseMyPlusLeadsNote(act.content);
+                              if (parsed.isParsed) {
+                                const grouped = groupMyPlusLeadsDetails(parsed.details);
+                                return (
+                                  <div className="mt-2.5 space-y-3 text-xs">
+                                    {grouped.lastOwnershipTransferDate && (
+                                      <div className="text-[10px] text-muted-foreground font-black uppercase tracking-wider flex items-center gap-1 bg-muted/40 px-2.5 py-1.5 rounded-lg border border-border/40 w-fit">
+                                        🗓️ Last Ownership Transfer: <span className="text-foreground font-extrabold">{grouped.lastOwnershipTransferDate}</span>
+                                      </div>
+                                    )}
+                                    
+                                    {grouped.contacts.length > 0 && (
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                        {grouped.contacts.map((c) => (
+                                          <div key={c.num} className="bg-muted/30 border border-border/60 rounded-xl p-3 space-y-2">
+                                            <span className="text-[10px] text-indigo-400 uppercase font-black tracking-wider block border-b border-border/40 pb-1">{c.name}</span>
+                                            <div className="space-y-1.5">
+                                              {c.phones.map((p, idx) => (
+                                                <div key={idx} className="flex flex-wrap items-center gap-1.5 text-foreground text-[11px] font-bold">
+                                                  <span className="text-muted-foreground font-semibold">📞 Line {idx + 1}:</span>
+                                                  <span className="font-extrabold">{p.number}</span>
+                                                  {p.lineType && (
+                                                    <span className="text-[9px] bg-muted px-1 rounded text-muted-foreground font-black uppercase">
+                                                      {p.lineType === 'M' ? 'Cell' : p.lineType === 'O' ? 'Office' : p.lineType}
+                                                    </span>
+                                                  )}
+                                                  {p.dnc && (
+                                                    <span className="text-[9px] bg-rose-500/10 border border-rose-500/20 text-rose-400 px-1 rounded font-black uppercase">
+                                                      DNC
+                                                    </span>
+                                                  )}
+                                                </div>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {parsed.remarks && (
+                                      <div className="bg-amber-500/[0.02] border border-amber-500/10 rounded-xl p-3">
+                                        <span className="text-[9px] text-amber-500 uppercase font-black tracking-wider block mb-1">Remarks</span>
+                                        <p className="text-foreground leading-relaxed italic font-medium">"{parsed.remarks}"</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              }
+                              return (
+                                <p className="text-xs text-muted-foreground mt-1.5 whitespace-pre-wrap leading-relaxed font-medium">
+                                  {act.content}
+                                </p>
+                              );
+                            })() : (
+                              <p className="text-xs text-muted-foreground mt-1.5 whitespace-pre-wrap leading-relaxed font-medium">
+                                {act.formattedContent || act.content}
+                              </p>
+                            )}
+>>>>>>> Stashed changes
                             <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/20">
                               <button
                                 onClick={() => handleTogglePin(act.id)}

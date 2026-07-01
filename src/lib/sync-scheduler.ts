@@ -27,7 +27,13 @@ export function startSyncScheduler() {
   const tick = async () => {
     try {
       const now = new Date();
-      const hour = now.getHours();
+      // Get current hour in Eastern Time (America/New_York)
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        hour: 'numeric',
+        hour12: false
+      });
+      const hour = parseInt(formatter.format(now), 10);
       const nowMs = now.getTime();
 
       const isMorningWindow = hour >= SYNC_WINDOW_START && hour < SYNC_WINDOW_END;

@@ -37,6 +37,15 @@ export default async function LeadDetailPage(props: {
     notFound();
   }
 
+  // Auto-mark lead as read when details page is loaded
+  if (!lead.isRead) {
+    await prisma.lead.update({
+      where: { id: lead.id },
+      data: { isRead: true },
+    });
+    lead.isRead = true;
+  }
+
   const campaigns = await prisma.smartPlan.findMany({
     where: { workspaceId: access.workspaceId, isActive: true },
     select: { id: true, name: true, description: true, steps: true },

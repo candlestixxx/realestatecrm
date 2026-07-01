@@ -37,6 +37,9 @@ export async function authenticate(email: string, passwordRaw: string): Promise<
 export type MPLListing = {
   listingId: number;
   processedDate: string;
+  listDate?: string;
+  price?: string | number;
+  remarks?: string;
   propertyAddress: {
     streetAddress?: string;
     city?: string;
@@ -58,10 +61,21 @@ export type MPLListing = {
     name?: string;
     firstName?: string;
     lastName?: string;
+    phone1?: string;
+    phone2?: string;
+    phone3?: string;
   };
   contact1?: {
     name?: string;
     phone1?: string;
+    phone2?: string;
+    phone3?: string;
+    email?: string;
+  };
+  contact2?: {
+    name?: string;
+    phone1?: string;
+    phone2?: string;
     email?: string;
   };
 };
@@ -84,8 +98,17 @@ export async function fetchListings(token: string, startID?: string | null): Pro
   if (startID) {
     url += `&startID=${startID}`;
   } else {
-    // If no startID, we might want to default to today so we don't pull their entire history
-    const today = new Date().toISOString().split('T')[0] + ' 00:00:00';
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+    const parts = formatter.formatToParts(new Date());
+    const year = parts.find(p => p.type === 'year')?.value;
+    const month = parts.find(p => p.type === 'month')?.value;
+    const day = parts.find(p => p.type === 'day')?.value;
+    const today = `${year}-${month}-${day} 00:00:00`;
     url += `&dateFrom=${encodeURIComponent(today)}`;
   }
 
@@ -98,6 +121,22 @@ export async function fetchListings(token: string, startID?: string | null): Pro
   });
 
   if (!res.ok) {
+    if (res.status === 400) {
+      try {
+        const errJson = await res.clone().json();
+        if (errJson && (errJson.code === 811 || String(errJson.status).toLowerCase().includes('no listings available'))) {
+          return {
+            result: {
+              success: "false",
+              minID: startID || "0",
+              maxID: startID || "0",
+              lastID: startID || "0"
+            },
+            listings: []
+          };
+        }
+      } catch {}
+    }
     throw new Error(`Failed to fetch MyPlusLeads listings: ${res.statusText}`);
   }
 

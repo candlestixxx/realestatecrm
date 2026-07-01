@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { getServerSession } from 'next-auth/next';
 import type { Prisma } from '@prisma/client';
 
+export const dynamic = 'force-dynamic';
+
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { leadSchema } from '@/lib/validations/lead';
@@ -137,7 +139,7 @@ export default async function LeadsPage(props: {
     whereClause.status = statusFilter;
   }
 
-  let leads: Prisma.LeadGetPayload<{ include: { contact: true } }>[] = [];
+  let leads: Prisma.LeadGetPayload<{ include: { contact: true; smartPlan: true } }>[] = [];
   let totalCount = 0;
   let loadError: string | null = null;
 
@@ -145,7 +147,7 @@ export default async function LeadsPage(props: {
     const [leadRows, leadTotal] = await Promise.all([
       prisma.lead.findMany({
         where: whereClause,
-        include: { contact: true },
+        include: { contact: true, smartPlan: true },
         orderBy: { createdAt: 'desc' },
         take: pageSize,
         skip: (currentPage - 1) * pageSize,

@@ -63,3 +63,8 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   @apply antialiased;
 }
+
+/* Hide Next.js developer overlay indicators */
+nextjs-portal {
+  display: none !important;
+}
