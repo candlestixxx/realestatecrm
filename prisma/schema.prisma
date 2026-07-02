@@ -25,32 +25,29 @@ model User {
   workflows     WorkflowSession[]
   workspaces    WorkspaceMember[]
   stakeholderIn DealStakeholder[]
+  blogPosts     BlogPost[]
 }
 
 model Workspace {
-  id             String            @id @default(cuid())
-  name           String
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  Activity       Activity[]
-  contacts       Contact[]
-  deals          Deal[]
-  leads          Lead[]
-  smartPlans     SmartPlan[]
-  workflows      WorkflowSession[]
-  members        WorkspaceMember[]
-  segments       Segment[]
-  agentWorkflows AgentWorkflow[]
-  agentLogs      AgentLog[]
-  landingPages   LandingPage[]
-  propertyListings       PropertyListing[]
+  id                      String                   @id @default(cuid())
+  name                    String
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  Activity                Activity[]
+  contacts                Contact[]
+  deals                   Deal[]
+  leads                   Lead[]
+  smartPlans              SmartPlan[]
+  workflows               WorkflowSession[]
+  members                 WorkspaceMember[]
+  segments                Segment[]
+  agentWorkflows          AgentWorkflow[]
+  agentLogs               AgentLog[]
+  landingPages            LandingPage[]
+  blogPosts               BlogPost[]
+  propertyListings        PropertyListing[]
   myPlusLeadsIntegrations MyPlusLeadsIntegration[]
-<<<<<<< Updated upstream
-  voiceSettings  VoiceSettings?
-=======
-  leadRoutingRules LeadRoutingRule[]
-  textCodes TextCode[]
->>>>>>> Stashed changes
+  voiceSettings           VoiceSettings?
 }
 
 model WorkspaceMember {
@@ -65,7 +62,7 @@ model WorkspaceMember {
 }
 
 model Contact {
-  id               String     @id @default(cuid())
+  id               String            @id @default(cuid())
   firstName        String
   lastName         String?
   email            String?
@@ -73,17 +70,17 @@ model Contact {
   address          String?
   workspaceId      String
   userId           String?
-  additionalPhones String?   // JSON array of additional phones
-  additionalEmails String?   // JSON array of additional emails
+  additionalPhones String? // JSON array of additional phones
+  additionalEmails String? // JSON array of additional emails
   spouseName       String?
   spousePhone      String?
   spouseEmail      String?
-  familyMembers    String?   // JSON array of family members
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  familyMembers    String? // JSON array of family members
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   Activity         Activity[]
-  user             User?      @relation(fields: [userId], references: [id])
-  workspace        Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user             User?             @relation(fields: [userId], references: [id])
+  workspace        Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   deals            Deal[]
   leads            Lead[]
   stakeholderIn    DealStakeholder[]
@@ -99,11 +96,10 @@ model Lead {
   contactId       String
   userId          String?
   isAiAssisted    Boolean           @default(false)
-  isRead          Boolean           @default(false)
   socialProfiles  String?
   publicRecords   String?
   lastEnrichedAt  DateTime?
-  tags            String?           // Comma-separated hashtags
+  tags            String? // Comma-separated hashtags
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   smartPlanId     String?
@@ -123,7 +119,7 @@ model SmartPlan {
   id          String    @id @default(cuid())
   name        String
   description String?
-  steps       String?   // JSON string of steps
+  steps       String? // JSON string of steps
   isActive    Boolean   @default(true)
   scope       String    @default("INDIVIDUAL") // COMPANY or INDIVIDUAL
   leadType    String    @default("Buyer")
@@ -157,30 +153,30 @@ model Deal {
 }
 
 model DealStakeholder {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   dealId      String
   contactId   String?
   userId      String?
-  role        String    // TITLE, LENDER, INSPECTOR, APPRAISER, CLIENT
-  permissions String    @default("VIEW_STATUS") // UPLOAD_DOCS, VIEW_STATUS, FULL_ACCESS
-  deal        Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  user        User?     @relation(fields: [userId], references: [id])
-  contact     Contact?  @relation(fields: [contactId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  role        String // TITLE, LENDER, INSPECTOR, APPRAISER, CLIENT
+  permissions String   @default("VIEW_STATUS") // UPLOAD_DOCS, VIEW_STATUS, FULL_ACCESS
+  deal        Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  user        User?    @relation(fields: [userId], references: [id])
+  contact     Contact? @relation(fields: [contactId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model DealRequirement {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   dealId      String
   title       String
   description String?
-  status      String    @default("PENDING") // PENDING (Red), IN_PROGRESS (Yellow), COMPLETED (Green)
-  assignedTo  String?   // Role string (e.g. TITLE) or specific User ID
-  isRequired  Boolean   @default(true)
-  deal        Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  status      String   @default("PENDING") // PENDING (Red), IN_PROGRESS (Yellow), COMPLETED (Green)
+  assignedTo  String? // Role string (e.g. TITLE) or specific User ID
+  isRequired  Boolean  @default(true)
+  deal        Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Task {
@@ -248,118 +244,118 @@ model VerificationToken {
 }
 
 model SearchAlert {
-  id          String   @id @default(cuid())
-  leadId      String
-  criteria    String   // JSON string: { city, minPrice, maxPrice, beds, baths }
-  type        String   // VIEW, SHOWING, OFFER
-  frequency   String   // INSTANT, DAILY, WEEKLY
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  leadId    String
+  criteria  String // JSON string: { city, minPrice, maxPrice, beds, baths }
+  type      String // VIEW, SHOWING, OFFER
+  frequency String // INSTANT, DAILY, WEEKLY
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
 }
 
 model Segment {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String?
-  filters     String?  // JSON string
+  filters     String? // JSON string
   workspaceId String
-  isPinned    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  leads       Lead[]   @relation("LeadSegments")
+  isPinned    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  leads       Lead[]    @relation("LeadSegments")
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 model AgentWorkflow {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String?
-  trigger     String   // e.g. "NEW_LEAD", "STATUS_CHANGE", "MANUAL"
-  actions     String   // JSON string
-  isActive    Boolean  @default(true)
+  trigger     String // e.g. "NEW_LEAD", "STATUS_CHANGE", "MANUAL"
+  actions     String // JSON string
+  isActive    Boolean   @default(true)
   workspaceId String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 model AgentLog {
-  id          String   @id @default(cuid())
-  actionType  String   // SMS, EMAIL, STATUS_UPDATE, NOTE
+  id          String    @id @default(cuid())
+  actionType  String // SMS, EMAIL, STATUS_UPDATE, NOTE
   details     String
   leadId      String?
   userId      String?
   workspaceId String
-  createdAt   DateTime @default(now())
-  lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  lead        Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 model LandingPage {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  title       String
-  subdomain   String?
-  customDomain String? @unique
-  gtmId       String?  // Google Tag Manager ID (e.g. GTM-XXXXXX)
-  fbPixelId   String?  // Facebook Pixel ID
-  blocks      String   // JSON string of page sections
-  ownerId     String?
-  workspaceId String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  title        String
+  subdomain    String?
+  customDomain String?   @unique
+  gtmId        String? // Google Tag Manager ID (e.g. GTM-XXXXXX)
+  fbPixelId    String? // Facebook Pixel ID
+  blocks       String // JSON string of page sections
+  ownerId      String?
+  workspaceId  String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
+
 // ==========================================
 // Phase 12 - Listing & MLS Integration
 // ==========================================
 
 model MyPlusLeadsIntegration {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   email       String
   password    String
   lastID      String?
-  isActive    Boolean  @default(true)
+  isActive    Boolean   @default(true)
   lastSyncAt  DateTime?
   workspaceId String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([workspaceId, email])
 }
 
 model PropertyListing {
-  id              String   @id @default(cuid())
-  mlsNumber       String?  @unique
-  address         String
-  city            String?
-  state           String?
-  zip             String?
-  price           Float?
-  bedrooms        Int?
-  bathroomsFull   Int?
-  bathroomsHalf   Int?
-  squareFeet      Int?
-  yearBuilt       Int?
-  propertyType    String?  // SingleFamily, Condo, MultiFamily
-  status          String   @default("ACTIVE") // ACTIVE, PENDING, SOLD
-  description     String?
-  images          String?  // JSON Array of image URLs
-  virtualTourUrl  String?
-  agentId         String?  // Link back to a user if it's their listing
-  workspaceId     String
-  source          String   @default("MANUAL") // MANUAL, RESO, MYPLUS
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  mlsNumber      String?  @unique
+  address        String
+  city           String?
+  state          String?
+  zip            String?
+  price          Float?
+  bedrooms       Int?
+  bathroomsFull  Int?
+  bathroomsHalf  Int?
+  squareFeet     Int?
+  yearBuilt      Int?
+  propertyType   String? // SingleFamily, Condo, MultiFamily
+  status         String   @default("ACTIVE") // ACTIVE, PENDING, SOLD
+  description    String?
+  images         String? // JSON Array of image URLs
+  virtualTourUrl String?
+  agentId        String? // Link back to a user if it's their listing
+  workspaceId    String
+  source         String   @default("MANUAL") // MANUAL, RESO, MYPLUS
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
-<<<<<<< Updated upstream
 model VoiceSettings {
   id                String   @id @default(cuid())
   provider          String   @default("SIMULATION") // OPENAI, ELEVENLABS, SIMULATION
@@ -371,31 +367,22 @@ model VoiceSettings {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  workspace         Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-=======
-model LeadRoutingRule {
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model BlogPost {
   id          String   @id @default(cuid())
-  name        String
-  source      String?  // Match specific lead source (e.g. 'MyPlusLeads', 'Zillow')
-  segmentId   String?  // Match specific segment criteria
-  isActive    Boolean  @default(true)
-  agentIds    String   // Comma-separated user/agent IDs in the round-robin pool
-  currentIndex Int     @default(0) // Tracks the index of the next agent to assign
+  slug        String   @unique
+  title       String
+  content     String // Markdown or HTML content
+  excerpt     String?
+  imageUrl    String?
+  isPublished Boolean  @default(false)
+  authorId    String?
   workspaceId String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-}
 
-model TextCode {
-  id           String   @id @default(cuid())
-  code         String
-  listingId    String?
-  replyMessage String
-  capturedLeads Int     @default(0)
-  workspaceId  String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
->>>>>>> Stashed changes
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  author    User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
 }
