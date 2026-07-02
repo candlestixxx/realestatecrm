@@ -1553,11 +1553,6 @@ export default function LeadDetailLayoutClient({
                               </div>
                               <span className="text-[10px] text-muted-foreground whitespace-nowrap">{new Date(act.createdAt).toLocaleString()}</span>
                             </div>
-<<<<<<< Updated upstream
-                            <p className="text-xs text-muted-foreground mt-1.5 whitespace-pre-wrap leading-relaxed">
-                              {act.formattedContent || act.content}
-                            </p>
-=======
                             {act.type === 'NOTE' ? (() => {
                               const parsed = parseMyPlusLeadsNote(act.content);
                               if (parsed.isParsed) {
@@ -1617,7 +1612,6 @@ export default function LeadDetailLayoutClient({
                                 {act.formattedContent || act.content}
                               </p>
                             )}
->>>>>>> Stashed changes
                             <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/20">
                               <button
                                 onClick={() => handleTogglePin(act.id)}
