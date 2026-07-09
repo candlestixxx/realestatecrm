@@ -464,26 +464,3 @@ export async function bulkDeleteLeadAction(leadIds: string[]) {
     return { error: 'An unexpected error occurred.' };
   }
 }
-
-export async function markLeadAsReadAction(leadId: string) {
-  const session = await getServerSession(authOptions);
-  const access = await requireWorkspaceAccess(session);
-
-  try {
-    const lead = await prisma.lead.update({
-      where: {
-        id: leadId,
-        workspaceId: access.workspaceId,
-      },
-      data: {
-        isRead: true,
-      },
-    });
-    revalidatePath('/dashboard/leads');
-    revalidatePath(`/dashboard/leads/${leadId}`);
-    return { success: true, lead };
-  } catch (error) {
-    console.error('Failed to mark lead as read:', error);
-    return { error: 'Failed to update read status.' };
-  }
-}

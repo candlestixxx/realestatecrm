@@ -31,7 +31,3 @@ The application is completely stable. There are no remaining deadlocks, CI failu
 **Deployment Recommendations (See `DEPLOY.md`):**
 1. Ensure production environments leverage `npx prisma migrate deploy` rather than `db push` to respect the newly established schema baseline.
 2. Provide valid API Keys (OpenAI, Pinecone, Twilio, SendGrid) inside your environment parameters to ensure the VoiceForge and RAG vector syncing engines instantiate properly.
-
-## 🔮 Next Logical Steps (Post-Release)
-- **Intent-Triggered Popups**: Develop interactive lead-capture modals for the new Custom Domain Landing Pages to increase raw lead generation.
-- **Drizzle ORM Evaluation**: Assess long-term migration from Prisma to Drizzle for better native edge runtime support on platforms like Vercel or Cloudflare.

@@ -50,9 +50,9 @@
 - [x] **AI Drip Execution:** Connect Twilio/SendGrid for automated SMS/Email dispatching led by Gemini.
 
 ## Tech Debt & Improvements
-- [ ] Evaluate Drizzle ORM for edge compatibility.
+- [x] Evaluate Drizzle ORM for edge compatibility.
 - [x] Robust port conflict handling for Playwright tests.
-- [ ] Implement WebSocket/WebRTC for real-time chat and voice.
+- [x] Implement WebSocket/WebRTC for real-time chat and voice.
 
 ## 0.39.0 Backlog Adjustments
 - [x] Fix Next.js 15 `searchParams` unwrap issue on the signin page.
@@ -69,6 +69,6 @@
 - [x] Build intent-triggered Lead Capture Modals (e.g., triggered on photo views).
 - [x] Set up GTM / GA4 injection for dynamically provisioned sites.
 - [x] Develop Server-Side tracking pipelines for Google Ads and Facebook CAPI.
-- [ ] Implement headless CMS adapter for Agent Blogs.
+- [x] Implement headless CMS adapter for Agent Blogs.
 - [x] Migrate local vector synchronization fallback to a hosted Pinecone database before production launch.
 - [x] Hosted Vector Migration completed. Pinecone auto-detection is active via env vars (`PINECONE_API_KEY`).

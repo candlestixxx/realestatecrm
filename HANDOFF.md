@@ -25,7 +25,6 @@ Successfully implemented the foundational configuration UI, database mapping, an
    - Refactored Next.js `middleware.ts` to natively rewrite incoming subdomains and custom hostnames securely to the `/(websites)/[domain]` dynamic router, maintaining strict tenant separation.
 
 ### Next Steps for Successor Models
-- **Intent-Triggered Lead Capture Modals**: Develop the frontend pop-ups and backend webhooks to trigger Lead Capture models (e.g., when a user views a property photo on the custom `LandingPage` sites).
 - **Evaluate Drizzle ORM**: Assess migrating Prisma to Drizzle for robust edge compatibility.
 
 ### Critical Database Migration Update

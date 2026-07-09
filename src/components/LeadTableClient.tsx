@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -16,7 +18,6 @@ type LeadRow = {
   score: number | null;
   source: string | null;
   isAiAssisted: boolean;
-  isRead?: boolean;
   tags?: string | null;
   userId?: string | null;
   contact: {
@@ -32,10 +33,6 @@ type LeadRow = {
     spouseEmail?: string | null;
     familyMembers?: string | null;
   };
-  smartPlan?: {
-    id: string;
-    name: string;
-  } | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -396,23 +393,6 @@ export function LeadTableClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [visibleColumns, setVisibleColumns] = useState<string[]>([
-    'contact', 'pipeline', 'tags', 'agent', 'source', 'smartPlan'
-  ]);
-  const [showColumnsMenu, setShowColumnsMenu] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedLimit = localStorage.getItem('realestatecrm_leads_limit');
-      const currentLimit = searchParams.get('limit');
-      if (storedLimit && currentLimit !== storedLimit) {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('limit', storedLimit);
-        params.set('page', searchParams.get('page') || '1');
-        router.replace(`?${params.toString()}`);
-      }
-    }
-  }, [searchParams, router]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [activeWorkspace, setActiveWorkspace] = useState('');
   const [activeAssignee, setActiveAssignee] = useState('');
@@ -732,9 +712,6 @@ export function LeadTableClient({
   };
 
   const handlePageSizeChange = (newSize: number) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('realestatecrm_leads_limit', String(newSize));
-    }
     const params = new URLSearchParams(searchParams.toString());
     params.set('limit', String(newSize));
     params.set('page', '1');
@@ -972,14 +949,12 @@ export function LeadTableClient({
            </button>
            <button
              onClick={handleExportCSV}
-             title="Export currently filtered leads list into a structured CSV file for reporting or backup"
              className="px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 text-xs font-bold rounded shadow-sm hover:bg-primary/15 transition-colors cursor-pointer"
            >
              📤 Export CSV
            </button>
            <button
              onClick={() => setShowAiIntakeModal(true)}
-             title="Paste an unformatted email inquiry, text log, or notes, and let AI automatically parse name, phone, email, and address to create the lead!"
              className="px-3 py-1.5 bg-amber-500/10 text-amber-600 border border-amber-500/20 text-xs font-bold rounded shadow-sm hover:bg-amber-500/15 transition-colors cursor-pointer"
            >
              ✨ AI Lead Intake
@@ -1446,7 +1421,7 @@ export function LeadTableClient({
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="text-xs text-muted-foreground uppercase bg-muted/30 select-none">
+          <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
             <tr>
               <th className="px-4 py-3 font-medium w-10">
                 <input
@@ -1457,118 +1432,12 @@ export function LeadTableClient({
                 />
               </th>
               <th className="px-4 py-3 font-medium">Name</th>
-              {visibleColumns.includes('contact') && <th className="px-4 py-3 font-medium">Contact Info</th>}
-              {visibleColumns.includes('address') && <th className="px-4 py-3 font-medium">Owner Street Address</th>}
-              {visibleColumns.includes('pipeline') && <th className="px-4 py-3 font-medium">Pipeline / Status</th>}
-              {visibleColumns.includes('tags') && <th className="px-4 py-3 font-medium">Tags</th>}
-              {visibleColumns.includes('agent') && <th className="px-4 py-3 font-medium">Agent</th>}
-              {visibleColumns.includes('source') && <th className="px-4 py-3 font-medium">Owner (Source)</th>}
-              {visibleColumns.includes('smartPlan') && <th className="px-4 py-3 font-medium">Smart Plan</th>}
-              <th className="px-4 py-3 font-medium text-right relative">
-                <div className="flex items-center justify-end gap-1">
-                  <span>Actions</span>
-                  <button
-                    onClick={() => setShowColumnsMenu(p => !p)}
-                    className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground cursor-pointer flex items-center justify-center border border-border/40 bg-card ml-1 shadow-sm"
-                    title="Customize Table Columns View"
-                  >
-                    ⚙️
-                  </button>
-                </div>
-                {showColumnsMenu && (
-                  <div className="absolute right-0 top-full mt-1.5 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-2.5 text-left text-xs text-foreground font-semibold space-y-1.5 p-3">
-                    <span className="text-[10px] text-muted-foreground uppercase font-black block tracking-wider pb-1 border-b border-border/40 mb-1">Display Columns</span>
-                    <label className="flex items-center gap-2 cursor-pointer py-0.5 opacity-60">
-                      <input type="checkbox" checked disabled className="rounded border-border text-primary" />
-                      <span>Name</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={visibleColumns.includes('contact')}
-                        onChange={e => {
-                          if (e.target.checked) setVisibleColumns(prev => [...prev, 'contact']);
-                          else setVisibleColumns(prev => prev.filter(c => c !== 'contact'));
-                        }}
-                        className="rounded border-border text-primary"
-                      />
-                      <span>Contact Info</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={visibleColumns.includes('address')}
-                        onChange={e => {
-                          if (e.target.checked) setVisibleColumns(prev => [...prev, 'address']);
-                          else setVisibleColumns(prev => prev.filter(c => c !== 'address'));
-                        }}
-                        className="rounded border-border text-primary"
-                      />
-                      <span>Owner Street Address</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={visibleColumns.includes('pipeline')}
-                        onChange={e => {
-                          if (e.target.checked) setVisibleColumns(prev => [...prev, 'pipeline']);
-                          else setVisibleColumns(prev => prev.filter(c => c !== 'pipeline'));
-                        }}
-                        className="rounded border-border text-primary"
-                      />
-                      <span>Pipeline</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={visibleColumns.includes('tags')}
-                        onChange={e => {
-                          if (e.target.checked) setVisibleColumns(prev => [...prev, 'tags']);
-                          else setVisibleColumns(prev => prev.filter(c => c !== 'tags'));
-                        }}
-                        className="rounded border-border text-primary"
-                      />
-                      <span>Tags</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={visibleColumns.includes('agent')}
-                        onChange={e => {
-                          if (e.target.checked) setVisibleColumns(prev => [...prev, 'agent']);
-                          else setVisibleColumns(prev => prev.filter(c => c !== 'agent'));
-                        }}
-                        className="rounded border-border text-primary"
-                      />
-                      <span>Agent</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={visibleColumns.includes('source')}
-                        onChange={e => {
-                          if (e.target.checked) setVisibleColumns(prev => [...prev, 'source']);
-                          else setVisibleColumns(prev => prev.filter(c => c !== 'source'));
-                        }}
-                        className="rounded border-border text-primary"
-                      />
-                      <span>Owner (Source)</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={visibleColumns.includes('smartPlan')}
-                        onChange={e => {
-                          if (e.target.checked) setVisibleColumns(prev => [...prev, 'smartPlan']);
-                          else setVisibleColumns(prev => prev.filter(c => c !== 'smartPlan'));
-                        }}
-                        className="rounded border-border text-primary"
-                      />
-                      <span>Smart Plan</span>
-                    </label>
-                  </div>
-                )}
-              </th>
+              <th className="px-4 py-3 font-medium">Contact Info</th>
+              <th className="px-4 py-3 font-medium">Pipeline / Status</th>
+              <th className="px-4 py-3 font-medium">Tags</th>
+              <th className="px-4 py-3 font-medium">Agent</th>
+              <th className="px-4 py-3 font-medium">Source</th>
+              <th className="px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -1588,12 +1457,9 @@ export function LeadTableClient({
                   <div className="flex flex-col">
                     <Link
                       href={`/dashboard/leads/${lead.id}`}
-                      className="hover:text-primary hover:underline font-bold text-foreground transition-colors text-sm flex items-center gap-1.5"
+                      className="hover:text-primary hover:underline font-bold text-foreground transition-colors text-sm"
                     >
-                      {lead.status === 'NEW' && !lead.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0 animate-pulse" title="New Unread Lead" />
-                      )}
-                      <span>{lead.contact?.firstName} {lead.contact?.lastName}</span>
+                      {lead.contact?.firstName} {lead.contact?.lastName}
                     </Link>
                     {lead.isAiAssisted && (
                       <span className="flex items-center gap-1 text-[10px] text-primary font-bold mt-0.5">
@@ -1605,102 +1471,72 @@ export function LeadTableClient({
                 </td>
 
                 {/* Contact Info */}
-                {visibleColumns.includes('contact') && (
-                  <td className="px-4 py-3">
-                    <div className="flex flex-col">
-                      <span className="text-sm">{lead.contact?.email || <span className="text-muted-foreground italic text-xs">No email</span>}</span>
-                      <span className="text-xs text-muted-foreground">{lead.contact?.phone}</span>
-                    </div>
-                  </td>
-                )}
-
-                {/* Owner Street Address */}
-                {visibleColumns.includes('address') && (
-                  <td className="px-4 py-3 text-xs text-foreground font-semibold">
-                    {lead.contact?.address || <span className="text-muted-foreground italic text-xs">No address</span>}
-                  </td>
-                )}
+                <td className="px-4 py-3">
+                  <div className="flex flex-col">
+                    <span className="text-sm">{lead.contact?.email || <span className="text-muted-foreground italic text-xs">No email</span>}</span>
+                    <span className="text-xs text-muted-foreground">{lead.contact?.phone}</span>
+                  </div>
+                </td>
 
                 {/* Pipeline / Status */}
-                {visibleColumns.includes('pipeline') && (
-                  <td className="px-4 py-3">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full font-medium border ${
-                        lead.status === 'NEW'
-                          ? 'bg-secondary/20 text-secondary-foreground border-secondary/30'
-                          : lead.status === 'QUALIFIED'
-                            ? 'bg-primary/20 text-primary border-primary/30'
-                            : 'bg-muted text-muted-foreground border-border'
-                      }`}
-                    >
-                      {lead.status}
-                    </span>
-                  </td>
-                )}
+                <td className="px-4 py-3">
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full font-medium border ${
+                      lead.status === 'NEW'
+                        ? 'bg-secondary/20 text-secondary-foreground border-secondary/30'
+                        : lead.status === 'QUALIFIED'
+                          ? 'bg-primary/20 text-primary border-primary/30'
+                          : 'bg-muted text-muted-foreground border-border'
+                    }`}
+                  >
+                    {lead.status}
+                  </span>
+                </td>
 
                 {/* Tags column with inline + Tag button */}
-                {visibleColumns.includes('tags') && (
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1 items-center">
-                      {lead.tags ? (
-                        lead.tags.split(',').map(tag => {
-                          const cleanTag = tag.trim();
-                          if (!cleanTag) return null;
-                          return (
-                            <span key={cleanTag} className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-tighter">
-                              {cleanTag}
-                            </span>
-                          );
-                        })
-                      ) : null}
-                      {/* Inline + Tag button */}
-                      <LeadQuickMenu
-                        lead={lead}
-                        users={users}
-                        campaigns={campaigns}
-                        workspaces={workspaces}
-                        onRefresh={() => router.refresh()}
-                        triggerMode="tag"
-                      />
-                    </div>
-                  </td>
-                )}
+                <td className="px-4 py-3">
+                  <div className="flex flex-wrap gap-1 items-center">
+                    {lead.tags ? (
+                      lead.tags.split(',').map(tag => {
+                        const cleanTag = tag.trim();
+                        if (!cleanTag) return null;
+                        return (
+                          <span key={cleanTag} className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-tighter">
+                            {cleanTag}
+                          </span>
+                        );
+                      })
+                    ) : null}
+                    {/* Inline + Tag button — appears on row hover or when no tags */}
+                    <LeadQuickMenu
+                      lead={lead}
+                      users={users}
+                      campaigns={campaigns}
+                      workspaces={workspaces}
+                      onRefresh={() => router.refresh()}
+                      triggerMode="tag"
+                    />
+                  </div>
+                </td>
 
                 {/* Agent */}
-                {visibleColumns.includes('agent') && (
-                  <td className="px-4 py-3">
-                    {(() => {
-                      const agent = users.find(u => u.id === lead.userId);
-                      if (!agent) return <span className="text-xs text-muted-foreground italic">Unassigned</span>;
-                      return (
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold uppercase">
-                            {(agent.name || agent.email || '?')[0]}
-                          </span>
-                          <span className="text-xs font-medium">{agent.name || agent.email}</span>
-                        </div>
-                      );
-                    })()}
-                  </td>
-                )}
+                <td className="px-4 py-3">
+                  {(() => {
+                    const agent = users.find(u => u.id === lead.userId);
+                    if (!agent) return <span className="text-xs text-muted-foreground italic">Unassigned</span>;
+                    return (
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold uppercase">
+                          {(agent.name || agent.email || '?')[0]}
+                        </span>
+                        <span className="text-xs font-medium">{agent.name || agent.email}</span>
+                      </div>
+                    );
+                  })()}
+                </td>
 
                 {/* Source */}
-                {visibleColumns.includes('source') && (
-                  <td className="px-4 py-3 text-muted-foreground text-sm">{lead.source}</td>
-                )}
-
-                {/* Smart Plan */}
-                {visibleColumns.includes('smartPlan') && (
-                  <td className="px-4 py-3">
-                    {lead.smartPlan ? (
-                      <span className="px-2 py-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-[10px] font-black rounded uppercase tracking-wider">
-                        {lead.smartPlan.name}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground italic text-xs">None</span>
-                    )}
-                  </td>
-                )}
+                <td className="px-4 py-3 text-muted-foreground text-sm">{lead.source}</td>
 
                 {/* Actions */}
                 <td className="px-4 py-3 text-right">
@@ -1732,7 +1568,7 @@ export function LeadTableClient({
             ))}
             {initialLeads.length === 0 && (
               <tr>
-                <td colSpan={3 + visibleColumns.length} className="px-6 py-8 text-center text-muted-foreground">
+                <td colSpan={8} className="px-6 py-8 text-center text-muted-foreground">
                   No leads found in this segment.
                 </td>
               </tr>
@@ -1976,13 +1812,20 @@ export function LeadTableClient({
 
               {!parsedLeadData ? (
                 <div className="flex justify-end">
-                  <button
-                    onClick={handleAiParse}
-                    disabled={isParsing || !aiIntakeText.trim()}
-                    className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/95 text-xs shadow-md disabled:opacity-50 cursor-pointer"
-                  >
-                    {isParsing ? 'AI Parsing Info...' : '⚡ AI Extract Details'}
-                  </button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={handleAiParse}
+                          disabled={isParsing || !aiIntakeText.trim()}
+                          className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/95 text-xs shadow-md disabled:opacity-50 cursor-pointer"
+                        >
+                          {isParsing ? 'AI Parsing Info...' : '⚡ AI Extract Details'}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">Uses Gemini AI to intelligently extract structured CRM data from unstructured text blocks.</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               ) : (
                 <>

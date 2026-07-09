@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { syncContactToVectorStore, syncLeadToVectorStore } from '@/lib/rag';
-import { routeLeadAction } from '@/lib/routing';
 
 export const runtime = 'nodejs';
 
@@ -31,12 +30,6 @@ export async function POST(
     let type: 'BUYER' | 'SELLER' = 'BUYER';
     let source = `${provider.toUpperCase()} Integration`;
     let address = '';
-
-    let additionalPhones: string | null = null;
-    let spouseName: string | null = null;
-    let spousePhone: string | null = null;
-    let spouseEmail: string | null = null;
-    let listingIdTag: string | null = null;
 
     if (provider === 'zillow') {
       const contact = body.contact || {};
@@ -71,53 +64,14 @@ export async function POST(
       type = 'BUYER';
       source = 'Homes.com Profile';
     } else if (provider === 'myplus') {
-      const streetName = body.propertyAddress?.streetAddress || body.address || '';
-      const fallbackName = streetName ? `Owner of ${streetName}` : 'Unknown';
-      const nameParts = (body.owner?.name || body.contact1?.name || fallbackName).split(' ');
-      firstName = body.owner?.firstName || nameParts[0] || 'MyPlus';
-      lastName = body.owner?.lastName || nameParts.slice(1).join(' ') || 'Lead';
-      email = body.contact1?.email || body.email || '';
-      address = streetName;
+      firstName = body.firstName || 'MyPlus';
+      lastName = body.lastName || 'Lead';
+      email = body.email || '';
+      phone = body.phone || '';
+      notes = body.notes || `Pre-foreclosure record: ${body.address || ''}`;
+      address = body.address || '';
       type = 'SELLER';
       source = 'MyPlusLeads';
-
-      // Parse multiple numbers
-      const p1 = body.contact1?.phone1 || body.phone || '';
-      const p2 = body.contact1?.phone2 || '';
-      const p3 = body.contact1?.phone3 || '';
-      const o1 = body.owner?.phone1 || '';
-      const o2 = body.owner?.phone2 || '';
-      const o3 = body.owner?.phone3 || '';
-      const c2p1 = body.contact2?.phone1 || '';
-      const c2p2 = body.contact2?.phone2 || '';
-
-      const rawUniquePhones = Array.from(new Set([p1, p2, p3, o1, o2, o3, c2p1, c2p2].filter(Boolean)));
-      phone = rawUniquePhones[0] || '';
-      const altPhones = rawUniquePhones.slice(1).map((val, idx) => ({
-        value: val,
-        label: idx === 0 ? 'Cell Phone 2' : idx === 1 ? 'Landline' : 'Work Phone'
-      }));
-      additionalPhones = altPhones.length > 0 ? JSON.stringify(altPhones) : null;
-
-      // Gather spouse details
-      spouseName = body.contact2?.name || null;
-      spousePhone = body.contact2?.phone1 || null;
-      spouseEmail = body.contact2?.email || null;
-      listingIdTag = body.listingId ? `id:${body.listingId}` : null;
-
-      // Extract remarks
-      const remarks = body.remarks || body.notes || '';
-      let notesContent = '';
-      if (remarks) {
-        notesContent += `Remarks: ${remarks}\n\n`;
-      }
-      if (body.listDate) {
-        notesContent += `List Date: ${body.listDate}\n`;
-      }
-      if (body.price) {
-        notesContent += `Listing Price: $${body.price}\n`;
-      }
-      notes = notesContent.trim() || `MyPlusLeads webhook intake: ${address}`;
     } else {
       firstName = body.firstName || 'External';
       lastName = body.lastName || 'Lead';
@@ -136,10 +90,6 @@ export async function POST(
         phone: phone || null,
         address: address || null,
         workspaceId: workspace.id,
-        additionalPhones,
-        spouseName,
-        spousePhone,
-        spouseEmail,
       },
     });
 
@@ -152,7 +102,6 @@ export async function POST(
         type,
         workspaceId: workspace.id,
         contactId: contact.id,
-        tags: listingIdTag,
       },
     });
 
@@ -253,13 +202,6 @@ View your leads dashboard: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhos
       syncContactToVectorStore(contact),
       syncLeadToVectorStore(lead, contact),
     ]);
-
-    // Route the lead using round-robin team assignment rules
-    try {
-      await routeLeadAction(lead.id);
-    } catch (routingErr) {
-      console.error(`[Lead Routing] Error routing webhook lead ${lead.id}:`, routingErr);
-    }
 
     return NextResponse.json({ success: true, leadId: lead.id });
   } catch (err: any) {
