@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -1812,20 +1810,13 @@ export function LeadTableClient({
 
               {!parsedLeadData ? (
                 <div className="flex justify-end">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={handleAiParse}
-                          disabled={isParsing || !aiIntakeText.trim()}
-                          className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/95 text-xs shadow-md disabled:opacity-50 cursor-pointer"
-                        >
-                          {isParsing ? 'AI Parsing Info...' : '⚡ AI Extract Details'}
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top">Uses Gemini AI to intelligently extract structured CRM data from unstructured text blocks.</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <button
+                    onClick={handleAiParse}
+                    disabled={isParsing || !aiIntakeText.trim()}
+                    className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/95 text-xs shadow-md disabled:opacity-50 cursor-pointer"
+                  >
+                    {isParsing ? 'AI Parsing Info...' : '⚡ AI Extract Details'}
+                  </button>
                 </div>
               ) : (
                 <>

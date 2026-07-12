@@ -114,17 +114,17 @@
 - [x] AI Chatbot Widget (WebSockets) embedded on agent websites for warm transfers.
 - [x] RESO Web API integration for IDX / MLS data syncing.
 - [x] Automated property page generation with SSR / ISR.
-- [ ] Comprehensive lead capture forms mapped directly to CRM Leads.
+- [x] Comprehensive lead capture forms mapped directly to CRM Leads.
 - [ ] SEO, Schema.org (JSON-LD), and Dynamic Sitemap infrastructure.
-- [ ] Google Tag Manager, GA4, and Ads Conversion tracking support.
+- [x] Google Tag Manager, GA4, and Ads Conversion tracking support.
 - [ ] Social Media Open Graph integrations and dynamic share widgets.
-- [ ] Headless CMS connection for localized real estate blogs.
+- [x] Headless CMS connection for localized real estate blogs.
 
 ## Phase 12 — Lofty.com Website Builder Parity
 - [ ] Implement a full drag-and-drop WYSIWYG website builder replicating Lofty.com features.
 - [ ] Add pre-built responsive templates for Agent Sites, Single Property Sites, and Neighborhood Guides.
 - [ ] Develop Advanced IDX Search capabilities directly embeddable via the builder.
-- [ ] Incorporate Lead Capture popups (forced registration walls) based on viewing parameters.
+- [x] Incorporate Lead Capture popups (forced registration walls) based on viewing parameters.
 - [ ] Synchronize all landing page and form data automatically with the core CRM pipeline.
 - [x] Migrate local vector synchronization fallback to a hosted Pinecone database before production launch.
 - [x] Hosted Vector Migration completed. Pinecone auto-detection is active via env vars (`PINECONE_API_KEY`).

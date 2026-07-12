@@ -20,14 +20,10 @@ export default async function TenantLayout({ children, params }: { children: Rea
     }
   });
 
-  // Sanitize pixel IDs to prevent Stored XSS inside dangerouslySetInnerHTML blocks
-  const safeGtmId = tenantSite?.gtmId?.replace(/[^A-Za-z0-9-]/g, '');
-  const safeFbPixelId = tenantSite?.fbPixelId?.replace(/[^0-9]/g, '');
-
   return (
     <>
       {/* Inject Google Tag Manager dynamically if configured */}
-      {safeGtmId && (
+      {tenantSite?.gtmId && (
         <Script
           id="gtm-script"
           strategy="afterInteractive"
@@ -37,14 +33,14 @@ export default async function TenantLayout({ children, params }: { children: Rea
               new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
               j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','${safeGtmId}');
+              })(window,document,'script','dataLayer','${tenantSite.gtmId}');
             `,
           }}
         />
       )}
 
       {/* Inject Facebook CAPI Pixel dynamically if configured */}
-      {safeFbPixelId && (
+      {tenantSite?.fbPixelId && (
         <Script
           id="fb-pixel"
           strategy="afterInteractive"
@@ -58,13 +54,12 @@ export default async function TenantLayout({ children, params }: { children: Rea
               t.src=v;s=b.getElementsByTagName(e)[0];
               s.parentNode.insertBefore(t,s)}(window, document,'script',
               'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '${safeFbPixelId}');
+              fbq('init', '${tenantSite.fbPixelId}');
               fbq('track', 'PageView');
             `,
           }}
         />
       )}
-
 
       {/* Fallback GTM noscript iframe injected near body via global layout if needed */}
       {children}

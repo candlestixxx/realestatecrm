@@ -12,6 +12,9 @@ The autonomous project execution and synchronization protocol has officially con
 ### 2. Multi-Tenant Architecture & Custom Domains
 - **Dynamic Routing**: Configured Next.js Middleware to natively identify and rewrite subdomains and **Custom Domains** straight to the internal CRM structure.
 - **Tenant Landing Pages**: Built a CMS-driven Landing Page module mapping `customDomain` variables to allow agents to spin up personalized web properties without leaving the dashboard.
+- **Agent Blogs**: Successfully implemented a Headless CMS adapter. Agents can author `BlogPost` entities stored in Prisma which are dynamically fetched and server-side rendered natively on their custom domain websites via `/(websites)/[domain]/blog/page.tsx`.
+- **Intent Lead Capture**: Implemented `LeadCaptureModal` tracking scroll depths, page timeouts, and explicit interaction intents (like viewing deep photo galleries) to autonomously push lead generation modals directly to visitors on custom domains.
+- **Tracking Pipelines**: Fully established Google Tag Manager (GTM) and Facebook CAPI server-side tracking pipelines driven directly by the CRM backend database.
 
 ### 3. CRM Core Functionality
 - **Database Architecture**: Implemented robust backend schemas using **Prisma** (SQLite). Successfully squashed and baseline-migrated a unified database instance, cleanly resolving upstream provider drift issues.

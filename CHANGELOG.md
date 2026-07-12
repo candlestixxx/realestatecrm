@@ -303,7 +303,11 @@
 - **Documentation:** Synced ROADME, TODO, CHANGELOG with reconciled feature state.
 
 ## [0.46.6] - AI Drip Execution
+<<<<<<< HEAD
 - Added `listCampaigns` and `enrollInCampaign` tools to the Gemini AI chatbot logic (`src/app/api/chat/route.ts`).
+=======
+- Added `listCampaigns` and `enrollInCampaign` tools to the Gemini AI chatbot logic (`src/app/api/chat/route.ts`).
+>>>>>>> origin/main
 - Gemini can now automatically list and enroll leads into Drip Campaigns to dispatch live SMS/emails as part of agent workflow automation.
 
 ## [0.47.0] - Voice & Speech Provider Selection
