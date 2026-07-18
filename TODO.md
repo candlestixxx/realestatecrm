@@ -50,7 +50,7 @@
 - [x] **AI Drip Execution:** Connect Twilio/SendGrid for automated SMS/Email dispatching led by Gemini.
 
 ## Tech Debt & Improvements
-- [x] Evaluate Drizzle ORM for edge compatibility.
+- [x] Evaluate Drizzle ORM for edge compatibility (See docs/DRIZZLE_EVALUATION.md).
 - [x] Robust port conflict handling for Playwright tests.
 - [x] Implement WebSocket/WebRTC for real-time chat and voice.
 
@@ -67,8 +67,13 @@
 - [x] Build RESO Web API data sync cron job/webhook listener.
 - [x] Configure `LandingPage` model to support full domain mapping / custom domains.
 - [x] Build intent-triggered Lead Capture Modals (e.g., triggered on photo views).
+<<<<<<< HEAD
 - [x] Set up GTM / GA4 injection for dynamically provisioned sites.
 - [x] Develop Server-Side tracking pipelines for Google Ads and Facebook CAPI.
+=======
+- [ ] Set up GTM / GA4 injection for dynamically provisioned sites.
+- [ ] Develop Server-Side tracking pipelines for Google Ads and Facebook CAPI.
+>>>>>>> origin/main
 - [x] Implement headless CMS adapter for Agent Blogs.
 - [x] Migrate local vector synchronization fallback to a hosted Pinecone database before production launch.
 - [x] Hosted Vector Migration completed. Pinecone auto-detection is active via env vars (`PINECONE_API_KEY`).

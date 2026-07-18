@@ -25,6 +25,11 @@ pnpm-debug.log*
 /data/rag-outbox.json
 /data/vector-index.json
 
+# AI tool session data
+.hypernexus/
+.hypernexus-session.json
+.hypernexus_startup_marker
+
 # Python
 __pycache__/
 *.pyc
@@ -41,6 +46,7 @@ android/.gradle/
 ios/Pods/
 
 /src/generated/prisma
+.hypercode/
 data/
 metamcp.db
 audit*.jsonl
