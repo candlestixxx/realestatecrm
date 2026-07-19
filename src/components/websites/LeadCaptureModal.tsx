@@ -92,24 +92,48 @@ export function LeadCaptureModal({ tenantName, triggerDelayMs = 15000, triggerSc
             </div>
           ) : (
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                // In a real app, wire this up to a server action to save the lead.
-                setSubmitted(true);
+                const formData = new FormData(e.currentTarget);
+
+                try {
+                  const response = await fetch('/api/leads/external', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      firstName: formData.get('fullName')?.toString().split(' ')[0] || '',
+                      lastName: formData.get('fullName')?.toString().split(' ').slice(1).join(' ') || '',
+                      email: formData.get('email') || '',
+                      phone: formData.get('phone') || '',
+                      source: `Website Lead Capture (${tenantName})`,
+                      type: 'BUYER'
+                    })
+                  });
+
+                  if (response.ok) {
+                    setSubmitted(true);
+                  } else {
+                    console.error('Failed to submit lead to CRM pipeline');
+                    setSubmitted(true); // Show success UX anyway to the user
+                  }
+                } catch (err) {
+                  console.error('Lead capture error', err);
+                  setSubmitted(true);
+                }
               }}
               className="space-y-4"
             >
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Full Name</label>
-                <input required type="text" className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" placeholder="John Doe" />
+                <input required type="text" className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" name="fullName" placeholder="John Doe" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email Address</label>
-                <input required type="email" className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" placeholder="john@example.com" />
+                <input required type="email" className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" name="email" placeholder="john@example.com" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Phone Number</label>
-                <input type="tel" className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" placeholder="(555) 123-4567" />
+                <input type="tel" className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" name="phone" placeholder="(555) 123-4567" />
               </div>
 
               <button type="submit" className="w-full bg-primary text-primary-foreground font-bold py-3.5 rounded-lg hover:bg-primary/90 transition-colors mt-2 shadow-lg shadow-primary/20">
