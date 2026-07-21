@@ -1138,7 +1138,7 @@ export function LeadTableClient({
 
       {/* ========== LOFTY-STYLE SELECTION TOOLBAR ========== */}
       {selectedIds.size > 0 && (
-        <div className="sticky top-0 z-30 border-b border-primary/25 bg-[hsl(var(--primary)/0.08)] backdrop-blur-md px-4 py-2 flex items-center gap-2 shadow-sm">
+        <div className="sticky top-16 z-30 border-b border-primary/25 bg-[hsl(var(--primary)/0.08)] backdrop-blur-md px-4 py-2 flex items-center gap-2 shadow-sm">
 
           {/* Selection count badge + select-all-pages toggle */}
           <div className="flex items-center gap-2 mr-2">

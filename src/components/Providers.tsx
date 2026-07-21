@@ -15,6 +15,12 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
     if (typeof args[0] === 'string' && args[0].includes('DialogContent requires a DialogTitle')) {
       return;
     }
+    if (typeof args[0] === 'string' && (args[0].includes('decryption operation failed') || args[0].includes('JWT_SESSION_ERROR'))) {
+      return;
+    }
+    if (args[1] && typeof args[1] === 'string' && (args[1].includes('decryption operation failed') || args[1].includes('JWT_SESSION_ERROR'))) {
+      return;
+    }
     originalError.apply(console, args);
   };
 }

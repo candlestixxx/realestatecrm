@@ -77,7 +77,7 @@ export function ContactTableClient({
     <div>
       {/* Bulk Actions Bar */}
       {selectedIds.size > 0 && (
-        <div className="bg-primary/10 border-b border-primary/20 p-3 flex items-center justify-between sticky top-0 z-20">
+        <div className="bg-primary/10 border-b border-primary/20 p-3 flex items-center justify-between sticky top-16 z-20">
           <div className="flex items-center gap-3">
             <span className="text-sm font-bold text-primary">{selectedIds.size} Selected</span>
             <div className="h-4 w-[1px] bg-primary/20 mx-1"></div>

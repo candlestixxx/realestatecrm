@@ -19,6 +19,7 @@ export type SyncQueueItem = {
   lastName: string;
   email: string | null;
   phone: string | null;
+  phones: string[];
   source: string | null;
   assignedAgent: string | null;
   status: SyncStatus;
@@ -80,6 +81,7 @@ export async function addToSyncQueue(lead: {
   lastName: string;
   email?: string | null;
   phone?: string | null;
+  phones?: string[];
   source?: string | null;
   assignedAgent?: string | null;
 }): Promise<SyncQueueItem> {
@@ -97,6 +99,7 @@ export async function addToSyncQueue(lead: {
     lastName: lead.lastName,
     email: lead.email ?? null,
     phone: lead.phone ?? null,
+    phones: lead.phones ?? (lead.phone ? [lead.phone] : []),
     source: lead.source ?? null,
     assignedAgent: lead.assignedAgent ?? null,
     status: 'QUEUED',
@@ -120,6 +123,7 @@ export async function addLeadsToSyncQueue(leads: Array<{
   lastName: string;
   email?: string | null;
   phone?: string | null;
+  phones?: string[];
   source?: string | null;
   assignedAgent?: string | null;
 }>): Promise<{ added: number; duplicates: number }> {
@@ -143,6 +147,7 @@ export async function addLeadsToSyncQueue(leads: Array<{
       lastName: lead.lastName,
       email: lead.email ?? null,
       phone: lead.phone ?? null,
+      phones: lead.phones ?? (lead.phone ? [lead.phone] : []),
       source: lead.source ?? null,
       assignedAgent: lead.assignedAgent ?? null,
       status: 'QUEUED',

@@ -1,12 +1,23 @@
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 
 export default async function DashboardHome() {
-  const session = await getServerSession(authOptions);
+  let session = null;
+  try {
+    session = await getServerSession(authOptions);
+  } catch (err) {
+    console.warn('Session decryption failed on dashboard page:', err);
+  }
+
+  if (!session) {
+    redirect('/api/auth/signin');
+  }
+
   const access = await requireWorkspaceAccess(session);
   const workspaceId = access.workspaceId;
   const userRole = access.workspaceRole;

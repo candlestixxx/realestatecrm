@@ -1,9 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { createLandingPageAction, updateLandingPageBlocksAction } from '@/lib/actions/website';
+import { createLandingPageAction, updateLandingPageBlocksAction, deleteLandingPageAction } from '@/lib/actions/website';
+import AICreatorTab from './AICreatorTab';
+import AnalyticsTab from './AnalyticsTab';
+import SEOBlogTab from './SEOBlogTab';
+import SocialAgentTab from './SocialAgentTab';
+import { Plus, Search, ChevronRight, LayoutGrid, Sparkles, BarChart3, Settings, Globe, FileText, ArrowLeft, Trash, Copy, BookOpen, Share2 } from 'lucide-react';
 
 type LandingPageBlock = {
   id: string;
@@ -36,41 +41,36 @@ export default function WebsitesClient({
   landingPages: LandingPageData[];
   workspaceId: string;
 }) {
-  const [activeTab, setActiveTab] = useState<'sites' | 'builder'>('sites');
+  const [activeTab, setActiveTab] = useState<'ai-creator' | 'traditional' | 'seo-blog' | 'social-agent' | 'analytics'>('ai-creator');
   const [isCreating, setIsCreating] = useState(false);
+  
+  // Builder state
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
   const [blocks, setBlocks] = useState<LandingPageBlock[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Replicated domains list
-  const domainSeats = [
-    {
-      agent: 'Hank Mendez',
-      role: 'Broker / Team Leader',
-      domain: 'hankmendez.excellegacyrealtyteam.com',
-      phone: '586-405-3333',
-      email: 'hankrealtyexec@gmail.com',
-      status: 'Active & Configured',
-    },
-    {
-      agent: 'Harry Kourlos',
-      role: 'Realtor / Broker Associate',
-      domain: 'harrykourlos.excellegacyrealtyteam.com',
-      phone: '586-883-3333',
-      email: 'harryrealtyexec@gmail.com',
-      status: 'Active & Configured',
-    },
-    {
-      agent: 'Don Sobieski',
-      role: 'Realtor / Listing Agent',
-      domain: 'donsobieski.excellegacyrealtyteam.com',
-      phone: '586-306-0051',
-      email: 'realtordon26@gmail.com',
-      status: 'Active & Configured',
-    },
-  ];
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'traditional') {
+      setActiveTab('traditional');
+    } else if (tabParam === 'ai-creator') {
+      setActiveTab('ai-creator');
+      setEditingPageId(null);
+    } else if (tabParam === 'seo-blog') {
+      setActiveTab('seo-blog');
+      setEditingPageId(null);
+    } else if (tabParam === 'social-agent') {
+      setActiveTab('social-agent');
+      setEditingPageId(null);
+    } else if (tabParam === 'analytics') {
+      setActiveTab('analytics');
+      setEditingPageId(null);
+    }
+  }, [searchParams]);
 
   const handleCreatePage = async (formData: FormData) => {
     const res = await createLandingPageAction(formData);
@@ -81,14 +81,14 @@ export default function WebsitesClient({
       setIsCreating(false);
       router.refresh();
       if (res.landingPageId) {
-        handleEditPage(landingPages.find((l) => l.id === res.landingPageId) || {
+        handleEditPage({
           id: res.landingPageId,
           title: formData.get('title') as string,
           slug: formData.get('slug') as string,
           subdomain: formData.get('subdomain') as string || null,
           blocks: '[]',
           createdAt: new Date(),
-        } as any);
+        });
       }
     }
   };
@@ -100,7 +100,7 @@ export default function WebsitesClient({
     } catch {
       setBlocks([]);
     }
-    setActiveTab('builder');
+    setActiveTab('traditional');
   };
 
   const handleAddBlock = (type: LandingPageBlock['type']) => {
@@ -151,7 +151,6 @@ export default function WebsitesClient({
       } else {
         toast.success('Landing page blocks saved successfully!');
         setEditingPageId(null);
-        setActiveTab('sites');
         router.refresh();
       }
     } catch {
@@ -161,344 +160,400 @@ export default function WebsitesClient({
     }
   };
 
+  const handleCopyPage = async (page: LandingPageData, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const formData = new FormData();
+      formData.set('title', `${page.title} (Copy)`);
+      formData.set('slug', `${page.slug}-copy-${Math.floor(Math.random() * 1000)}`);
+      formData.set('subdomain', page.subdomain ? `${page.subdomain}-copy` : '');
+      const res = await createLandingPageAction(formData);
+      if (res && res.error) {
+        toast.error(res.error);
+        return;
+      }
+      if (res.landingPageId) {
+        await updateLandingPageBlocksAction(res.landingPageId, page.blocks);
+        toast.success('Landing page duplicated successfully!');
+        router.refresh();
+      }
+    } catch (err: any) {
+      toast.error('Failed to duplicate page: ' + err.message);
+    }
+  };
+
+  const handleDeletePage = async (pageId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('Are you sure you want to delete this landing page? This cannot be undone.')) {
+      return;
+    }
+    try {
+      const res = await deleteLandingPageAction(pageId);
+      if (res && res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success('Landing page deleted.');
+        if (editingPageId === pageId) {
+          setEditingPageId(null);
+        }
+        router.refresh();
+      }
+    } catch (err: any) {
+      toast.error('Failed to delete page: ' + err.message);
+    }
+  };
+
+  const filteredPages = landingPages.filter(p =>
+    p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.slug.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const editingPage = landingPages.find((p) => p.id === editingPageId);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Agent Websites & Marketing</h1>
-          <p className="text-muted-foreground">Replicate hosted domains, configure SEO landing pages, and build block layouts.</p>
-        </div>
-        {activeTab === 'sites' && (
+    <div className="flex bg-background rounded-3xl border border-border/60 overflow-hidden min-h-[700px] text-foreground">
+      
+      {/* Left Sidebar - Google Gemini Style */}
+      <aside className="w-64 bg-muted/30 border-r border-border/60 flex flex-col shrink-0">
+        
+        {/* New Page Header Option */}
+        <div className="p-4 border-b border-border/40">
           <button
             onClick={() => setIsCreating(true)}
-            className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors shadow-sm text-sm"
+            className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            Create Landing Page
-          </button>
-        )}
-      </div>
-
-      {/* Tabs Selector */}
-      {editingPageId === null && (
-        <div className="flex border-b border-border">
-          <button
-            onClick={() => setActiveTab('sites')}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'sites' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'
-            }`}
-          >
-            Website Seats & Landing Pages
+            <Plus className="w-4 h-4" /> New Page / Chat
           </button>
         </div>
-      )}
 
-      {/* Domain Seats & Pages Tab */}
-      {activeTab === 'sites' && (
-        <div className="space-y-8">
-          {/* Replicated Domain Seats */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-bold">Configured Host Subdomains (Excel Legacy Seats)</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {domainSeats.map((seat, idx) => (
-                <div key={idx} className="bg-background border border-border rounded-xl shadow-sm p-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="w-8 h-8 rounded bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-                      🌐
-                    </div>
-                    <span className="text-[10px] font-bold text-green-500 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                      {seat.status}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-base">{seat.agent}</h3>
-                    <p className="text-xs text-muted-foreground">{seat.role}</p>
-                    <p className="text-xs text-primary font-semibold mt-2 select-all">{seat.domain}</p>
-                  </div>
-                  <div className="text-xs space-y-1 text-muted-foreground pt-2 border-t border-border/50">
-                    <p>📞 Cell: {seat.phone}</p>
-                    <p>✉️ Email: {seat.email}</p>
-                  </div>
-                  <div className="pt-2">
-                    <a
-                      href={`/portal/site/agent-${seat.agent.toLowerCase().replace(' ', '-')}`}
-                      className="block text-center py-2 bg-muted/65 text-foreground hover:bg-muted text-xs font-semibold rounded-lg border border-border"
-                    >
-                      Visit Seat Site
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
+        {/* Sidebar Search option */}
+        <div className="px-4 py-3 relative">
+          <Search className="w-3.5 h-3.5 absolute left-7 top-5.5 text-muted-foreground" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search pages..."
+            className="w-full bg-background border border-border/60 rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none"
+          />
+        </div>
+
+        {/* Saved pages history list */}
+        <div className="flex-1 overflow-y-auto px-2 space-y-1 py-2">
+          <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider px-3 block mb-2">History & Recents</span>
+          {filteredPages.map(page => (
+            <button
+              key={page.id}
+              onClick={() => handleEditPage(page)}
+              className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
+                editingPageId === page.id
+                  ? 'bg-primary/10 text-primary border border-primary/20'
+                  : 'hover:bg-muted/65 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <div className="flex items-center gap-2 truncate">
+                <Globe className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{page.title}</span>
+              </div>
+
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={(e) => handleCopyPage(page, e)}
+                  className="p-1 hover:bg-muted text-muted-foreground hover:text-indigo-500 rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  title="Duplicate Landing Page"
+                >
+                  <Copy className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={(e) => handleDeletePage(page.id, e)}
+                  className="p-1 hover:bg-muted text-muted-foreground hover:text-rose-500 rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  title="Delete Landing Page"
+                >
+                  <Trash className="w-3 h-3" />
+                </button>
+                <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+              </div>
+            </button>
+          ))}
+          {filteredPages.length === 0 && (
+            <span className="text-[10px] text-muted-foreground italic px-3 py-4 block text-center">No matching pages</span>
+          )}
+        </div>
+      </aside>
+
+      {/* Main Workspace Panel */}
+      <main className="flex-1 flex flex-col min-w-0">
+        
+        {/* Portal Header with dynamic switcher tabs */}
+        <div className="px-6 py-4 border-b border-border/40 bg-muted/10 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+          <div>
+            <h1 className="text-xl font-black tracking-tight flex items-center gap-1.5">
+              LANDING PAGE PORTAL
+            </h1>
+            <p className="text-xs text-muted-foreground">Build, prompt, and share targeted county campaigns</p>
           </div>
 
-          {/* Landing Pages List */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-bold">Marketing Landing Pages</h2>
-            <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden">
-              <table className="w-full text-sm text-left">
-                <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
-                  <tr>
-                    <th className="px-6 py-3 font-semibold">Title</th>
-                    <th className="px-6 py-3 font-semibold">Public Link</th>
-                    <th className="px-6 py-3 font-semibold">Subdomain Mapping</th>
-                    <th className="px-6 py-3 font-semibold">Created</th>
-                    <th className="px-6 py-3 font-semibold text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {landingPages.map((page) => (
-                    <tr key={page.id} className="hover:bg-muted/10 transition-colors">
-                      <td className="px-6 py-4 font-semibold">{page.title}</td>
-                      <td className="px-6 py-4 text-xs text-primary">
-                        <a
-                          href={`/portal/site/${page.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline"
-                        >
-                          /portal/site/{page.slug}
-                        </a>
-                      </td>
-                      <td className="px-6 py-4 text-xs text-muted-foreground">
-                        {page.subdomain || 'Revert to main domain'}
-                      </td>
-                      <td className="px-6 py-4 text-xs text-muted-foreground">
-                        {new Date(page.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => handleEditPage(page)}
-                          className="text-xs text-primary font-bold hover:underline"
-                        >
-                          Configure Layout Blocks &rarr;
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {landingPages.length === 0 && (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground italic">
-                        No custom landing pages configured. Click &ldquo;Create Landing Page&rdquo; to start.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          {/* Switcher Tab Buttons */}
+          <div className="flex bg-muted/60 border border-border/60 rounded-xl p-1 gap-1 text-[11px] font-black uppercase tracking-wider">
+            <button
+              onClick={() => { setEditingPageId(null); setActiveTab('ai-creator'); }}
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
+                activeTab === 'ai-creator' && !editingPageId
+                  ? 'bg-background text-indigo-500 shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" /> INSTA GEN "NEW"
+            </button>
+            <button
+              onClick={() => {
+                if (!editingPageId && landingPages.length > 0) {
+                  handleEditPage(landingPages[0]);
+                } else {
+                  setActiveTab('traditional');
+                }
+              }}
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
+                activeTab === 'traditional' || editingPageId
+                  ? 'bg-background text-indigo-500 shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" /> Traditional Builder
+            </button>
+            <button
+              onClick={() => { setEditingPageId(null); setActiveTab('seo-blog'); }}
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
+                activeTab === 'seo-blog'
+                  ? 'bg-background text-indigo-500 shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" /> SEO & Blog Creator
+            </button>
+            <button
+              onClick={() => { setEditingPageId(null); setActiveTab('social-agent'); }}
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
+                activeTab === 'social-agent'
+                  ? 'bg-background text-indigo-500 shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Share2 className="w-3.5 h-3.5" /> Social Studio
+            </button>
+            <button
+              onClick={() => { setEditingPageId(null); setActiveTab('analytics'); }}
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
+                activeTab === 'analytics'
+                  ? 'bg-background text-indigo-500 shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5" /> Analytics
+            </button>
           </div>
         </div>
-      )}
 
-      {/* Block Layout Builder */}
-      {activeTab === 'builder' && editingPage && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Controls Side Panel */}
-          <div className="lg:col-span-1 space-y-6">
-            <div className="bg-background border border-border rounded-xl p-6 shadow-sm space-y-4">
-              <div className="flex justify-between items-center pb-2 border-b border-border/50">
-                <h3 className="font-bold text-sm uppercase text-muted-foreground">Visual Blocks Library</h3>
-                <button
-                  onClick={() => {
-                    setEditingPageId(null);
-                    setActiveTab('sites');
-                  }}
-                  className="text-xs text-muted-foreground hover:text-foreground"
-                >
-                  Close Builder
-                </button>
-              </div>
+        {/* Tab workspace renders */}
+        <div className="flex-1 p-6 overflow-y-auto">
+          
+          {/* 1. INSTA GEN AI TAB */}
+          {activeTab === 'ai-creator' && !editingPageId && (
+            <AICreatorTab workspaceId={workspaceId} />
+          )}
 
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Add blocks sequentially to construct a marketing landing page. Each block can contain embedded videos, MLS listings, and leads generation triggers.
-              </p>
+          {/* 1.2 SEO & BLOG CREATOR TAB */}
+          {activeTab === 'seo-blog' && !editingPageId && (
+            <SEOBlogTab workspaceId={workspaceId} />
+          )}
 
-              <div className="grid grid-cols-2 gap-2 pt-2">
-                <button
-                  onClick={() => handleAddBlock('HEADER')}
-                  className="p-3 border border-border/70 hover:border-primary/50 hover:bg-primary/5 rounded-xl text-center text-xs font-semibold flex flex-col items-center gap-1.5 transition-all"
-                >
-                  <span className="text-lg">📢</span>
-                  Header Section
-                </button>
-                <button
-                  onClick={() => handleAddBlock('VIDEO')}
-                  className="p-3 border border-border/70 hover:border-primary/50 hover:bg-primary/5 rounded-xl text-center text-xs font-semibold flex flex-col items-center gap-1.5 transition-all"
-                >
-                  <span className="text-lg">🎥</span>
-                  Embed Video
-                </button>
-                <button
-                  onClick={() => handleAddBlock('PROPERTY')}
-                  className="p-3 border border-border/70 hover:border-primary/50 hover:bg-primary/5 rounded-xl text-center text-xs font-semibold flex flex-col items-center gap-1.5 transition-all"
-                >
-                  <span className="text-lg">🏠</span>
-                  MLS Property sync
-                </button>
-                <button
-                  onClick={() => handleAddBlock('LEAD_CAPTURE')}
-                  className="p-3 border border-border/70 hover:border-primary/50 hover:bg-primary/5 rounded-xl text-center text-xs font-semibold flex flex-col items-center gap-1.5 transition-all"
-                >
-                  <span className="text-lg">📥</span>
-                  Lead Capture Form
-                </button>
-              </div>
+          {/* 1.3 SOCIAL STUDIO TAB */}
+          {activeTab === 'social-agent' && !editingPageId && (
+            <SocialAgentTab workspaceId={workspaceId} />
+          )}
 
-              <div className="pt-4 border-t border-border/50 flex flex-col gap-2">
-                <button
-                  disabled={isSaving}
-                  onClick={handleSaveBlocks}
-                  className="w-full py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-lg"
-                >
-                  {isSaving ? 'Publishing...' : 'Save & Publish Page'}
-                </button>
-                <button
-                  onClick={() => {
-                    setEditingPageId(null);
-                    setActiveTab('sites');
-                  }}
-                  className="w-full py-2 bg-muted text-foreground text-xs font-semibold rounded-lg hover:bg-muted/80 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
+          {/* 2. ANALYTICS TAB */}
+          {activeTab === 'analytics' && !editingPageId && (
+            <AnalyticsTab />
+          )}
 
-          {/* Builder Canvas */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-background border border-border rounded-xl p-6 shadow-sm">
-              <div className="flex justify-between items-center mb-4 pb-2 border-b border-border/50">
-                <h2 className="font-bold text-lg">Designing Page: {editingPage.title}</h2>
-                <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 rounded px-2 py-0.5 font-bold">
-                  CANVAS
-                </span>
-              </div>
-
-              <div className="space-y-4 min-h-[400px]">
-                {blocks.map((block, idx) => (
-                  <div key={block.id} className="p-4 border border-border rounded-xl bg-muted/10 relative space-y-4 group">
-                    <div className="flex justify-between items-center pb-2 border-b border-border/30">
-                      <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                        Block {idx + 1}: {block.type}
-                      </span>
+          {/* 3. TRADITIONAL LOFTY BUILDER VIEW */}
+          {(activeTab === 'traditional' || editingPageId) && (
+            <>
+              {editingPage ? (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-foreground">
+                  
+                  {/* Lofty Blocks library layout sidebar */}
+                  <div className="lg:col-span-4 bg-card border border-border/60 rounded-2xl p-6 shadow-sm space-y-5">
+                    <div className="flex justify-between items-center pb-2 border-b border-border/40">
+                      <h3 className="font-extrabold text-xs uppercase text-muted-foreground tracking-wider">Lofty Canvas Blocks</h3>
                       <button
-                        onClick={() => handleRemoveBlock(idx)}
-                        className="text-xs text-red-500 hover:text-red-600 font-bold opacity-30 group-hover:opacity-100 transition-opacity"
+                        onClick={() => { setEditingPageId(null); setActiveTab('ai-creator'); }}
+                        className="text-[10px] bg-muted hover:bg-muted/80 px-2 py-1 rounded border border-border font-bold uppercase transition-colors"
                       >
-                        Remove Block
+                        Exit
                       </button>
                     </div>
 
-                    {/* Block Content Editor Form Inputs */}
-                    {block.type === 'HEADER' && (
-                      <div className="grid grid-cols-1 gap-3">
-                        <input
-                          type="text"
-                          value={block.title || ''}
-                          onChange={(e) => handleBlockChange(idx, 'title', e.target.value)}
-                          placeholder="Header Title"
-                          className="w-full bg-background border border-border rounded px-2.5 py-1.5 text-xs"
-                        />
-                        <input
-                          type="text"
-                          value={block.subtitle || ''}
-                          onChange={(e) => handleBlockChange(idx, 'subtitle', e.target.value)}
-                          placeholder="Header Subtitle / Tagline"
-                          className="w-full bg-background border border-border rounded px-2.5 py-1.5 text-xs"
-                        />
-                      </div>
-                    )}
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Build and deploy templates using predefined responsive elements for Macomb, Oakland, and Wayne counties.
+                    </p>
 
-                    {block.type === 'VIDEO' && (
-                      <div className="grid grid-cols-1 gap-3">
-                        <input
-                          type="text"
-                          value={block.title || ''}
-                          onChange={(e) => handleBlockChange(idx, 'title', e.target.value)}
-                          placeholder="Video Section Title"
-                          className="w-full bg-background border border-border rounded px-2.5 py-1.5 text-xs"
-                        />
-                        <input
-                          type="text"
-                          value={block.videoUrl || ''}
-                          onChange={(e) => handleBlockChange(idx, 'videoUrl', e.target.value)}
-                          placeholder="YouTube Embed URL (e.g. https://www.youtube.com/embed/...)"
-                          className="w-full bg-background border border-border rounded px-2.5 py-1.5 text-xs"
-                        />
-                      </div>
-                    )}
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <button onClick={() => handleAddBlock('HEADER')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+                        <span>📢</span> Header Block
+                      </button>
+                      <button onClick={() => handleAddBlock('VIDEO')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+                        <span>🎥</span> Video Tour
+                      </button>
+                      <button onClick={() => handleAddBlock('PROPERTY')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+                        <span>🏠</span> MLS Listings
+                      </button>
+                      <button onClick={() => handleAddBlock('LEAD_CAPTURE')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+                        <span>📥</span> Lead capture
+                      </button>
+                    </div>
 
-                    {block.type === 'PROPERTY' && (
-                      <div className="space-y-3">
-                        <div className="grid grid-cols-2 gap-3">
-                          <input
-                            type="text"
-                            value={block.address || ''}
-                            onChange={(e) => handleBlockChange(idx, 'address', e.target.value)}
-                            placeholder="MLS Listing Address"
-                            className="w-full bg-background border border-border rounded px-2.5 py-1.5 text-xs"
-                          />
-                          <input
-                            type="number"
-                            value={block.price || ''}
-                            onChange={(e) => handleBlockChange(idx, 'price', Number(e.target.value))}
-                            placeholder="Price ($)"
-                            className="w-full bg-background border border-border rounded px-2.5 py-1.5 text-xs"
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <input
-                            type="number"
-                            value={block.beds || ''}
-                            onChange={(e) => handleBlockChange(idx, 'beds', Number(e.target.value))}
-                            placeholder="Beds Count"
-                            className="w-full bg-background border border-border rounded px-2.5 py-1.5 text-xs"
-                          />
-                          <input
-                            type="number"
-                            value={block.baths || ''}
-                            onChange={(e) => handleBlockChange(idx, 'baths', Number(e.target.value))}
-                            placeholder="Baths Count"
-                            className="w-full bg-background border border-border rounded px-2.5 py-1.5 text-xs"
-                          />
-                        </div>
-                        <textarea
-                          value={block.remarks || ''}
-                          onChange={(e) => handleBlockChange(idx, 'remarks', e.target.value)}
-                          placeholder="MLS Property Remarks / Highlights..."
-                          rows={2}
-                          className="w-full bg-background border border-border rounded px-2.5 py-1.5 text-xs resize-none"
-                        />
-                      </div>
-                    )}
-
-                    {block.type === 'LEAD_CAPTURE' && (
-                      <div>
-                        <input
-                          type="text"
-                          value={block.ctaText || ''}
-                          onChange={(e) => handleBlockChange(idx, 'ctaText', e.target.value)}
-                          placeholder="CTA Text for Lead Capture Form Button"
-                          className="w-full bg-background border border-border rounded px-2.5 py-1.5 text-xs"
-                        />
-                      </div>
-                    )}
+                    <div className="pt-4 border-t border-border/40 flex flex-col gap-2 shrink-0">
+                      <button
+                        disabled={isSaving}
+                        onClick={handleSaveBlocks}
+                        className="w-full py-2 bg-indigo-600 text-white text-xs font-black uppercase rounded-lg hover:bg-indigo-500 transition-colors shadow shadow-indigo-500/20 cursor-pointer"
+                      >
+                        {isSaving ? 'Publishing...' : 'Save & Publish Page'}
+                      </button>
+                    </div>
                   </div>
-                ))}
 
-                {blocks.length === 0 && (
-                  <div className="py-16 text-center border-2 border-dashed border-border rounded-xl text-muted-foreground italic text-xs">
-                    Canvas is empty. Add block types from the left panel.
+                  {/* Visual canvas grid */}
+                  <div className="lg:col-span-8 bg-card border border-border/60 rounded-2xl p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-4 pb-2 border-b border-border/40">
+                      <h2 className="font-extrabold text-base">Editing Lofty Canvas: {editingPage.title}</h2>
+                      <span className="text-[9px] bg-primary/10 text-primary border border-primary/20 rounded-md px-2.5 py-0.5 font-bold uppercase tracking-wider">
+                        Active Workspace
+                      </span>
+                    </div>
+
+                    <div className="space-y-4 min-h-[400px]">
+                      {blocks.map((block, idx) => (
+                        <div key={block.id} className="p-4.5 border border-border/60 rounded-xl bg-muted/15 relative space-y-4 group">
+                          <div className="flex justify-between items-center pb-2 border-b border-border/30">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary">
+                              Block {idx + 1}: {block.type}
+                            </span>
+                            <button
+                              onClick={() => handleRemoveBlock(idx)}
+                              className="text-[10px] text-rose-500 hover:text-rose-600 font-bold opacity-30 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            >
+                              Remove Block
+                            </button>
+                          </div>
+
+                          {/* Block input fields */}
+                          {block.type === 'HEADER' && (
+                            <div className="grid grid-cols-1 gap-3">
+                              <input
+                                type="text"
+                                value={block.title || ''}
+                                onChange={(e) => handleBlockChange(idx, 'title', e.target.value)}
+                                placeholder="Header Title"
+                                className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                              />
+                              <input
+                                type="text"
+                                value={block.subtitle || ''}
+                                onChange={(e) => handleBlockChange(idx, 'subtitle', e.target.value)}
+                                placeholder="Header Tagline / Subtitle"
+                                className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                              />
+                            </div>
+                          )}
+
+                          {block.type === 'VIDEO' && (
+                            <div className="grid grid-cols-1 gap-3">
+                              <input
+                                type="text"
+                                value={block.title || ''}
+                                onChange={(e) => handleBlockChange(idx, 'title', e.target.value)}
+                                placeholder="Video Headline"
+                                className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                              />
+                              <input
+                                type="text"
+                                value={block.videoUrl || ''}
+                                onChange={(e) => handleBlockChange(idx, 'videoUrl', e.target.value)}
+                                placeholder="YouTube Embed Link"
+                                className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                              />
+                            </div>
+                          )}
+
+                          {block.type === 'PROPERTY' && (
+                            <div className="space-y-3">
+                              <div className="grid grid-cols-2 gap-3">
+                                <input
+                                  type="text"
+                                  value={block.address || ''}
+                                  onChange={(e) => handleBlockChange(idx, 'address', e.target.value)}
+                                  placeholder="Property Address"
+                                  className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                                />
+                                <input
+                                  type="number"
+                                  value={block.price || ''}
+                                  onChange={(e) => handleBlockChange(idx, 'price', Number(e.target.value))}
+                                  placeholder="Listing Price ($)"
+                                  className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                                />
+                              </div>
+                              <textarea
+                                value={block.remarks || ''}
+                                onChange={(e) => handleBlockChange(idx, 'remarks', e.target.value)}
+                                placeholder="MLS sync comments and features..."
+                                rows={2}
+                                className="w-full bg-background border border-border/60 rounded-lg p-3 text-xs resize-none focus:outline-none"
+                              />
+                            </div>
+                          )}
+
+                          {block.type === 'LEAD_CAPTURE' && (
+                            <input
+                              type="text"
+                              value={block.ctaText || ''}
+                              onChange={(e) => handleBlockChange(idx, 'ctaText', e.target.value)}
+                              placeholder="CTA Button Text"
+                              className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                            />
+                          )}
+                        </div>
+                      ))}
+                      {blocks.length === 0 && (
+                        <div className="py-24 text-center border border-dashed border-border/60 rounded-xl text-muted-foreground italic text-xs">
+                          Canvas layout is empty. Click elements on the left side to compile blocks.
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
+
+                </div>
+              ) : (
+                <div className="py-16 text-center border border-dashed border-border/60 rounded-2xl text-muted-foreground text-xs font-semibold space-y-4">
+                  <span>No landing page currently loaded in editor.</span>
+                  <div>
+                    <button
+                      onClick={() => setIsCreating(true)}
+                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg uppercase tracking-wider font-black cursor-pointer shadow text-[10px]"
+                    >
+                      Initialize Landing Page Template
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
         </div>
-      )}
+      </main>
 
       {/* Page creation modal */}
       {isCreating && (
@@ -520,7 +575,7 @@ export default function WebsitesClient({
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Custom Subdomain mapping (Optional)</label>
-                <input name="subdomain" placeholder="e.g. walktours.excellegacy.com" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
+                <input name="subdomain" placeholder="e.g. valuation.excellegacy.com" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
               </div>
 
               <div className="flex justify-end gap-2 pt-4">

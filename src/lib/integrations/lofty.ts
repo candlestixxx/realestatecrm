@@ -17,6 +17,7 @@ export type LoftyContact = {
   lastName: string;
   email: string | null;
   phone: string | null;
+  phones: string[];
   tags: string[];
   source: string;
   agentId: string | null;
@@ -48,6 +49,33 @@ function firstString(value: unknown): string | null {
   return null;
 }
 
+function normalizePhones(value: unknown): string[] {
+  const out: string[] = [];
+
+  const push = (candidate: unknown) => {
+    if (typeof candidate === 'string') {
+      const cleaned = candidate.trim();
+      if (cleaned && !out.includes(cleaned)) {
+        out.push(cleaned);
+      }
+      return;
+    }
+
+    if (Array.isArray(candidate)) {
+      candidate.forEach(push);
+      return;
+    }
+
+    if (candidate && typeof candidate === 'object') {
+      const record = candidate as Record<string, unknown>;
+      push(record.value ?? record.number ?? record.phone ?? record.phoneNumber);
+    }
+  };
+
+  push(value);
+  return out;
+}
+
 /**
  * Normalize Lofty's v1.0 lead shapes into the contact shape the sync queue uses.
  * Lofty can return camelCase, snake_case, or nested phone/email arrays depending
@@ -63,6 +91,7 @@ export function mapLoftyLead(lead: Record<string, unknown>): LoftyContact {
     lastName: String(lead.lastName ?? lead.last_name ?? ''),
     email: firstString(lead.email ?? lead.primaryEmail ?? lead.primary_email ?? lead.emails),
     phone: firstString(lead.phone ?? lead.primaryPhone ?? lead.primary_phone ?? lead.phones),
+    phones: normalizePhones(lead.phones ?? lead.phone ?? lead.primaryPhone ?? lead.primary_phone),
     tags: Array.isArray(tags) ? tags.map(String) : [],
     source: String(lead.source ?? 'MyPlus'),
     agentId: lead.agentId || lead.agent_id ? String(lead.agentId ?? lead.agent_id) : null,

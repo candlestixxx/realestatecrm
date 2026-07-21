@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { getServerSession } from 'next-auth/next';
 import type { Prisma } from '@prisma/client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { leadSchema } from '@/lib/validations/lead';

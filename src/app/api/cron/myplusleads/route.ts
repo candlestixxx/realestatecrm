@@ -1,6 +1,42 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { authenticate, fetchListings, MPLListing } from '@/lib/myplusleads';
+import { authenticate, fetchListings } from '@/lib/myplusleads';
+
+
+function collectPhoneValues(value: unknown, out: string[] = []): string[] {
+  if (!value) return out;
+
+  if (typeof value === 'string') {
+    const cleaned = value.trim();
+    if (cleaned && !out.includes(cleaned)) out.push(cleaned);
+    return out;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((entry) => collectPhoneValues(entry, out));
+    return out;
+  }
+
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    for (const [key, child] of Object.entries(record)) {
+      if (key.toLowerCase().includes('phone')) {
+        collectPhoneValues(child, out);
+      } else if (child && typeof child === 'object') {
+        collectPhoneValues(child, out);
+      }
+    }
+  }
+
+  return out;
+}
+
+function serializeAdditionalPhones(phones: string[]) {
+  return JSON.stringify(phones.slice(1).map((phone, index) => ({
+    value: phone,
+    label: index === 0 ? 'Cell Phone 2' : `Phone ${index + 2}`,
+  })));
+}
 
 // Disable caching for cron jobs
 export const dynamic = 'force-dynamic';

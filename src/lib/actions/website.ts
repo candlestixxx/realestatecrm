@@ -155,3 +155,26 @@ export async function submitLandingPageLeadAction(
     return { error: 'Failed to submit lead information.' };
   }
 }
+
+export async function deleteLandingPageAction(pageId: string) {
+  const session = await getServerSession(authOptions);
+  const access = await requireWorkspaceAccess(session);
+
+  if (!isAtLeastRole(access.workspaceRole, AppRole.REALTOR_AGENT)) {
+    return { error: 'Insufficient permissions to delete landing pages.' };
+  }
+
+  try {
+    await prisma.landingPage.delete({
+      where: {
+        id: pageId,
+        workspaceId: access.workspaceId,
+      },
+    });
+    revalidatePath('/dashboard/agent-websites');
+    return { success: true };
+  } catch (error: any) {
+    console.error('Failed to delete landing page:', error);
+    return { error: error.message || 'Failed to delete landing page.' };
+  }
+}

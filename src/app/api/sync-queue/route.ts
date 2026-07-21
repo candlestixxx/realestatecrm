@@ -18,6 +18,47 @@ import { searchLoftyContactStrict, verifyLeadInLofty } from '@/lib/integrations/
 import { buildIntegrationReadiness } from '@/lib/integrations/sync-workflow';
 import prisma from '@/lib/prisma';
 
+function normalizePhoneList(value: unknown): string[] {
+  const out: string[] = [];
+
+  const add = (candidate: unknown) => {
+    if (typeof candidate === 'string') {
+      const cleaned = candidate.trim();
+      if (cleaned && !out.includes(cleaned)) {
+        out.push(cleaned);
+      }
+      return;
+    }
+
+    if (Array.isArray(candidate)) {
+      candidate.forEach(add);
+      return;
+    }
+
+    if (candidate && typeof candidate === 'object') {
+      const record = candidate as Record<string, unknown>;
+      add(record.value ?? record.number ?? record.phone ?? record.phoneNumber);
+    }
+  };
+
+  add(value);
+  return out;
+}
+
+function contactPhoneList(contact: { phone?: string | null; additionalPhones?: string | null; spousePhone?: string | null }) {
+  const base = normalizePhoneList(contact.phone ? [contact.phone] : []);
+  const extra = normalizePhoneList(contact.additionalPhones ? JSON.parse(contact.additionalPhones) : []);
+  const spouse = normalizePhoneList(contact.spousePhone ? [contact.spousePhone] : []);
+  return Array.from(new Set([...base, ...extra, ...spouse]));
+}
+
+function serializeAdditionalPhones(phones: string[]) {
+  return JSON.stringify(phones.slice(1).map((phone, index) => ({
+    value: phone,
+    label: index === 0 ? 'Cell Phone 2' : `Phone ${index + 2}`,
+  })));
+}
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -76,6 +117,7 @@ export async function POST(req: NextRequest) {
         lastName: lead.contact.lastName ?? '',
         email: lead.contact.email,
         phone: lead.contact.phone,
+        phones: contactPhoneList(lead.contact),
         source: lead.source,
         assignedAgent: lead.user?.name ?? null,
       }));
@@ -103,6 +145,7 @@ export async function POST(req: NextRequest) {
         lastName: lead.contact.lastName ?? '',
         email: lead.contact.email,
         phone: lead.contact.phone,
+        phones: contactPhoneList(lead.contact),
         source: lead.source,
         assignedAgent: lead.user?.name ?? null,
       }));
@@ -231,21 +274,33 @@ export async function POST(req: NextRequest) {
 
       for (const item of queued) {
         try {
+          const phones = normalizePhoneList((item as { phones?: string[] }).phones ?? (item.phone ? [item.phone] : []));
+          const primaryPhone = phones[0] ?? item.phone ?? null;
+
           // Check if contact already exists by email/phone or leadId
           const existingLead = await prisma.lead.findFirst({
-            where: { 
-               OR: [
-                 { id: item.leadId },
-                 { contact: { email: item.email } },
-                 { contact: { phone: item.phone } }
-               ],
-               workspaceId: access.workspaceId 
-            }
+            where: {
+              OR: [
+                { id: item.leadId },
+                { contact: { email: item.email } },
+                { contact: { phone: primaryPhone } },
+              ],
+              workspaceId: access.workspaceId,
+            },
           });
 
           if (existingLead) {
-             await updateSyncItem(item.id, { status: 'SYNCED', syncedAt: new Date().toISOString() });
-             continue;
+            if (phones.length > 1) {
+              await prisma.contact.update({
+                where: { id: existingLead.contactId },
+                data: {
+                  phone: primaryPhone,
+                  additionalPhones: serializeAdditionalPhones(phones),
+                },
+              });
+            }
+            await updateSyncItem(item.id, { status: 'SYNCED', syncedAt: new Date().toISOString() });
+            continue;
           }
 
           // Create new contact + lead
@@ -254,7 +309,8 @@ export async function POST(req: NextRequest) {
               firstName: item.firstName,
               lastName: item.lastName,
               email: item.email,
-              phone: item.phone,
+              phone: primaryPhone,
+              additionalPhones: phones.length > 1 ? serializeAdditionalPhones(phones) : null,
               workspaceId: access.workspaceId,
             }
           });
