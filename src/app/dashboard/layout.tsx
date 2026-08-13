@@ -18,6 +18,7 @@ import CommunicationsHub from '@/components/CommunicationsHub';
 import { processDueCampaignTasks } from '@/lib/campaign-processor';
 import { startSyncScheduler } from '@/lib/sync-scheduler';
 import LeadAlertListener from '@/components/LeadAlertListener';
+import NotificationDropdown from '@/components/NotificationDropdown';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   let session = null;
@@ -213,6 +214,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
             <div className="flex items-center gap-4">
               <ThemeToggle />
+              <NotificationDropdown />
               <WorkspaceSwitcher workspaces={workspaces} activeSlug={access.workspaceSlug} />
               <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-secondary/15 text-secondary border border-secondary/30 uppercase tracking-wider">
                 {access.workspaceRole.replace('REALTOR_', '').replace('_', ' ')} Seat

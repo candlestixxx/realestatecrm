@@ -25,6 +25,10 @@ model User {
   workflows     WorkflowSession[]
   workspaces    WorkspaceMember[]
   stakeholderIn DealStakeholder[]
+  blogPosts     BlogPost[]
+  smsAlertsMlsRelist   Boolean   @default(false)
+  emailAlertsMlsRelist Boolean   @default(true)
+  notifications        SystemNotification[]
 }
 
 model Workspace {
@@ -47,6 +51,7 @@ model Workspace {
   propertyListings       PropertyListing[]
   myPlusLeadsIntegrations MyPlusLeadsIntegration[]
   voiceSettings  VoiceSettings?
+  notifications  SystemNotification[]
 }
 
 model WorkspaceMember {
@@ -95,6 +100,7 @@ model Lead {
   contactId       String
   userId          String?
   isAiAssisted    Boolean           @default(false)
+  isRead          Boolean           @default(false)
   socialProfiles  String?
   publicRecords   String?
   lastEnrichedAt  DateTime?
@@ -199,10 +205,12 @@ model Task {
 }
 
 model Activity {
-  id          String    @id @default(cuid())
-  type        String    @default("NOTE")
-  content     String
-  metadata    String?
+  id               String    @id @default(cuid())
+  type             String    @default("NOTE")
+  content          String
+  formattedContent String?
+  isPinned         Boolean           @default(false)
+  metadata         String?
   workspaceId String
   userId      String?
   leadId      String?
@@ -382,4 +390,18 @@ model BlogPost {
 
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   author      User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+}
+
+model SystemNotification {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  type        String   @default("MLS_ALERT") // MLS_ALERT, TASK, LEAD
+  isRead      Boolean  @default(false)
+  workspaceId String
+  userId      String?
+  createdAt   DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

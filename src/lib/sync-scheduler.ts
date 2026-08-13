@@ -30,15 +30,12 @@ export function startSyncScheduler() {
       const hour = now.getHours();
       const nowMs = now.getTime();
 
-      const isMorningWindow = hour >= SYNC_WINDOW_START && hour < SYNC_WINDOW_END;
       const timeSinceLastSync = nowMs - lastSyncTimeMs;
-      const oneHourMs = 60 * 60 * 1000;
+      const fifteenMinsMs = 15 * 60 * 1000;
 
-      // Run sync if:
-      // A) In the morning window (runs every 15 mins to capture morning drop immediately)
-      // B) Outside morning window, but at least 1 hour has elapsed since last sync (to fetch stragglers)
-      if (isMorningWindow || timeSinceLastSync >= oneHourMs) {
-        console.log(`[MyPlus Scheduler] Triggering sync (isMorningWindow: ${isMorningWindow}, lastSync: ${lastSyncTimeMs > 0 ? new Date(lastSyncTimeMs).toLocaleTimeString() : 'never'})...`);
+      // Run sync every 15 minutes all day long to deliver leads as soon as they are posted
+      if (timeSinceLastSync >= fifteenMinsMs) {
+        console.log(`[MyPlus Scheduler] Triggering sync (lastSync: ${lastSyncTimeMs > 0 ? new Date(lastSyncTimeMs).toLocaleTimeString() : 'never'})...`);
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const cronSecret = process.env.CRON_SECRET;

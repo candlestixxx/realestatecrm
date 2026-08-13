@@ -53,6 +53,7 @@ type LeadData = {
   source: string | null;
   type: string;
   isAiAssisted: boolean;
+  publicRecords: string | null;
   tags: string | null;
   createdAt: Date | string;
   smartPlanId: string | null;
@@ -111,6 +112,7 @@ export default function LeadDetailLayoutClient({
   const [noteContent, setNoteContent] = useState('');
   const [noteType, setNoteType] = useState('NOTE');
   const [isPostingNote, setIsPostingNote] = useState(false);
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState(true);
 
   // Activity Feed Filter
   const [timelineFilter, setTimelineFilter] = useState('ALL');
@@ -1153,6 +1155,57 @@ export default function LeadDetailLayoutClient({
 
             </div>
 
+            {/* MLS Property details if available */}
+            {(() => {
+              if (!lead.publicRecords) return null;
+              try {
+                const details = JSON.parse(lead.publicRecords);
+                if (!details || typeof details !== 'object') return null;
+
+                return (
+                  <div className="pt-4 border-t border-border/60 space-y-2.5">
+                    <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">MLS & Listing Details</span>
+                    <div className="p-3 bg-muted/40 border border-border/60 rounded-xl space-y-2 text-xs font-semibold">
+                      {details.daysOnMarket !== undefined && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">Days on Market:</span>
+                          <span className="text-foreground font-black">{details.daysOnMarket} Days</span>
+                        </div>
+                      )}
+                      {details.timesListed !== undefined && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">Times Listed:</span>
+                          <span className="text-foreground font-black">{details.timesListed} Times</span>
+                        </div>
+                      )}
+                      {details.listPrice !== undefined && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">List Price:</span>
+                          <span className="text-foreground font-black">${Number(details.listPrice).toLocaleString()}</span>
+                        </div>
+                      )}
+                      {details.originalPrice !== undefined && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">Original Price:</span>
+                          <span className="text-foreground font-black">${Number(details.originalPrice).toLocaleString()}</span>
+                        </div>
+                      )}
+                      {details.lastPriceChangeDate && (
+                        <div className="flex flex-col gap-0.5 pt-1 border-t border-border/30">
+                          <span className="text-[10px] text-muted-foreground uppercase font-black">Price Change History</span>
+                          <span className="text-[10px] text-foreground font-semibold">
+                            Changed on {new Date(details.lastPriceChangeDate).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              } catch (_) {
+                return null;
+              }
+            })()}
+
             {/* Ownership Card */}
             <div className="pt-4 border-t border-border/60 space-y-2.5">
               <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Ownership</span>
@@ -1256,13 +1309,25 @@ export default function LeadDetailLayoutClient({
                         <List className="w-3.5 h-3.5" />
                       </button>
                       <span className="mx-1 text-border">|</span>
-                      <span className="text-[10px] text-muted-foreground font-medium">Style your note</span>
+                      <button
+                        type="button"
+                        onClick={() => setSpellCheckEnabled(!spellCheckEnabled)}
+                        className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer border ${
+                          spellCheckEnabled 
+                            ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
+                            : 'bg-muted text-muted-foreground border-border'
+                        }`}
+                        title="Toggle Browser Spell Check"
+                      >
+                        🔤 Spellcheck: {spellCheckEnabled ? 'ON' : 'OFF'}
+                      </button>
                     </div>
 
                     <textarea
                       ref={textareaRef}
                       value={noteContent}
                       onChange={(e) => setNoteContent(e.target.value)}
+                      spellCheck={spellCheckEnabled}
                       placeholder={
                         noteType === 'CALL' ? 'Write summary of the phone call...' :
                         noteType === 'TEXT' ? 'Type text message content...' :
@@ -1414,6 +1479,7 @@ export default function LeadDetailLayoutClient({
                           onChange={(e) => setNewTaskDesc(e.target.value)}
                           placeholder="Task Description..."
                           rows={2}
+                          spellCheck={spellCheckEnabled}
                           className="w-full bg-background border border-border/60 rounded px-2.5 py-1 text-xs focus:outline-none resize-none"
                         />
                         <div className="grid grid-cols-2 gap-2">
@@ -1522,7 +1588,7 @@ export default function LeadDetailLayoutClient({
                                 className="w-full bg-background border border-border rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
                                 placeholder="Task title" />
                               <textarea value={editTaskDesc} onChange={(e) => setEditTaskDesc(e.target.value)}
-                                rows={2} className="w-full bg-background border border-border rounded px-3 py-2 text-xs focus:outline-none resize-none"
+                                rows={2} spellCheck={spellCheckEnabled} className="w-full bg-background border border-border rounded px-3 py-2 text-xs focus:outline-none resize-none"
                                 placeholder="Description (optional)" />
                               <div className="grid grid-cols-2 gap-2">
                                 <div>

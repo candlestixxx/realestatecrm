@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { 
   Search, ShieldAlert, Sparkles, Code2, Database, HelpCircle, MailCheck, UserPlus, Sliders, Globe2, CreditCard, ToggleRight, ToggleLeft
 } from 'lucide-react';
 import { MyPlusLeadsSettingsForm } from '@/components/MyPlusLeadsSettingsForm';
+import { getNotificationPreferencesAction, updateNotificationPreferencesAction } from '@/lib/actions/notification';
 
 type PartnerProduct = {
   id: string;
@@ -89,6 +90,35 @@ export default function IntegrationCenterClient({
   
   // MyPlusLeads Configuration modal state
   const [activePartnerConfig, setActivePartnerConfig] = useState<string | null>(null);
+
+  // MLS Relisting Alerts preferences state
+  const [smsAlerts, setSmsAlerts] = useState(false);
+  const [emailAlerts, setEmailAlerts] = useState(true);
+  const [isUpdatingPrefs, setIsUpdatingPrefs] = useState(false);
+
+  useEffect(() => {
+    async function loadPrefs() {
+      const res = await getNotificationPreferencesAction();
+      if (res.success && res.preferences) {
+        setSmsAlerts(res.preferences.smsAlertsMlsRelist);
+        setEmailAlerts(res.preferences.emailAlertsMlsRelist);
+      }
+    }
+    loadPrefs();
+  }, []);
+
+  const handleUpdatePrefs = async (sms: boolean, email: boolean) => {
+    setSmsAlerts(sms);
+    setEmailAlerts(email);
+    setIsUpdatingPrefs(true);
+    const res = await updateNotificationPreferencesAction(sms, email);
+    setIsUpdatingPrefs(false);
+    if (res.success) {
+      toast.success('Notification preferences updated!');
+    } else {
+      toast.error(res.error || 'Failed to save preferences.');
+    }
+  };
 
   const toggleConnection = (id: string) => {
     if (id === 'myplus') {
@@ -218,6 +248,56 @@ export default function IntegrationCenterClient({
             ))}
           </div>
 
+        </div>
+
+        {/* Notification Alerts Preferences Card */}
+        <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-sm mt-6">
+          <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+            <ShieldAlert className="w-5 h-5 text-indigo-500" />
+            <h3 className="text-sm font-black text-foreground uppercase tracking-wider">
+              MLS Relist Notification Preferences
+            </h3>
+          </div>
+          <p className="text-xs text-muted-foreground font-semibold leading-relaxed">
+            When a lead's property is detected as back on the market (ACTIVE on MLS), configure how you want to be notified. Drip campaigns will always be paused automatically.
+          </p>
+          <div className="grid md:grid-cols-2 gap-4 pt-2">
+            <div className="flex items-center justify-between p-3 bg-muted/20 border border-border/60 rounded-xl">
+              <div className="flex flex-col min-w-0 pr-2">
+                <span className="text-xs font-bold text-foreground">Email Notifications</span>
+                <span className="text-[10px] text-muted-foreground font-semibold leading-normal">Send email alerts to assigned agent</span>
+              </div>
+              <button
+                onClick={() => handleUpdatePrefs(smsAlerts, !emailAlerts)}
+                disabled={isUpdatingPrefs}
+                className="cursor-pointer shrink-0"
+              >
+                {emailAlerts ? (
+                  <ToggleRight className="w-9 h-9 text-indigo-500" />
+                ) : (
+                  <ToggleLeft className="w-9 h-9 text-muted-foreground" />
+                )}
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-muted/20 border border-border/60 rounded-xl">
+              <div className="flex flex-col min-w-0 pr-2">
+                <span className="text-xs font-bold text-foreground">SMS Notifications (Charges Apply)</span>
+                <span className="text-[10px] text-muted-foreground font-semibold leading-normal">Send text alerts to agent's cell phone</span>
+              </div>
+              <button
+                onClick={() => handleUpdatePrefs(!smsAlerts, emailAlerts)}
+                disabled={isUpdatingPrefs}
+                className="cursor-pointer shrink-0"
+              >
+                {smsAlerts ? (
+                  <ToggleRight className="w-9 h-9 text-indigo-500" />
+                ) : (
+                  <ToggleLeft className="w-9 h-9 text-muted-foreground" />
+                )}
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>

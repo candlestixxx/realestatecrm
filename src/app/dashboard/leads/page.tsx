@@ -145,19 +145,13 @@ export default async function LeadsPage(props: {
   let loadError: string | null = null;
 
   try {
-    const [leadRows, leadTotal] = await Promise.all([
-      prisma.lead.findMany({
-        where: whereClause,
-        include: { contact: true },
-        orderBy: { createdAt: 'desc' },
-        take: pageSize,
-        skip: (currentPage - 1) * pageSize,
-      }),
-      prisma.lead.count({ where: whereClause }),
-    ]);
-
+    const leadRows = await prisma.lead.findMany({
+      where: { workspaceId },
+      include: { contact: true },
+      orderBy: { createdAt: 'desc' },
+    });
     leads = leadRows;
-    totalCount = leadTotal;
+    totalCount = leadRows.length;
   } catch (error) {
     console.error('Leads page load failed:', error);
     loadError = 'The leads list could not load from the database. Showing a safe fallback view.';
@@ -177,7 +171,6 @@ export default async function LeadsPage(props: {
         some: { workspaceId },
       },
     },
-    select: { id: true, name: true, email: true },
   });
 
   const segments = await prisma.segment.findMany({
@@ -194,64 +187,24 @@ export default async function LeadsPage(props: {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Leads</h1>
-          <p className="text-muted-foreground">Manage your incoming leads and prospects.</p>
-        </div>
-        <div className="flex gap-2">
-          <MyPlusImportModal />
-          <AddLeadModal addLeadAction={addLead} workspaces={workspaces} />
-        </div>
-      </div>
-
       {loadError ? (
         <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm text-amber-800 dark:text-amber-200">
           {loadError}
         </div>
       ) : null}
 
-      <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden">
-        <form className="p-4 border-b border-border flex gap-4 items-center bg-muted/20">
-          <input
-            type="text"
-            name="q"
-            defaultValue={query}
-            placeholder="Search leads..."
-            className="flex-1 bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-          />
-          <select
-            name="status"
-            defaultValue={statusFilter}
-            className="bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="ALL">All Statuses</option>
-            <option value="NEW">NEW</option>
-            <option value="PROSPECTING">PROSPECTING</option>
-            <option value="CONTACTED">CONTACTED</option>
-            <option value="QUALIFIED">QUALIFIED</option>
-          </select>
-          <input type="hidden" name="page" value={currentPage} />
-          <input type="hidden" name="limit" value={pageSize} />
-          <button
-            type="submit"
-            className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/90 transition-colors"
-          >
-            Search
-          </button>
-        </form>
-
-        <LeadTableClient
-          initialLeads={leads}
-          totalCount={totalCount}
-          currentPage={currentPage}
-          pageSize={pageSize}
-          workspaces={workspaces}
-          users={users}
-          segments={segments}
-          campaigns={campaigns}
-        />
-      </div>
+      <LeadTableClient
+        initialLeads={leads}
+        totalCount={totalCount}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        workspaces={workspaces}
+        users={users}
+        segments={segments}
+        campaigns={campaigns}
+        addLeadAction={addLead}
+        currentUserId={access.userId}
+      />
     </div>
   );
 }

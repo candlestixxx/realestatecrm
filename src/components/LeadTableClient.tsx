@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AddTaskModal from './AddTaskModal';
+import AddLeadModal from './AddLeadModal';
 import { addTaskAction } from '@/lib/actions/task';
 import { bulkEnrollLeadsInCampaignAction } from '@/lib/actions/campaign';
 import { deleteLeadAction, importLeadsBulkAction, assignLeadAction, enrollLeadInSmartPlanAction, updateLeadTagsAction, bulkUpdateLeadTagsAction, bulkAssignLeadAction, bulkDeleteLeadAction } from '@/lib/actions/lead';
@@ -373,14 +374,18 @@ function LeadQuickMenu({
 
 export function LeadTableClient({
   initialLeads,
-  totalCount,
-  currentPage,
-  pageSize,
+  totalCount: serverTotalCount,
+  currentPage: serverCurrentPage,
+  pageSize: serverPageSize,
   workspaces,
   users,
   segments = [],
   campaigns = [],
+  addLeadAction,
+  currentUserId,
 }: {
+  addLeadAction: (formData: FormData) => Promise<{ success?: boolean; error?: string }>;
+  currentUserId?: string;
   initialLeads: LeadRow[];
   totalCount: number;
   currentPage: number;
@@ -392,6 +397,170 @@ export function LeadTableClient({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Custom view and filter states
+  const [activeView, setActiveView] = useState('All Leads');
+  const [customViews, setCustomViews] = useState<{name: string, filters: any}[]>([]);
+  const [activeStatus, setActiveStatus] = useState('ALL');
+  const [ownerMode, setOwnerMode] = useState('ALL'); // 'ALL' | 'COMPANY' | 'PRIVATE'
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // All Filters Sidebar States
+  const [showFiltersSidebar, setShowFiltersSidebar] = useState(false);
+  const [sidebarSearch, setSidebarSearch] = useState('');
+  const [filterAddress, setFilterAddress] = useState('');
+  const [filterOwner, setFilterOwner] = useState('ALL');
+  const [filterAgent, setFilterAgent] = useState('ALL');
+  const [filterType, setFilterType] = useState('ALL');
+  const [filterSource, setFilterSource] = useState('ALL');
+  const [filterTags, setFilterTags] = useState('');
+  const [filterMinScore, setFilterMinScore] = useState('');
+
+  // Three dots menu state
+  const [showThreeDotsMenu, setShowThreeDotsMenu] = useState(false);
+  const threeDotsRef = useRef<HTMLDivElement>(null);
+  
+  // Custom view creation modal state
+  const [showCustomViewModal, setShowCustomViewModal] = useState(false);
+  const [newViewName, setNewViewName] = useState('');
+
+  // Collapsed sections in sidebar
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
+    address: true,
+    owner: false,
+    agent: false,
+    type: false,
+    source: false,
+    tags: true,
+    score: true,
+  });
+
+  // Client-side pagination state overrides
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Load custom views on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('crm_custom_views');
+      if (saved) {
+        setCustomViews(JSON.parse(saved));
+      }
+    } catch (e) {}
+  }, []);
+
+  // Close three dots menu on click outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (threeDotsRef.current && !threeDotsRef.current.contains(e.target as Node)) {
+        setShowThreeDotsMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Filtering Logic
+  const displayLeads = initialLeads.filter(lead => {
+    // 1. Owner Mode Filter
+    if (ownerMode === 'COMPANY' && lead.userId) return false;
+    if (ownerMode === 'PRIVATE' && !lead.userId) return false;
+
+    // 2. Active View Filter
+    if (activeView === 'My Leads' && lead.userId !== currentUserId) return false;
+    if (activeView === 'Priorities' && (lead.score === null || lead.score <= 70)) return false;
+    if (activeView === 'Expired' && (!lead.tags || !lead.tags.toLowerCase().includes('expired'))) return false;
+    if (activeView === 'Preforeclosure' && lead.status !== 'PREFORECLOSURE' && (!lead.source || !lead.source.toLowerCase().includes('foreclosure'))) return false;
+    
+    // Custom Saved Views
+    const customView = customViews.find(v => v.name === activeView);
+    if (customView) {
+      const f = customView.filters;
+      if (f.address && (!lead.contact.address || !lead.contact.address.toLowerCase().includes(f.address.toLowerCase()))) return false;
+      if (f.owner && f.owner !== 'ALL' && lead.userId !== f.owner) return false;
+      if (f.agent && f.agent !== 'ALL' && lead.userId !== f.agent) return false;
+      if (f.type && f.type !== 'ALL' && lead.contact.spouseName !== f.type) return false; // type map
+      if (f.source && f.source !== 'ALL' && lead.source !== f.source) return false;
+      if (f.tags && (!lead.tags || !lead.tags.toLowerCase().includes(f.tags.toLowerCase()))) return false;
+      if (f.minScore && (lead.score === null || lead.score < Number(f.minScore))) return false;
+    }
+
+    // 3. Active Status Chip
+    if (activeStatus !== 'ALL' && lead.status !== activeStatus) return false;
+
+    // 4. Main & Sidebar Text Search
+    const searchVal = (searchQuery || sidebarSearch).toLowerCase();
+    if (searchVal) {
+      const fn = (lead.contact.firstName || '').toLowerCase();
+      const ln = (lead.contact.lastName || '').toLowerCase();
+      const email = (lead.contact.email || '').toLowerCase();
+      const phone = (lead.contact.phone || '').toLowerCase();
+      const addr = (lead.contact.address || '').toLowerCase();
+      const tags = (lead.tags || '').toLowerCase();
+      if (!fn.includes(searchVal) && !ln.includes(searchVal) && !email.includes(searchVal) && !phone.includes(searchVal) && !addr.includes(searchVal) && !tags.includes(searchVal)) {
+        return false;
+      }
+    }
+
+    // 5. Sidebar Collapsible Filters
+    if (filterAddress && (!lead.contact.address || !lead.contact.address.toLowerCase().includes(filterAddress.toLowerCase()))) return false;
+    if (filterOwner !== 'ALL' && lead.userId !== filterOwner) return false;
+    if (filterAgent !== 'ALL' && lead.userId !== filterAgent) return false;
+    if (filterType !== 'ALL' && lead.status !== filterType) return false; // Type matching
+    if (filterSource !== 'ALL' && lead.source !== filterSource) return false;
+    if (filterTags && (!lead.tags || !lead.tags.toLowerCase().includes(filterTags.toLowerCase()))) return false;
+    if (filterMinScore && (lead.score === null || lead.score < Number(filterMinScore))) return false;
+
+    return true;
+  });
+
+  const totalCount = displayLeads.length;
+
+  const handleCreateCustomView = () => {
+    if (!newViewName.trim()) return;
+    const newView = {
+      name: newViewName.trim(),
+      filters: {
+        address: filterAddress,
+        owner: filterOwner,
+        agent: filterAgent,
+        type: filterType,
+        source: filterSource,
+        tags: filterTags,
+        minScore: filterMinScore
+      }
+    };
+    const next = [...customViews.filter(v => v.name !== newView.name), newView];
+    setCustomViews(next);
+    localStorage.setItem('crm_custom_views', JSON.stringify(next));
+    setActiveView(newView.name);
+    setNewViewName('');
+    setShowCustomViewModal(false);
+    toast.success(`Custom View "${newView.name}" created!`);
+  };
+
+  const handleDeleteCustomView = (name: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const next = customViews.filter(v => v.name !== name);
+    setCustomViews(next);
+    localStorage.setItem('crm_custom_views', JSON.stringify(next));
+    if (activeView === name) {
+      setActiveView('All Leads');
+    }
+    toast.success(`Custom View "${name}" deleted.`);
+  };
+
+  // Pipeline chip count functions
+  const countByStatus = (status: string) => {
+    return initialLeads.filter(l => {
+      if (ownerMode === 'COMPANY' && l.userId) return false;
+      if (ownerMode === 'PRIVATE' && !l.userId) return false;
+      if (activeView === 'My Leads' && l.userId !== currentUserId) return false;
+      if (status === 'ALL') return true;
+      return l.status === status;
+    }).length;
+  };
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSyncing, setIsSyncing] = useState(false);
   const [activeWorkspace, setActiveWorkspace] = useState('');
@@ -923,683 +1092,625 @@ export function LeadTableClient({
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   return (
-    <div>
-      {/* Top Controls Bar */}
-      <div className="p-4 border-b border-border flex justify-between items-center bg-muted/5">
-        <div className="flex gap-2">
-           <button
-             onClick={handleImportFromQueue}
-             disabled={isSyncing}
-             className="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/20 text-xs font-bold rounded shadow-sm hover:bg-secondary/15 transition-colors disabled:opacity-50"
-           >
-             {isSyncing ? 'Syncing...' : '📥 Sync from Queue'}
-           </button>
-           <button
-             onClick={() => bulkAction('Import from Workflow')}
-             className="px-3 py-1.5 bg-background border border-border text-xs font-medium rounded shadow-sm hover:bg-muted transition-colors mr-2"
-           >
-             🔄 Sync from Workflow
-           </button>
-           <div className="h-6 w-[1px] bg-border mx-1 self-center"></div>
-           <button
-             onClick={() => setShowCsvImportModal(true)}
-             className="px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 text-xs font-bold rounded shadow-sm hover:bg-primary/15 transition-colors cursor-pointer"
-           >
-             📥 Import CSV
-           </button>
-           <button
-             onClick={handleExportCSV}
-             className="px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 text-xs font-bold rounded shadow-sm hover:bg-primary/15 transition-colors cursor-pointer"
-           >
-             📤 Export CSV
-           </button>
-           <button
-             onClick={() => setShowAiIntakeModal(true)}
-             className="px-3 py-1.5 bg-amber-500/10 text-amber-600 border border-amber-500/20 text-xs font-bold rounded shadow-sm hover:bg-amber-500/15 transition-colors cursor-pointer"
-           >
-             ✨ AI Lead Intake
-           </button>
-        </div>
+    <div className="flex relative min-h-screen bg-background">
+      {/* Main Leads Pane */}
+      <div className="flex-1 space-y-4 p-6 transition-all duration-300">
         
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-           <div className="relative" ref={pageSizeMenuRef}>
-            <button
-              onClick={() => setShowPageSizeMenu(p => !p)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border rounded-lg text-xs font-semibold hover:bg-muted transition-colors"
-            >
-              <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-              {pageSize} per page
-              <svg className={`w-3 h-3 transition-transform ${showPageSizeMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-            </button>
-
-            {showPageSizeMenu && (
-              <div className="absolute right-0 top-full mt-1 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-2">
-                <p className="px-3 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Quick select</p>
-                <div className="flex flex-wrap gap-1.5 px-3 pb-2">
-                  {[10, 25, 50, 100, 250, 500].map(n => (
-                    <button
-                      key={n}
-                      onClick={() => { handlePageSizeChange(n); setShowPageSizeMenu(false); }}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
-                        pageSize === n
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-muted border-border hover:bg-muted/80'
-                      }`}
-                    >
-                      {n}
-                    </button>
-                  ))}
+        {/* CRM Header - Add Lead, 3-dots, and Filters Toggle */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2">
+              Leads
+              <span className="bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded-full">
+                {totalCount} total
+              </span>
+            </h1>
+            <p className="text-xs text-muted-foreground font-semibold mt-0.5">Manage your incoming leads and prospects.</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <AddLeadModal addLeadAction={addLeadAction} workspaces={workspaces} />
+            
+            {/* Three Dots Import/Export Dropdown */}
+            <div className="relative" ref={threeDotsRef}>
+              <button
+                onClick={() => setShowThreeDotsMenu(prev => !prev)}
+                className="p-2 border border-border rounded-xl hover:bg-muted/50 transition-colors cursor-pointer"
+                title="More Ingestion Options"
+              >
+                <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
+              </button>
+              
+              {showThreeDotsMenu && (
+                <div className="absolute right-0 top-full mt-2.5 z-50 w-52 bg-card border border-border/80 rounded-2xl shadow-xl overflow-hidden py-2 animate-fadeIn text-xs font-semibold text-muted-foreground">
+                  <p className="px-3 pb-1.5 text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest border-b border-border/40">Leads Actions</p>
+                  <button
+                    onClick={() => { setShowCsvImportModal(true); setShowThreeDotsMenu(false); }}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-muted/60 transition-colors text-left"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    <span>Import CSV File</span>
+                  </button>
+                  <button
+                    onClick={() => { handleExportCSV(); setShowThreeDotsMenu(false); }}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-muted/60 transition-colors text-left"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    <span>Export CSV File</span>
+                  </button>
+                  <button
+                    onClick={() => { setShowAiIntakeModal(true); setShowThreeDotsMenu(false); }}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-muted/60 transition-colors text-left text-amber-600 hover:text-amber-700"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                    <span>✨ AI Lead Ingest</span>
+                  </button>
                 </div>
-                <div className="border-t border-border pt-2 px-3">
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1.5">Custom amount</p>
-                  <div className="flex gap-1.5">
+              )}
+            </div>
+
+            {/* All Filters Toggle Sidebar Button */}
+            <button
+              onClick={() => setShowFiltersSidebar(prev => !prev)}
+              className={`px-4.5 py-2.5 border rounded-xl flex items-center gap-2 transition-all font-black uppercase text-[10px] tracking-widest cursor-pointer ${
+                showFiltersSidebar || displayLeads.length !== initialLeads.length
+                  ? 'bg-primary text-primary-foreground border-primary shadow-md'
+                  : 'bg-background hover:bg-muted text-foreground border-border'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+              <span>Filters ({displayLeads.length !== initialLeads.length ? 'Active' : '0'})</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Lofty Quick View Tabs and Company Leads Dropdown */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-border pb-3 text-xs font-semibold text-muted-foreground overflow-x-auto">
+          <div className="flex items-center gap-2">
+            {/* Company Leads Toggle dropdown */}
+            <select
+              value={ownerMode}
+              onChange={(e) => { setOwnerMode(e.target.value); setCurrentPage(1); }}
+              className="bg-muted hover:bg-muted/80 border-none rounded-xl px-3 py-2 text-foreground font-black uppercase text-[10px] tracking-widest focus:outline-none cursor-pointer"
+            >
+              <option value="ALL">🏢 All Owned Leads</option>
+              <option value="COMPANY">🏢 Company Leads</option>
+              <option value="PRIVATE">🔒 Private Leads</option>
+            </select>
+
+            {/* Quick Views */}
+            <div className="flex items-center gap-1.5 ml-2">
+              {['All Leads', 'My Leads', 'Priorities', 'Expired', 'Preforeclosure'].map(view => (
+                <button
+                  key={view}
+                  onClick={() => { setActiveView(view); setCurrentPage(1); }}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    activeView === view
+                      ? 'bg-primary/15 text-primary font-bold'
+                      : 'hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  {view}
+                </button>
+              ))}
+
+              {/* Custom views */}
+              {customViews.map(view => (
+                <div
+                  key={view.name}
+                  onClick={() => { setActiveView(view.name); setCurrentPage(1); }}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    activeView === view.name
+                      ? 'bg-primary/15 text-primary font-bold'
+                      : 'hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <span>{view.name}</span>
+                  <span
+                    onClick={(e) => handleDeleteCustomView(view.name, e)}
+                    className="text-muted-foreground/60 hover:text-red-500 font-bold ml-1 text-xs"
+                    title="Delete View"
+                  >
+                    ×
+                  </span>
+                </div>
+              ))}
+
+              {/* Add Custom View Button */}
+              <button
+                onClick={() => setShowCustomViewModal(true)}
+                className="px-2.5 py-1.5 border border-dashed border-border hover:border-muted-foreground/40 rounded-lg hover:text-foreground flex items-center gap-1 transition-all cursor-pointer text-[10px] font-black uppercase tracking-wider"
+              >
+                <span>+ View</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Pipeline Stage Chips with count badges */}
+        <div className="flex flex-wrap items-center gap-2 py-2">
+          {[
+            { id: 'ALL', label: 'All Leads' },
+            { id: 'NEW', label: 'New Leads' },
+            { id: 'PROSPECTING', label: 'Attempting Contact' },
+            { id: 'CONTACTED', label: 'Nurturing/Cold' },
+            { id: 'QUALIFIED', label: 'Warm/Hot' },
+          ].map(chip => {
+            const count = countByStatus(chip.id);
+            return (
+              <button
+                key={chip.id}
+                onClick={() => { setActiveStatus(chip.id); setCurrentPage(1); }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                  activeStatus === chip.id
+                    ? 'bg-primary text-primary-foreground shadow-xs'
+                    : 'bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <span>{chip.label}</span>
+                <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
+                  activeStatus === chip.id ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted text-muted-foreground'
+                }`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Sync/Action Toolbar for selection actions */}
+        {selectedIds.size > 0 && (
+          <div className="p-3 border border-indigo-500/20 bg-indigo-500/5 rounded-2xl flex items-center justify-between animate-fadeIn text-xs font-bold text-foreground">
+            <span className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center font-black text-[10px]">
+                {selectedIds.size}
+              </span>
+              <span>Leads Selected</span>
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => bulkAction('Assign')}
+                className="px-3 py-1.5 bg-background border border-border hover:bg-muted rounded-xl transition-all cursor-pointer"
+              >
+                👤 Assign
+              </button>
+              <button
+                onClick={() => bulkAction('Tags')}
+                className="px-3 py-1.5 bg-background border border-border hover:bg-muted rounded-xl transition-all cursor-pointer"
+              >
+                🏷️ Tags
+              </button>
+              <button
+                onClick={() => bulkAction('Enroll Smart Plan')}
+                className="px-3 py-1.5 bg-background border border-border hover:bg-muted rounded-xl transition-all cursor-pointer"
+              >
+                🤖 Smart Plan
+              </button>
+              <button
+                onClick={() => bulkAction('Delete')}
+                className="px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/15 rounded-xl transition-all cursor-pointer border border-red-500/20"
+              >
+                🗑️ Delete
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Lead Rows Table */}
+        <div className="bg-card border border-border/60 rounded-2xl shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
+                <tr>
+                  <th className="px-4 py-3.5 font-medium w-10">
                     <input
-                      type="number"
-                      min={1}
-                      max={1000}
-                      value={customPageSize}
-                      onChange={e => setCustomPageSize(e.target.value)}
-                      placeholder="e.g. 200"
-                      className="flex-1 bg-background border border-border rounded-lg px-2 py-1 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          const n = parseInt(customPageSize);
-                          if (n > 0) { handlePageSizeChange(Math.min(n, 1000)); setShowPageSizeMenu(false); setCustomPageSize(''); }
-                        }
-                      }}
+                      type="checkbox"
+                      onChange={handleSelectAll}
+                      checked={selectedIds.size === displayLeads.length && displayLeads.length > 0}
+                      className="rounded border-border cursor-pointer accent-primary"
                     />
-                    <button
-                      onClick={() => {
-                        const n = parseInt(customPageSize);
-                        if (n > 0) { handlePageSizeChange(Math.min(n, 1000)); setShowPageSizeMenu(false); setCustomPageSize(''); }
-                      }}
-                      className="px-2.5 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90"
-                    >
-                      Go
-                    </button>
-                  </div>
-                  <p className="text-[10px] text-muted-foreground mt-1">{totalCount} total leads</p>
-                </div>
-                <div className="border-t border-border mt-2 pt-2 px-3">
-                  <button
-                    onClick={() => { handlePageSizeChange(totalCount || 1000); setShowPageSizeMenu(false); }}
-                    className="w-full px-2 py-1.5 bg-amber-500/10 text-amber-600 border border-amber-500/20 text-xs font-bold rounded-lg hover:bg-amber-500/20 transition-colors"
-                  >
-                    Show all {totalCount} leads
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+                  </th>
+                  <th className="px-4 py-3.5 font-bold">Name</th>
+                  <th className="px-4 py-3.5 font-bold">Contact Info</th>
+                  <th className="px-4 py-3.5 font-bold">Pipeline</th>
+                  <th className="px-4 py-3.5 font-bold">Tags</th>
+                  <th className="px-4 py-3.5 font-bold">Owner</th>
+                  <th className="px-4 py-3.5 font-bold">Agent</th>
+                  <th className="px-4 py-3.5 font-bold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {displayLeads.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((lead) => {
+                  const assignedUser = users.find(u => u.id === lead.userId);
+                  return (
+                    <tr key={lead.id} className={`hover:bg-muted/10 transition-colors group ${selectedIds.has(lead.id) ? 'bg-primary/5' : ''}`}>
+                      <td className="px-4 py-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(lead.id)}
+                          onChange={(e) => handleSelectOne(lead.id, e.target.checked)}
+                          className="rounded border-border text-primary cursor-pointer accent-primary"
+                        />
+                      </td>
 
-      {/* Workflow Selection Modal */}
-      {showWorkflowModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-md overflow-hidden">
-            <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
-              <h3 className="font-bold text-lg">Select Workflow</h3>
-              <button onClick={() => setShowWorkflowModal(false)} className="text-muted-foreground hover:text-foreground">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            <div className="p-4 space-y-2">
-              <button onClick={() => startWorkflow('/workflows/offer-draft')} className="w-full flex items-start gap-3 p-3 rounded-xl border border-border bg-background hover:bg-muted/50 transition-all text-left group">
-                <span className="text-2xl group-hover:scale-110 transition-transform">📄</span>
-                <div className="flex flex-col">
-                  <span className="font-bold text-sm">Offer Draft</span>
-                  <span className="text-xs text-muted-foreground">Prepare a buy-side offer for this lead.</span>
-                </div>
-              </button>
-              <button onClick={() => startWorkflow('/workflows/listing-entry')} className="w-full flex items-start gap-3 p-3 rounded-xl border border-border bg-background hover:bg-muted/50 transition-all text-left group">
-                <span className="text-2xl group-hover:scale-110 transition-transform">🏡</span>
-                <div className="flex flex-col">
-                  <span className="font-bold text-sm">Listing Entry</span>
-                  <span className="text-xs text-muted-foreground">Prepare a sell-side property listing.</span>
-                </div>
-              </button>
-              <button onClick={() => startWorkflow('/workflows/foreclosure-intake')} className="w-full flex items-start gap-3 p-3 rounded-xl border border-border bg-background hover:bg-muted/50 transition-all text-left group">
-                <span className="text-2xl group-hover:scale-110 transition-transform">🏛️</span>
-                <div className="flex flex-col">
-                  <span className="font-bold text-sm">Foreclosure Intake</span>
-                  <span className="text-xs text-muted-foreground">Process distressed property data.</span>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                      {/* Name + lead type badge */}
+                      <td className="px-4 py-3 font-semibold">
+                        <div className="flex flex-col">
+                          <Link
+                            href={`/dashboard/leads/${lead.id}`}
+                            className="hover:text-primary hover:underline font-extrabold text-foreground transition-colors text-sm"
+                          >
+                            {lead.contact?.firstName} {lead.contact?.lastName}
+                          </Link>
+                          <span className="text-[10px] text-muted-foreground font-medium mt-0.5 uppercase tracking-wider block">
+                            {lead.status === 'PREFORECLOSURE' ? 'Seller' : 'Buyer'}
+                          </span>
+                        </div>
+                      </td>
 
-      {/* Segment Selection Modal */}
-      {showSegmentModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-md overflow-hidden">
-            <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
-              <h3 className="font-bold text-lg">Add to Segment</h3>
-              <button onClick={() => setShowSegmentModal(false)} className="text-muted-foreground hover:text-foreground">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            <div className="p-4 space-y-2 max-h-[300px] overflow-y-auto">
-              {segments.length === 0 ? (
-                <div className="p-4 text-center text-sm text-muted-foreground">
-                  No segments found. Go to the Segments page to create one.
-                </div>
-              ) : (
-                segments.map((seg) => (
-                  <button
-                    key={seg.id}
-                    onClick={() => handleAddToSegment(seg.id)}
-                    className="w-full flex items-center justify-between p-3 rounded-xl border border-border bg-background hover:bg-muted/50 transition-all text-left font-bold text-sm"
-                  >
-                    <span>📁 {seg.name}</span>
-                    <span className="text-xs text-primary font-normal">Select &rarr;</span>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+                      {/* Contact Info */}
+                      <td className="px-4 py-3 text-xs font-semibold text-muted-foreground">
+                        <div className="flex flex-col gap-0.5">
+                          {lead.contact?.email && <span className="text-foreground">{lead.contact.email}</span>}
+                          {lead.contact?.phone && <span>{lead.contact.phone}</span>}
+                        </div>
+                      </td>
 
-      {/* Campaign Selection Modal */}
-      {showCampaignModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-md overflow-hidden">
-            <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
-              <h3 className="font-bold text-lg">Enroll in Drip Campaign</h3>
-              <button onClick={() => setShowCampaignModal(false)} className="text-muted-foreground hover:text-foreground">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            <div className="p-4 space-y-2 max-h-[300px] overflow-y-auto">
-              {campaigns.length === 0 ? (
-                <div className="p-4 text-center text-sm text-muted-foreground">
-                  No campaigns found. Go to the Campaigns page to create one.
-                </div>
-              ) : (
-                campaigns.map((camp) => (
-                  <button
-                    key={camp.id}
-                    onClick={() => handleEnrollCampaignBulk(camp.id)}
-                    className="w-full flex items-center justify-between p-3 rounded-xl border border-border bg-background hover:bg-muted/50 transition-all text-left font-bold text-sm"
-                  >
-                    <span>🤖 {camp.name}</span>
-                    <span className="text-xs text-primary font-normal">Enroll Selected &rarr;</span>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+                      {/* Pipeline Status */}
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
+                          lead.status === 'NEW' ? 'bg-blue-500/10 text-blue-500' :
+                          lead.status === 'PROSPECTING' ? 'bg-amber-500/10 text-amber-500' :
+                          lead.status === 'CONTACTED' ? 'bg-emerald-500/10 text-emerald-500' :
+                          'bg-muted text-muted-foreground'
+                        }`}>
+                          {lead.status}
+                        </span>
+                      </td>
 
+                      {/* Tags */}
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1 max-w-[150px]">
+                          {(lead.tags || '').split(',').filter(Boolean).map(t => (
+                            <span key={t} className="bg-primary/5 text-primary text-[9px] font-bold px-1.5 py-0.5 rounded">
+                              {t.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
 
-      {/* ========== LOFTY-STYLE SELECTION TOOLBAR ========== */}
-      {selectedIds.size > 0 && (
-        <div className="sticky top-16 z-30 border-b border-primary/25 bg-[hsl(var(--primary)/0.08)] backdrop-blur-md px-4 py-2 flex items-center gap-2 shadow-sm">
+                      {/* Owner */}
+                      <td className="px-4 py-3 text-xs font-bold text-muted-foreground">
+                        {assignedUser ? assignedUser.name || assignedUser.email : 'Company-Owned'}
+                      </td>
 
-          {/* Selection count badge + select-all-pages toggle */}
-          <div className="flex items-center gap-2 mr-2">
-            <span className="inline-flex items-center justify-center min-w-[24px] h-6 rounded-full bg-primary text-primary-foreground text-[11px] font-black px-2">
-              {selectAllMode ? totalCount : selectedIds.size}
-            </span>
-            <span className="text-xs font-semibold text-foreground/70">
-              {selectAllMode ? `all leads selected` : 'selected'}
-            </span>
-          </div>
+                      {/* Agent */}
+                      <td className="px-4 py-3 text-xs font-bold text-muted-foreground">
+                        {assignedUser ? assignedUser.name || 'Unassigned' : 'Excel Legacy Real Estate'}
+                      </td>
 
-          <div className="h-5 w-px bg-border mx-1" />
+                      <td className="px-4 py-3 text-right">
+                        <LeadQuickMenu
+                          lead={lead}
+                          users={users}
+                          campaigns={campaigns}
+                          workspaces={workspaces}
+                          onRefresh={() => router.refresh()}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
 
-          {/* Mass Email */}
-          <button
-            onClick={() => bulkAction('Email')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-semibold hover:bg-muted transition-colors"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-            Mass Email
-          </button>
-
-          {/* Assign to Agent – flyout */}
-          <div className="relative">
-            <button
-              onClick={() => { setShowBulkAssignPanel(p => !p); setShowBulkTagPanel(false); setShowMoreMenu(false); }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-semibold hover:bg-muted transition-colors"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-              Assign to Agent
-              <svg className={`w-3 h-3 transition-transform ${showBulkAssignPanel ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-            </button>
-            {showBulkAssignPanel && (
-              <div className="absolute left-0 top-full mt-1 z-50 w-56 bg-background border border-border rounded-xl shadow-2xl overflow-hidden">
-                <div className="px-3 py-2 border-b border-border">
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase">Assign {selectedIds.size} lead(s) to:</p>
-                </div>
-                <div className="py-1 max-h-52 overflow-y-auto">
-                  <button
-                    onClick={() => handleBulkAssign(null)}
-                    disabled={isBulkAssigning}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
-                  >
-                    <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">—</span>
-                    <span>Unassigned</span>
-                  </button>
-                  {users.map(user => (
-                    <button
-                      key={user.id}
-                      onClick={() => handleBulkAssign(user.id)}
-                      disabled={isBulkAssigning}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
-                    >
-                      <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold uppercase">
-                        {(user.name || user.email || '?')[0]}
-                      </span>
-                      <span>{user.name || user.email || 'Agent'}</span>
-                    </button>
-                  ))}
-                </div>
-                {isBulkAssigning && (
-                  <div className="px-3 py-2 border-t border-border text-[10px] text-muted-foreground text-center">Assigning...</div>
+                {displayLeads.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-6 py-12 text-center text-muted-foreground font-semibold text-xs">
+                      No leads match the active filters. Open "Filters" or choose a different tab view.
+                    </td>
+                  </tr>
                 )}
-              </div>
-            )}
+              </tbody>
+            </table>
           </div>
 
-          {/* Add Smart Plan – flyout */}
-          <button
-            onClick={() => { setShowCampaignModal(true); setShowMoreMenu(false); }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-semibold hover:bg-muted transition-colors"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" /></svg>
-            Add Smart Plan
-          </button>
-
-          {/* More dropdown */}
-          <div className="relative" ref={moreMenuRef}>
-            <button
-              onClick={() => { setShowMoreMenu(p => !p); setShowBulkAssignPanel(false); setShowBulkTagPanel(false); }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-semibold hover:bg-muted transition-colors"
-            >
-              More
-              <svg className={`w-3 h-3 transition-transform ${showMoreMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-            </button>
-
-            {showMoreMenu && (
-              <div className="absolute left-0 top-full mt-1 z-50 w-56 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-1">
-
-                {/* Change Tags */}
-                <button
-                  onClick={() => { setShowBulkTagPanel(true); setShowMoreMenu(false); setBulkTagInput(''); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
-                >
-                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
-                  <span className="font-semibold">Change Tags</span>
-                </button>
-
-                {/* Add to Segment */}
-                <button
-                  onClick={() => { setShowSegmentModal(true); setShowMoreMenu(false); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
-                >
-                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
-                  <span className="font-semibold">Add to Segment</span>
-                </button>
-
-                {/* Add to Workflow */}
-                <button
-                  onClick={() => { setShowWorkflowModal(true); setShowMoreMenu(false); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
-                >
-                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                  <span className="font-semibold">Add to Workflow</span>
-                </button>
-
-                {/* Send Opt-In Email */}
-                <button
-                  onClick={() => { toast.success('Opt-in email queued for selected leads.'); setShowMoreMenu(false); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
-                >
-                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                  <span className="font-semibold">Send Opt-In Email</span>
-                </button>
-
-                {/* Mailing Label */}
-                <button
-                  onClick={() => { toast.success('Mailing labels generated.'); setShowMoreMenu(false); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
-                >
-                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                  <span className="font-semibold">Mailing Label</span>
-                </button>
-
-                {/* Merge */}
-                <button
-                  onClick={() => {
-                    if (selectedIds.size !== 2) { toast.error('Select exactly 2 leads to merge.'); setShowMoreMenu(false); return; }
-                    toast.success('Merge feature coming soon — select exactly 2 leads.');
-                    setShowMoreMenu(false);
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
-                >
-                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
-                  <span className="font-semibold">Merge</span>
-                  {selectedIds.size !== 2 && <span className="ml-auto text-[10px] text-muted-foreground">2 required</span>}
-                </button>
-
-                <div className="border-t border-border my-1" />
-
-                {/* Delete */}
-                <button
-                  onClick={async () => {
-                    setShowMoreMenu(false);
-                    if (selectAllMode) {
-                      toast.error('Bulk deleting across all pages is coming soon. For now, please delete one page at a time.');
-                      return;
-                    }
-                    const ids = Array.from(selectedIds);
-                    if (confirm(`Delete ${ids.length} selected lead(s)? This cannot be undone.`)) {
-                      const res = await bulkDeleteLeadAction(ids);
-                      if (res.error) {
-                        toast.error(res.error);
-                      } else {
-                        toast.success(`Deleted ${ids.length} leads.`);
-                        setSelectedIds(new Set());
-                        router.refresh();
-                      }
-                    }
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-red-500/10 text-red-500 transition-colors text-left"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  <span className="font-semibold">Delete</span>
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          {/* Cancel selection */}
-          <button
-            onClick={() => { setSelectedIds(new Set()); setSelectAllMode(false); }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background/60 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            Cancel
-          </button>
-        </div>
-      )}
-
-      {/* Gmail-style Select-All-Pages Banner */}
-      {selectedIds.size === initialLeads.length && initialLeads.length > 0 && totalCount > initialLeads.length && (
-        <div className={`flex items-center justify-center gap-3 px-4 py-2 text-xs font-medium border-b ${
-          selectAllMode
-            ? 'bg-primary/10 border-primary/20 text-primary'
-            : 'bg-blue-500/8 border-blue-500/15 text-foreground'
-        }`}>
-          {selectAllMode ? (
-            <>
-              <svg className="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              <span>All <strong>{totalCount}</strong> leads are selected across all pages.</span>
-              <button
-                onClick={() => { setSelectAllMode(false); setSelectedIds(new Set()); }}
-                className="underline underline-offset-2 hover:text-primary transition-colors font-semibold"
-              >
-                Clear selection
-              </button>
-            </>
-          ) : (
-            <>
-              <span>All <strong>{initialLeads.length}</strong> leads on this page are selected.</span>
-              <button
-                onClick={() => setSelectAllMode(true)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 transition-colors"
-              >
-                Select all {totalCount} leads
-              </button>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* Bulk Tag Change Panel (modal) */}
-      {showBulkTagPanel && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-background border border-border rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-            <div className="p-4 border-b border-border flex items-center justify-between bg-muted/20">
-              <div>
-                <h3 className="font-bold text-sm">Change Tags</h3>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Applies to {selectedIds.size} selected lead(s)</p>
-              </div>
-              <button onClick={() => setShowBulkTagPanel(false)} className="text-muted-foreground hover:text-foreground">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
+          {/* Client Side Pagination controls */}
+          <div className="p-4 border-t border-border flex items-center justify-between text-xs font-semibold text-muted-foreground bg-muted/10">
+            <div>
+              <span>
+                Showing {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1} to{' '}
+                {Math.min(currentPage * pageSize, totalCount)} of {totalCount} entries
+              </span>
             </div>
-            <div className="p-4 space-y-3">
-              <p className="text-[10px] text-muted-foreground">This will replace tags on all selected leads. Separate with commas.</p>
-              <input
-                type="text"
-                value={bulkTagInput}
-                onChange={e => setBulkTagInput(e.target.value)}
-                placeholder="e.g. #hot, #investor, #june-2025"
-                autoFocus
-                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
-              />
-              <div className="flex flex-wrap gap-1">
-                {['#hot', '#warm', '#cold', '#investor', '#cash-buyer', '#motivated', '#vip'].map(chip => (
+            
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+                className="px-3 py-1.5 border border-border rounded-xl hover:bg-muted transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+              >
+                Prev
+              </button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).slice(Math.max(0, currentPage - 3), Math.min(totalPages, currentPage + 2)).map(p => (
                   <button
-                    key={chip}
-                    onClick={() => {
-                      const current = bulkTagInput.split(',').map(t => t.trim()).filter(Boolean);
-                      if (!current.includes(chip)) setBulkTagInput([...current, chip].join(', '));
-                    }}
-                    className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 hover:bg-blue-500/20 transition-colors"
+                    key={p}
+                    onClick={() => setCurrentPage(p)}
+                    className={`w-8 h-8 rounded-lg font-bold transition-all cursor-pointer ${
+                      currentPage === p ? 'bg-primary text-primary-foreground shadow-xs' : 'hover:bg-muted'
+                    }`}
                   >
-                    {chip}
+                    {p}
                   </button>
                 ))}
               </div>
-            </div>
-            <div className="p-4 border-t border-border flex gap-2 justify-end">
-              <button onClick={() => setShowBulkTagPanel(false)} className="px-3 py-1.5 text-xs rounded-lg hover:bg-muted">
-                Cancel
-              </button>
+
               <button
-                onClick={handleBulkChangeTags}
-                disabled={isBulkTagSaving}
-                className="px-4 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90 disabled:opacity-50"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+                className="px-3 py-1.5 border border-border rounded-xl hover:bg-muted transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
               >
-                {isBulkTagSaving ? 'Saving...' : `Apply to ${selectedIds.size} Lead(s)`}
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Lofty "All Filters" Right Slide-Out Sidebar Panel */}
+      {showFiltersSidebar && (
+        <div className="w-80 bg-card border-l border-border/80 p-5 shadow-2xl flex flex-col h-screen sticky top-0 overflow-y-auto animate-slideIn">
+          <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-4">
+            <span className="font-extrabold text-sm text-foreground uppercase tracking-wider">All Filters</span>
+            <button
+              onClick={() => setShowFiltersSidebar(false)}
+              className="p-1.5 hover:bg-muted/60 rounded-lg text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+
+          <div className="flex-1 space-y-4 text-xs font-semibold text-muted-foreground">
+            {/* Direct Finder Search bar inside panel */}
+            <div className="space-y-1.5 p-3.5 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl">
+              <label className="block text-[9px] font-black uppercase text-indigo-600 tracking-wider">Tell criteria or filter leads</label>
+              <div className="flex gap-1.5 mt-1">
+                <input
+                  type="text"
+                  placeholder="e.g. St. Clair Shores..."
+                  value={sidebarSearch}
+                  onChange={(e) => setSidebarSearch(e.target.value)}
+                  className="flex-1 bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none font-medium"
+                />
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors cursor-pointer"
+                >
+                  Find
+                </button>
+              </div>
+            </div>
+
+            {/* Address Collapsible accordion */}
+            <div className="border-b border-border/40 pb-3">
+              <button
+                onClick={() => setCollapsedSections(prev => ({ ...prev, address: !prev.address }))}
+                className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
+              >
+                <span>Filter by Address</span>
+                <span className="text-muted-foreground/60">{collapsedSections.address ? '▼' : '▲'}</span>
+              </button>
+              {!collapsedSections.address && (
+                <input
+                  type="text"
+                  placeholder="City, Zip, or Street"
+                  value={filterAddress}
+                  onChange={(e) => { setFilterAddress(e.target.value); setCurrentPage(1); }}
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 mt-2 text-foreground font-medium focus:outline-none"
+                />
+              )}
+            </div>
+
+            {/* Lead Owner Collapsible Accordion */}
+            <div className="border-b border-border/40 pb-3">
+              <button
+                onClick={() => setCollapsedSections(prev => ({ ...prev, owner: !prev.owner }))}
+                className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
+              >
+                <span>Lead Owner</span>
+                <span className="text-muted-foreground/60">{collapsedSections.owner ? '▼' : '▲'}</span>
+              </button>
+              {!collapsedSections.owner && (
+                <select
+                  value={filterOwner}
+                  onChange={(e) => { setFilterOwner(e.target.value); setCurrentPage(1); }}
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 mt-2 text-foreground focus:outline-none cursor-pointer"
+                >
+                  <option value="ALL">All Owners</option>
+                  <option value="COMPANY">Company Leads</option>
+                  {users.map(u => (
+                    <option key={u.id} value={u.id}>{u.name || u.email}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Agent Collapsible Accordion */}
+            <div className="border-b border-border/40 pb-3">
+              <button
+                onClick={() => setCollapsedSections(prev => ({ ...prev, agent: !prev.agent }))}
+                className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
+              >
+                <span>Assignee Agent</span>
+                <span className="text-muted-foreground/60">{collapsedSections.agent ? '▼' : '▲'}</span>
+              </button>
+              {!collapsedSections.agent && (
+                <select
+                  value={filterAgent}
+                  onChange={(e) => { setFilterAgent(e.target.value); setCurrentPage(1); }}
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 mt-2 text-foreground focus:outline-none cursor-pointer"
+                >
+                  <option value="ALL">All Agents</option>
+                  {users.map(u => (
+                    <option key={u.id} value={u.id}>{u.name || u.email}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Lead Type / Status Collapsible Accordion */}
+            <div className="border-b border-border/40 pb-3">
+              <button
+                onClick={() => setCollapsedSections(prev => ({ ...prev, type: !prev.type }))}
+                className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
+              >
+                <span>Lead Pipeline Status</span>
+                <span className="text-muted-foreground/60">{collapsedSections.type ? '▼' : '▲'}</span>
+              </button>
+              {!collapsedSections.type && (
+                <select
+                  value={filterType}
+                  onChange={(e) => { setFilterType(e.target.value); setCurrentPage(1); }}
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 mt-2 text-foreground focus:outline-none cursor-pointer"
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="NEW">NEW</option>
+                  <option value="PROSPECTING">Attempting Contact</option>
+                  <option value="CONTACTED">Nurturing/Cold</option>
+                  <option value="QUALIFIED">Warm/Hot</option>
+                  <option value="PREFORECLOSURE">Preforeclosure</option>
+                </select>
+              )}
+            </div>
+
+            {/* Source Collapsible Accordion */}
+            <div className="border-b border-border/40 pb-3">
+              <button
+                onClick={() => setCollapsedSections(prev => ({ ...prev, source: !prev.source }))}
+                className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
+              >
+                <span>Leads Source</span>
+                <span className="text-muted-foreground/60">{collapsedSections.source ? '▼' : '▲'}</span>
+              </button>
+              {!collapsedSections.source && (
+                <select
+                  value={filterSource}
+                  onChange={(e) => { setFilterSource(e.target.value); setCurrentPage(1); }}
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 mt-2 text-foreground focus:outline-none cursor-pointer"
+                >
+                  <option value="ALL">All Sources</option>
+                  <option value="MyPlusLeads">MyPlusLeads</option>
+                  <option value="Manual">Manual</option>
+                  <option value="Zillow">Zillow</option>
+                  <option value="Referral">Referral</option>
+                  <option value="Legal News - Macomb Foreclosures">Foreclosures (Legal News)</option>
+                </select>
+              )}
+            </div>
+
+            {/* Tags Collapsible Accordion */}
+            <div className="border-b border-border/40 pb-3">
+              <button
+                onClick={() => setCollapsedSections(prev => ({ ...prev, tags: !prev.tags }))}
+                className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
+              >
+                <span>Tags Contains</span>
+                <span className="text-muted-foreground/60">{collapsedSections.tags ? '▼' : '▲'}</span>
+              </button>
+              {!collapsedSections.tags && (
+                <input
+                  type="text"
+                  placeholder="e.g. Expired, Buyer"
+                  value={filterTags}
+                  onChange={(e) => { setFilterTags(e.target.value); setCurrentPage(1); }}
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 mt-2 text-foreground font-medium focus:outline-none"
+                />
+              )}
+            </div>
+
+            {/* Score Collapsible Accordion */}
+            <div className="border-b border-border/40 pb-3">
+              <button
+                onClick={() => setCollapsedSections(prev => ({ ...prev, score: !prev.score }))}
+                className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
+              >
+                <span>Lead Score Threshold</span>
+                <span className="text-muted-foreground/60">{collapsedSections.score ? '▼' : '▲'}</span>
+              </button>
+              {!collapsedSections.score && (
+                <input
+                  type="number"
+                  placeholder="Min Score (e.g. 50)"
+                  value={filterMinScore}
+                  onChange={(e) => { setFilterMinScore(e.target.value); setCurrentPage(1); }}
+                  className="w-full bg-background border border-border rounded-lg px-3 py-2 mt-2 text-foreground font-medium focus:outline-none"
+                />
+              )}
+            </div>
+
+          </div>
+
+          {/* Reset button & Create View button inside Panel footer */}
+          <div className="border-t border-border/40 pt-4 mt-6 flex gap-2 text-xs font-bold text-foreground">
+            <button
+              onClick={() => {
+                setFilterAddress('');
+                setFilterOwner('ALL');
+                setFilterAgent('ALL');
+                setFilterType('ALL');
+                setFilterSource('ALL');
+                setFilterTags('');
+                setFilterMinScore('');
+                setSidebarSearch('');
+                setCurrentPage(1);
+                toast.success('Filters cleared.');
+              }}
+              className="flex-1 py-2.5 border border-border rounded-xl hover:bg-muted/60 transition-colors cursor-pointer text-center"
+            >
+              Clear All
+            </button>
+            <button
+              onClick={() => setShowCustomViewModal(true)}
+              className="flex-1 py-2.5 bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl transition-all shadow-md cursor-pointer text-center"
+            >
+              Create View
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Save Custom View Modal */}
+      {showCustomViewModal && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-card border border-border shadow-2xl rounded-2xl w-full max-w-sm overflow-hidden text-xs font-semibold text-muted-foreground">
+            <div className="p-4 border-b border-border/40 flex justify-between items-center bg-muted/10">
+              <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">Create Custom View</h3>
+              <button onClick={() => setShowCustomViewModal(false)} className="text-muted-foreground hover:text-foreground">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block mb-1.5 text-[9px] font-black uppercase tracking-wider">Custom View Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. St. Clair Shores Expired"
+                  value={newViewName}
+                  onChange={(e) => setNewViewName(e.target.value)}
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+              <button
+                onClick={handleCreateCustomView}
+                className="w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-md cursor-pointer"
+              >
+                Save View Tab
               </button>
             </div>
           </div>
         </div>
       )}
-
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left">
-          <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
-            <tr>
-              <th className="px-4 py-3 font-medium w-10">
-                <input
-                  type="checkbox"
-                  onChange={handleSelectAll}
-                  checked={selectedIds.size === initialLeads.length && initialLeads.length > 0}
-                  className="rounded border-border"
-                />
-              </th>
-              <th className="px-4 py-3 font-medium">Name</th>
-              <th className="px-4 py-3 font-medium">Contact Info</th>
-              <th className="px-4 py-3 font-medium">Pipeline / Status</th>
-              <th className="px-4 py-3 font-medium">Tags</th>
-              <th className="px-4 py-3 font-medium">Agent</th>
-              <th className="px-4 py-3 font-medium">Source</th>
-              <th className="px-4 py-3 font-medium text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {initialLeads.map((lead) => (
-              <tr key={lead.id} className={`hover:bg-muted/10 transition-colors group ${selectedIds.has(lead.id) ? 'bg-primary/5' : ''}`}>
-                <td className="px-4 py-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(lead.id)}
-                    onChange={(e) => handleSelectOne(lead.id, e.target.checked)}
-                    className="rounded border-border text-primary"
-                  />
-                </td>
-
-                {/* Name + lead type badge */}
-                <td className="px-4 py-3 font-medium">
-                  <div className="flex flex-col">
-                    <Link
-                      href={`/dashboard/leads/${lead.id}`}
-                      className="hover:text-primary hover:underline font-bold text-foreground transition-colors text-sm"
-                    >
-                      {lead.contact?.firstName} {lead.contact?.lastName}
-                    </Link>
-                    {lead.isAiAssisted && (
-                      <span className="flex items-center gap-1 text-[10px] text-primary font-bold mt-0.5">
-                        <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
-                        AI ACTIVE
-                      </span>
-                    )}
-                  </div>
-                </td>
-
-                {/* Contact Info */}
-                <td className="px-4 py-3">
-                  <div className="flex flex-col">
-                    <span className="text-sm">{lead.contact?.email || <span className="text-muted-foreground italic text-xs">No email</span>}</span>
-                    <span className="text-xs text-muted-foreground">{lead.contact?.phone}</span>
-                  </div>
-                </td>
-
-                {/* Pipeline / Status */}
-                <td className="px-4 py-3">
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full font-medium border ${
-                      lead.status === 'NEW'
-                        ? 'bg-secondary/20 text-secondary-foreground border-secondary/30'
-                        : lead.status === 'QUALIFIED'
-                          ? 'bg-primary/20 text-primary border-primary/30'
-                          : 'bg-muted text-muted-foreground border-border'
-                    }`}
-                  >
-                    {lead.status}
-                  </span>
-                </td>
-
-                {/* Tags column with inline + Tag button */}
-                <td className="px-4 py-3">
-                  <div className="flex flex-wrap gap-1 items-center">
-                    {lead.tags ? (
-                      lead.tags.split(',').map(tag => {
-                        const cleanTag = tag.trim();
-                        if (!cleanTag) return null;
-                        return (
-                          <span key={cleanTag} className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-tighter">
-                            {cleanTag}
-                          </span>
-                        );
-                      })
-                    ) : null}
-                    {/* Inline + Tag button — appears on row hover or when no tags */}
-                    <LeadQuickMenu
-                      lead={lead}
-                      users={users}
-                      campaigns={campaigns}
-                      workspaces={workspaces}
-                      onRefresh={() => router.refresh()}
-                      triggerMode="tag"
-                    />
-                  </div>
-                </td>
-
-                {/* Agent */}
-                <td className="px-4 py-3">
-                  {(() => {
-                    const agent = users.find(u => u.id === lead.userId);
-                    if (!agent) return <span className="text-xs text-muted-foreground italic">Unassigned</span>;
-                    return (
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold uppercase">
-                          {(agent.name || agent.email || '?')[0]}
-                        </span>
-                        <span className="text-xs font-medium">{agent.name || agent.email}</span>
-                      </div>
-                    );
-                  })()}
-                </td>
-
-                {/* Source */}
-                <td className="px-4 py-3 text-muted-foreground text-sm">{lead.source}</td>
-
-                {/* Actions */}
-                <td className="px-4 py-3 text-right">
-                  <div className="flex items-center justify-end gap-1.5">
-                    <AddTaskModal
-                      addTaskAction={addTaskAction}
-                      workspaces={workspaces}
-                      users={users}
-                      leadId={lead.id}
-                      triggerText="+ Task"
-                      triggerClassName="px-2.5 py-1.5 bg-secondary/15 text-secondary hover:bg-secondary/20 text-[10px] font-bold rounded-lg border border-secondary/30 transition-colors uppercase tracking-wider"
-                    />
-                    <Link
-                      href={`/dashboard/leads/${lead.id}`}
-                      className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors shadow-sm"
-                    >
-                      View
-                    </Link>
-                    <LeadQuickMenu
-                      lead={lead}
-                      users={users}
-                      campaigns={campaigns}
-                      workspaces={workspaces}
-                      onRefresh={() => router.refresh()}
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {initialLeads.length === 0 && (
-              <tr>
-                <td colSpan={8} className="px-6 py-8 text-center text-muted-foreground">
-                  No leads found in this segment.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="p-4 border-t border-border flex items-center justify-between text-sm text-muted-foreground bg-muted/10">
-        <div className="flex items-center gap-4">
-          <span>
-            Showing {totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1} to{' '}
-            {Math.min(currentPage * pageSize, totalCount)} of {totalCount} entries
-          </span>
-        </div>
-        <div className="flex gap-2">
-          <Link
-            href={`?${new URLSearchParams({ ...Object.fromEntries(searchParams), page: String(currentPage - 1) }).toString()}`}
-            className={`px-3 py-1 border border-border rounded hover:bg-muted transition-colors ${currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}`}
-          >
-            Prev
-          </Link>
-          <Link
-            href={`?${new URLSearchParams({ ...Object.fromEntries(searchParams), page: String(currentPage + 1) }).toString()}`}
-            className={`px-3 py-1 border border-border rounded hover:bg-muted transition-colors ${currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
-          >
-            Next
-          </Link>
-        </div>
-      </div>
-
       {/* CSV Universal Import Modal */}
       {showCsvImportModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">

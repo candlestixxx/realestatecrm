@@ -72,6 +72,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
   const [subTab, setSubTab] = useState<'posts' | 'planner' | 'listing-feed'>('posts');
   const [posts, setPosts] = useState<SocialPost[]>(INITIAL_POSTS);
   const [showWalkthrough, setShowWalkthrough] = useState(true);
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState(true);
   
   // Composer Modal State
   const [showComposer, setShowComposer] = useState(false);
@@ -362,11 +363,25 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
 
             <form onSubmit={handleCreatePost} className="space-y-4 text-xs font-semibold text-muted-foreground">
               <div>
-                <label className="block mb-1 text-[10px] font-black uppercase">Post Message Content</label>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-[10px] font-black uppercase">Post Message Content</label>
+                  <button
+                    type="button"
+                    onClick={() => setSpellCheckEnabled(!spellCheckEnabled)}
+                    className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider transition-colors cursor-pointer border ${
+                      spellCheckEnabled 
+                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
+                        : 'bg-muted text-muted-foreground border-border'
+                    }`}
+                  >
+                    🔤 Spellcheck: {spellCheckEnabled ? 'ON' : 'OFF'}
+                  </button>
+                </div>
                 <textarea
                   required
                   value={postText}
                   onChange={(e) => setPostText(e.target.value)}
+                  spellCheck={spellCheckEnabled}
                   placeholder="What is happening on your listing? Add details, sign rider codes, or pricing updates..."
                   rows={4}
                   className="w-full bg-background border border-border/60 rounded-xl p-3 text-foreground focus:outline-none resize-none"

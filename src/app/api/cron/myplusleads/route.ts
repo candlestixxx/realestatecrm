@@ -137,6 +137,7 @@ export async function GET(request: Request) {
               workspaceId: integration.workspaceId,
               contactId,
               tags: generatedTag || null,
+              publicRecords: listing.propertyDetails ? JSON.stringify(listing.propertyDetails) : null,
             },
           });
 
