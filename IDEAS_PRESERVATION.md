@@ -139,10 +139,10 @@
 
 | Idea | Source | Status | Notes |
 |---|---|---|---|
-| HyperNexus NL Command Engine | README/HYPERNEXUS | Built | 13 NL commands (summarize, list, create task, update lead, send email/sms, draft, negotiate) |
-| HyperNexus Workflow Engine (if/then automation) | HYPERNEXUS.md | Built | 5 triggers, 5 conditions, 8 actions including AI actions |
-| MCP Server (10 CRM tools via JSON-RPC 2.0) | HYPERNEXUS.md | Built | `/api/mcp` endpoint, Bearer token auth |
-| Claude Desktop MCP integration | HYPERNEXUS.md | Built | Ready-to-copy config |
+| AgentCore NL Command Engine | README/AGENTCORE | Built | 13 NL commands (summarize, list, create task, update lead, send email/sms, draft, negotiate) |
+| AgentCore Workflow Engine (if/then automation) | AGENTCORE.md | Built | 5 triggers, 5 conditions, 8 actions including AI actions |
+| MCP Server (10 CRM tools via JSON-RPC 2.0) | AGENTCORE.md | Built | `/api/mcp` endpoint, Bearer token auth |
+| Claude Desktop MCP integration | AGENTCORE.md | Built | Ready-to-copy config |
 | Multi-Model LLM Router (Tier 1/Tier 2) | MEMORY.md | Built | Fast/cheap vs frontier reasoning, keyword heuristics |
 | Secure API Vault (AES-256-GCM encrypted keys) | MEMORY.md | Built | BYOK architecture |
 | Multi-Model providers: OpenAI, Anthropic, Gemini, DeepSeek, Qwen | HANDOFF.md | Built | With fallback across tiers |
@@ -152,31 +152,31 @@
 | Cross-Tenant Syndication | IDEAS.md | Planned | Anonymized market trends across brokerages |
 | Gamification (points/leaderboards for agents) | IDEAS.md | Planned | Based on workflow execution, leads enriched, outbound volume |
 | Predictive Lead Scoring (MLS historical data) | IDEAS.md | Planned | ML model as Tier 1 task |
-| HyperNexus Mobile Port (voice commands) | IDEAS.md | Planned | "Text all my Hot leads about the open house" |
+| AgentCore Mobile Port (voice commands) | IDEAS.md | Planned | "Text all my Hot leads about the open house" |
 | Blockchain Smart Contracts | IDEAS.md | Planned | Lease agreements / earnest money deposits |
 | MiMLS/Paragon MLS Data Access (RESO Web API) | RETS_TEMPLATE | Documented | Full request template + env config |
-| HyperNexus Control Plane integration | INTEGRATION.md | Built | Go kernel (port 7778), memory, tool catalog, swarm orchestration |
-| HyperNexus pi extension | INTEGRATION.md | Built | 4 tools + 1 command |
+| AgentCore Control Plane integration | INTEGRATION.md | Built | Go kernel (port 7778), memory, tool catalog, swarm orchestration |
+| AgentCore pi extension | INTEGRATION.md | Built | 4 tools + 1 command |
 | Funnel Builder (landing pages with custom domains) | schema.prisma | Built | |
 | Social Post scheduling with media | schema.prisma | Built | |
 | Campaign Execution Logging | schema.prisma | Built | Status tracking per lead/step |
 | Segment management (smart filters) | schema.prisma | Built | |
-| Rate limiting (auth, router, hypernexus) | HANDOFF.md | Built | |
+| Rate limiting (auth, router, agentcore) | HANDOFF.md | Built | |
 | Email verification + password reset | HANDOFF.md | Built | |
 | PostgreSQL + libSQL auto-select adapter | MEMORY.md | Built | |
 | Demo login: demo@aicrm.com / demo-password | README.md | Built | |
 
 ### aicrm → Main CRM Port Plan
 1. **MCP Server** → `src/app/api/mcp/route.ts` (from aicrm's `/api/mcp`)
-2. **NL Command Engine** → `src/lib/hypernexus/engine.ts`
-3. **Workflow Engine (if/then)** → `src/lib/hypernexus/workflows.ts`
+2. **NL Command Engine** → `src/lib/agentcore/engine.ts`
+3. **Workflow Engine (if/then)** → `src/lib/agentcore/workflows.ts`
 4. **Multi-Model LLM Router** → `src/lib/llm/router.ts`
 5. **Secure API Vault** → `src/lib/vault/`
 6. **Approval Queue + Audit Log** → extend Prisma schema
 7. **Vector Embeddings** → integrate with existing RAG
 8. **Funnel Builder** → port to main CRM's landing page system
 9. **RESO/RETS MLS integration** → `src/lib/mls/` + use RETS template
-10. **HyperNexus Control Plane bridge** → `src/lib/hypernexus/client.ts`
+10. **AgentCore Control Plane bridge** → `src/lib/agentcore/client.ts`
 
 ---
 
@@ -242,3 +242,5 @@
 | Notification System | All | leadcaller (global toast) | Use leadcaller pattern |
 | Workflow Builder (visual) | leadcaller, aicrm | leadcaller (drag-and-drop) | Use leadcaller |
 | AI Persona/Brand Voice | prototype, contentplanner | prototype (from past posts) | Merge into Brand Kit |
+
+

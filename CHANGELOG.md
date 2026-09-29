@@ -1,3 +1,18 @@
+
+## [0.48.0] - 2026-09-22
+
+### Added — AgentCore AI Orchestration Engine (ported from aicrm)
+- **AgentCore NL Command Engine** (src/lib/agentcore/engine.ts) — 8 natural language intents: update lead status, create task, list contacts, summarize workspace, list tasks, get contact, negotiate, draft content. Rule-based with LLM fallback.
+- **AgentCore Workflow Engine** (src/lib/agentcore/workflows.ts) — conditional if/then automation with 6 trigger events and 4 action types.
+- **MCP Server** (src/lib/mcp/server.ts + src/app/api/mcp/route.ts) — 9 CRM tools via Model Context Protocol (JSON-RPC 2.0). Bearer token or session auth.
+- **Multi-Model LLM Providers** (src/lib/ai/llm-providers.ts) — OpenAI, Anthropic, Google Gemini, DeepSeek, Qwen support.
+- **API Key Vault** (src/app/api/vault/route.ts) — AES-256-GCM encrypted key storage with provider CRUD.
+- **Encryption** (src/lib/encryption.ts) — AES-256-GCM with scrypt key derivation.
+- **Rate Limiting** (src/lib/rate-limit.ts) — in-memory rate limiter for API endpoints.
+- **ApiKey Prisma model** — encrypted provider key storage.
+
+### Renamed
+- All references to "HyperNexus" renamed to "AgentCore" (name conflict with external tool).
 # CHANGELOG.md
 
 ## [0.46.5] - MyPlusLeads Hourly Sync Optimization & Lead Quick Actions
@@ -317,3 +332,4 @@
 - Hardened server-side component security by properly masking API keys before hydration to the client payload.
 - **VoiceForge Pipeline Base:** Created `src/lib/voice.ts` containing foundational STT/TTS abstractions that read configuration dynamically from `getVoiceConfig(workspaceId)`, supporting Simulation, OpenAI, and ElevenLabs API integration streams.
 - **Voice Assistant Integration:** Added a mock Conversational Mode trigger (microphone button) to `AIChat.tsx` to enable users to toggle Voice STT capture dynamically from the global dashboard AI interface.
+
