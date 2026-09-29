@@ -1,6 +1,8 @@
 # Repo Consolidation Analysis
 
 > Generated from deep analysis of all 9 repos (2026-09-22)
+> **Status:** Phase A (Voice merge) and Phase B (Content merge) COMPLETE
+> See `IDEAS_PRESERVATION.md` for every idea/concept preserved across merges.
 
 ## Architecture Decision: Git Submodules
 
@@ -12,15 +14,16 @@ Each retains its own independent git history and GitHub repo.
 realestatecrm/                    ← main umbrella repo
 ├── src/                          ← main CRM dashboard ("Excel Legacy")
 ├── apps/
-│   ├── foreclosureworkflow/      ← forclosureworkflow
-│   ├── aicrm/                    ← aicrm
-│   ├── leadcaller/               ← realestateleadcaller
-│   ├── leadg/                    ← leadG
-│   ├── contentplanner/           ← socialmediacontentplanner
-│   ├── media-workflow/           ← re-agent-workflow-media-1
-│   ├── prototype/                ← realestateprototype
-│   └── legacyleads/              ← LegacyLeads
+│   ├── foreclosureworkflow/      ← forclosureworkflow (specialized vertical)
+│   ├── aicrm/                    ← aicrm (features to port to main)
+│   ├── leadcaller/               ← realestateleadcaller (⚠ DEPRECATED — merged into leadg)
+│   ├── leadg/                    ← leadG (✅ MERGED: voice-agent = leadG + leadcaller)
+│   ├── contentplanner/           ← socialmediacontentplanner (✅ MERGED: content-studio = contentplanner + prototype)
+│   ├── media-workflow/           ← re-agent-workflow-media-1 (unique pipeline)
+│   ├── prototype/                ← realestateprototype (⚠ DEPRECATED — merged into contentplanner)
+│   └── legacyleads/              ← LegacyLeads (unique data platform)
 ├── push-all.ps1                  ← push main + all submodules
+├── IDEAS_PRESERVATION.md         ← every unique idea from every repo
 └── CONSOLIDATION.md              ← this file
 ```
 
@@ -140,25 +143,33 @@ that feeds leads into the CRM and calling platforms.
 
 ---
 
-## Consolidation Roadmap (Recommended Priority)
+## Consolidation Roadmap
 
-### Phase A: Merge Voice Projects (highest impact)
-1. Use `leadG` as the base for the merged voice/calling platform
-2. Port from `realestateleadcaller`: direct mail, calendar, state-machine workflows
-3. Deprecate `realestateleadcaller` repo after merge
+### Phase A: Merge Voice Projects ✅ COMPLETE (2026-09-22)
+1. ✅ Used `leadG` as the base for the merged voice/calling platform
+2. ✅ Ported from `realestateleadcaller`: direct mail, calendar, state-machine workflows,
+   knowledge base, sentiment analyzer, maps/geocoding, WebRTC dialer, MCP server,
+   workflow builder, notification system, AI scripts
+3. ✅ 49 files, 5,043 lines of code ported
+4. ✅ MERGE_GUIDE.md documents all integration points
+5. ⏳ Deprecate `realestateleadcaller` repo (after verification)
 
-### Phase B: Merge Content Projects
-1. Use `socialmediacontentplanner` as the base
-2. Port from `realestateprototype`: universal business-type config
-3. Deprecate `realestateprototype` repo after merge
+### Phase B: Merge Content Projects ✅ COMPLETE (2026-09-22)
+1. ✅ Used `socialmediacontentplanner` as the base
+2. ✅ Ported from `realestateprototype`: universal business-type config,
+   AI persona/brand voice, Canva integration, drag-to-select calendar,
+   draft review flow, content library filters
+3. ✅ 14 files, 1,195 lines of code ported
+4. ✅ MERGE_GUIDE.md documents all integration points
+5. ⏳ Deprecate `realestateprototype` repo (after verification)
 
-### Phase C: Consolidate CRM Features into Main
-1. Port from `aicrm`: MCP server, workflow engine, multi-model LLM routing
-2. Keep `foreclosureworkflow` as specialized vertical (or port its foreclosure
-   pipeline into main as a workflow template)
+### Phase C: Consolidate CRM Features into Main ⏳ NEXT
+1. Port from `aicrm`: MCP server, NL command engine, workflow engine,
+   multi-model LLM router, secure API vault, approval queue, vector embeddings
+2. Keep `foreclosureworkflow` as specialized vertical
 3. Deprecate `aicrm` repo after merge
 
-### Phase D: Integrate Media Pipeline
+### Phase D: Integrate Media Pipeline ⏳ FUTURE
 1. Evaluate merging `re-agent-workflow-media-1` into main CRM's
    `src/lib/media-pipeline/`
 2. Keep as sub-module if it needs to run independently
@@ -167,8 +178,8 @@ that feeds leads into the CRM and calling platforms.
 ```
 realestatecrm/                    ← single main CRM (absorbed aicrm features)
 ├── apps/
-│   ├── voice-agent/              ← merged leadG + leadcaller
-│   ├── content-studio/           ← merged contentplanner + prototype
+│   ├── voice-agent/              ← leadG (merged voice + concierge) ✅
+│   ├── content-studio/           ← contentplanner (merged content + universal) ✅
 │   ├── foreclosure/              ← specialized foreclosure vertical
 │   ├── media-pipeline/           ← marketing media automation
 │   └── data-platform/            ← LegacyLeads (MLS/skip-trace service)
