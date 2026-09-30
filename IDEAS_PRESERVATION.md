@@ -243,4 +243,21 @@
 | Workflow Builder (visual) | leadcaller, aicrm | leadcaller (drag-and-drop) | Use leadcaller |
 | AI Persona/Brand Voice | prototype, contentplanner | prototype (from past posts) | Merge into Brand Kit |
 
+---
+
+## ARCHIVE STATUS (2026-09-29)
+
+> All features from the following repos have been merged into their target projects.
+> These repos can be safely archived on GitHub.
+
+| Repo | Merged Into | Verified |
+|---|---|---|
+| `aicrm` | `realestatecrm` (AgentCore engine, MCP server, workflows, vault) | ✅ Sprint 1 |
+| `realestateleadcaller` | `leadG` (27 phases: knowledge base, sentiment, geocoding, workflows, MCP, direct mail) | ✅ Sprint 1-2 |
+| `realestateprototype` | `socialmediacontentplanner` (business types, brand voice, Canva, draft review) | ✅ Sprint 1-2 |
+
+**Submodules removed from realestatecrm:** `apps/aicrm`, `apps/leadcaller`, `apps/prototype`
+
+**Remaining active submodules:** `apps/leadg`, `apps/contentplanner`, `apps/foreclosureworkflow`, `apps/media-workflow`, `apps/legacyleads`
+
 
