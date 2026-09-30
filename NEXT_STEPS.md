@@ -184,11 +184,13 @@ These connect the sub-projects to the main CRM:
 
 ---
 
-## ARCHIVE CLEANUP
+## ARCHIVE CLEANUP ✅ DONE (2026-09-29)
 
 After verifying all features are preserved:
-- [ ] Archive `aicrm` repo (features merged into main CRM)
-- [ ] Archive `realestateleadcaller` repo (features merged into leadG)
-- [ ] Archive `realestateprototype` repo (features merged into contentplanner)
-- [ ] Remove deprecated submodules from realestatecrm (`apps/aicrm`, `apps/leadcaller`, `apps/prototype`)
-- [ ] Update `IDEAS_PRESERVATION.md` to mark archived projects
+- [x] Archive `aicrm` repo (features merged into main CRM)
+- [x] Archive `realestateleadcaller` repo (features merged into leadG)
+- [x] Archive `realestateprototype` repo (features merged into contentplanner)
+- [x] Remove deprecated submodules from realestatecrm (`apps/aicrm`, `apps/leadcaller`, `apps/prototype`)
+- [x] Update `IDEAS_PRESERVATION.md` to mark archived projects
+
+**Remaining active submodules:** `apps/leadg`, `apps/contentplanner`, `apps/foreclosureworkflow`, `apps/media-workflow`, `apps/legacyleads`
