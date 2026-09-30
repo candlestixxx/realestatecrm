@@ -47,6 +47,8 @@ model Workspace {
   agentWorkflows AgentWorkflow[]
   agentLogs      AgentLog[]
   routingRules   LeadRoutingRule[]
+  socialAccounts SocialAccount[]
+  messages       Message[]
   landingPages   LandingPage[]
   blogPosts      BlogPost[]
   propertyListings       PropertyListing[]
@@ -89,6 +91,7 @@ model Contact {
   deals            Deal[]
   leads            Lead[]
   stakeholderIn    DealStakeholder[]
+  messages         Message[]
 }
 
 model Lead {
@@ -120,6 +123,7 @@ model Lead {
   segments        Segment[]         @relation("LeadSegments")
   agentLogs       AgentLog[]
   qualifications  LeadQualification[]
+  messages        Message[]
 }
 
 model SmartPlan {
@@ -332,6 +336,47 @@ model LeadQualification {
 
   @@index([leadId])
   @@index([score])
+}
+
+model SocialAccount {
+  id           String   @id @default(cuid())
+  workspaceId  String
+  platform     String   // facebook, instagram, linkedin, twitter, tiktok, gmb
+  accountName  String
+  accountId    String?  // platform-specific ID
+  accessToken  String?  // encrypted
+  refreshToken String?  // encrypted
+  isActive     Boolean  @default(true)
+  lastSyncAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, platform, accountName])
+  @@index([workspaceId])
+}
+
+model Message {
+  id           String   @id @default(cuid())
+  workspaceId  String
+  channel      String   // email, sms, facebook, instagram, linkedin, twitter
+  direction    String   // inbound, outbound
+  fromName     String?
+  fromAddress  String?  // email or phone
+  toAddress    String?
+  subject      String?
+  body         String
+  isRead       Boolean  @default(false)
+  leadId       String?
+  contactId    String?
+  createdAt    DateTime @default(now())
+  lead         Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  contact      Contact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, channel, isRead])
+  @@index([leadId])
+  @@index([createdAt])
 }
 
 

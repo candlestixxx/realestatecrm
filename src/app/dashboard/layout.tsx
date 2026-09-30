@@ -108,11 +108,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <span className="flex items-center gap-2">📢 Marketing & CMS</span>
               <span className="text-[10px] text-muted-foreground/55 font-bold group-hover/menu:translate-x-0.5 transition-transform">→</span>
             </div>
-            
+
             <div className="absolute left-full top-0 ml-2.5 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-1.5 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-150 transform translate-x-2 group-hover/menu:translate-x-0">
               <div className="px-3 pb-1 border-b border-border/40 mb-1">
                 <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Marketing</span>
               </div>
+              <Link href="/dashboard/social" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                Social Connections
+              </Link>
+              <Link href="/dashboard/inbox" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                Unified Inbox
+              </Link>
               <Link href="/dashboard/campaigns" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
                 Drip Campaigns
               </Link>
