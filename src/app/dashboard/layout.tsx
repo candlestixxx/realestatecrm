@@ -90,6 +90,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <Link href="/dashboard/segments" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
                 Filtered Segments
               </Link>
+              <Link href="/dashboard/map" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                Lead Map
+              </Link>
               <Link href="/dashboard/deals" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
                 Deals Pipeline
               </Link>
@@ -191,6 +194,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
               </Link>
               <Link href="/dashboard/workflows" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
                 Workflows (Wizards)
+              </Link>
+              <Link href="/dashboard/approvals" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                Approvals
               </Link>
             </div>
           </div>
