@@ -44,15 +44,15 @@ const executors: Record<string, ToolExecutor> = {
     const search = args['search'] as string | undefined;
     const limit = (args['limit'] as number) || 25;
     if (search) where.OR = [
-      { firstName: { contains: search, mode: 'insensitive' } },
-      { lastName: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
+      { firstName: { contains: search } },
+      { lastName: { contains: search } },
+      { email: { contains: search } },
       { phone: { contains: search } },
     ];
     return prisma.contact.findMany({ where, take: Math.min(limit, 100), orderBy: { updatedAt: 'desc' } });
   },
   async get_contact(session, args) {
-    return prisma.contact.findFirst({ where: { id: args['id'] as string, workspaceId: session.workspaceId }, include: { leads: true, activities: { orderBy: { createdAt: 'desc' }, take: 20 } } });
+    return prisma.contact.findFirst({ where: { id: args['id'] as string, workspaceId: session.workspaceId }, include: { leads: true, Activity: { orderBy: { createdAt: 'desc' }, take: 20 } } });
   },
   async create_contact(session, args) {
     return prisma.contact.create({ data: { workspaceId: session.workspaceId, firstName: args['firstName'] as string, lastName: args['lastName'] as string, email: (args['email'] as string) || null, phone: (args['phone'] as string) || null } });
@@ -60,15 +60,15 @@ const executors: Record<string, ToolExecutor> = {
   async update_lead_status(session, args) {
     const lead = await prisma.lead.findFirst({ where: { id: args['leadId'] as string, workspaceId: session.workspaceId } });
     if (!lead) throw new Error('Lead not found');
-    return prisma.lead.update({ where: { id: lead.id }, data: { status: args['status'] as 'NEW' | 'ACTIVE' | 'HOT' | 'COLD' | 'CLOSED_WON' | 'CLOSED_LOST' } });
+    return prisma.lead.update({ where: { id: lead.id }, data: { status: args['status'] as string } });
   },
   async create_task(session, args) {
-    return prisma.task.create({ data: { workspaceId: session.workspaceId, userId: session.userId, title: args['title'] as string, description: (args['description'] as string) || null, dueDate: args['dueDate'] ? new Date(args['dueDate'] as string) : null, priority: (args['priority'] as 'LOW' | 'MEDIUM' | 'HIGH') || 'MEDIUM' } });
+    return prisma.task.create({ data: { workspaceId: session.workspaceId, assignedToId: session.userId, title: args['title'] as string, description: (args['description'] as string) || null, dueDate: args['dueDate'] ? new Date(args['dueDate'] as string) : null } });
   },
   async list_tasks(session, args) {
     const where: Record<string, unknown> = { workspaceId: session.workspaceId };
-    if (args['status'] === 'pending') where.completed = false;
-    if (args['status'] === 'completed') where.completed = true;
+    if (args['status'] === 'pending') where.status = { not: 'DONE' };
+    if (args['status'] === 'completed') where.status = 'DONE';
     return prisma.task.findMany({ where, orderBy: { dueDate: 'asc' } });
   },
   async summarize_workspace(session) {
@@ -76,7 +76,7 @@ const executors: Record<string, ToolExecutor> = {
       prisma.contact.count({ where: { workspaceId: session.workspaceId } }),
       prisma.lead.count({ where: { workspaceId: session.workspaceId } }),
       prisma.lead.count({ where: { workspaceId: session.workspaceId, status: 'HOT' } }),
-      prisma.task.count({ where: { workspaceId: session.workspaceId, completed: false } }),
+      prisma.task.count({ where: { workspaceId: session.workspaceId, status: { not: 'DONE' } } }),
       prisma.deal.count({ where: { workspaceId: session.workspaceId } }),
     ]);
     return { contacts, leads, hotLeads, deals, pendingTasks: tasks, summary: `${contacts} contacts, ${leads} leads (${hotLeads} hot), ${deals} deals, ${tasks} pending tasks` };
@@ -84,13 +84,13 @@ const executors: Record<string, ToolExecutor> = {
   async search_contacts(session, args) {
     const query = args['query'] as string;
     return prisma.contact.findMany({ where: { workspaceId: session.workspaceId, OR: [
-      { firstName: { contains: query, mode: 'insensitive' } },
-      { lastName: { contains: query, mode: 'insensitive' } },
-      { email: { contains: query, mode: 'insensitive' } },
+      { firstName: { contains: query } },
+      { lastName: { contains: query } },
+      { email: { contains: query } },
     ] }, take: 25 });
   },
   async log_activity(session, args) {
-    return prisma.activity.create({ data: { type: (args['type'] as 'NOTE' | 'CALL' | 'EMAIL' | 'SMS') || 'NOTE', description: args['description'] as string, userId: session.userId, leadId: (args['leadId'] as string) || null } });
+    return prisma.activity.create({ data: { type: (args['type'] as string) || 'NOTE', content: args['description'] as string, userId: session.userId, workspaceId: session.workspaceId, leadId: (args['leadId'] as string) || null } });
   },
 };
 

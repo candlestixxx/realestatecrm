@@ -137,13 +137,39 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
           </div>
 
+          {/* AgentCore */}
+          <div className="relative group/menu">
+            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/40 hover:bg-muted text-foreground font-black text-xs cursor-pointer transition-all border border-border/40 select-none">
+              <span className="flex items-center gap-2">🧠 AgentCore</span>
+              <span className="text-[10px] text-muted-foreground/55 font-bold group-hover/menu:translate-x-0.5 transition-transform">→</span>
+            </div>
+
+            <div className="absolute left-full top-0 ml-2.5 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-1.5 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-150 transform translate-x-2 group-hover/menu:translate-x-0">
+              <div className="px-3 pb-1 border-b border-border/40 mb-1">
+                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">AI Engine</span>
+              </div>
+              <Link href="/dashboard/agentcore" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                Command Console
+              </Link>
+              <Link href="/dashboard/agentcore#workflows" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                Workflow Builder
+              </Link>
+              <Link href="/dashboard/settings/ai-models" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                AI Model Keys
+              </Link>
+              <Link href="/dashboard/settings/mcp" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                MCP Server
+              </Link>
+            </div>
+          </div>
+
           {/* Automations */}
           <div className="relative group/menu">
             <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/40 hover:bg-muted text-foreground font-black text-xs cursor-pointer transition-all border border-border/40 select-none">
               <span className="flex items-center gap-2">🤖 Automations</span>
               <span className="text-[10px] text-muted-foreground/55 font-bold group-hover/menu:translate-x-0.5 transition-transform">→</span>
             </div>
-            
+
             <div className="absolute left-full top-0 ml-2.5 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-1.5 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-150 transform translate-x-2 group-hover/menu:translate-x-0">
               <div className="px-3 pb-1 border-b border-border/40 mb-1">
                 <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Wizards</span>
@@ -176,6 +202,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
               </Link>
               <Link href="/dashboard/settings/email" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
                 Email Settings
+              </Link>
+              <Link href="/dashboard/settings/ai-models" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                AI Model Keys
+              </Link>
+              <Link href="/dashboard/settings/mcp" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                MCP Server
               </Link>
               <Link href="/dashboard/sync-queue" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
                 Sync Queue Log

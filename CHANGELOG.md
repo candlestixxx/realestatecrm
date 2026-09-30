@@ -1,4 +1,20 @@
 
+## [0.49.0] - 2026-09-29
+
+### Added — AgentCore UI Dashboard (Sprint 1)
+- **AgentCore Command Console** (src/components/AgentCoreConsole.tsx) — interactive NL terminal with example commands, intent badges, LLM fallback toggle, and real-time streaming to `POST /api/agentcore`.
+- **AgentCore Workflow Builder** (src/components/AgentCoreWorkflowBuilder.tsx) — visual if/then automation editor with trigger selection, conditional filters, multi-action support (update status, create task, add activity, notify), and inline list management (pause/resume/edit/delete).
+- **AI Model Keys Settings** (src/app/dashboard/settings/ai-models/) — vault UI for 5 LLM providers (OpenAI, Anthropic, Gemini, DeepSeek, Qwen) with add/update/remove and configuration status indicators.
+- **MCP Server Settings** (src/app/dashboard/settings/mcp/) — endpoint URL display, token auth configuration, connection tester, 9-tool catalog, and Claude Desktop JSON config generator.
+- **AgentCore Dashboard Page** (src/app/dashboard/agentcore/) — unified overview with status cards (NL Engine, Workflows, MCP) and embedded console + workflow builder.
+- **Workflow CRUD API** (src/app/api/agentcore/workflows/) — GET/POST list/create and PATCH/DELETE per-workflow endpoints scoped to workspace.
+- **Sidebar Navigation** — new "🧠 AgentCore" menu group with Command Console, Workflow Builder, AI Model Keys, and MCP Server links.
+
+### Fixed
+- AgentCore engine.ts schema mismatches with main CRM Prisma (Lead name→contact relation, Activity description→content, Task userId→assignedToId, Task completed→status, SQLite mode:insensitive removal, named regex groups→numbered for ES2017 target).
+- AgentCore workflows.ts schema mismatches (Task priority removed, Activity description→content, workspaceId added).
+- MCP server.ts schema mismatches (same Prisma model field corrections).
+
 ## [0.48.0] - 2026-09-22
 
 ### Added — AgentCore AI Orchestration Engine (ported from aicrm)

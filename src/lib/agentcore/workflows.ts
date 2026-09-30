@@ -51,17 +51,17 @@ async function executeAction(action: WorkflowAction, payload: WorkflowEventPaylo
   switch (action.type) {
     case 'update_lead_status': {
       if (!payload.leadId || !action.status) return 'skipped: missing leadId or status';
-      await prisma.lead.update({ where: { id: payload.leadId }, data: { status: action.status as 'NEW' | 'ACTIVE' | 'HOT' | 'COLD' | 'CLOSED_WON' | 'CLOSED_LOST' } });
+      await prisma.lead.update({ where: { id: payload.leadId }, data: { status: action.status } });
       return `lead ${payload.leadId} -> ${action.status}`;
     }
     case 'create_task': {
       if (!action.title) return 'skipped: missing title';
-      await prisma.task.create({ data: { workspaceId: payload.workspaceId, userId: payload.userId, title: action.title, priority: (action.priority as 'LOW' | 'MEDIUM' | 'HIGH') || 'MEDIUM' } });
+      await prisma.task.create({ data: { workspaceId: payload.workspaceId, assignedToId: payload.userId, title: action.title, description: action.note || null } });
       return `task created: ${action.title}`;
     }
     case 'add_activity': {
       if (!action.note) return 'skipped: missing note';
-      await prisma.activity.create({ data: { type: 'NOTE', description: action.note, userId: payload.userId, ...(payload.leadId && { leadId: payload.leadId }) } });
+      await prisma.activity.create({ data: { type: 'NOTE', content: action.note, userId: payload.userId, workspaceId: payload.workspaceId, ...(payload.leadId && { leadId: payload.leadId }) } });
       return 'activity logged';
     }
     case 'notify': {
