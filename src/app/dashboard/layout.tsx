@@ -119,6 +119,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <Link href="/dashboard/inbox" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
                 Unified Inbox
               </Link>
+              <Link href="/dashboard/marketing-studio" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                Marketing Studio
+              </Link>
+              <Link href="/dashboard/calendar" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
+                Publishing Calendar
+              </Link>
               <Link href="/dashboard/campaigns" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
                 Drip Campaigns
               </Link>
