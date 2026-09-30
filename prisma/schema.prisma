@@ -46,6 +46,7 @@ model Workspace {
   segments       Segment[]
   agentWorkflows AgentWorkflow[]
   agentLogs      AgentLog[]
+  routingRules   LeadRoutingRule[]
   landingPages   LandingPage[]
   blogPosts      BlogPost[]
   propertyListings       PropertyListing[]
@@ -118,6 +119,7 @@ model Lead {
   searchAlerts    SearchAlert[]
   segments        Segment[]         @relation("LeadSegments")
   agentLogs       AgentLog[]
+  qualifications  LeadQualification[]
 }
 
 model SmartPlan {
@@ -298,6 +300,38 @@ model AgentLog {
   createdAt   DateTime @default(now())
   lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model LeadRoutingRule {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  workspaceId String
+  isActive    Boolean  @default(true)
+  source      String?  // Match lead by source (e.g. "Zillow", "Realtor.com")
+  segmentId   String?  // Match lead by segment membership
+  agentIds    String   // Comma-separated User IDs forming the agent pool
+  currentIndex Int     @default(0) // Round-robin pointer
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, isActive])
+}
+
+model LeadQualification {
+  id          String   @id @default(cuid())
+  leadId      String
+  score       Int      // 0-100
+  grade       String   // HOT, WARM, COLD
+  reasoning   String   // LLM reasoning text
+  factors     String   // JSON of scoring factors
+  model       String   @default("gpt-4o-mini")
+  createdAt   DateTime @default(now())
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@index([score])
 }
 
 
