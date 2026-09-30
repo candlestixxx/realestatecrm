@@ -159,28 +159,28 @@ These connect the sub-projects to the main CRM:
 
 ## RECOMMENDED EXECUTION ORDER
 
-### Sprint 1 (Days 1-5): Make it usable
-1. **AgentCore UI** — Console, Workflow Builder, AI Models, MCP settings (main CRM)
-2. **Voice schema merge** — unify Prisma models (leadG)
-3. **Wire brand voice + business types** (contentplanner)
+### Sprint 1 (Days 1-5): Make it usable ✅ DONE
+1. **AgentCore UI** — Console, Workflow Builder, AI Models, MCP settings (main CRM) ✅
+2. **Voice schema merge** — unify Prisma models (leadG) ✅
+3. **Wire brand voice + business types** (contentplanner) ✅
 
-### Sprint 2 (Days 6-12): Core integrations
-4. **Voice → CRM timeline webhook** (cross-project)
-5. **Lead routing + AI qualification** (main CRM)
-6. **Wire Knowledge Base + Sentiment + Geocoding** (leadG)
-7. **Wire Draft Review + Canva** (contentplanner)
+### Sprint 2 (Days 6-12): Core integrations ✅ DONE
+4. **Voice → CRM timeline webhook** (cross-project) ✅
+5. **Lead routing + AI qualification** (main CRM) ✅
+6. **Wire Knowledge Base + Sentiment + Geocoding** (leadG) ✅
+7. **Wire Draft Review + Canva** (contentplanner) ✅
 
-### Sprint 3 (Days 13-20): Feature completion
-8. **Social connections + Unified inbox** (main CRM)
-9. **Publishing calendar + Marketing studio** (main CRM)
-10. **Wire RAG + Stripe + BullMQ** (contentplanner)
-11. **Wire Inngest + WebRTC monitoring** (leadG)
+### Sprint 3 (Days 13-20): Feature completion ✅ DONE
+8. **Social connections + Unified inbox** (main CRM) ✅
+9. **Publishing calendar + Marketing studio** (main CRM) ✅
+10. **Wire RAG + Stripe + BullMQ** (contentplanner) ✅
+11. **Wire Inngest + WebRTC monitoring** (leadG) ✅
 
-### Sprint 4 (Days 21-30): Advanced features
-12. **Media pipeline integration** (media-workflow)
-13. **Foreclosure real-time monitoring** (foreclosureworkflow)
-14. **LegacyLeads Mapbox + skip-tracing** (legacyleads)
-15. **Approval workflows + Asset export** (main CRM)
+### Sprint 4 (Days 21-30): Advanced features ✅ DONE
+12. **Media pipeline integration** (media-workflow) ✅
+13. **Foreclosure real-time monitoring** (foreclosureworkflow) ✅
+14. **LegacyLeads Mapbox + skip-tracing** (legacyleads) ✅
+15. **Approval workflows + Asset export** (main CRM) ✅
 
 ---
 
