@@ -1,36 +1,92 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+/**
+ * Audit Trail API
+ * Tracks all data mutations for compliance and debugging.
+ * Uses Activity model with type=AUDIT for persistence.
+ */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const workspaceId = searchParams.get('workspaceId');
-  const entityType = searchParams.get('entityType');
+  const workspaceId = searchParams.get('workspaceId') || 'excel-legacy-team';
+  const entityType = searchParams.get('entityType'); // lead, contact, deal, listing, offer
+  const entityId = searchParams.get('entityId');
+  const action = searchParams.get('action'); // CREATE, UPDATE, DELETE
   const userId = searchParams.get('userId');
-  const limit = parseInt(searchParams.get('limit') || '50');
+  const page = parseInt(searchParams.get('page') || '1');
+  const pageSize = Math.min(parseInt(searchParams.get('pageSize') || '50'), 200);
 
-  const logs = await prisma.auditLog.findMany({
-    where: {
-      ...(workspaceId && { workspaceId }),
-      ...(entityType && { entityType }),
-      ...(userId && { userId }),
-    },
-    include: { user: { select: { name: true, email: true } } },
+  const where: any = {
+    workspaceId,
+    type: 'AUDIT',
+  };
+
+  // Parse content filters from JSON
+  const activities = await prisma.activity.findMany({
+    where,
     orderBy: { createdAt: 'desc' },
-    take: limit,
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+    include: { user: { select: { name: true, email: true } } },
   });
-  return NextResponse.json(logs);
+
+  // Client-side filtering for JSON fields
+  let filtered = activities;
+  if (entityType) filtered = filtered.filter(a => {
+    try { return JSON.parse(a.content).entityType === entityType; } catch { return false; }
+  });
+  if (entityId) filtered = filtered.filter(a => {
+    try { return JSON.parse(a.content).entityId === entityId; } catch { return false; }
+  });
+  if (action) filtered = filtered.filter(a => {
+    try { return JSON.parse(a.content).action === action; } catch { return false; }
+  });
+  if (userId) filtered = filtered.filter(a => a.userId === userId);
+
+  return NextResponse.json({
+    entries: filtered.map(a => {
+      let parsed: any = {};
+      try { parsed = JSON.parse(a.content); } catch { /* raw */ }
+      return {
+        id: a.id,
+        ...parsed,
+        user: a.user,
+        timestamp: a.createdAt,
+      };
+    }),
+    pagination: { page, pageSize, total: filtered.length },
+  });
 }
 
+/**
+ * POST: Log an audit entry.
+ * Called internally after any data mutation.
+ */
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { action, entityType, entityId, userId, workspaceId, ipAddress, userAgent, changes } = body;
+  const { entityType, entityId, action, changes, userId, workspaceId } = body;
 
-  if (!action || !entityType || !workspaceId) {
-    return NextResponse.json({ error: 'action, entityType, workspaceId required' }, { status: 400 });
+  if (!entityType || !entityId || !action) {
+    return NextResponse.json({ error: 'entityType, entityId, action required' }, { status: 400 });
   }
 
-  const log = await prisma.auditLog.create({
-    data: { action, entityType, entityId, userId, workspaceId, ipAddress, userAgent, changes: changes ? JSON.stringify(changes) : null },
+  const entry = {
+    entityType,
+    entityId,
+    action, // CREATE, UPDATE, DELETE
+    changes: changes || null, // { field: { from, to } }
+    ip: request.headers.get('x-forwarded-for') || 'unknown',
+    userAgent: request.headers.get('user-agent') || 'unknown',
+  };
+
+  const activity = await prisma.activity.create({
+    data: {
+      type: 'AUDIT',
+      content: JSON.stringify(entry),
+      userId: userId || null,
+      workspaceId: workspaceId || 'excel-legacy-team',
+    },
   });
-  return NextResponse.json(log, { status: 201 });
+
+  return NextResponse.json({ id: activity.id, logged: true }, { status: 201 });
 }
