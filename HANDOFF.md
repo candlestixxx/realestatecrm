@@ -1,34 +1,42 @@
-# Session Handoff - v0.47.0 Voice Provider Logic
+# HANDOFF.md — Multi-Agent Session Handoff
 
-Successfully implemented the foundational configuration UI, database mapping, and backend abstractions for the VoiceForge pipeline.
+> **Current state: ALL development phases complete. All repos clean and pushed.**
+> See `SESSION_HANDOFF_2026-06-10.md` for full session details.
 
-### Completed Operations in this Session
-1. **Speech Provider Selection UI**:
-   - Created the `/dashboard/settings/voice` page featuring the new `VoiceSettingsClient`.
-   - The interface provides a beautiful luxury-themed selection toggle between **OpenAI**, **ElevenLabs**, and **Simulation Mode**.
-   - Input forms support configuring Voice IDs and API Keys natively into the Prisma SQLite backend via the new `VoiceSettings` schema table.
-   - Fixed a critical security vulnerability by ensuring API keys are securely masked when passed from Server Components to Client Components (`page.tsx`), preventing sensitive credentials from leaking into the React hydration payload.
-   - Updated the Dashboard Sidebar layout to seamlessly link to the new Voice Settings page.
-2. **System State Updates**:
-   - Added `VoiceSettings` model to `schema.prisma` mapping 1-to-1 with `Workspace`.
-   - Executed Prisma migration and generated the client to support the new schema.
-   - Replaced ephemeral filesystem (`voice-settings.json`) logic with robust Prisma query operations in `src/lib/voice-config.ts` ensuring multi-tenant isolation.
-   - Bumped project version to `0.47.0` and correctly synced `package-lock.json` dependency graphs via `npm install --legacy-peer-deps`.
-   - Marked "Speech provider selection" and "Conversational Mode" as completed in the active roadmap.
-   - Pre-commit builds (`npm run build`), linting (`npm run lint`), and E2E integration tests all passed cleanly.
-3. **VoiceForge Integration**:
-   - Created `src/lib/voice.ts` implementing the core `synthesizeSpeech` action which maps the configured VoiceProvider to live API outputs for OpenAI and ElevenLabs.
-   - Implemented real-time `transcribeSpeech` using the OpenAI Whisper API.
-   - Wired the Voice Assistant module to the `AIChat.tsx` floating widget utilizing `MediaRecorder` to capture microphone audio blobs, push them to the new `/api/chat/voice` route for processing, and stream back generated TTS audio via `/api/chat/tts`.
-4. **Tenant Site Custom Domains**:
-   - Upgraded the `LandingPage` Prisma schema with a `customDomain` mapping and successfully created and deployed the migration script.
-   - Refactored Next.js `middleware.ts` to natively rewrite incoming subdomains and custom hostnames securely to the `/(websites)/[domain]` dynamic router, maintaining strict tenant separation.
+## Last Session Summary (2026-06-10)
 
-### Next Steps for Successor Models
-- **Maintain Current State**: All major v0.47.0 integration milestones (VoiceForge, Headless CMS, Intent Tracking, Tooltips) have been successfully finalized.
+### Completed
+- **T35-T36**: Live production wiring (SendGrid, WebSocket live audio, Stripe verification)
+- **T37-T39**: All planned features (S3 upload, folder detection, data quality, predictive scoring, RAG objections, gamification, accent morphing, avatar sync, Canva branding, voice commands)
+- **T40**: media-workflow AI brand compliance + leadG A/B testing + enhanced dashboard
+- **T41**: Cross-tenant syndication, HubSpot/Salesforce social lead gen, blockchain smart contracts
 
-### Critical Database Migration Update
-The migration history was completely corrupted by upstream database provider mismatches (`postgresql` vs `sqlite`) and drifting missing histories. The initial migration logic failed to execute properly.
-As a result, I had to completely blow away `dev.db` and the old migration history, and re-generate a single unified initialization baseline migration.
+### Repository State (all pushed to origin/main)
+| Repo | HEAD | Status |
+|---|---|---|
+| realestatecrm | `6a668d8` | clean |
+| apps/leadg | `d592b04` | clean |
+| apps/contentplanner | `a5c2028` | clean |
+| apps/foreclosureworkflow | `9e1dca0` | clean |
+| apps/media-workflow | `15cf986` | clean |
+| apps/legacyleads | `08cd887` | clean |
 
-**Next Steps**: Do not run `prisma db push`. When deploying, rely on the standard `prisma migrate deploy` since the migration files have been permanently corrected and fully synchronize the current schema.
+### Next Agent Should
+1. Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, BS&A, Magnific, HubSpot, Salesforce)
+2. Run E2E integration tests
+3. Deploy to production (see DEPLOY.md)
+4. Archive 3 deprecated GitHub repos (aicrm, realestateleadcaller, realestateprototype)
+5. Load test with concurrent users
+
+### Critical Context
+- npm install requires `--legacy-peer-deps`
+- Never use PowerShell here-strings with TS template literals
+- Contact model: `firstName`/`lastName` (not `name`)
+- Lead model: `tags` field (comma-separated), no `notes`
+- WebSocket live audio: standalone server on port 8090
+- A/B variant assignment now uses configured weights
+
+## Agent Specializations
+- **Gemini**: Speed, bulk refactoring, massive context
+- **Claude**: UI/UX, documentation, deep feature execution
+- **GPT**: Architecture, systemic debugging, type enforcement

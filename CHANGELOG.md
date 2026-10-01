@@ -1,4 +1,42 @@
 
+## [0.52.0] - 2026-06-10
+
+### Added — Cross-Tenant Syndication + Social Lead Gen + Blockchain Contracts
+- **Cross-Tenant Syndication API** (`/api/syndication`) — anonymized market trends across brokerages with min 5-sample privacy threshold, market heat indicators, demand index.
+- **HubSpot/Salesforce Social Lead Gen** (`/api/lead-gen/social`) — captures leads from social media engagement, auto-creates contacts, syncs to HubSpot and Salesforce CRMs.
+- **Blockchain Smart Contracts** (`/api/contracts`) — lease agreements, earnest money deposits, purchase agreements with deploy/execute/dispute lifecycle.
+
+### Added — A/B Testing Engine + Enhanced Dashboard (leadG)
+- **Weighted A/B variant picker** — `pickVariantByWeight()` in campaign-engine.ts using configured weights (was hardcoded 50/50).
+- **A/B Analytics API** (`/api/campaigns/ab-test`) — per-variant conversion/contact rates, winner detection, statistical comparison.
+- **ABTestDashboard component** — visual variant comparison with progress bars and winner highlighting.
+- **Enhanced Campaign Dashboard** (`/dashboard`) — overview stats, A/B test setup wizard, quick actions panel.
+
+### Added — AI Brand Compliance Review (media-workflow)
+- **AIBrandReviewService** — Fair Housing violation detection, FTC disclosure checks, misleading claims detection, image quality scoring, brand consistency validation, platform-specific caption limits, hashtag count limits.
+- **ApprovalWorkflowService** — real AI auto-approval (replaced simulation stub), reject with reason, compliance logging with Slack/Discord alerts.
+
+## [0.51.0] - 2026-06-10
+
+### Added — Planned Features Batch
+- **AWS S3 Document Upload** (`/api/uploads`) — presigned URLs when AWS configured, local fallback.
+- **Folder Detection Service** (`/api/folder-detection`) — magic byte detection for 8 formats (PDF/DOCX/XLSX/JPG/PNG/ZIP/CSV/EML).
+- **Data Quality Dashboard** (`/dashboard/data-quality`) — contact field completeness scoring with recommendations.
+- **Predictive Lead Scoring** (`/api/scoring`) — feature extraction (recency, engagement, deal size), weighted scoring with confidence intervals.
+- **RAG Objection Handling** (`/api/objections`) — keyword-matched objection responses from activity history.
+- **Gamification Engine** (`/api/gamification` + `/dashboard/leaderboard`) — activity-based points, streaks, achievement badges.
+- **Accent Morphing** (`/api/voice/accent-morphing`) — accent profile presets + text-to-speech parameters.
+- **DeepFake Avatar Sync** (`/api/avatar`) — avatar session management, audio-to-viseme mapping, video generation.
+- **Canva Branding Integration** (`/api/canva`) — brand kit application to design templates.
+- **AgentCore Voice Commands** (`/api/agentcore/voice-command`) — natural language search, dial, create task, show analytics.
+
+## [0.50.0] - 2026-06-10
+
+### Added — Live Production Wiring
+- **SendGrid API email transport** — prefers `@sendgrid/mail`, falls back to SMTP (nodemailer) in campaign-worker.
+- **WebSocket live-audio server** (`scripts/live-audio-server.mjs`) — Twilio Media Streams monitoring on port 8090 with monitor/barge-in roles.
+- **LiveAudioMonitor** — connects to WebSocket server for real-time call audio monitoring.
+
 ## [0.49.0] - 2026-09-29
 
 ### Added — AgentCore UI Dashboard (Sprint 1)
@@ -348,4 +386,5 @@
 - Hardened server-side component security by properly masking API keys before hydration to the client payload.
 - **VoiceForge Pipeline Base:** Created `src/lib/voice.ts` containing foundational STT/TTS abstractions that read configuration dynamically from `getVoiceConfig(workspaceId)`, supporting Simulation, OpenAI, and ElevenLabs API integration streams.
 - **Voice Assistant Integration:** Added a mock Conversational Mode trigger (microphone button) to `AIChat.tsx` to enable users to toggle Voice STT capture dynamically from the global dashboard AI interface.
+
 

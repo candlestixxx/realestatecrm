@@ -11,9 +11,9 @@
 ### From leadG "VoiceForge AI" — UNIQUE IDEAS
 | Idea | Source | Status | Notes |
 |---|---|---|---|
-| DeepFake Avatar Video Sync (HeyGen/D-ID over WebRTC) | IDEAS.md | Planned | Live video avatars instead of just phone calls |
-| Aggressive Memory Vectoring (RAG objection handling) | IDEAS.md | Planned | Embed successful closings, inject top 3 objection responses into live prompts across all orgs |
-| Accent Morphing (ElevenLabs by area code) | IDEAS.md | Planned | Dynamically assign voice ID based on geo-location of dialed number |
+| DeepFake Avatar Video Sync (HeyGen/D-ID over WebRTC) | IDEAS.md | Built | Live video avatars instead of just phone calls |
+| Aggressive Memory Vectoring (RAG objection handling) | IDEAS.md | Built | Embed successful closings, inject top 3 objection responses into live prompts across all orgs |
+| Accent Morphing (ElevenLabs by area code) | IDEAS.md | Built | Dynamically assign voice ID based on geo-location of dialed number |
 | ReflectionEngine (continuous learning) | README.md | Built | Post-call transcript analysis auto-adapts objection-handling params |
 | Multi-day omnichannel BullMQ campaigns | README.md | Built | Fallback SMS/email if leads drop off or hit voicemail |
 | LeadRouter with A/B campaign mapping | README.md | Built | Maps leads to specialized campaign queues via tracking variables |
@@ -117,7 +117,7 @@
 | Global State (React Context + reducers) | CHANGELOG.md | Built | |
 | Docker multi-stage build | CHANGELOG.md | Built | |
 | Cross-platform scripts (start.bat/sh, build.bat/sh) | CHANGELOG.md | Built | |
-| Third-party: Canva + HubSpot/Salesforce lead gen | IDEAS.md | Planned | Via social posts |
+| Third-party: Canva + HubSpot/Salesforce lead gen | IDEAS.md | Built | Via social posts |
 | Mobile App Port (React Native) | IDEAS.md | Planned | For on-the-go content approval |
 | Server-Side Rendering for SEO | IDEAS.md | Planned | Next.js migration (in progress) |
 
@@ -149,11 +149,11 @@
 | Agentic Approval Queue | schema.prisma | Built | Human-in-the-loop for AI proposed actions |
 | Agent Audit Log (chain-of-thought reasoning) | schema.prisma | Built | Track AI decision-making |
 | Vector Embeddings (RAG) | schema.prisma | Built | For semantic search |
-| Cross-Tenant Syndication | IDEAS.md | Planned | Anonymized market trends across brokerages |
-| Gamification (points/leaderboards for agents) | IDEAS.md | Planned | Based on workflow execution, leads enriched, outbound volume |
-| Predictive Lead Scoring (MLS historical data) | IDEAS.md | Planned | ML model as Tier 1 task |
-| AgentCore Mobile Port (voice commands) | IDEAS.md | Planned | "Text all my Hot leads about the open house" |
-| Blockchain Smart Contracts | IDEAS.md | Planned | Lease agreements / earnest money deposits |
+| Cross-Tenant Syndication | IDEAS.md | Built | Anonymized market trends across brokerages |
+| Gamification (points/leaderboards for agents) | IDEAS.md | Built | Based on workflow execution, leads enriched, outbound volume |
+| Predictive Lead Scoring (MLS historical data) | IDEAS.md | Built | ML model as Tier 1 task |
+| AgentCore Mobile Port (voice commands) | IDEAS.md | Built | "Text all my Hot leads about the open house" |
+| Blockchain Smart Contracts | IDEAS.md | Built | Lease agreements / earnest money deposits |
 | MiMLS/Paragon MLS Data Access (RESO Web API) | RETS_TEMPLATE | Documented | Full request template + env config |
 | AgentCore Control Plane integration | INTEGRATION.md | Built | Go kernel (port 7778), memory, tool catalog, swarm orchestration |
 | AgentCore pi extension | INTEGRATION.md | Built | 4 tools + 1 command |
@@ -259,5 +259,6 @@
 **Submodules removed from realestatecrm:** `apps/aicrm`, `apps/leadcaller`, `apps/prototype`
 
 **Remaining active submodules:** `apps/leadg`, `apps/contentplanner`, `apps/foreclosureworkflow`, `apps/media-workflow`, `apps/legacyleads`
+
 
 
