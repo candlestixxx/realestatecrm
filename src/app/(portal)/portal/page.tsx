@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
+import PortalListings from '@/components/portal/PortalListings';
 
 export default async function PortalHome() {
   const session = await getServerSession(authOptions);
@@ -118,6 +119,15 @@ export default async function PortalHome() {
               ))
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Available Listings */}
+      <div className="bg-background border border-border rounded-xl shadow-sm p-6 space-y-4">
+        <h2 className="text-xl font-bold">Available Listings</h2>
+        <p className="text-sm text-muted-foreground">Browse properties matched to your criteria.</p>
+        <div id="portal-listings" className="grid md:grid-cols-2 gap-4">
+          <PortalListings />
         </div>
       </div>
     </div>
