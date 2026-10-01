@@ -15,15 +15,15 @@ npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
+# Database & state files are tracked (retention policy)
+# (dev.db, prisma/dev.db, metamcp.db, *.sqlite are intentionally not ignored)
+
 # Build artifacts
 /dist
 /build
 /out
 /.next
 /.turbo
-/data/workflow-state.json
-/data/rag-outbox.json
-/data/vector-index.json
 
 
 # Python
@@ -42,15 +42,8 @@ android/.gradle/
 ios/Pods/
 
 /src/generated/prisma
-data/
-metamcp.db
-audit*.jsonl
-dev.db
-dev.db*
 tsconfig.tsbuildinfo
 *.tsbuildinfo
-prisma/dev.db
-prisma/dev.db-journal
 
 # Sub-project local state
 apps/*/node_modules

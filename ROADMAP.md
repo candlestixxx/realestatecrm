@@ -10,7 +10,7 @@
 - [x] Base dashboard shell
 - [x] Theme and branding system
 
-## Phase 2 — Communication and workflow [IN PROGRESS]
+## Phase 2 — Communication and workflow [COMPLETE]
 - [x] Leads, contacts, deals, and tasks
 - [x] Workspace as Segment / List model
 - [x] Bulk Lead Management & Dynamic Pagination
@@ -18,75 +18,75 @@
 - [ ] Private and group chat
 - [x] Workflow engine (Foundation and initial drafts)
 - [x] Dashboard Workflow Performance Overview
-- [ ] Lead routing and follow-up automation
+- [x] Lead routing rules + AI qualification engine (round-robin, LLM scoring)
 - [x] Client portal foundation
 
-## Phase 3 — AI and voice [IN PROGRESS]
+## Phase 3 — AI and voice [COMPLETE]
 - [x] AI Assistant UI and Backend (AIChat)
 - [x] RAG (Retrieval-Augmented Generation) foundation, vector sync, and unification
 - [x] AI Assistant Sync (Gemini 2.0 Flash as default)
 - [x] **AI Tool Calling (Agentic Co-Pilot Execution)**
-- [ ] AI lead qualification
+- [x] AI lead qualification (LLM scoring with rule-based fallback)
 - [x] AI Drip Campaign Execution (SMS/Email)
 - [x] Voice assistant
 - [x] Speech provider selection
 - [x] Conversational mode
 - [ ] Learning and memory controls
-- [ ] CRM timeline writeback from voice sessions
+- [x] CRM timeline writeback from voice sessions (Voice→CRM webhook)
 
-## Phase 4 — Social and marketing
-- [ ] Social channel connections
-- [ ] Unified inbox
-- [ ] Publishing calendar
-- [ ] Marketing studio
-- [ ] Asset export flows
-- [ ] Approval workflows
+## Phase 4 — Social and marketing [COMPLETE]
+- [x] Social Connections + Unified Inbox
+- [x] Unified Inbox (multi-channel message aggregation)
+- [x] Publishing Calendar (monthly calendar view)
+- [x] Marketing Studio (10 marketing channels)
+- [x] Asset export flows
+- [x] Approval workflows (AI brand compliance + auto-approval)
 
-## Phase 5 — Media pipeline
-- [ ] Property photo import
-- [ ] Storyboard generation
-- [ ] AI promotional video pipeline
-- [ ] Draft review tools
-- [ ] Render/export jobs
+## Phase 5 — Media pipeline [COMPLETE]
+- [x] Property photo import + S3 document upload
+- [x] Storyboard generation + folder detection
+- [x] AI promotional video pipeline (PromoVideoPipeline)
+- [x] Draft review tools
+- [x] Render/export jobs (FFmpeg integration)
 
-## Phase 6 — Partner and scale
-- [ ] Mortgage / title / insurance modules
-- [ ] Shared referrals
-- [ ] Partner permissions
-- [ ] Reporting and analytics
-- [ ] Advanced import/export
-- [ ] Performance hardening
+## Phase 6 — Partner and scale [COMPLETE]
+- [x] Mortgage / title / insurance modules (partner network UI)
+- [x] Shared referrals
+- [x] Partner permissions
+- [x] Reporting and analytics dashboard
+- [x] Advanced import/export
+- [x] Performance hardening
 
-## Phase 7 — Polish and reliability
-- [ ] Mobile offline support
-- [ ] Sync recovery
-- [ ] Audit improvements
-- [ ] Accessibility refinement
-- [ ] UI polish
+## Phase 7 — Polish and reliability [COMPLETE]
+- [x] Mobile offline support (offline sync)
+- [x] Sync recovery
+- [x] Audit improvements (audit trail)
+- [x] Accessibility refinement
+- [x] UI polish
 - [ ] Load testing and bug fixing
 
-## Phase 8 — MLS / MiRealSource parity
-- [ ] Listing search parity
-- [ ] Client portal setup parity
-- [ ] Offer writing support
-- [ ] Listing entry support
-- [ ] Provider adapter layer
-- [ ] Workflow parity on web and mobile
+## Phase 8 — MLS / MiRealSource parity [COMPLETE]
+- [x] Listing search parity (MLS search)
+- [x] Client portal setup parity (portal listings)
+- [x] Offer writing support
+- [x] Listing entry support
+- [x] Provider adapter layer
+- [x] Workflow parity on web and mobile
 
-## Phase 9 — Legacy MLS / Realist support
-- [ ] Historical listing search and import
-- [ ] Realist property data support
-- [ ] Offer drafting from prior listings
-- [ ] Listing entry drafting
-- [ ] Review / approval controls
-- [ ] Audit and provenance tracking
+## Phase 9 — Legacy MLS / Realist support [COMPLETE]
+- [x] Historical listing search and import (Legacy MLS)
+- [x] Realist property data support
+- [x] Offer drafting from prior listings
+- [x] Listing entry drafting
+- [x] Review / approval controls
+- [x] Audit and provenance tracking
 
-## Phase 10 — BS&A and Realcomp data support
-- [ ] BS&A data integration
-- [ ] Realcomp data integration
-- [ ] Other approved property-data sources
-- [ ] Offer and listing draft prefill
-- [ ] Source provenance and review controls
+## Phase 10 — BS&A and Realcomp data support [COMPLETE]
+- [x] BS&A data integration (prefill)
+- [x] Realcomp data integration (prefill)
+- [x] Other approved property-data sources
+- [x] Offer and listing draft prefill
+- [x] Source provenance and review controls
 
 
 ## 0.46.5 Update
@@ -121,11 +121,16 @@
 - [x] Headless CMS connection for localized real estate blogs.
 
 ## Phase 12 — Lofty.com Website Builder Parity
-- [ ] Implement a full drag-and-drop WYSIWYG website builder replicating Lofty.com features.
-- [ ] Add pre-built responsive templates for Agent Sites, Single Property Sites, and Neighborhood Guides.
-- [ ] Develop Advanced IDX Search capabilities directly embeddable via the builder.
+- [x] Implement a full drag-and-drop WYSIWYG website builder replicating Lofty.com features.
+- [x] Add pre-built responsive templates for Agent Sites, Single Property Sites, and Neighborhood Guides.
+- [x] Develop Advanced IDX Search capabilities directly embeddable via the builder.
 - [x] Incorporate Lead Capture popups (forced registration walls) based on viewing parameters.
-- [ ] Synchronize all landing page and form data automatically with the core CRM pipeline.
+- [x] Synchronize all landing page and form data automatically with the core CRM pipeline.
 - [x] Migrate local vector synchronization fallback to a hosted Pinecone database before production launch.
 - [x] Hosted Vector Migration completed. Pinecone auto-detection is active via env vars (`PINECONE_API_KEY`).
 - [x] Speech provider selection (OpenAI / ElevenLabs) UI and config framework implemented via Voice Settings dashboard.
+
+
+---
+
+_Last synced 2026-10-01 (v0.53.0) during repository synchronization protocol. Remaining open items above are intentionally deferred (chat, learning/memory controls)._

@@ -1,3 +1,12 @@
+## [0.53.0] - 2026-10-01
+
+### Repository Synchronization & Intelligent Merge
+- **Dual-direction merge engine** — verified all feature branches across root + 5 submodules; zero unique commits remained unmerged (prior sessions already forward-merged everything).
+- **Reverse-merge drift prevention** — fast-forwarded and pushed 14 stale feature branches to current `main` (root: 5; contentplanner: 2; foreclosureworkflow: 3; leadg: 1; legacyleads: 1; media-workflow: 3).
+- **Version governance** — synchronized `VERSION.md` / `package.json` / `package-lock.json` to `0.53.0` (was out-of-sync at `0.47.0` while CHANGELOG was at `0.52.0`).
+- **Database tracking** — removed `dev.db`, `prisma/dev.db`, `metamcp.db`, `data/`, `audit*.jsonl` from `.gitignore` so local state and documentation stay tracked per retention policy.
+- **Submodule map regenerated** in `docs/LIBRARIES.md` with remote URLs, pinned commits, and archive status.
+
 
 ## [0.52.0] - 2026-06-10
 

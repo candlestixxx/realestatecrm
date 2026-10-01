@@ -1,4 +1,4 @@
-# Libraries & Submodules
+﻿# Libraries & Submodules
 
 This document lists the major libraries, frameworks, and submodules used in the RealEstateCRM project, along with their purpose and version.
 
@@ -52,3 +52,23 @@ This document lists the major libraries, frameworks, and submodules used in the 
 
 ## 0.39.0 Audit
 - Confirmed versions for major dependencies: Next.js (16.2.6), React (19.0.0), Tailwind CSS (3.4.1), Prisma (6.19.3), NextAuth.js (4.24.11).
+
+## Git Submodules — Structural Map (verified 2026-10-01, v0.53.0)
+
+| Path | Remote URL | Pinned Commit | Branch | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| `apps/leadg` | https://github.com/candlestixxx/leadG.git | `d592b04` | `main` | Active — Voice agent (campaigns, calls, A/B testing) |
+| `apps/contentplanner` | https://github.com/candlestixxx/socialmediacontentplanner.git | `a5c2028` | `main` | Active — Content studio (AI generation, billing, social) |
+| `apps/foreclosureworkflow` | https://github.com/candlestixxx/forclosureworkflow.git | `9e1dca0` | `main` | Active — Foreclosure monitoring + tax assessors |
+| `apps/media-workflow` | https://github.com/candlestixxx/re-agent-workflow-media-1.git | `15cf986` | `main` | Active — Media pipeline + AI compliance |
+| `apps/legacyleads` | https://github.com/candlestixxx/LegacyLeads.git | `08cd887` | `main` | Active — Skip-tracing, Mapbox, TCPA |
+
+### Archived Submodules (removed from .gitmodules 2026-06-10; features fully merged)
+
+| Path | Remote URL | Last Commit | Status |
+| :--- | :--- | :--- | :--- |
+| `apps/aicrm` | https://github.com/candlestixxx/aicrm.git | `58b5337` | Archived — MCP, NL commands, workflow engine ported to main CRM |
+| `apps/leadcaller` | https://github.com/candlestixxx/realestateleadcaller.git | `9eb331e` | Archived — merged into leadG |
+| `apps/prototype` | https://github.com/candlestixxx/realestateprototype.git | `f561af8` | Archived — merged into contentplanner |
+
+> Root repository: https://github.com/robertpelloni/realestatecrm.git (resolves to candlestixxx/realestatecrm). Not a fork — no upstream parent.
