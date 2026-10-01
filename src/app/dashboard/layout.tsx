@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import AIChat from '@/components/AIChat';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
@@ -19,6 +19,7 @@ import { processDueCampaignTasks } from '@/lib/campaign-processor';
 import { startSyncScheduler } from '@/lib/sync-scheduler';
 import LeadAlertListener from '@/components/LeadAlertListener';
 import NotificationDropdown from '@/components/NotificationDropdown';
+import SidebarNav from '@/components/dashboard/SidebarNav';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   let session = null;
@@ -69,180 +70,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-4">
-          {/* CRM Core */}
-          <div className="relative group/menu">
-            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/40 hover:bg-muted text-foreground font-black text-xs cursor-pointer transition-all border border-border/40 select-none">
-              <span className="flex items-center gap-2">🗂️ CRM Core</span>
-              <span className="text-[10px] text-muted-foreground/55 font-bold group-hover/menu:translate-x-0.5 transition-transform">→</span>
-            </div>
-            
-            <div className="absolute left-full top-0 ml-2.5 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-1.5 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-150 transform translate-x-2 group-hover/menu:translate-x-0">
-              <div className="px-3 pb-1 border-b border-border/40 mb-1">
-                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Core CRM</span>
-              </div>
-              <Link href="/dashboard" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Dashboard Overview
-              </Link>
-              <Link href="/dashboard/leads" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Leads & Contacts
-              </Link>
-              <Link href="/dashboard/segments" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Filtered Segments
-              </Link>
-              <Link href="/dashboard/map" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Lead Map
-              </Link>
-              <Link href="/dashboard/deals" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Deals Pipeline
-              </Link>
-              <Link href="/dashboard/tasks" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Task Checklist
-              </Link>
-              <Link href="/dashboard/agent-websites?tab=analytics" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Reporting Studio
-              </Link>
-            </div>
-          </div>
-
-          {/* Marketing & Content */}
-          <div className="relative group/menu">
-            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/40 hover:bg-muted text-foreground font-black text-xs cursor-pointer transition-all border border-border/40 select-none">
-              <span className="flex items-center gap-2">📢 Marketing & CMS</span>
-              <span className="text-[10px] text-muted-foreground/55 font-bold group-hover/menu:translate-x-0.5 transition-transform">→</span>
-            </div>
-
-            <div className="absolute left-full top-0 ml-2.5 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-1.5 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-150 transform translate-x-2 group-hover/menu:translate-x-0">
-              <div className="px-3 pb-1 border-b border-border/40 mb-1">
-                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Marketing</span>
-              </div>
-              <Link href="/dashboard/social" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Social Connections
-              </Link>
-              <Link href="/dashboard/inbox" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Unified Inbox
-              </Link>
-              <Link href="/dashboard/marketing-studio" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Marketing Studio
-              </Link>
-              <Link href="/dashboard/calendar" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Publishing Calendar
-              </Link>
-              <Link href="/dashboard/campaigns" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Drip Campaigns
-              </Link>
-              <Link href="/dashboard/agent-websites?tab=ai-creator" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-indigo-500 hover:text-indigo-600 flex items-center gap-1">
-                ✨ INSTA GEN "NEW" (AI)
-              </Link>
-              <Link href="/dashboard/agent-websites?tab=seo-blog" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                ✍️ SEO & Blog Creator
-              </Link>
-              <Link href="/dashboard/agent-websites?tab=social-agent" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                📱 Social Studio
-              </Link>
-              <Link href="/dashboard/agent-websites?tab=traditional" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                🏢 Traditional Landing Page Builder
-              </Link>
-              <Link href="/workflows/marketing-media" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Media Studio
-              </Link>
-              <Link href="/dashboard/marketing/text-codes" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                SMS Text Codes
-              </Link>
-            </div>
-          </div>
-
-          {/* AgentCore */}
-          <div className="relative group/menu">
-            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/40 hover:bg-muted text-foreground font-black text-xs cursor-pointer transition-all border border-border/40 select-none">
-              <span className="flex items-center gap-2">🧠 AgentCore</span>
-              <span className="text-[10px] text-muted-foreground/55 font-bold group-hover/menu:translate-x-0.5 transition-transform">→</span>
-            </div>
-
-            <div className="absolute left-full top-0 ml-2.5 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-1.5 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-150 transform translate-x-2 group-hover/menu:translate-x-0">
-              <div className="px-3 pb-1 border-b border-border/40 mb-1">
-                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">AI Engine</span>
-              </div>
-              <Link href="/dashboard/agentcore" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Command Console
-              </Link>
-              <Link href="/dashboard/agentcore#workflows" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Workflow Builder
-              </Link>
-              <Link href="/dashboard/settings/ai-models" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                AI Model Keys
-              </Link>
-              <Link href="/dashboard/settings/mcp" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                MCP Server
-              </Link>
-            </div>
-          </div>
-
-          {/* Automations */}
-          <div className="relative group/menu">
-            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/40 hover:bg-muted text-foreground font-black text-xs cursor-pointer transition-all border border-border/40 select-none">
-              <span className="flex items-center gap-2">🤖 Automations</span>
-              <span className="text-[10px] text-muted-foreground/55 font-bold group-hover/menu:translate-x-0.5 transition-transform">→</span>
-            </div>
-
-            <div className="absolute left-full top-0 ml-2.5 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-1.5 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-150 transform translate-x-2 group-hover/menu:translate-x-0">
-              <div className="px-3 pb-1 border-b border-border/40 mb-1">
-                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Wizards</span>
-              </div>
-              <Link href="/dashboard/agent-studio" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Agent Studio (AI)
-              </Link>
-              <Link href="/dashboard/workflows" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Workflows (Wizards)
-              </Link>
-              <Link href="/dashboard/approvals" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Approvals
-              </Link>
-            </div>
-          </div>
-
-          {/* Settings */}
-          <div className="relative group/menu">
-            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/40 hover:bg-muted text-foreground font-black text-xs cursor-pointer transition-all border border-border/40 select-none">
-              <span className="flex items-center gap-2">⚙️ CRM Settings</span>
-              <span className="text-[10px] text-muted-foreground/55 font-bold group-hover/menu:translate-x-0.5 transition-transform">→</span>
-            </div>
-            
-            <div className="absolute left-full top-0 ml-2.5 z-50 w-52 bg-background border border-border rounded-xl shadow-2xl overflow-hidden py-1.5 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-150 transform translate-x-2 group-hover/menu:translate-x-0">
-              <div className="px-3 pb-1 border-b border-border/40 mb-1">
-                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Configuration</span>
-              </div>
-              <Link href="/dashboard/settings/integrations" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Lead Integrations
-              </Link>
-              <Link href="/dashboard/settings/routing" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Lead Routing
-              </Link>
-              <Link href="/dashboard/settings/email" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Email Settings
-              </Link>
-              <Link href="/dashboard/settings/ai-models" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                AI Model Keys
-              </Link>
-              <Link href="/dashboard/settings/mcp" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                MCP Server
-              </Link>
-              <Link href="/dashboard/sync-queue" className="block px-4 py-2 hover:bg-muted text-xs font-bold text-muted-foreground hover:text-foreground">
-                Sync Queue Log
-              </Link>
-            </div>
-          </div>
-
-          {/* Support */}
-          <div className="pt-2 border-t border-border/20">
-            <Link
-              href="/dashboard/help-center"
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all text-xs font-bold"
-            >
-              🤝 Help Center
-            </Link>
-          </div>
-        </nav>
+        <SidebarNav />
         <div className="p-4 border-t border-border bg-muted/10">
           <div className="text-[10px] text-muted-foreground uppercase tracking-widest text-center font-bold">
             Version {getProjectVersion()}
