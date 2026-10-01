@@ -29,6 +29,8 @@ model User {
   smsAlertsMlsRelist   Boolean   @default(false)
   emailAlertsMlsRelist Boolean   @default(true)
   notifications        SystemNotification[]
+  auditLogs            AuditLog[]
+  agentSites           AgentSite[]
 }
 
 model Workspace {
@@ -53,6 +55,15 @@ model Workspace {
   blogPosts      BlogPost[]
   propertyListings       PropertyListing[]
   myPlusLeadsIntegrations MyPlusLeadsIntegration[]
+  partners       Partner[]
+  referrals      Referral[]
+  partnerPermissions PartnerPermission[]
+  auditLogs      AuditLog[]
+  listings       Listing[]
+  offers         Offer[]
+  clientPortals  ClientPortal[]
+  websiteTemplates WebsiteTemplate[]
+  agentSites     AgentSite[]
   voiceSettings  VoiceSettings?
   notifications  SystemNotification[]
 }
@@ -92,7 +103,10 @@ model Contact {
   leads            Lead[]
   stakeholderIn    DealStakeholder[]
   messages         Message[]
-}
+    referrals        Referral[]       @relation("ReferralContact")
+    buyerOffers      Offer[]          @relation("OfferBuyer")
+    clientPortals    ClientPortal[]   @relation("ClientPortalContact")
+  }
 
 model Lead {
   id              String            @id @default(cuid())
@@ -120,11 +134,12 @@ model Lead {
   WorkflowSession WorkflowSession[]
   tasks           Task[]
   searchAlerts    SearchAlert[]
+    referrals       Referral[]       @relation("ReferralLead")
   segments        Segment[]         @relation("LeadSegments")
   agentLogs       AgentLog[]
   qualifications  LeadQualification[]
   messages        Message[]
-}
+  }
 
 model SmartPlan {
   id          String    @id @default(cuid())
@@ -161,7 +176,8 @@ model Deal {
   tasks           Task[]
   stakeholders    DealStakeholder[]
   requirements    DealRequirement[]
-}
+    referrals       Referral[]       @relation("ReferralDeal")
+  }
 
 model DealStakeholder {
   id          String    @id @default(cuid())
@@ -491,4 +507,180 @@ model SystemNotification {
 
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Phase 6: Partner Modules ───
+
+model Partner {
+  id            String   @id @default(cuid())
+  companyName   String
+  contactName   String
+  email         String?
+  phone         String?
+  type          String   // MORTGAGE, TITLE, INSURANCE, INSPECTION, LEGAL
+  licenseNumber String?
+  address       String?
+  website       String?
+  notes         String?
+  isActive      Boolean  @default(true)
+  workspaceId   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  referrals     Referral[]
+  permissions   PartnerPermission[]
+}
+
+model Referral {
+  id          String   @id @default(cuid())
+  type        String   // SENT, RECEIVED
+  status      String   @default("PENDING") // PENDING, ACCEPTED, CLOSED, REJECTED
+  commissionRate Float?
+  notes       String?
+  partnerId   String
+  leadId      String?
+  dealId      String?
+  contactId   String?
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  lead        Lead?    @relation("ReferralLead", fields: [leadId], references: [id])
+  deal        Deal?    @relation("ReferralDeal", fields: [dealId], references: [id])
+  contact     Contact? @relation("ReferralContact", fields: [contactId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model PartnerPermission {
+  id          String   @id @default(cuid())
+  partnerId   String
+  canViewLeads     Boolean @default(false)
+  canViewDeals     Boolean @default(false)
+  canViewContacts  Boolean @default(false)
+  canCreateReferral Boolean @default(false)
+  canEditReferral  Boolean @default(false)
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+// ─── Phase 7: Polish ───
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String   // CREATE, UPDATE, DELETE, LOGIN, EXPORT, VIEW
+  entityType  String   // Lead, Contact, Deal, Partner, etc.
+  entityId    String?
+  userId      String?
+  workspaceId String
+  ipAddress   String?
+  userAgent   String?
+  changes     String?  // JSON diff of changes
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+// ─── Phase 8-10: MLS Parity ───
+
+model Listing {
+  id              String   @id @default(cuid())
+  mlsNumber       String?  @unique
+  status          String   @default("ACTIVE") // ACTIVE, PENDING, SOLD, EXPIRED, WITHDRAWN
+  listPrice       Float?
+  soldPrice       Float?
+  address         String
+  city            String?
+  state           String?
+  zip             String?
+  bedrooms        Int?
+  bathrooms       Float?
+  squareFeet      Int?
+  lotSize         Float?
+  yearBuilt       Int?
+  propertyType    String?  // SINGLE_FAMILY, CONDO, TOWNHOUSE, MULTI_FAMILY, LAND, COMMERCIAL
+  description     String?
+  photos          String?  // JSON array of photo URLs
+  virtualTourUrl  String?
+  listingAgentId  String?
+  sellingAgentId  String?
+  sellerContactId String?
+  buyerContactId  String?
+  listDate        DateTime?
+  soldDate        DateTime?
+  daysOnMarket    Int?
+  workspaceId     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  offers          Offer[]
+}
+
+model Offer {
+  id            String   @id @default(cuid())
+  amount        Float
+  status        String   @default("SUBMITTED") // SUBMITTED, COUNTERED, ACCEPTED, REJECTED, WITHDRAWN, EXPIRED
+  contingencies String?  // JSON array
+  closingDate   DateTime?
+  earnestMoney  Float?
+  notes         String?
+  listingId     String
+  buyerContactId String
+  agentId       String?
+  workspaceId   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  listing       Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyer         Contact  @relation("OfferBuyer", fields: [buyerContactId], references: [id])
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model ClientPortal {
+  id          String   @id @default(cuid())
+  token       String   @unique @default(cuid())
+  contactId   String
+  title       String?
+  expiresAt   DateTime?
+  isActive    Boolean  @default(true)
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  contact     Contact  @relation("ClientPortalContact", fields: [contactId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+// ─── Phase 12: Website Builder ───
+
+model WebsiteTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  category    String?  // AGENT, LISTING, LANDING, BLOG
+  html        String   // HTML template content
+  css         String?  // Custom CSS
+  thumbnail   String?  // Preview image URL
+  isActive    Boolean  @default(true)
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sites       AgentSite[]
+}
+
+model AgentSite {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  content     String?  // JSON of page content/blocks
+  domain      String?  // Custom domain
+  isPublished Boolean  @default(false)
+  templateId  String?
+  userId      String?
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  template    WebsiteTemplate? @relation(fields: [templateId], references: [id])
+  user        User?    @relation(fields: [userId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
