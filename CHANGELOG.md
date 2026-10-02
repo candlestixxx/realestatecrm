@@ -1,10 +1,62 @@
+## [0.54.0] - 2026-10-01
+
+### Build Repair Across All Submodules
+Every component now installs and builds green. Root `npm run build` and the
+production server were already healthy; this release makes the five `apps/*`
+submodules match.
+
+- **leadg** â€” installed undeclared deps (`leaflet`, `react-leaflet`,
+  `@hello-pangea/dnd`, `inngest`, `@sendgrid/mail`, `@twilio/voice-sdk`,
+  `@types/leaflet`); added `src/lib/prisma.ts` re-export (several modules
+  imported `@/lib/prisma` which never existed); extracted `authOptions` to
+  `src/lib/auth.ts` (Next.js route files may only export HTTP methods) and
+  rewrote 13 imports; added NextAuth `Session.user.id` augmentation; fixed
+  Prisma relation `agent` -> `assignedAgent`; added required
+  `organizationId` on `lead.create` and required `CallLog` fields in the
+  vapi webhook; mapped `CallOutcome` to real enum values.
+
+- **foreclosureworkflow** â€” verified install + `next build` green (all
+  routes compile, including `/api/sequences/*` and `/leads/[id]/edit`).
+
+- **contentplanner** â€” repaired 97 strict-mode errors across the turbo
+  workspace. Mechanical: `process.env.X` -> bracket access, unused
+  params/locals, explicit `return` on terminal Express responses. Structural:
+  `authOptions` extracted to `apps/web/src/lib/auth.ts` (exporting it from
+  the route failed the build with "data did not match any variant of untagged
+  enum Config"); billing import path fixed to `@contentcommand/billing`;
+  `ioredis` type identity unified (bullmq bundles 5.10.1, app had 5.11.1);
+  `@next/swc-win32-x64-msvc@15.2.1` declared so Next stops patching the
+  lockfile through a yarn probe that loops; `@prisma/client` hoisted to the
+  workspace root so resolution stops climbing to the parent monorepo's client
+  (wrong schema); `"use client"` moved above the React import in
+  `draft-review-modal.tsx`; Badge gained a `ghost` variant. Prisma schema
+  extended: `Workspace` now carries `plan`, `subscriptionStatus`,
+  `stripeCustomerId` â€” the Stripe webhook wrote these against a nonexistent
+  `Organization` model, now remapped to `prisma.workspace`.
+  DATABASE_URL port corrected to 5433.
+
+- **media-workflow** â€” `ApprovalWorkflowService.autoApproveJob` returns
+  `{ job, review }`; the orchestrator assigned that whole object to a
+  `ListingMediaJob`. Destructured and the review outcome is now logged.
+  `tsconfig.json` excludes `dist/` (tsc emitted `.d.ts` there and the next
+  run failed TS5055 "would overwrite input file"). Vite frontend builds clean.
+
+- **legacyleads** â€” installed `@mapbox/mapbox-gl-draw`, `supercluster`,
+  and their type packages (InteractiveMap.tsx imported them undeclared).
+  Next.js frontend builds clean; backend `tsc --noEmit` already clean.
+
+### Tooling
+- `scripts/system-tray.ps1` â€” Windows tray controller (see 0.53.2).
+- One-shot repair scripts kept beside their packages for auditability.
+
+
 ## [0.53.0] - 2026-10-01
 
 ### Repository Synchronization & Intelligent Merge
-- **Dual-direction merge engine** — verified all feature branches across root + 5 submodules; zero unique commits remained unmerged (prior sessions already forward-merged everything).
-- **Reverse-merge drift prevention** — fast-forwarded and pushed 14 stale feature branches to current `main` (root: 5; contentplanner: 2; foreclosureworkflow: 3; leadg: 1; legacyleads: 1; media-workflow: 3).
-- **Version governance** — synchronized `VERSION.md` / `package.json` / `package-lock.json` to `0.53.0` (was out-of-sync at `0.47.0` while CHANGELOG was at `0.52.0`).
-- **Database tracking** — removed `dev.db`, `prisma/dev.db`, `metamcp.db`, `data/`, `audit*.jsonl` from `.gitignore` so local state and documentation stay tracked per retention policy.
+- **Dual-direction merge engine** ï¿½ verified all feature branches across root + 5 submodules; zero unique commits remained unmerged (prior sessions already forward-merged everything).
+- **Reverse-merge drift prevention** ï¿½ fast-forwarded and pushed 14 stale feature branches to current `main` (root: 5; contentplanner: 2; foreclosureworkflow: 3; leadg: 1; legacyleads: 1; media-workflow: 3).
+- **Version governance** ï¿½ synchronized `VERSION.md` / `package.json` / `package-lock.json` to `0.53.0` (was out-of-sync at `0.47.0` while CHANGELOG was at `0.52.0`).
+- **Database tracking** ï¿½ removed `dev.db`, `prisma/dev.db`, `metamcp.db`, `data/`, `audit*.jsonl` from `.gitignore` so local state and documentation stay tracked per retention policy.
 - **Submodule map regenerated** in `docs/LIBRARIES.md` with remote URLs, pinned commits, and archive status.
 
 
