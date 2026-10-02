@@ -21,7 +21,8 @@
     "sync:myplus": "tsx scripts/sync-myplusleads.ts",
     "kill:port": "node scripts/kill-port.js 3000",
     "dev:full": "node scripts/kill-port.js 3000 && next dev -p 3000 --webpack",
-    "start:prod": "node scripts/kill-port.js 3000 && next build && next start -p 3000"
+    "start:prod": "node scripts/kill-port.js 3000 && next build && next start -p 3000",
+    "tray": "powershell -ExecutionPolicy Bypass -File scripts/system-tray.ps1"
   },
   "prisma": {
     "seed": "node prisma/seed.mjs"
