@@ -1,0 +1,97 @@
+﻿packages/ai/src/parser/index.ts(33,94): error TS2554: Expected 2 arguments, but got 3.
+packages/ai/src/parser/index.ts(46,45): error TS2339: Property 'generate' does not exist on type 'AIProvider'.
+packages/ai/src/providers/claude.ts(9,39): error TS4111: Property 'ANTHROPIC_API_KEY' comes from an index signature, so it must be accessed with ['ANTHROPIC_API_KEY'].
+packages/ai/src/providers/claude.ts(40,39): error TS6133: 'prompt' is declared but its value is never read.
+packages/ai/src/providers/claude.ts(40,55): error TS6133: 'schema' is declared but its value is never read.
+packages/ai/src/providers/claude.ts(40,68): error TS6133: 'systemPrompt' is declared but its value is never read.
+packages/ai/src/providers/gemini.ts(9,39): error TS4111: Property 'GEMINI_API_KEY' comes from an index signature, so it must be accessed with ['GEMINI_API_KEY'].
+packages/ai/src/providers/gemini.ts(39,39): error TS6133: 'prompt' is declared but its value is never read.
+packages/ai/src/providers/gemini.ts(39,55): error TS6133: 'schema' is declared but its value is never read.
+packages/ai/src/providers/gemini.ts(39,68): error TS6133: 'systemPrompt' is declared but its value is never read.
+packages/ai/src/providers/openai.ts(10,39): error TS4111: Property 'OPENAI_API_KEY' comes from an index signature, so it must be accessed with ['OPENAI_API_KEY'].
+packages/ai/src/providers/openai.ts(55,39): error TS6133: 'prompt' is declared but its value is never read.
+packages/ai/src/providers/openai.ts(55,55): error TS6133: 'schema' is declared but its value is never read.
+packages/ai/src/providers/openai.ts(55,68): error TS6133: 'systemPrompt' is declared but its value is never read.
+packages/api/src/index.ts(9,10): error TS2614: Module '"./routes/billing"' has no exported member 'billingRouter'. Did you mean to use 'import billingRouter from "./routes/billing"' instead?
+packages/api/src/index.ts(23,21): error TS6133: 'req' is declared but its value is never read.
+packages/api/src/middleware/auth.ts(3,1): error TS6133: 'RedisStore' is declared but its value is never read.
+packages/api/src/middleware/auth.ts(10,43): error TS6133: 'res' is declared but its value is never read.
+packages/api/src/middleware/auth.ts(28,43): error TS4111: Property 'REDIS_URL' comes from an index signature, so it must be accessed with ['REDIS_URL'].
+packages/api/src/middleware/auth.ts(45,13): error TS6133: 'req' is declared but its value is never read.
+packages/api/src/middleware/auth.ts(45,23): error TS6133: 'next' is declared but its value is never read.
+packages/api/src/routes/ai.ts(10,26): error TS7030: Not all code paths return a value.
+packages/api/src/routes/ai.ts(74,31): error TS7030: Not all code paths return a value.
+packages/api/src/routes/analytics.ts(7,17): error TS7030: Not all code paths return a value.
+packages/api/src/routes/analytics.ts(9,35): error TS4111: Property 'workspaceId' comes from an index signature, so it must be accessed with ['workspaceId'].
+packages/api/src/routes/analytics.ts(28,21): error TS7006: Parameter 'm' implicitly has an 'any' type.
+packages/api/src/routes/billing.ts(2,60): error TS2307: Cannot find module '../billing/src/stripe/webhook' or its corresponding type declarations.
+packages/api/src/routes/billing.ts(7,24): error TS4111: Property 'STRIPE_PRICE_STARTER' comes from an index signature, so it must be accessed with ['STRIPE_PRICE_STARTER'].
+packages/api/src/routes/billing.ts(8,29): error TS4111: Property 'STRIPE_PRICE_PROFESSIONAL' comes from an index signature, so it must be accessed with ['STRIPE_PRICE_PROFESSIONAL'].
+packages/api/src/routes/billing.ts(9,27): error TS4111: Property 'STRIPE_PRICE_ENTERPRISE' comes from an index signature, so it must be accessed with ['STRIPE_PRICE_ENTERPRISE'].
+packages/api/src/routes/billing.ts(29,46): error TS4111: Property 'APP_URL' comes from an index signature, so it must be accessed with ['APP_URL'].
+packages/api/src/routes/billing.ts(30,44): error TS4111: Property 'APP_URL' comes from an index signature, so it must be accessed with ['APP_URL'].
+packages/api/src/routes/billing.ts(44,79): error TS4111: Property 'STRIPE_WEBHOOK_SECRET' comes from an index signature, so it must be accessed with ['STRIPE_WEBHOOK_SECRET'].
+packages/api/src/routes/brand-kits.ts(7,17): error TS7030: Not all code paths return a value.
+packages/api/src/routes/brand-kits.ts(9,35): error TS4111: Property 'workspaceId' comes from an index signature, so it must be accessed with ['workspaceId'].
+packages/api/src/routes/brand-kits.ts(21,18): error TS7030: Not all code paths return a value.
+packages/api/src/routes/campaigns.ts(3,1): error TS6133: 'AIProvider' is declared but its value is never read.
+packages/api/src/routes/campaigns.ts(10,35): error TS4111: Property 'workspaceId' comes from an index signature, so it must be accessed with ['workspaceId'].
+packages/api/src/routes/campaigns.ts(22,20): error TS7030: Not all code paths return a value.
+packages/api/src/routes/campaigns.ts(38,18): error TS7030: Not all code paths return a value.
+packages/api/src/routes/landing-pages.ts(8,17): error TS7030: Not all code paths return a value.
+packages/api/src/routes/landing-pages.ts(9,33): error TS4111: Property 'workspaceId' comes from an index signature, so it must be accessed with ['workspaceId'].
+packages/api/src/routes/landing-pages.ts(17,18): error TS7030: Not all code paths return a value.
+packages/api/src/routes/landing-pages.ts(32,26): error TS7030: Not all code paths return a value.
+packages/api/src/routes/notifications.ts(13,18): error TS6133: 'req' is declared but its value is never read.
+packages/api/src/routes/notifications.ts(31,27): error TS7030: Not all code paths return a value.
+packages/api/src/routes/notifications.ts(39,28): error TS6133: 'req' is declared but its value is never read.
+packages/api/src/routes/podcasts.ts(14,18): error TS6133: 'req' is declared but its value is never read.
+packages/api/src/routes/podcasts.ts(19,26): error TS7030: Not all code paths return a value.
+packages/api/src/routes/posts.ts(7,17): error TS7030: Not all code paths return a value.
+packages/api/src/routes/posts.ts(9,35): error TS4111: Property 'workspaceId' comes from an index signature, so it must be accessed with ['workspaceId'].
+packages/api/src/routes/posts.ts(26,18): error TS7030: Not all code paths return a value.
+packages/api/src/routes/social.ts(10,25): error TS7030: Not all code paths return a value.
+packages/api/src/routes/social.ts(11,30): error TS4111: Property 'provider' comes from an index signature, so it must be accessed with ['provider'].
+packages/api/src/routes/social.ts(18,38): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+packages/api/src/routes/social.ts(39,25): error TS7030: Not all code paths return a value.
+packages/api/src/routes/social.ts(57,35): error TS4111: Property 'NEXT_PUBLIC_APP_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_APP_URL'].
+packages/api/src/routes/social.ts(62,26): error TS6133: 'req' is declared but its value is never read.
+packages/api/src/routes/videos.ts(14,18): error TS6133: 'req' is declared but its value is never read.
+packages/api/src/routes/videos.ts(19,26): error TS7030: Not all code paths return a value.
+packages/api/src/routes/workspace.ts(7,17): error TS7030: Not all code paths return a value.
+packages/api/src/routes/workspace.ts(9,35): error TS4111: Property 'workspaceId' comes from an index signature, so it must be accessed with ['workspaceId'].
+packages/api/src/routes/workspace.ts(21,19): error TS7030: Not all code paths return a value.
+packages/api/src/routes/workspace.ts(30,28): error TS4111: Property 'businessType' comes from an index signature, so it must be accessed with ['businessType'].
+packages/api/src/routes/workspace.ts(31,20): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+packages/api/src/server.ts(10,26): error TS4111: Property 'PORT' comes from an index signature, so it must be accessed with ['PORT'].
+packages/database/index.ts(26,16): error TS4111: Property 'analyticsMetric' comes from an index signature, so it must be accessed with ['analyticsMetric'].
+packages/database/index.ts(41,11): error TS6133: 'getModelHandler' is declared but its value is never read.
+packages/database/index.ts(107,23): error TS6133: 'args' is declared but its value is never read.
+packages/database/index.ts(114,25): error TS6133: 'args' is declared but its value is never read.
+packages/database/index.ts(127,30): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+packages/database/index.ts(128,31): error TS4111: Property 'USE_MOCK_DB' comes from an index signature, so it must be accessed with ['USE_MOCK_DB'].
+packages/database/index.ts(166,23): error TS6133: 'mockModel' is declared but its value is never read.
+packages/jobs/src/queues/social.ts(4,44): error TS4111: Property 'REDIS_URL' comes from an index signature, so it must be accessed with ['REDIS_URL'].
+packages/jobs/src/queues/social.ts(8,65): error TS2322: Type 'Redis' is not assignable to type 'ConnectionOptions'.
+  Type 'Redis' is not assignable to type 'ClusterOptions | Redis | IRedisClient | Cluster'.
+    Type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/ioredis/built/Redis").default' is not assignable to type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/bullmq/node_modules/ioredis/built/Redis").default'.
+      Types of property 'options' are incompatible.
+        Type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/ioredis/built/redis/RedisOptions").RedisOptions' is not assignable to type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/bullmq/node_modules/ioredis/built/redis/RedisOptions").RedisOptions'.
+          Type 'RedisOptions' is not assignable to type 'CommonRedisOptions'.
+            Types of property 'Connector' are incompatible.
+              Type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/ioredis/built/connectors/ConnectorConstructor").default | undefined' is not assignable to type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/bullmq/node_modules/ioredis/built/connectors/ConnectorConstructor").default | undefined'.
+                Type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/ioredis/built/connectors/ConnectorConstructor").default' is not assignable to type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/bullmq/node_modules/ioredis/built/connectors/ConnectorConstructor").default'.
+                  Type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/ioredis/built/connectors/AbstractConnector").default' is not assignable to type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/bullmq/node_modules/ioredis/built/connectors/AbstractConnector").default'.
+                    Property 'connecting' is protected but type 'AbstractConnector' is not a class derived from 'AbstractConnector'.
+packages/jobs/src/workers/social.ts(6,44): error TS4111: Property 'REDIS_URL' comes from an index signature, so it must be accessed with ['REDIS_URL'].
+packages/jobs/src/workers/social.ts(54,6): error TS2322: Type 'Redis' is not assignable to type 'ConnectionOptions'.
+  Type 'Redis' is not assignable to type 'ClusterOptions | Redis | IRedisClient | Cluster'.
+    Type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/ioredis/built/Redis").default' is not assignable to type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/bullmq/node_modules/ioredis/built/Redis").default'.
+      Types of property 'options' are incompatible.
+        Type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/ioredis/built/redis/RedisOptions").RedisOptions' is not assignable to type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/bullmq/node_modules/ioredis/built/redis/RedisOptions").RedisOptions'.
+          Type 'RedisOptions' is not assignable to type 'CommonRedisOptions'.
+            Types of property 'Connector' are incompatible.
+              Type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/ioredis/built/connectors/ConnectorConstructor").default | undefined' is not assignable to type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/bullmq/node_modules/ioredis/built/connectors/ConnectorConstructor").default | undefined'.
+                Type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/ioredis/built/connectors/ConnectorConstructor").default' is not assignable to type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/bullmq/node_modules/ioredis/built/connectors/ConnectorConstructor").default'.
+                  Type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/ioredis/built/connectors/AbstractConnector").default' is not assignable to type 'import("C:/Users/hyper/workspace/realestatecrm/apps/contentplanner/node_modules/bullmq/node_modules/ioredis/built/connectors/AbstractConnector").default'.
+                    Property 'connecting' is protected but type 'AbstractConnector' is not a class derived from 'AbstractConnector'.

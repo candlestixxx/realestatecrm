@@ -1,0 +1,84 @@
+﻿
+> real-estate-crm@0.54.0 prebuild
+> node scripts/kill-port.js 3000
+
+
+> real-estate-crm@0.54.0 build
+> next build
+
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+node.exe : Turbopack build encountered 1 warnings:
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\hyper\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Turbopack build encountered 1 warnings::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace 
+below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/app/api/folder-detection/route.ts
+
+
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./src/lib/workspace-context.ts:1:1
+You're importing a module that depends on "next/headers". This API is only available in Server Components in the App 
+Router, but you are using it in the Pages Router.
+    Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { cookies } [36mfrom[0m [32m'next/headers'[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m [36mimport[0m [36mtype[0m { [33mSession[0m } [36mfrom[0m [32m'next-auth'[0m;
+  [90m3 |[0m
+  [90m4 |[0m [36mexport[0m [36mconst[0m [33mDEFAULT_WORKSPACE_SLUG[0m = [32m'excel-legacy-team'[0m;
+
+Ecmascript file had an error
+
+Import traces:
+  #1 [App Route]:
+    ./src/lib/workspace-context.ts
+    ./src/app/api/folder-detection/route.ts
+
+  #2 [App Route]:
+    ./src/lib/workspace-context.ts
+    ./src/app/api/reporting/route.ts
+
+  #3 [Server Component]:
+    ./src/lib/workspace-context.ts
+    ./src/lib/actions/workspace.ts
+
+  #4 [Server Component]:
+    ./src/lib/workspace-context.ts
+    ./src/lib/auth.ts
+    ./src/app/dashboard/layout.tsx
+
+  #5 [Client Component Browser]:
+    ./src/lib/workspace-context.ts [Client Component Browser]
+    ./src/lib/workspace-client.ts [Client Component Browser]
+    ./src/app/dashboard/audit/page.tsx [Client Component Browser]
+    ./src/app/dashboard/audit/page.tsx [Server Component]
+
+  #6 [Client Component SSR]:
+    ./src/lib/workspace-context.ts [Client Component SSR]
+    ./src/lib/workspace-client.ts [Client Component SSR]
+    ./src/app/dashboard/audit/page.tsx [Client Component SSR]
+    ./src/app/dashboard/audit/page.tsx [Server Component]
+
+
+    at <unknown> (./src/lib/workspace-context.ts:1:1)

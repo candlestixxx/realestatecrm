@@ -1,0 +1,71 @@
+﻿
+> app@2.16.0 build
+> cd frontend && npm install && npm run build && cd .. && tsc
+
+
+up to date, audited 37 packages in 970ms
+
+9 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+[36mvite v8.2.2 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 46 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.47 kB │ gzip:  0.29 kB
+dist/assets/index-Bww_UaBo.css    3.82 kB │ gzip:  1.49 kB
+dist/assets/index-BwRwqDGp.js   235.50 kB │ gzip: 73.68 kB
+
+[32m✓ built in 378ms[39m
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/index.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/models/ComplianceLog.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/models/GeneratedAsset.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/models/LandingPageJob.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/models/ListingMediaJob.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/models/SocialPostDraft.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/models/VideoProcessingJob.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/AIBrandReviewService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/AlertingService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/ApprovalWorkflowService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/AssetStorageService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/AutomationTriggerService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/BatchProcessingService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/CanvaIntegrationService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/DatabaseService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/FolderDetectionService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/JustSoldPipelineService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/LoftyIntegrationService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/MagnificAiService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/MicroserviceOrchestrator.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/PromoVideoPipeline.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/RealEstateCrmService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/SocialCopyService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/SocialPublishingService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/services/VideoProcessingService.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/utils/MessageBroker.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/src/utils/PerformanceMonitor.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/AlertingService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/ApprovalWorkflowService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/AssetStorageService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/AutomationTriggerService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/BatchProcessingService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/CanvaIntegrationService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/DatabaseService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/FolderDetectionService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/JustSoldPipelineService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/LoftyIntegrationService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/MagnificAiService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/PerformanceMonitor.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/SocialCopyService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/SocialPublishingService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/VideoProcessingService.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/integration/end-to-end.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/integration/performance.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/integration/sandbox.test.d.ts' because it would overwrite input file.
+error TS5055: Cannot write file 'C:/Users/hyper/workspace/realestatecrm/apps/media-workflow/dist/tests/models.test.d.ts' because it would overwrite input file.

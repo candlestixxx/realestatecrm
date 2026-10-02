@@ -1,0 +1,152 @@
+﻿
+> real-estate-crm@0.54.0 prebuild
+> node scripts/kill-port.js 3000
+
+
+> real-estate-crm@0.54.0 build
+> next build
+
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+node.exe : Turbopack build encountered 3 warnings:
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\hyper\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Turbopack build encountered 3 warnings::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+./src/app/api/uploads/route.ts:25:52
+Module not found: Can't resolve '@aws-sdk/client-s3'
+  [90m23 |[0m   [36mif[0m ([33mAWS_BUCKET[0m && [33mAWS_ACCESS_KEY[0m && [33mAWS_SECRET_KEY[0m) {
+  [90m24 |[0m     [36mtry[0m {
+[31m[1m>[0m [90m25 |[0m       [36mconst[0m { [33mS3Client[0m, [33mPutObjectCommand[0m } = [36mawait[0m 
+[36mimport[0m([32m'@aws-sdk/client-s3'[0m [36mas[0m string);
+  [90m   |[0m                                                    [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m26 |[0m       [36mconst[0m { getSignedUrl } = [36mawait[0m 
+[36mimport[0m([32m'@aws-sdk/s3-request-presigner'[0m [36mas[0m string);
+  [90m27 |[0m
+  [90m28 |[0m       [36mconst[0m client = [36mnew[0m [33mS3Client[0m({
+
+
+
+Import trace:
+  App Route:
+    ./src/app/api/uploads/route.ts
+    ./src/app/api/folder-detection/route.ts
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./src/app/api/uploads/route.ts:26:38
+Module not found: Can't resolve '@aws-sdk/s3-request-presigner'
+  [90m24 |[0m     [36mtry[0m {
+  [90m25 |[0m       [36mconst[0m { [33mS3Client[0m, [33mPutObjectCommand[0m } = [36mawait[0m 
+[36mimport[0m([32m'@aws-sdk/client-s3'[0m [36mas[0m string);
+[31m[1m>[0m [90m26 |[0m       [36mconst[0m { getSignedUrl } = [36mawait[0m 
+[36mimport[0m([32m'@aws-sdk/s3-request-presigner'[0m [36mas[0m string);
+  [90m   |[0m                                      [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m27 |[0m
+  [90m28 |[0m       [36mconst[0m client = [36mnew[0m [33mS3Client[0m({
+  [90m29 |[0m         region: [33mAWS_REGION[0m,
+
+
+
+Import trace:
+  App Route:
+    ./src/app/api/uploads/route.ts
+    ./src/app/api/folder-detection/route.ts
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace 
+below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/app/api/folder-detection/route.ts
+
+
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./src/components/dashboard/CommandCenter.tsx:20:8
+Expected ',', got '{'
+  [90m18 |[0m [36mimport[0m [33mLink[0m [36mfrom[0m [32m'next/link'[0m;
+  [90m19 |[0m [36mimport[0m {
+[31m[1m>[0m [90m20 |[0m [36mimport[0m { getClientWorkspaceSlug, withWorkspace } [36mfrom[0m 
+[32m'@/lib/workspace-client'[0m;
+  [90m   |[0m        [31m[1m^[0m
+  [90m21 |[0m   [33mTooltip[0m,
+  [90m22 |[0m   [33mTooltipContent[0m,
+  [90m23 |[0m   [33mTooltipProvider[0m,
+
+Parsing ecmascript source code failed
+
+Import traces:
+  App Route:
+    ./src/components/dashboard/CommandCenter.tsx
+    ./src/app/api/folder-detection/route.ts
+
+  Server Component:
+    ./src/components/dashboard/CommandCenter.tsx
+    ./src/app/dashboard/page.tsx
+
+
+./src/lib/workspace-context.ts:1:1
+You're importing a module that depends on "next/headers". This API is only available in Server Components in the App 
+Router, but you are using it in the Pages Router.
+    Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { cookies } [36mfrom[0m [32m'next/headers'[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m [36mimport[0m [36mtype[0m { [33mSession[0m } [36mfrom[0m [32m'next-auth'[0m;
+  [90m3 |[0m
+  [90m4 |[0m [36mexport[0m [36mconst[0m [33mDEFAULT_WORKSPACE_SLUG[0m = [32m'excel-legacy-team'[0m;
+
+Ecmascript file had an error
+
+Import traces:
+  #1 [App Route]:
+    ./src/lib/workspace-context.ts
+    ./src/app/api/folder-detection/route.ts
+
+  #2 [App Route]:
+    ./src/lib/workspace-context.ts
+    ./src/app/api/reporting/route.ts
+
+  #3 [Server Component]:
+    ./src/lib/workspace-context.ts
+    ./src/lib/actions/workspace.ts
+
+  #4 [Server Component]:
+    ./src/lib/workspace-context.ts
+    ./src/lib/auth.ts
+    ./src/app/dashboard/layout.tsx
+
+  #5 [Client Component Browser]:
+    ./src/lib/workspace-context.ts [Client Component Browser]
+    ./src/lib/workspace-client.ts [Client Component Browser]
+    ./src/app/dashboard/audit/page.tsx [Client Component Browser]
+    ./src/app/dashboard/audit/page.tsx [Server Component]
+
+  #6 [Client Component SSR]:
+    ./src/lib/workspace-context.ts [Client Component SSR]
+    ./src/lib/workspace-client.ts [Client Component SSR]
+    ./src/app/dashboard/audit/page.tsx [Client Component SSR]
+    ./src/app/dashboard/audit/page.tsx [Server Component]
+
+
+    at <unknown> (./src/components/dashboard/CommandCenter.tsx:20:8)
+    at <unknown> (./src/lib/workspace-context.ts:1:1)

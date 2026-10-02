@@ -1,0 +1,144 @@
+{
+  "packages/ai/src/providers/claude.ts": [
+    {
+      "line": 40,
+      "col": 39,
+      "name": "prompt"
+    },
+    {
+      "line": 40,
+      "col": 55,
+      "name": "schema"
+    },
+    {
+      "line": 40,
+      "col": 68,
+      "name": "systemPrompt"
+    }
+  ],
+  "packages/ai/src/providers/gemini.ts": [
+    {
+      "line": 39,
+      "col": 39,
+      "name": "prompt"
+    },
+    {
+      "line": 39,
+      "col": 55,
+      "name": "schema"
+    },
+    {
+      "line": 39,
+      "col": 68,
+      "name": "systemPrompt"
+    }
+  ],
+  "packages/ai/src/providers/openai.ts": [
+    {
+      "line": 55,
+      "col": 39,
+      "name": "prompt"
+    },
+    {
+      "line": 55,
+      "col": 55,
+      "name": "schema"
+    },
+    {
+      "line": 55,
+      "col": 68,
+      "name": "systemPrompt"
+    }
+  ],
+  "packages/api/src/index.ts": [
+    {
+      "line": 23,
+      "col": 21,
+      "name": "req"
+    }
+  ],
+  "packages/api/src/middleware/auth.ts": [
+    {
+      "line": 3,
+      "col": 1,
+      "name": "RedisStore"
+    },
+    {
+      "line": 10,
+      "col": 43,
+      "name": "res"
+    },
+    {
+      "line": 45,
+      "col": 13,
+      "name": "req"
+    },
+    {
+      "line": 45,
+      "col": 23,
+      "name": "next"
+    }
+  ],
+  "packages/api/src/routes/campaigns.ts": [
+    {
+      "line": 3,
+      "col": 1,
+      "name": "AIProvider"
+    }
+  ],
+  "packages/api/src/routes/notifications.ts": [
+    {
+      "line": 13,
+      "col": 18,
+      "name": "req"
+    },
+    {
+      "line": 39,
+      "col": 28,
+      "name": "req"
+    }
+  ],
+  "packages/api/src/routes/podcasts.ts": [
+    {
+      "line": 14,
+      "col": 18,
+      "name": "req"
+    }
+  ],
+  "packages/api/src/routes/social.ts": [
+    {
+      "line": 62,
+      "col": 26,
+      "name": "req"
+    }
+  ],
+  "packages/api/src/routes/videos.ts": [
+    {
+      "line": 14,
+      "col": 18,
+      "name": "req"
+    }
+  ],
+  "packages/database/index.ts": [
+    {
+      "line": 41,
+      "col": 11,
+      "name": "getModelHandler"
+    },
+    {
+      "line": 107,
+      "col": 23,
+      "name": "args"
+    },
+    {
+      "line": 114,
+      "col": 25,
+      "name": "args"
+    },
+    {
+      "line": 166,
+      "col": 23,
+      "name": "mockModel"
+    }
+  ]
+}

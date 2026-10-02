@@ -1,0 +1,35 @@
+﻿
+> frontend@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.4
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+node.exe : Failed to compile.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\hyper\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Failed to compile.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+./src/app/components/InteractiveMap.tsx:5:24
+Type error: Could not find a declaration file for module '@mapbox/mapbox-gl-draw'. 
+'C:/Users/hyper/workspace/realestatecrm/apps/legacyleads/frontend/node_modules/@mapbox/mapbox-gl-draw/index.js' 
+implicitly has an 'any' type.
+  Try `npm i --save-dev @types/mapbox__mapbox-gl-draw` if it exists or add a new declaration (.d.ts) file containing 
+`declare module '@mapbox/mapbox-gl-draw';`
+
+[0m [90m 3 |[39m [36mimport[39m [33mReact[39m[33m,[39m { useState[33m,[39m useRef[33m,[39m 
+useCallback[33m,[39m useEffect } [36mfrom[39m [32m'react'[39m[33m;[39m[0m
+[0m [90m 4 |[39m [36mimport[39m [33mMap[39m[33m,[39m { [33mNavigationControl[39m[33m,[39m 
+[33mScaleControl[39m[33m,[39m [33mSource[39m[33m,[39m [33mLayer[39m } [36mfrom[39m 
+[32m'react-map-gl/mapbox'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m [33mMapboxDraw[39m [36mfrom[39m 
+[32m'@mapbox/mapbox-gl-draw'[39m[33m;[39m[0m
+[0m [90m   |[39m                        [31m[1m^[22m[39m[0m
+[0m [90m 6 |[39m [36mimport[39m [33mSupercluster[39m [36mfrom[39m [32m'supercluster'[39m[33m;[39m[0m
+[0m [90m 7 |[39m [36mimport[39m [32m'mapbox-gl/dist/mapbox-gl.css'[39m[33m;[39m[0m
+[0m [90m 8 |[39m [36mimport[39m [32m'@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'[39m[33m;[39m[0m

@@ -13,16 +13,11 @@ import { createServer } from 'http';
 
 const PORT = parseInt(process.env.LIVE_AUDIO_PORT || '8090');
 
-// Track active calls and their audio streams
-interface CallStream {
-  callSid: string;
-  agentId: string;
-  twilioSocket: WebSocket | null;
-  monitors: Set<WebSocket>;
-  startTime: number;
-}
-
-const activeCalls = new Map<string, CallStream>();
+// Track active calls and their audio streams.
+// NOTE: this file is .mjs (ESM JavaScript) — TypeScript type annotations are
+// stripped because `interface` is a strict-mode reserved word in ESM and
+// Node's ESM loader rejects it at parse time (SyntaxError).
+const activeCalls = new Map();
 
 const httpServer = createServer((req, res) => {
   if (req.url === '/health') {
@@ -36,7 +31,7 @@ const httpServer = createServer((req, res) => {
 
 const wss = new WebSocketServer({ server: httpServer });
 
-wss.on('connection', (ws: WebSocket, req) => {
+wss.on('connection', (ws, req) => {
   const url = new URL(req.url || '/', `http://localhost:${PORT}`);
   const role = url.searchParams.get('role'); // 'twilio' | 'monitor'
   const callSid = url.searchParams.get('callSid');
@@ -46,7 +41,7 @@ wss.on('connection', (ws: WebSocket, req) => {
 
   if (role === 'twilio' && callSid) {
     // Twilio Media Stream connection
-    const stream: CallStream = {
+    const stream = {
       callSid,
       agentId: agentId || 'unknown',
       twilioSocket: ws,
@@ -55,7 +50,7 @@ wss.on('connection', (ws: WebSocket, req) => {
     };
     activeCalls.set(callSid, stream);
 
-    ws.on('message', (data: Buffer | string) => {
+    ws.on('message', (data) => {
       try {
         const msg = JSON.parse(data.toString());
 
@@ -107,7 +102,7 @@ wss.on('connection', (ws: WebSocket, req) => {
       return;
     }
 
-    const stream = activeCalls.get(callSid)!;
+    const stream = activeCalls.get(callSid);
     stream.monitors.add(ws);
 
     ws.send(JSON.stringify({
@@ -117,7 +112,7 @@ wss.on('connection', (ws: WebSocket, req) => {
       duration: Date.now() - stream.startTime,
     }));
 
-    ws.on('message', (data: Buffer | string) => {
+    ws.on('message', (data) => {
       try {
         const msg = JSON.parse(data.toString());
         if (msg.event === 'barge_in' && stream.twilioSocket) {
@@ -151,7 +146,7 @@ wss.on('connection', (ws: WebSocket, req) => {
   }
 });
 
-function broadcastToMonitors(callSid: string, message: any) {
+function broadcastToMonitors(callSid, message) {
   const stream = activeCalls.get(callSid);
   if (!stream) return;
   const payload = JSON.stringify(message);

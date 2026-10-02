@@ -1,0 +1,32 @@
+﻿
+> frontend@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.4
+
+   Creating an optimized production build ...
+node.exe : Failed to compile.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\hyper\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Failed to compile.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+./src/app/components/InteractiveMap.tsx
+Module not found: Can't resolve '@mapbox/mapbox-gl-draw'
+
+https://nextjs.org/docs/messages/module-not-found
+
+./src/app/components/InteractiveMap.tsx
+Module not found: Can't resolve 'supercluster'
+
+https://nextjs.org/docs/messages/module-not-found
+
+./src/app/components/InteractiveMap.tsx
+Module not found: Can't resolve '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+> Build failed because of webpack errors
