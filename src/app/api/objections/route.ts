@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 
 /**
  * RAG Objection Handling
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
   // Search for similar objection responses in knowledge base
   const activities = await prisma.activity.findMany({
     where: {
-      workspaceId: workspaceId || 'excel-legacy-team',
+      workspaceId: workspaceId || DEFAULT_WORKSPACE_SLUG,
       type: { in: ['OBJECTION_RESPONSE', 'CLOSING_SCRIPT', 'KNOWLEDGE'] },
     },
     orderBy: { createdAt: 'desc' },
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const workspaceId = searchParams.get('workspaceId') || 'excel-legacy-team';
+  const workspaceId = searchParams.get('workspaceId') || DEFAULT_WORKSPACE_SLUG;
   const category = searchParams.get('category');
 
   const where: any = {

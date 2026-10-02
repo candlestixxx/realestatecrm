@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
 
 interface Partner {
   id: string;
@@ -50,7 +51,7 @@ export default function PartnersPage() {
   const fetchPartners = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ workspaceId: 'excel-legacy-team' });
+      const params = withWorkspace({  });
       if (filterType) params.set('type', filterType);
       const res = await fetch('/api/partners?' + params);
       setPartners(await res.json());
@@ -65,7 +66,7 @@ export default function PartnersPage() {
       await fetch('/api/partners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...partnerForm, workspaceId: 'excel-legacy-team' }),
+        body: JSON.stringify({ ...partnerForm, workspaceId: getClientWorkspaceSlug() }),
       });
       setShowAddForm(false);
       setPartnerForm({ companyName: '', contactName: '', email: '', phone: '', type: 'MORTGAGE', licenseNumber: '', website: '', notes: '' });
@@ -81,7 +82,7 @@ export default function PartnersPage() {
         body: JSON.stringify({
           ...referralForm,
           commissionRate: referralForm.commissionRate ? parseFloat(referralForm.commissionRate) : null,
-          workspaceId: 'excel-legacy-team',
+          workspaceId: getClientWorkspaceSlug(),
         }),
       });
       setShowReferralForm(false);

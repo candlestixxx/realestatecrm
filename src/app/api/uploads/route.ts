@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 
 /**
  * AWS S3 Document Upload for Leads/Contacts.
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
           }),
           leadId: leadId || null,
           contactId: contactId || null,
-          workspaceId: workspaceId || 'excel-legacy-team',
+          workspaceId: workspaceId || DEFAULT_WORKSPACE_SLUG,
         },
       });
 
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
       }),
       leadId: leadId || null,
       contactId: contactId || null,
-      workspaceId: workspaceId || 'excel-legacy-team',
+      workspaceId: workspaceId || DEFAULT_WORKSPACE_SLUG,
     },
   });
 
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const leadId = searchParams.get('leadId');
   const contactId = searchParams.get('contactId');
-  const workspaceId = searchParams.get('workspaceId') || 'excel-legacy-team';
+  const workspaceId = searchParams.get('workspaceId') || DEFAULT_WORKSPACE_SLUG;
 
   const where: any = { workspaceId, type: 'DOCUMENT' };
   if (leadId) where.leadId = leadId;

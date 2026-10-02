@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const workspaceId = searchParams.get('workspaceId') || 'excel-legacy-team';
+  const workspaceId = searchParams.get('workspaceId') || DEFAULT_WORKSPACE_SLUG;
 
   const [
     totalLeads, leadsByStatus, totalDeals, dealsByStage,

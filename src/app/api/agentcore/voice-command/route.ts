@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 
 /**
  * AgentCore Mobile Voice Commands
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
   }
 
   const parsed = parseCommand(command);
-  const result = await executeCommand(parsed, workspaceId || 'excel-legacy-team', userId);
+  const result = await executeCommand(parsed, workspaceId || DEFAULT_WORKSPACE_SLUG, userId);
 
   return NextResponse.json({
     command,

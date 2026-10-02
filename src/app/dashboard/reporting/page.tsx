@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
 
 interface ReportData {
   leads: { total: number; byStatus: { status: string; _count: number }[] };
@@ -18,7 +19,7 @@ export default function ReportingPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/reporting?workspaceId=excel-legacy-team')
+    fetch('/api/reporting?workspaceId=${getClientWorkspaceSlug()}')
       .then(r => r.json())
       .then(setData)
       .catch(console.error)

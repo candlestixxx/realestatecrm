@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
 
 interface AuditEntry {
   id: string;
@@ -28,7 +29,7 @@ export default function AuditPage() {
   const fetchAudit = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ workspaceId: 'excel-legacy-team', pageSize: '100' });
+      const params = withWorkspace({ pageSize: '100' });
       if (filterAction) params.set('action', filterAction);
       if (filterEntity) params.set('entityType', filterEntity);
       const res = await fetch('/api/audit?' + params);

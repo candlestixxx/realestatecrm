@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 
 /**
  * Folder Detection Service
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
       data: {
         type: 'FOLDER_SCAN',
         content: JSON.stringify({ source, folder, filesFound: newFiles.length, timestamp: new Date().toISOString() }),
-        workspaceId: workspaceId || 'excel-legacy-team',
+        workspaceId: workspaceId || DEFAULT_WORKSPACE_SLUG,
       },
     });
 

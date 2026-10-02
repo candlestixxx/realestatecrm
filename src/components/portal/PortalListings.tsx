@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
 
 interface Listing {
   id: string;
@@ -22,7 +23,7 @@ export default function PortalListingsClient() {
   const [filter, setFilter] = useState('ACTIVE');
 
   useEffect(() => {
-    fetch(`/api/listings?workspaceId=excel-legacy-team&status=${filter}`)
+    fetch(`/api/listings?workspaceId=${getClientWorkspaceSlug()}&status=${filter}`)
       .then(r => r.json())
       .then(data => setListings(Array.isArray(data) ? data.slice(0, 6) : []))
       .catch(console.error)

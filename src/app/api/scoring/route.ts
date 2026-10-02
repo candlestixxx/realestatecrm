@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 
 /**
  * Predictive Lead Scoring
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const workspaceId = searchParams.get('workspaceId') || 'excel-legacy-team';
+  const workspaceId = searchParams.get('workspaceId') || DEFAULT_WORKSPACE_SLUG;
 
   const leads = await prisma.lead.findMany({
     where: { workspaceId },

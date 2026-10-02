@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 
 /**
  * Gamification Engine
@@ -29,7 +30,7 @@ const POINTS: Record<string, number> = {
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const workspaceId = searchParams.get('workspaceId') || 'excel-legacy-team';
+  const workspaceId = searchParams.get('workspaceId') || DEFAULT_WORKSPACE_SLUG;
   const period = searchParams.get('period') || 'all'; // all, month, week
 
   const since = period === 'week' ? new Date(Date.now() - 7 * 86400000)
@@ -110,7 +111,7 @@ export async function POST(request: NextRequest) {
       type: 'GAMIFICATION',
       content: JSON.stringify({ action, points, metadata: metadata || {} }),
       userId,
-      workspaceId: workspaceId || 'excel-legacy-team',
+      workspaceId: workspaceId || DEFAULT_WORKSPACE_SLUG,
     },
   });
 

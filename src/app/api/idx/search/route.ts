@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 
 /**
  * IDX Property Search API for website builder.
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
     data: {
       type: 'SAVED_SEARCH',
       content: JSON.stringify({ name: name || 'Saved Search', criteria, domain }),
-      workspaceId: 'excel-legacy-team',
+      workspaceId: DEFAULT_WORKSPACE_SLUG,
       ...(contact && { contactId: contact.id }),
     },
   });

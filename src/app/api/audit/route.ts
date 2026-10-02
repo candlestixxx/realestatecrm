@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 
 /**
  * Audit Trail API
@@ -8,7 +9,7 @@ import prisma from '@/lib/prisma';
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const workspaceId = searchParams.get('workspaceId') || 'excel-legacy-team';
+  const workspaceId = searchParams.get('workspaceId') || DEFAULT_WORKSPACE_SLUG;
   const entityType = searchParams.get('entityType'); // lead, contact, deal, listing, offer
   const entityId = searchParams.get('entityId');
   const action = searchParams.get('action'); // CREATE, UPDATE, DELETE
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
       type: 'AUDIT',
       content: JSON.stringify(entry),
       userId: userId || null,
-      workspaceId: workspaceId || 'excel-legacy-team',
+      workspaceId: workspaceId || DEFAULT_WORKSPACE_SLUG,
     },
   });
 

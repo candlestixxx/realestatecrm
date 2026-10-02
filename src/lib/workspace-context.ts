@@ -1,8 +1,10 @@
 import { cookies } from 'next/headers';
 import type { Session } from 'next-auth';
+// Constants live in workspace-constants.ts so client code can share them
+// without dragging `next/headers` into the browser bundle.
+import { DEFAULT_WORKSPACE_SLUG, WORKSPACE_COOKIE_NAME } from './workspace-constants';
 
-export const DEFAULT_WORKSPACE_SLUG = 'excel-legacy-team';
-export const WORKSPACE_COOKIE_NAME = 'x-workspace-slug';
+export { DEFAULT_WORKSPACE_SLUG, WORKSPACE_COOKIE_NAME };
 
 export async function getActiveWorkspaceSlug(session?: Session | null) {
   const cookieStore = await cookies();

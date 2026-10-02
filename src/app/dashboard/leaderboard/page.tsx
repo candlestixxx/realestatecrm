@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
 
 interface LeaderboardEntry {
   userId: string;
@@ -19,7 +20,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('/api/gamification?workspaceId=excel-legacy-team&period=' + period)
+    fetch('/api/gamification?workspaceId=${getClientWorkspaceSlug()}&period=' + period)
       .then(r => r.json())
       .then(data => setEntries(data.leaderboard || []))
       .catch(console.error)

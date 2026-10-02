@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
 
 interface Listing {
   id: string;
@@ -57,7 +58,7 @@ export default function ListingsPage() {
   const [entryForm, setEntryForm] = useState({
     address: '', city: '', state: 'MI', zip: '', listPrice: '',
     bedrooms: '', bathrooms: '', squareFeet: '', lotSize: '', yearBuilt: '',
-    propertyType: 'SINGLE_FAMILY', mlsNumber: '', description: '', workspaceId: 'excel-legacy-team',
+    propertyType: 'SINGLE_FAMILY', mlsNumber: '', description: '', workspaceId: getClientWorkspaceSlug(),
   });
 
   const [offerForm, setOfferForm] = useState({
@@ -67,7 +68,7 @@ export default function ListingsPage() {
   const fetchListings = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ workspaceId: 'excel-legacy-team' });
+      const params = withWorkspace({  });
       if (filters.status !== 'ALL') params.set('status', filters.status);
       if (filters.propertyType) params.set('propertyType', filters.propertyType);
       if (filters.minPrice) params.set('minPrice', filters.minPrice);
@@ -120,7 +121,7 @@ export default function ListingsPage() {
           earnestMoney: offerForm.earnestMoney ? parseFloat(offerForm.earnestMoney) : null,
           closingDate: offerForm.closingDate || null,
           contingencies: offerForm.contingencies ? offerForm.contingencies.split(',').map(s => s.trim()) : null,
-          workspaceId: 'excel-legacy-team',
+          workspaceId: getClientWorkspaceSlug(),
         }),
       });
       setShowOfferForm(false);

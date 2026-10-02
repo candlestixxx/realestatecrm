@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
 
 interface Site {
   id: string;
@@ -34,7 +35,7 @@ export default function WebsiteBuilderPage() {
   const [preview, setPreview] = useState(false);
 
   useEffect(() => {
-    fetch('/api/websites?workspaceId=excel-legacy-team')
+    fetch('/api/websites?workspaceId=${getClientWorkspaceSlug()}')
       .then(r => r.json())
       .then(setSites)
       .catch(console.error);
@@ -74,7 +75,7 @@ export default function WebsiteBuilderPage() {
       body: JSON.stringify({
         slug, title,
         content: blocks,
-        workspaceId: 'excel-legacy-team',
+        workspaceId: getClientWorkspaceSlug(),
       }),
     });
   };

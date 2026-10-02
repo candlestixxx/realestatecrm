@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
 
 interface QualityMetric {
   label: string;
@@ -15,7 +16,7 @@ export default function DataQualityPage() {
   const [overallScore, setOverallScore] = useState(0);
 
   useEffect(() => {
-    fetch('/api/data-quality?workspaceId=excel-legacy-team')
+    fetch('/api/data-quality?workspaceId=${getClientWorkspaceSlug()}')
       .then(r => r.json())
       .then(data => {
         setMetrics(data.metrics || []);
