@@ -98,9 +98,18 @@ $Services = [ordered]@{
     'legacyleads' = @{
         Label = 'Legacy Leads (frontend)'
         Port = 3005
-        Cmd = 'node node_modules\next\dist\bin\next start -p 3005'
+        Cmd = 'set NEXTAUTH_SECRET=dev_secret_change_me && set NEXTAUTH_URL=http://localhost:3005 && node node_modules\next\dist\bin\next start -p 3005'
         WorkDir = (Join-Path $Root 'apps\legacyleads\frontend')
         HealthPath = '/'
+        Log = 'server.log'
+        ErrLog = 'server-err.log'
+    }
+    'legacyleads-api' = @{
+        Label = 'Legacy Leads (API)'
+        Port = 3006
+        Cmd = 'set PORT=3006 && npx ts-node --esm src/index.ts'
+        WorkDir = (Join-Path $Root 'apps\legacyleads\backend')
+        HealthPath = '/health'
         Log = 'server.log'
         ErrLog = 'server-err.log'
     }
