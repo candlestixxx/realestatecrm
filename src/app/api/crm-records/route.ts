@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 
 import { authOptions } from '@/lib/auth';
 import { buildDashboardCards, listCrmRecords, seedCrmRecordsIfEmpty } from '@/lib/crm-records';
-import { requireWorkspaceAccess, WorkspaceAccessError } from '@/lib/workspace-access';
+import { requireWorkspaceAccess, workspaceErrorResponse } from '@/lib/workspace-access';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,9 +30,8 @@ export async function GET() {
       records: buildDashboardCards(records),
     });
   } catch (err) {
-    if (err instanceof WorkspaceAccessError) {
-      return NextResponse.json({ error: err.message }, { status: err.statusCode });
-    }
+    const resp = workspaceErrorResponse(err);
+    if (resp) return resp;
     console.error('crm-records GET failed:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

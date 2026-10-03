@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 
 import { authOptions } from '@/lib/auth';
-import { requireWorkspaceAccess, WorkspaceAccessError } from '@/lib/workspace-access';
+import { requireWorkspaceAccess, workspaceErrorResponse } from '@/lib/workspace-access';
 import {
   getSyncQueue,
   getQueueStats,
@@ -70,10 +70,10 @@ export async function GET() {
     const session = await getServerSession(authOptions);
     await requireWorkspaceAccess(session);
   } catch (err) {
-    if (err instanceof WorkspaceAccessError) {
-      return NextResponse.json({ error: err.message }, { status: err.statusCode });
-    }
-    throw err;
+    const resp = workspaceErrorResponse(err);
+    if (resp) return resp;
+    console.error('sync-queue GET failed:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   const [items, stats] = await Promise.all([getSyncQueue(), getQueueStats()]);
@@ -352,9 +352,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
     }
   } catch (err) {
-    if (err instanceof WorkspaceAccessError) {
-      return NextResponse.json({ error: err.message }, { status: err.statusCode });
-    }
-    throw err;
+    const resp = workspaceErrorResponse(err);
+    if (resp) return resp;
+    console.error('sync-queue POST failed:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

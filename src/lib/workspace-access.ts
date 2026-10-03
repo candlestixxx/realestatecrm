@@ -1,5 +1,6 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import type { Session } from 'next-auth';
+import { NextResponse } from 'next/server';
 
 import prisma from './prisma';
 import { DEFAULT_WORKSPACE_SLUG, getActiveWorkspaceSlug } from './workspace-context';
@@ -12,6 +13,45 @@ export class WorkspaceAccessError extends Error {
     this.name = 'WorkspaceAccessError';
     this.statusCode = statusCode;
   }
+}
+
+/**
+ * Duck-type guard that replaces `instanceof WorkspaceAccessError`.
+ *
+ * Why: Turbopack bundles this module into multiple server chunks. The
+ * class thrown by `requireWorkspaceAccess` can be a *different* class
+ * object than the one imported by a route's catch block, so `instanceof`
+ * silently returns false and the 401 escapes as an opaque 500. Checking
+ * `name` + `statusCode` is immune to that identity mismatch.
+ */
+export function isWorkspaceAccessError(err: unknown): err is WorkspaceAccessError {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    (err as { name?: unknown }).name === 'WorkspaceAccessError' &&
+    typeof (err as { statusCode?: unknown }).statusCode === 'number'
+  );
+}
+
+/**
+ * Map a caught error to a proper NextResponse when it carries an HTTP
+ * `statusCode` (WorkspaceAccessError and similar). Returns `null` for
+ * errors the caller should re-throw or handle itself.
+ *
+ * Why not `isWorkspaceAccessError` alone: even the name+statusCode duck-type
+ * can miss if the error object is proxied/wrapped across a Turbopack chunk
+ * boundary. A bare `statusCode` number check is the most primitive signal
+ * and always survives serialization boundaries.
+ */
+export function workspaceErrorResponse(err: unknown): NextResponse | null {
+  const statusCode = typeof err === 'object' && err !== null
+    ? (err as { statusCode?: unknown }).statusCode
+    : undefined;
+  if (typeof statusCode === 'number') {
+    const msg = err instanceof Error ? err.message : 'Workspace access denied.';
+    return NextResponse.json({ error: msg }, { status: statusCode });
+  }
+  return null;
 }
 
 export type WorkspaceAccess = {

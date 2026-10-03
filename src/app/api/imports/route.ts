@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { requireWorkspaceAccess, WorkspaceAccessError } from '@/lib/workspace-access';
+import { requireWorkspaceAccess, workspaceErrorResponse } from '@/lib/workspace-access';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 
 export const runtime = 'nodejs';
@@ -17,11 +17,12 @@ export async function GET() {
     await requireWorkspaceAccess(session);
   } catch (err) {
     // Convert WorkspaceAccessError to a proper HTTP response instead of
-    // letting Next.js return an opaque 500.
-    if (err instanceof WorkspaceAccessError) {
-      return NextResponse.json({ error: err.message }, { status: err.statusCode });
-    }
-    throw err;
+    // letting Next.js return an opaque 500. Never re-throw: a bare throw
+    // escapes to Next's default handler even when statusCode is present.
+    const resp = workspaceErrorResponse(err);
+    if (resp) return resp;
+    console.error('imports GET failed:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   // Read import history from the data directory
@@ -136,9 +137,9 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
     }
   } catch (err) {
-    if (err instanceof WorkspaceAccessError) {
-      return NextResponse.json({ error: err.message }, { status: err.statusCode });
-    }
-    throw err;
+    const resp = workspaceErrorResponse(err);
+    if (resp) return resp;
+    console.error('imports POST failed:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
