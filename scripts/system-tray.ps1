@@ -107,7 +107,7 @@ $Services = [ordered]@{
     'legacyleads-api' = @{
         Label = 'Legacy Leads (API)'
         Port = 3006
-        Cmd = 'set PORT=3006 && npx ts-node --esm src/index.ts'
+        Cmd = 'set PORT=3006 && npx tsx src/index.ts'
         WorkDir = (Join-Path $Root 'apps\legacyleads\backend')
         HealthPath = '/health'
         Log = 'server.log'
