@@ -1,3 +1,15 @@
+﻿
+## [0.55.0] - 2026-06-10
+
+### Repository Synchronization & Intelligent Merge
+- **Full fetch + sync**: All 5 submodules + main repo synced to latest `origin/main`. Discovered and integrated substantial remote changes (dashboard refactor, workspace libs, auth, social providers, new frontend pages).
+- **Feature branch reconciliation**: All 10 feature branches across 5 submodules analyzed — zero unique commits found (already merged). All branches reverse-merged with latest `main` and pushed to prevent drift.
+- **Main repo** (`333aff9`): Script archival, CommandCenter/SidebarNav/SettingsTabs components, workspace-access/client/constants libs, settings page, kill-port/system-tray utilities.
+- **leadG** (`9125157`): Auth (NextAuth), prisma client, next-auth types, API route auth middleware.
+- **contentplanner** (`cfc7712`): Social provider enhancements (LinkedIn/Meta/Twitter), auth lib, strict build fixes, database schema updates.
+- **foreclosureworkflow** (`24e7e0b`): Server.js improvements, package updates.
+- **media-workflow** (`275bb27`): MicroserviceOrchestrator fix, tsconfig updates.
+- **legacyleads** (`d2c49c5`): New frontend pages (contacts, fsbo-expired, help, neighborhoods, settings), PageShell/Sidebar components, API client.
 ## [0.54.0] - 2026-10-01
 
 ### Build Repair Across All Submodules
@@ -5,7 +17,7 @@ Every component now installs and builds green. Root `npm run build` and the
 production server were already healthy; this release makes the five `apps/*`
 submodules match.
 
-- **leadg** — installed undeclared deps (`leaflet`, `react-leaflet`,
+- **leadg** â€” installed undeclared deps (`leaflet`, `react-leaflet`,
   `@hello-pangea/dnd`, `inngest`, `@sendgrid/mail`, `@twilio/voice-sdk`,
   `@types/leaflet`); added `src/lib/prisma.ts` re-export (several modules
   imported `@/lib/prisma` which never existed); extracted `authOptions` to
@@ -15,10 +27,10 @@ submodules match.
   `organizationId` on `lead.create` and required `CallLog` fields in the
   vapi webhook; mapped `CallOutcome` to real enum values.
 
-- **foreclosureworkflow** — verified install + `next build` green (all
+- **foreclosureworkflow** â€” verified install + `next build` green (all
   routes compile, including `/api/sequences/*` and `/leads/[id]/edit`).
 
-- **contentplanner** — repaired 97 strict-mode errors across the turbo
+- **contentplanner** â€” repaired 97 strict-mode errors across the turbo
   workspace. Mechanical: `process.env.X` -> bracket access, unused
   params/locals, explicit `return` on terminal Express responses. Structural:
   `authOptions` extracted to `apps/web/src/lib/auth.ts` (exporting it from
@@ -31,100 +43,100 @@ submodules match.
   (wrong schema); `"use client"` moved above the React import in
   `draft-review-modal.tsx`; Badge gained a `ghost` variant. Prisma schema
   extended: `Workspace` now carries `plan`, `subscriptionStatus`,
-  `stripeCustomerId` — the Stripe webhook wrote these against a nonexistent
+  `stripeCustomerId` â€” the Stripe webhook wrote these against a nonexistent
   `Organization` model, now remapped to `prisma.workspace`.
   DATABASE_URL port corrected to 5433.
 
-- **media-workflow** — `ApprovalWorkflowService.autoApproveJob` returns
+- **media-workflow** â€” `ApprovalWorkflowService.autoApproveJob` returns
   `{ job, review }`; the orchestrator assigned that whole object to a
   `ListingMediaJob`. Destructured and the review outcome is now logged.
   `tsconfig.json` excludes `dist/` (tsc emitted `.d.ts` there and the next
   run failed TS5055 "would overwrite input file"). Vite frontend builds clean.
 
-- **legacyleads** — installed `@mapbox/mapbox-gl-draw`, `supercluster`,
+- **legacyleads** â€” installed `@mapbox/mapbox-gl-draw`, `supercluster`,
   and their type packages (InteractiveMap.tsx imported them undeclared).
   Next.js frontend builds clean; backend `tsc --noEmit` already clean.
 
 ### Tooling
-- `scripts/system-tray.ps1` — Windows tray controller (see 0.53.2).
+- `scripts/system-tray.ps1` â€” Windows tray controller (see 0.53.2).
 - One-shot repair scripts kept beside their packages for auditability.
 
 
 ## [0.53.0] - 2026-10-01
 
 ### Repository Synchronization & Intelligent Merge
-- **Dual-direction merge engine** � verified all feature branches across root + 5 submodules; zero unique commits remained unmerged (prior sessions already forward-merged everything).
-- **Reverse-merge drift prevention** � fast-forwarded and pushed 14 stale feature branches to current `main` (root: 5; contentplanner: 2; foreclosureworkflow: 3; leadg: 1; legacyleads: 1; media-workflow: 3).
-- **Version governance** � synchronized `VERSION.md` / `package.json` / `package-lock.json` to `0.53.0` (was out-of-sync at `0.47.0` while CHANGELOG was at `0.52.0`).
-- **Database tracking** � removed `dev.db`, `prisma/dev.db`, `metamcp.db`, `data/`, `audit*.jsonl` from `.gitignore` so local state and documentation stay tracked per retention policy.
+- **Dual-direction merge engine** ï¿½ verified all feature branches across root + 5 submodules; zero unique commits remained unmerged (prior sessions already forward-merged everything).
+- **Reverse-merge drift prevention** ï¿½ fast-forwarded and pushed 14 stale feature branches to current `main` (root: 5; contentplanner: 2; foreclosureworkflow: 3; leadg: 1; legacyleads: 1; media-workflow: 3).
+- **Version governance** ï¿½ synchronized `VERSION.md` / `package.json` / `package-lock.json` to `0.53.0` (was out-of-sync at `0.47.0` while CHANGELOG was at `0.52.0`).
+- **Database tracking** ï¿½ removed `dev.db`, `prisma/dev.db`, `metamcp.db`, `data/`, `audit*.jsonl` from `.gitignore` so local state and documentation stay tracked per retention policy.
 - **Submodule map regenerated** in `docs/LIBRARIES.md` with remote URLs, pinned commits, and archive status.
 
 
 ## [0.52.0] - 2026-06-10
 
-### Added — Cross-Tenant Syndication + Social Lead Gen + Blockchain Contracts
-- **Cross-Tenant Syndication API** (`/api/syndication`) — anonymized market trends across brokerages with min 5-sample privacy threshold, market heat indicators, demand index.
-- **HubSpot/Salesforce Social Lead Gen** (`/api/lead-gen/social`) — captures leads from social media engagement, auto-creates contacts, syncs to HubSpot and Salesforce CRMs.
-- **Blockchain Smart Contracts** (`/api/contracts`) — lease agreements, earnest money deposits, purchase agreements with deploy/execute/dispute lifecycle.
+### Added â€” Cross-Tenant Syndication + Social Lead Gen + Blockchain Contracts
+- **Cross-Tenant Syndication API** (`/api/syndication`) â€” anonymized market trends across brokerages with min 5-sample privacy threshold, market heat indicators, demand index.
+- **HubSpot/Salesforce Social Lead Gen** (`/api/lead-gen/social`) â€” captures leads from social media engagement, auto-creates contacts, syncs to HubSpot and Salesforce CRMs.
+- **Blockchain Smart Contracts** (`/api/contracts`) â€” lease agreements, earnest money deposits, purchase agreements with deploy/execute/dispute lifecycle.
 
-### Added — A/B Testing Engine + Enhanced Dashboard (leadG)
-- **Weighted A/B variant picker** — `pickVariantByWeight()` in campaign-engine.ts using configured weights (was hardcoded 50/50).
-- **A/B Analytics API** (`/api/campaigns/ab-test`) — per-variant conversion/contact rates, winner detection, statistical comparison.
-- **ABTestDashboard component** — visual variant comparison with progress bars and winner highlighting.
-- **Enhanced Campaign Dashboard** (`/dashboard`) — overview stats, A/B test setup wizard, quick actions panel.
+### Added â€” A/B Testing Engine + Enhanced Dashboard (leadG)
+- **Weighted A/B variant picker** â€” `pickVariantByWeight()` in campaign-engine.ts using configured weights (was hardcoded 50/50).
+- **A/B Analytics API** (`/api/campaigns/ab-test`) â€” per-variant conversion/contact rates, winner detection, statistical comparison.
+- **ABTestDashboard component** â€” visual variant comparison with progress bars and winner highlighting.
+- **Enhanced Campaign Dashboard** (`/dashboard`) â€” overview stats, A/B test setup wizard, quick actions panel.
 
-### Added — AI Brand Compliance Review (media-workflow)
-- **AIBrandReviewService** — Fair Housing violation detection, FTC disclosure checks, misleading claims detection, image quality scoring, brand consistency validation, platform-specific caption limits, hashtag count limits.
-- **ApprovalWorkflowService** — real AI auto-approval (replaced simulation stub), reject with reason, compliance logging with Slack/Discord alerts.
+### Added â€” AI Brand Compliance Review (media-workflow)
+- **AIBrandReviewService** â€” Fair Housing violation detection, FTC disclosure checks, misleading claims detection, image quality scoring, brand consistency validation, platform-specific caption limits, hashtag count limits.
+- **ApprovalWorkflowService** â€” real AI auto-approval (replaced simulation stub), reject with reason, compliance logging with Slack/Discord alerts.
 
 ## [0.51.0] - 2026-06-10
 
-### Added — Planned Features Batch
-- **AWS S3 Document Upload** (`/api/uploads`) — presigned URLs when AWS configured, local fallback.
-- **Folder Detection Service** (`/api/folder-detection`) — magic byte detection for 8 formats (PDF/DOCX/XLSX/JPG/PNG/ZIP/CSV/EML).
-- **Data Quality Dashboard** (`/dashboard/data-quality`) — contact field completeness scoring with recommendations.
-- **Predictive Lead Scoring** (`/api/scoring`) — feature extraction (recency, engagement, deal size), weighted scoring with confidence intervals.
-- **RAG Objection Handling** (`/api/objections`) — keyword-matched objection responses from activity history.
-- **Gamification Engine** (`/api/gamification` + `/dashboard/leaderboard`) — activity-based points, streaks, achievement badges.
-- **Accent Morphing** (`/api/voice/accent-morphing`) — accent profile presets + text-to-speech parameters.
-- **DeepFake Avatar Sync** (`/api/avatar`) — avatar session management, audio-to-viseme mapping, video generation.
-- **Canva Branding Integration** (`/api/canva`) — brand kit application to design templates.
-- **AgentCore Voice Commands** (`/api/agentcore/voice-command`) — natural language search, dial, create task, show analytics.
+### Added â€” Planned Features Batch
+- **AWS S3 Document Upload** (`/api/uploads`) â€” presigned URLs when AWS configured, local fallback.
+- **Folder Detection Service** (`/api/folder-detection`) â€” magic byte detection for 8 formats (PDF/DOCX/XLSX/JPG/PNG/ZIP/CSV/EML).
+- **Data Quality Dashboard** (`/dashboard/data-quality`) â€” contact field completeness scoring with recommendations.
+- **Predictive Lead Scoring** (`/api/scoring`) â€” feature extraction (recency, engagement, deal size), weighted scoring with confidence intervals.
+- **RAG Objection Handling** (`/api/objections`) â€” keyword-matched objection responses from activity history.
+- **Gamification Engine** (`/api/gamification` + `/dashboard/leaderboard`) â€” activity-based points, streaks, achievement badges.
+- **Accent Morphing** (`/api/voice/accent-morphing`) â€” accent profile presets + text-to-speech parameters.
+- **DeepFake Avatar Sync** (`/api/avatar`) â€” avatar session management, audio-to-viseme mapping, video generation.
+- **Canva Branding Integration** (`/api/canva`) â€” brand kit application to design templates.
+- **AgentCore Voice Commands** (`/api/agentcore/voice-command`) â€” natural language search, dial, create task, show analytics.
 
 ## [0.50.0] - 2026-06-10
 
-### Added — Live Production Wiring
-- **SendGrid API email transport** — prefers `@sendgrid/mail`, falls back to SMTP (nodemailer) in campaign-worker.
-- **WebSocket live-audio server** (`scripts/live-audio-server.mjs`) — Twilio Media Streams monitoring on port 8090 with monitor/barge-in roles.
-- **LiveAudioMonitor** — connects to WebSocket server for real-time call audio monitoring.
+### Added â€” Live Production Wiring
+- **SendGrid API email transport** â€” prefers `@sendgrid/mail`, falls back to SMTP (nodemailer) in campaign-worker.
+- **WebSocket live-audio server** (`scripts/live-audio-server.mjs`) â€” Twilio Media Streams monitoring on port 8090 with monitor/barge-in roles.
+- **LiveAudioMonitor** â€” connects to WebSocket server for real-time call audio monitoring.
 
 ## [0.49.0] - 2026-09-29
 
-### Added — AgentCore UI Dashboard (Sprint 1)
-- **AgentCore Command Console** (src/components/AgentCoreConsole.tsx) — interactive NL terminal with example commands, intent badges, LLM fallback toggle, and real-time streaming to `POST /api/agentcore`.
-- **AgentCore Workflow Builder** (src/components/AgentCoreWorkflowBuilder.tsx) — visual if/then automation editor with trigger selection, conditional filters, multi-action support (update status, create task, add activity, notify), and inline list management (pause/resume/edit/delete).
-- **AI Model Keys Settings** (src/app/dashboard/settings/ai-models/) — vault UI for 5 LLM providers (OpenAI, Anthropic, Gemini, DeepSeek, Qwen) with add/update/remove and configuration status indicators.
-- **MCP Server Settings** (src/app/dashboard/settings/mcp/) — endpoint URL display, token auth configuration, connection tester, 9-tool catalog, and Claude Desktop JSON config generator.
-- **AgentCore Dashboard Page** (src/app/dashboard/agentcore/) — unified overview with status cards (NL Engine, Workflows, MCP) and embedded console + workflow builder.
-- **Workflow CRUD API** (src/app/api/agentcore/workflows/) — GET/POST list/create and PATCH/DELETE per-workflow endpoints scoped to workspace.
-- **Sidebar Navigation** — new "🧠 AgentCore" menu group with Command Console, Workflow Builder, AI Model Keys, and MCP Server links.
+### Added â€” AgentCore UI Dashboard (Sprint 1)
+- **AgentCore Command Console** (src/components/AgentCoreConsole.tsx) â€” interactive NL terminal with example commands, intent badges, LLM fallback toggle, and real-time streaming to `POST /api/agentcore`.
+- **AgentCore Workflow Builder** (src/components/AgentCoreWorkflowBuilder.tsx) â€” visual if/then automation editor with trigger selection, conditional filters, multi-action support (update status, create task, add activity, notify), and inline list management (pause/resume/edit/delete).
+- **AI Model Keys Settings** (src/app/dashboard/settings/ai-models/) â€” vault UI for 5 LLM providers (OpenAI, Anthropic, Gemini, DeepSeek, Qwen) with add/update/remove and configuration status indicators.
+- **MCP Server Settings** (src/app/dashboard/settings/mcp/) â€” endpoint URL display, token auth configuration, connection tester, 9-tool catalog, and Claude Desktop JSON config generator.
+- **AgentCore Dashboard Page** (src/app/dashboard/agentcore/) â€” unified overview with status cards (NL Engine, Workflows, MCP) and embedded console + workflow builder.
+- **Workflow CRUD API** (src/app/api/agentcore/workflows/) â€” GET/POST list/create and PATCH/DELETE per-workflow endpoints scoped to workspace.
+- **Sidebar Navigation** â€” new "ðŸ§  AgentCore" menu group with Command Console, Workflow Builder, AI Model Keys, and MCP Server links.
 
 ### Fixed
-- AgentCore engine.ts schema mismatches with main CRM Prisma (Lead name→contact relation, Activity description→content, Task userId→assignedToId, Task completed→status, SQLite mode:insensitive removal, named regex groups→numbered for ES2017 target).
-- AgentCore workflows.ts schema mismatches (Task priority removed, Activity description→content, workspaceId added).
+- AgentCore engine.ts schema mismatches with main CRM Prisma (Lead nameâ†’contact relation, Activity descriptionâ†’content, Task userIdâ†’assignedToId, Task completedâ†’status, SQLite mode:insensitive removal, named regex groupsâ†’numbered for ES2017 target).
+- AgentCore workflows.ts schema mismatches (Task priority removed, Activity descriptionâ†’content, workspaceId added).
 - MCP server.ts schema mismatches (same Prisma model field corrections).
 
 ## [0.48.0] - 2026-09-22
 
-### Added — AgentCore AI Orchestration Engine (ported from aicrm)
-- **AgentCore NL Command Engine** (src/lib/agentcore/engine.ts) — 8 natural language intents: update lead status, create task, list contacts, summarize workspace, list tasks, get contact, negotiate, draft content. Rule-based with LLM fallback.
-- **AgentCore Workflow Engine** (src/lib/agentcore/workflows.ts) — conditional if/then automation with 6 trigger events and 4 action types.
-- **MCP Server** (src/lib/mcp/server.ts + src/app/api/mcp/route.ts) — 9 CRM tools via Model Context Protocol (JSON-RPC 2.0). Bearer token or session auth.
-- **Multi-Model LLM Providers** (src/lib/ai/llm-providers.ts) — OpenAI, Anthropic, Google Gemini, DeepSeek, Qwen support.
-- **API Key Vault** (src/app/api/vault/route.ts) — AES-256-GCM encrypted key storage with provider CRUD.
-- **Encryption** (src/lib/encryption.ts) — AES-256-GCM with scrypt key derivation.
-- **Rate Limiting** (src/lib/rate-limit.ts) — in-memory rate limiter for API endpoints.
-- **ApiKey Prisma model** — encrypted provider key storage.
+### Added â€” AgentCore AI Orchestration Engine (ported from aicrm)
+- **AgentCore NL Command Engine** (src/lib/agentcore/engine.ts) â€” 8 natural language intents: update lead status, create task, list contacts, summarize workspace, list tasks, get contact, negotiate, draft content. Rule-based with LLM fallback.
+- **AgentCore Workflow Engine** (src/lib/agentcore/workflows.ts) â€” conditional if/then automation with 6 trigger events and 4 action types.
+- **MCP Server** (src/lib/mcp/server.ts + src/app/api/mcp/route.ts) â€” 9 CRM tools via Model Context Protocol (JSON-RPC 2.0). Bearer token or session auth.
+- **Multi-Model LLM Providers** (src/lib/ai/llm-providers.ts) â€” OpenAI, Anthropic, Google Gemini, DeepSeek, Qwen support.
+- **API Key Vault** (src/app/api/vault/route.ts) â€” AES-256-GCM encrypted key storage with provider CRUD.
+- **Encryption** (src/lib/encryption.ts) â€” AES-256-GCM with scrypt key derivation.
+- **Rate Limiting** (src/lib/rate-limit.ts) â€” in-memory rate limiter for API endpoints.
+- **ApiKey Prisma model** â€” encrypted provider key storage.
 
 ### Renamed
 - All references to "HyperNexus" renamed to "AgentCore" (name conflict with external tool).
@@ -447,5 +459,6 @@ submodules match.
 - Hardened server-side component security by properly masking API keys before hydration to the client payload.
 - **VoiceForge Pipeline Base:** Created `src/lib/voice.ts` containing foundational STT/TTS abstractions that read configuration dynamically from `getVoiceConfig(workspaceId)`, supporting Simulation, OpenAI, and ElevenLabs API integration streams.
 - **Voice Assistant Integration:** Added a mock Conversational Mode trigger (microphone button) to `AIChat.tsx` to enable users to toggle Voice STT capture dynamically from the global dashboard AI interface.
+
 
 

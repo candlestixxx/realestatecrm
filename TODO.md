@@ -96,3 +96,17 @@
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, BS&A, HubSpot, Salesforce)
 - [ ] E2E integration tests
 - [ ] Production deploy (see DEPLOY.md)
+
+## Repository Sync Tasks (v0.55.0)
+- [x] Fetch all remotes and tags
+- [x] Sync all submodules to latest origin/main
+- [x] Analyze all feature branches for unique content
+- [x] Reverse-merge main into all feature branches
+- [x] Push all feature branches
+- [x] Version bump + changelog
+- [x] Generate submodule structural map
+- [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, BS&A, Magnific, HubSpot, Salesforce)
+- [ ] Run E2E integration tests
+- [ ] Production deployment
+- [ ] Archive deprecated GitHub repos (aicrm, realestateleadcaller, realestateprototype)
+- [ ] Load testing
