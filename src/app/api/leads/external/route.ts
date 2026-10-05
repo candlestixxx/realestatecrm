@@ -4,7 +4,13 @@ import { syncContactToVectorStore, syncLeadToVectorStore } from '@/lib/rag';
 
 export async function POST(req: Request) {
   try {
-    const { name, email, phone, notes, assignedAgentEmail, source } = await req.json();
+    let parsed;
+    try {
+      parsed = await req.json();
+    } catch {
+      return NextResponse.json({ success: false, error: 'Invalid JSON body' }, { status: 400 });
+    }
+    const { name, email, phone, notes, assignedAgentEmail, source } = parsed;
 
     if (!name || !email) {
       return NextResponse.json({ success: false, error: 'Name and email are required.' }, { status: 400 });
