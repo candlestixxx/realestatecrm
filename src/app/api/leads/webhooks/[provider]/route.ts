@@ -153,7 +153,7 @@ export async function POST(
       }
 
       // Connect the lead to the segment
-      await prisma.lead.update({
+      await prisma.lead.updateMany({
         where: { id: lead.id },
         data: {
           segments: {
