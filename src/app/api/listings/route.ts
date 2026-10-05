@@ -40,16 +40,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'address and workspaceId required' }, { status: 400 });
   }
 
-  const listing = await prisma.listing.create({
-    data: {
-      mlsNumber, status, listPrice, address, city, state, zip,
-      bedrooms, bathrooms, squareFeet, lotSize, yearBuilt, propertyType,
-      description, photos: photos ? JSON.stringify(photos) : null,
-      virtualTourUrl, listingAgentId, sellerContactId,
-      listDate: listDate ? new Date(listDate) : new Date(), workspaceId,
-    },
-  });
-  return NextResponse.json(listing, { status: 201 });
+  try {
+    const listing = await prisma.listing.create({
+      data: {
+        mlsNumber, status, listPrice, address, city, state, zip,
+        bedrooms, bathrooms, squareFeet, lotSize, yearBuilt, propertyType,
+        description, photos: photos ? JSON.stringify(photos) : null,
+        virtualTourUrl, listingAgentId, sellerContactId,
+        listDate: listDate ? new Date(listDate) : new Date(), workspaceId,
+      },
+    });
+    return NextResponse.json(listing, { status: 201 });
+  } catch (err) {
+    if ((err as { code?: string })?.code === 'P2002') {
+      return NextResponse.json({ error: 'A listing with this MLS number already exists' }, { status: 409 });
+    }
+    throw err;
+  }
 }
 
 export async function PATCH(request: NextRequest) {
