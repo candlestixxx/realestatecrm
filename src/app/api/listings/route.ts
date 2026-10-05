@@ -24,7 +24,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const {
     mlsNumber, status, listPrice, address, city, state, zip,
     bedrooms, bathrooms, squareFeet, lotSize, yearBuilt, propertyType,
@@ -35,20 +40,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'address and workspaceId required' }, { status: 400 });
   }
 
-  const listing = await prisma.listing.create({
-    data: {
-      mlsNumber, status, listPrice, address, city, state, zip,
-      bedrooms, bathrooms, squareFeet, lotSize, yearBuilt, propertyType,
-      description, photos: photos ? JSON.stringify(photos) : null,
-      virtualTourUrl, listingAgentId, sellerContactId,
-      listDate: listDate ? new Date(listDate) : new Date(), workspaceId,
-    },
-  });
-  return NextResponse.json(listing, { status: 201 });
+  try {
+    const listing = await prisma.listing.create({
+      data: {
+        mlsNumber, status, listPrice, address, city, state, zip,
+        bedrooms, bathrooms, squareFeet, lotSize, yearBuilt, propertyType,
+        description, photos: photos ? JSON.stringify(photos) : null,
+        virtualTourUrl, listingAgentId, sellerContactId,
+        listDate: listDate ? new Date(listDate) : new Date(), workspaceId,
+      },
+    });
+    return NextResponse.json(listing, { status: 201 });
+  } catch (err) {
+    if ((err as { code?: string })?.code === 'P2002') {
+      return NextResponse.json({ error: 'A listing with this MLS number already exists' }, { status: 409 });
+    }
+    throw err;
+  }
 }
 
 export async function PATCH(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const { id, ...data } = body;
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
   const listing = await prisma.listing.update({ where: { id }, data });

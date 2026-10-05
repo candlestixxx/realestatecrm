@@ -64,7 +64,12 @@ export async function GET(request: NextRequest) {
  * Called internally after any data mutation.
  */
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const { entityType, entityId, action, changes, userId, workspaceId } = body;
 
   if (!entityType || !entityId || !action) {

@@ -29,7 +29,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { text } = await req.json();
+    let parsed;
+    try {
+      parsed = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+    const { text } = parsed;
 
     if (!text || !text.trim()) {
       return NextResponse.json({ error: 'Text content is required for AI intake.' }, { status: 400 });

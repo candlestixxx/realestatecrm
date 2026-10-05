@@ -8,7 +8,12 @@ import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
  * and behavioral patterns to predict lead conversion probability.
  */
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const { leadId, workspaceId } = body;
 
   if (!leadId) {

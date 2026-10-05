@@ -6,7 +6,12 @@ import { NextRequest, NextResponse } from 'next/server';
  * Creates a talking avatar synchronized with the voice agent.
  */
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const { action, avatarId, text, voiceId, callSid, provider } = body;
 
   const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;

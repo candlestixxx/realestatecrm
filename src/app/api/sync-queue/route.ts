@@ -104,7 +104,12 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const access = await requireWorkspaceAccess(session);
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
   const { action } = body;
 
   switch (action) {

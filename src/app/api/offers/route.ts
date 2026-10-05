@@ -18,7 +18,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const { amount, listingId, buyerContactId, agentId, contingencies, closingDate, earnestMoney, notes, workspaceId } = body;
 
   if (!amount || !listingId || !buyerContactId || !workspaceId) {
@@ -37,7 +42,12 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const { id, status, notes, closingDate, earnestMoney } = body;
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 

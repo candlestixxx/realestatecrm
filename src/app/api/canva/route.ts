@@ -8,7 +8,12 @@ import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
  * Supports: social posts, listing flyers, email headers.
  */
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const { templateType, brandKitId, content, listingId, workspaceId, outputFormat } = body;
 
   const CANVA_API_KEY = process.env.CANVA_API_KEY;

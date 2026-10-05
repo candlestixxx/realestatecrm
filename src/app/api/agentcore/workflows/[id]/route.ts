@@ -20,7 +20,12 @@ export async function PATCH(request: NextRequest, context: Ctx) {
 
   const { id } = await Promise.resolve(context.params);
   try {
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
     const data: Record<string, unknown> = {};
     if (body.name !== undefined) data.name = body.name;
     if (body.description !== undefined) data.description = body.description;

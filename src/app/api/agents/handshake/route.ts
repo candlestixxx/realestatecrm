@@ -3,7 +3,12 @@ import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
     const { agentName, token, action, payload } = body;
 
     // Simple authentication handshake (accepting a mock or sandbox token)

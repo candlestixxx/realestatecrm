@@ -11,7 +11,12 @@ export async function POST(
   const { provider } = await params;
 
   try {
-    const body = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
     // Default workspace
     const workspace = await prisma.workspace.findFirst({

@@ -11,7 +11,16 @@ import { z } from 'zod';
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+  const { messages } = body;
+  if (!Array.isArray(messages)) {
+    return new Response(JSON.stringify({ error: 'messages must be an array' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
   const session = await getServerSession(authOptions);
   
   let access;
