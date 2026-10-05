@@ -532,7 +532,7 @@ function useDashboardStats() {
   const refresh = useCallback(async () => {
     try {
       // Single consolidated endpoint keeps the console fast.
-      const res = await fetch('/api/reporting?workspaceId=${getClientWorkspaceSlug()}');
+      const res = await fetch('/api/reporting?workspaceId=' + getClientWorkspaceSlug());
       if (!res.ok) throw new Error('reporting fetch failed');
       const data = await res.json();
       const next: Record<string, string> = {};
