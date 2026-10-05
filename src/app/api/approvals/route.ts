@@ -47,7 +47,12 @@ export async function POST(request: NextRequest) {
   if (!workspace) return NextResponse.json({ error: 'No workspace' }, { status: 404 });
 
   try {
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
     const { title, description, leadId, assetType, assetUrl } = body;
     if (!title) return NextResponse.json({ error: 'title is required' }, { status: 400 });
 
@@ -81,7 +86,12 @@ export async function PATCH(request: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
     const { id, action, notes } = body;
     if (!id || !action) return NextResponse.json({ error: 'id and action are required' }, { status: 400 });
 

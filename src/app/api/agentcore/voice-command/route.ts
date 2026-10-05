@@ -8,7 +8,12 @@ import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
  * "Text all my Hot leads about the open house" → structured action.
  */
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const { command, workspaceId, userId } = body;
 
   if (!command) {

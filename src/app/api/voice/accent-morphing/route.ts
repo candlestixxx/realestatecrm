@@ -5,7 +5,12 @@ import { NextRequest, NextResponse } from 'next/server';
  * Dynamically selects voice accent/ID based on the geo-location of the dialed number.
  */
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const { phone, agentId, preferredGender } = body;
 
   if (!phone) {

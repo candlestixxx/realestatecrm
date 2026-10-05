@@ -45,7 +45,12 @@ function simulateDeploy(template: ContractTemplate): DeployedContract {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
     const { template, workspaceId, action } = body as {
       template: ContractTemplate;
       workspaceId: string;

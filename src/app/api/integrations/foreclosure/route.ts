@@ -17,7 +17,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
     const {
       firstName, lastName, email, phone, address, city, state, zip,
       filingType, filingDate, auctionDate, loanAmount, estimatedValue,

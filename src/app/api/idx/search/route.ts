@@ -79,7 +79,12 @@ export async function GET(request: NextRequest) {
  * POST: Create a saved search for a visitor on an agent website.
  */
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
   const { domain, email, criteria, name } = body;
 
   if (!email || !criteria) {

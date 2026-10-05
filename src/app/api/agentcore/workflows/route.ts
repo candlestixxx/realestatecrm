@@ -34,7 +34,12 @@ export async function POST(request: NextRequest) {
   if (!workspace) return NextResponse.json({ error: 'No workspace' }, { status: 404 });
 
   try {
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
     const { name, description, trigger, actions, isActive } = body;
     if (!name || !trigger || !actions) {
       return NextResponse.json({ error: 'name, trigger, and actions are required' }, { status: 400 });
