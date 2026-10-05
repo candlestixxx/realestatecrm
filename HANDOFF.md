@@ -1,3 +1,48 @@
+# HANDOFF v0.55.1 - 2026-06-10
+
+## Session Summary: Full Service Verification & Script Cleanup
+
+### All 8 Services Running
+| Port | Service | Status | Notes |
+|------|---------|--------|-------|
+| 3000 | Main CRM | 200 | |
+| 3001 | LeadG | 200 | |
+| 3002 | Foreclosure | 200 | Fixed: NEXTAUTH_SECRET required |
+| 3003 | ContentPlanner | 200 | Built after prisma generate |
+| 3004 | Media Workflow | 200 | |
+| 3005 | LegacyLeads Frontend | 200 | Built after SWC fix + lucide-react install |
+| 3006 | LegacyLeads Backend | 200 | tsx global install needed |
+| 8090 | Live Audio WS | OK | WebSocket server |
+
+### Key Fixes Applied
+1. **Foreclosure NO_SECRET crash** - set NEXTAUTH_SECRET + NEXTAUTH_URL at startup
+2. **CommandCenter template literal** - single-quoted fetch URL prevented interpolation
+3. **Script reorganization** - integrations/lofty/, pipelines/foreclosure/, archive/
+4. **Stale submodule gitlinks** - removed aicrm/leadcaller/prototype re-added by remote merge
+
+### Build Status
+- Main CRM: CLEAN
+- media-workflow: CLEAN
+- leadG: CLEAN (needs @hello-pangea/dnd, inngest/next, @modelcontextprotocol/sdk)
+- contentplanner: CLEAN (needs prisma generate first)
+- foreclosureworkflow: CLEAN (needs lucide-react 1.52+ for React 19)
+- legacyleads: CLEAN (needs tsx global, SWC reinstall, lucide-react)
+
+### What Isnt Working / Could Be Better
+1. **contentplanner/legacyleads/foreclosure submodule builds** not yet run in CI - build on demand
+2. **System tray** (scripts/system-tray.ps1) has Start/Stop/Restart/Quit but untested with running services
+3. **Live Audio WebSocket** on 8090 - root returns 404 (expected for WS, but no HTTP health endpoint)
+4. **Marketing/media workflows** at /workflows/* are outside /dashboard/* routes - not in unified CommandCenter section rail
+5. **3 deprecated GitHub repos** still need manual archiving (aicrm, realestateleadcaller, realestateprototype)
+
+### Next Steps
+1. Test system tray against running services
+2. Add health check endpoint to live-audio-server
+3. Move /workflows/* pages into dashboard routes or add to CommandCenter
+4. Set up CI builds for all submodules
+5. Wire contentplanner/legacyleads APIs to main CRM for unified data
+
+---
 ﻿# HANDOFF.md — Multi-Agent Session Handoff
 
 > **Current state: v0.55.0 — All repos synced, all feature branches reconciled, all docs updated.**
