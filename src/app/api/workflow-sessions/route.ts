@@ -70,7 +70,11 @@ export async function POST(request: NextRequest) {
   const dataJson = typeof data === 'string' ? data : JSON.stringify(data || {});
 
   if (id) {
-    // Update existing session
+    // P2025 guard — update on missing id throws → 500. findUnique → 404 first.
+    const existing = await prisma.workflowSession.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
     const session = await prisma.workflowSession.update({
       where: { id },
       data: {
@@ -79,6 +83,25 @@ export async function POST(request: NextRequest) {
       },
     });
     return NextResponse.json({ id: session.id, updated: true });
+  }
+
+  // FK validation — workspaceId must exist or Prisma throws P2003 → 500
+  const workspace = await prisma.workspace.findUnique({ where: { id: wsId } });
+  if (!workspace) {
+    return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
+  }
+  // Optional FKs — validate only when provided
+  if (userId) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+  }
+  if (leadId) {
+    const lead = await prisma.lead.findUnique({ where: { id: leadId } });
+    if (!lead) return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
+  }
+  if (dealId) {
+    const deal = await prisma.deal.findUnique({ where: { id: dealId } });
+    if (!deal) return NextResponse.json({ error: 'Deal not found' }, { status: 404 });
   }
 
   // Create new session
