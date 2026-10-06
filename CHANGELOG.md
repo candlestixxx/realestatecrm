@@ -4,11 +4,23 @@
 - Editable partner permission toggles in partners page (wired to PartnerPermission API)
 - CRM restarted with latest build for new routes
 
+### Fixed
+- FK validation + P2025 guards on 8 API routes — all now return 400/404 instead of 500:
+  - `deal-stakeholders` POST — dealId FK → 404 on missing Deal
+  - `deal-requirements` POST — dealId FK → 404 on missing Deal
+  - `search-alerts` POST — leadId FK → 404 on missing Lead
+  - `workflow-sessions` POST — P2025 guard on update + workspaceId/userId/leadId/dealId FK validation
+  - `ai/memory-settings` POST — malformed JSON guard → 400
+  - `voice-settings` PUT — workspaceId FK → 404 on upsert create path
+  - `websites` POST — workspaceId FK → 404 on missing Workspace
+  - `websites` PATCH — P2025 guard → 404 on missing id
+
 ### Verified
 - All 8 services healthy
 - E2E smoke: 21/21 pass
 - Zero template literal bugs across all submodules
 - All Prisma models confirmed in use (scan false positives resolved)
+- All 57 API routes represented in CommandCenter with tooltips
 
 
 ## [0.57.8] - 2026-10-06
