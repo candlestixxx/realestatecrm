@@ -147,6 +147,9 @@
 - [x] P2025 update→404 pattern for 6 CRUD handlers (listings/offers/partners/referrals/webhooks/leads)
 - [x] FK validation for child records (notes/relatives/tasks/documents/tags/properties/tasks)
 - [x] 94/94 UI pages GREEN across all 6 services
+- [x] 8 new dashboard pages (vault/contracts/chat/client-portal/imports/avatar/canva/objections/property-data)
+- [x] CommandCenter: 10 new feature cards with tooltips
+- [x] 103/103 UI pages GREEN across all 6 services
 
 ### Remaining Known Issues
 - [ ] Redis/Memurai for media-workflow (gracefully degrades without it)
