@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
   const baths = searchParams.get('baths');
   const propertyType = searchParams.get('propertyType');
   const status = searchParams.get('status') || 'ACTIVE';
-  const page = parseInt(searchParams.get('page') || '1');
-  const pageSize = Math.min(parseInt(searchParams.get('pageSize') || '12'), 50);
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1);
+  const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get('pageSize') || '12') || 12));
   const sort = searchParams.get('sort') || 'newest'; // newest | price_asc | price_desc
 
   const where: any = { status };

@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
   const entityId = searchParams.get('entityId');
   const action = searchParams.get('action'); // CREATE, UPDATE, DELETE
   const userId = searchParams.get('userId');
-  const page = parseInt(searchParams.get('page') || '1');
-  const pageSize = Math.min(parseInt(searchParams.get('pageSize') || '50'), 200);
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1);
+  const pageSize = Math.min(200, Math.max(1, parseInt(searchParams.get('pageSize') || '50') || 50));
 
   const where: any = {
     workspaceId,
