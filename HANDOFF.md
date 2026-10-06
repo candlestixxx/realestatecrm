@@ -1,3 +1,19 @@
+## v0.57.9 - FK Validation + P2025 Guards + CommandCenter Completeness
+
+**FK/P2025 fixes (8 routes)**: All now return 400/404 instead of 500:
+- `deal-stakeholders` POST — dealId FK → 404 on missing Deal
+- `deal-requirements` POST — dealId FK → 404 on missing Deal
+- `search-alerts` POST — leadId FK → 404 on missing Lead
+- `workflow-sessions` POST — P2025 guard on update + workspaceId/userId/leadId/dealId FK validation
+- `ai/memory-settings` POST — malformed JSON guard → 400
+- `voice-settings` PUT — workspaceId FK → 404 on upsert create path
+- `websites` POST — workspaceId FK → 404 on missing Workspace
+- `websites` PATCH — P2025 guard → 404 on missing id
+
+**CommandCenter completeness**: All 57 API routes represented in `src/components/dashboard/CommandCenter.tsx` with tooltips. 8 new feature cards added for vault, contracts, chat, client-portal, imports, avatar, canva, objections, property-data.
+
+**103/103 UI pages GREEN** across all 6 services. 12/12 ports UP.
+
 ## v0.57.6 - UI Page Completion + Error Boundaries + Layout Hardening
 
 **Root cause of dashboard 404s (RESOLVED)**: `requireWorkspaceAccess` in `src/app/dashboard/layout.tsx` was uncaught — threw WorkspaceAccessError which crashed the layout. Pages with `error.tsx` recovered (200 with error UI); pages without returned 404. Fix: wrapped in try/catch so layout never crashes from access errors.
