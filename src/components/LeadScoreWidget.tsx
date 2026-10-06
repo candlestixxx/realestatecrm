@@ -105,14 +105,14 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
           {result.factors && result.factors.length > 0 && (
             <div className="space-y-1.5 mb-3">
               <div className="text-xs font-medium text-gray-500 uppercase">Score Factors</div>
-              {result.factors.map((f, i) => (
+              {result.factors.length === 0 ? <div className="text-xs text-gray-400 italic">No score factors available.</div> : (result.factors.map((f, i) => (
                 <div key={i} className="flex items-center justify-between text-xs">
                   <span className="text-gray-600">{f.name}</span>
                   <span className={f.impact >= 0 ? 'text-green-600' : 'text-red-600'}>
                     {f.impact >= 0 ? '+' : ''}{f.impact}
                   </span>
                 </div>
-              ))}
+              )))}
             </div>
           )}
 
@@ -120,9 +120,9 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
             <div className="text-xs text-gray-600 bg-gray-50 rounded p-2">
               <div className="font-medium mb-1">Recommendations:</div>
               <ul className="space-y-0.5">
-                {result.recommendations.map((r, i) => (
+                {result.recommendations.length === 0 ? <div className="text-xs text-gray-400 italic">No recommendations at this time.</div> : (result.recommendations.map((r, i) => (
                   <li key={i}>• {r}</li>
-                ))}
+                )))}
               </ul>
             </div>
           )}
