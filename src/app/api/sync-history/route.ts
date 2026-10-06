@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'No workspace found' }, { status: 404 });
   }
 
-  const limit = Math.min(parseInt(request.nextUrl.searchParams.get('limit') || '30'), 100);
+  const limit = Math.min(100, Math.max(1, parseInt(request.nextUrl.searchParams.get('limit') || '30') || 30));
 
   // MyPlusSyncLog model may not exist in schema ? handle gracefully
   let logs: any[] = [];

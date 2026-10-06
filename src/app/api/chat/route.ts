@@ -88,6 +88,10 @@ export async function POST(req: Request) {
           leadId: z.string().optional().describe('Link to a specific lead ID.'),
         }),
         execute: async ({ title, description, dueDate, leadId }: { title: string; description?: string; dueDate?: string; leadId?: string }) => {
+          if (leadId) {
+            const lead = await prisma.lead.findUnique({ where: { id: leadId } });
+            if (!lead) return { error: 'Lead not found' };
+          }
           const task = await prisma.task.create({
             data: {
               title,

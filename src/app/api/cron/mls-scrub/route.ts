@@ -57,7 +57,7 @@ export async function GET(request: Request) {
 
       if (isRelistedActive) {
         // 3. Pause Smart Plan / Campaign
-        await prisma.lead.update({
+        await prisma.lead.updateMany({
           where: { id: lead.id },
           data: {
             smartPlanId: null,

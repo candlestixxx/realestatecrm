@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const bathrooms = searchParams.get('bathrooms');
   const propertyType = searchParams.get('propertyType');
   const radius = searchParams.get('radius'); // miles from address
-  const limit = parseInt(searchParams.get('limit') || '50');
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '50') || 50));
 
   // Build search over sold/expired/withdrawn listings
   const where: any = {

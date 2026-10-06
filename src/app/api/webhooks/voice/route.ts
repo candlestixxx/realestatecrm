@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         const tagList = currentTags ? currentTags.split(',').map(t => t.trim()) : [];
         if (!tagList.includes('negative-call')) {
           tagList.push('negative-call');
-          await prisma.lead.update({
+          await prisma.lead.updateMany({
             where: { id: lead.id },
             data: { tags: tagList.join(',') },
           });
