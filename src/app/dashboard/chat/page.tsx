@@ -45,6 +45,7 @@ export default function ChatPage() {
 
   return (
     <div className="p-6 max-w-5xl h-[calc(100vh-4rem)]">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Team Chat</h1> <span title="Private and group messaging with your team. Create channels, share files, and mention teammates for quick collaboration." aria-label="About this section: Private and group messaging with your team. Create channels, share files, and mention teammates for quick collaboration." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
         <MessageSquare className="w-6 h-6 text-primary" /> Team Chat
       </h1>
