@@ -64,6 +64,15 @@ const TABS: SettingsTab[] = [
     icon: '🔑',
   },
   {
+    id: 'ai-memory',
+    label: 'AI Memory',
+    description: 'Control what the AI remembers, learning preferences, and data retention.',
+    tooltip:
+      'Manage conversation memory retention, enable/disable AI learning and personalization, set custom instructions, and export or delete your AI data.',
+    href: '/dashboard/settings/ai-memory',
+    icon: '🧠',
+  },
+  {
     id: 'mcp',
     label: 'MCP Server',
     description: 'Model Context Protocol exposure for external agent tools.',
