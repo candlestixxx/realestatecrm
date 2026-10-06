@@ -302,7 +302,7 @@ export default function SyncQueuePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">MyPlus → Lofty Sync Queue</h1>
+          <h1 className="text-3xl font-bold tracking-tight">MyPlus → Lofty Sync Queue <span title="Monitor MyPlus to Lofty sync operations. View sync status, retry failed syncs, and manage field mappings." aria-label="About this section: Monitor MyPlus to Lofty sync operations. View sync status, retry failed syncs, and manage field mappings." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-muted-foreground">
             One-at-a-time lead sync from MyPlus portal into Lofty CRM.
           </p>

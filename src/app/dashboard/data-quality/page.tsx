@@ -34,7 +34,7 @@ export default function DataQualityPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Data Quality Dashboard</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Data Quality Dashboard <span title="Monitor data completeness, accuracy, and freshness across contacts, leads, and deals. Identify duplicates and missing fields." aria-label="About this section: Monitor data completeness, accuracy, and freshness across contacts, leads, and deals. Identify duplicates and missing fields." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
 
       {/* Overall Score */}
       <div className="bg-white rounded-lg border p-6 mb-6">

@@ -49,7 +49,7 @@ export default async function AgentStudioPage() {
     <div className="space-y-8 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">AI Agent Studio</h1>
+          <h1 className="text-3xl font-bold tracking-tight">AI Agent Studio <span title="Configure AI agents for lead qualification, follow-up sequences, and automated responses. Set agent personality, knowledge base, and escalation rules." aria-label="About this section: Configure AI agents for lead qualification, follow-up sequences, and automated responses. Set agent personality, knowledge base, and escalation rules." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-muted-foreground">Build, monitor, and control autonomous actions taken by your CRM AI Agents.</p>
         </div>
         <div className="flex items-center gap-2">

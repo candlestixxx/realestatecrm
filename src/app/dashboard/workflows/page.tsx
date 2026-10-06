@@ -45,7 +45,7 @@ export default async function WorkflowsPage() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Workflows</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Workflows <span title="Design automated workflows for lead intake, listing entry, marketing media, and offer drafting. Drag-and-drop builder with conditional logic." aria-label="About this section: Design automated workflows for lead intake, listing entry, marketing media, and offer drafting. Drag-and-drop builder with conditional logic." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
         <p className="text-muted-foreground">Automated business processes and task sequences.</p>
       </div>
 

@@ -13,7 +13,7 @@ export default function AgentCorePage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">AgentCore</h1>
+          <h1 className="text-2xl font-bold text-foreground">AgentCore <span title="Central orchestration hub for AI agents, workflows, and system monitoring. Manage agent lifecycle and view execution logs." aria-label="About this section: Central orchestration hub for AI agents, workflows, and system monitoring. Manage agent lifecycle and view execution logs." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-sm text-muted-foreground mt-1">
             AI-powered command center — natural language control, workflow automation, and MCP integration.
           </p>

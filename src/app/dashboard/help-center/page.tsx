@@ -263,7 +263,7 @@ export default function HelpCenterPage() {
       <div className="border-b border-border/40 pb-5">
         <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-2">
           📖 CRM Help Center & Training Portal
-        </h1>
+         <span title="Searchable help articles, video tutorials, and interactive training simulations for all CRM features." aria-label="About this section: Searchable help articles, video tutorials, and interactive training simulations for all CRM features." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
         <p className="text-sm text-muted-foreground font-semibold mt-1">
           Interactive simulation videos and master operator manuals for the Excel Legacy CRM features.
         </p>
