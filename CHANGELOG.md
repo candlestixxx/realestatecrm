@@ -1,3 +1,9 @@
+## [0.58.4] - 2026-10-06
+
+### Added
+- Empty states for pipeline-trigger, agent-site-chat, analytics, SEO blog, landing pages, workflow screen components
+
+
 ## [0.58.3] - 2026-10-06
 
 ### Added
