@@ -130,7 +130,7 @@ export default function AIChat() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/5">
-            {messages.map((m) => (
+            {messages.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No messages yet. Start a conversation with the AI assistant.</div> : (messages.map((m) => (
               <div
                 key={m.id}
                 className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
@@ -165,7 +165,7 @@ export default function AIChat() {
                   })}
                 </div>
               </div>
-            ))}
+            )))}
             {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
               <div className="flex justify-start">
                 <div className="bg-muted/50 border border-border rounded-lg rounded-bl-none p-3 text-sm flex gap-1 items-center">

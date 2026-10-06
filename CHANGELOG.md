@@ -1,3 +1,15 @@
+## [0.58.11] - 2026-10-06
+
+### Added
+- Loading states for CommandCenter, WebsiteBuilder, LeadAlertListener, image-workflow, ServiceHealthGrid, workflow-studio
+
+
+## [0.58.10] - 2026-10-06
+
+### Added
+- Empty states for AIChat, IntegrationCenter, SidebarAIAssistant, LeadContactInfoCard
+
+
 ## [0.58.9] - 2026-10-06
 
 ### Added

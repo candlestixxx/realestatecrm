@@ -262,6 +262,7 @@ export function WorkflowStudio({
   defaultValues,
   activitySeed,
 }: WorkflowStudioProps) {
+  const [dataLoading, setDataLoading] = useState(true);
   const [draft, setDraft] = useState<Record<string, string>>(defaultValues);
   const [activity, setActivity] = useState<WorkflowActivityEntry[]>(activitySeed);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);

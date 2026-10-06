@@ -6,6 +6,7 @@ import { BellRing, BellOff, Volume2, VolumeX } from 'lucide-react';
 
 export default function LeadAlertListener() {
   const lastCheckedRef = useRef<string>(new Date().toISOString());
+  const [dataLoading, setDataLoading] = useState(true);
   const [alertsKilled, setAlertsKilled] = useState(false);
   const [alertsMutedUntilBatch, setAlertsMutedUntilBatch] = useState(false);
 

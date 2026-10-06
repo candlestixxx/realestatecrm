@@ -9,6 +9,7 @@ interface ImageWorkflowProps {
 }
 
 export function ImageWorkflow({ listingId }: ImageWorkflowProps) {
+  const [dataLoading, setDataLoading] = useState(true);
   const [variants, setVariants] = useState<ImageVariant[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [sourcePath, setSourcePath] = useState('\\\\excelserver\\WeichertShare\\1 LISTINGS\\2026 Listings\\123_Main_St');
