@@ -47,15 +47,22 @@ export default async function DashboardLayout({ children }: { children: React.Re
     console.error('Failed processing due drip campaigns in layout:', e);
   }
 
-  const access = await requireWorkspaceAccess(session);
-
-  const workspaces = await prisma.workspace.findMany({
-    where: {
-      members: {
-        some: { userId: access.userId },
+  // Workspace access can throw WorkspaceAccessError (or a Turbopack-duplicated
+  // variant that fails instanceof checks). Catch here so the layout never crashes
+  // — individual pages handle their own access denials via error.tsx boundaries.
+  let workspaces: { id: string; name: string; slug: string }[] = [];
+  try {
+    const access = await requireWorkspaceAccess(session);
+    workspaces = await prisma.workspace.findMany({
+      where: {
+        members: {
+          some: { userId: access.userId },
+        },
       },
-    },
-  });
+    });
+  } catch (e) {
+    console.error('Workspace access check failed in dashboard layout:', e);
+  }
 
   return (
     <div className="flex h-screen bg-background">
