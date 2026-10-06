@@ -1,3 +1,15 @@
+## [0.57.7] - 2026-10-06
+
+### Added
+- ServiceHealthGrid — real-time 8-service status widget in CommandCenter Platform section (auto-polls every 30s)
+- JSON-LD structured data on public pages (WebPage + RealEstateAgent schema.org)
+- E2E smoke test suite (scripts/e2e-smoke.js) — 21 endpoint checks across all 8 services
+
+### Changed
+- ROADMAP.md: SEO/JSON-LD and OG share widgets marked complete
+- Main CRM restarted to serve latest build (sitemap.xml, robots.txt now live)
+
+
 ## [0.57.6] - 2026-10-06
 
 ### Added
