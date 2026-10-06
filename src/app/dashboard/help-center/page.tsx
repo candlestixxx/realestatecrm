@@ -195,6 +195,42 @@ const VIDEOS: VideoTopic[] = [
       '⚠️ [Alert] Auction date: 2025-03-15 | Redemption period: 6 months.',
       '👤 [Lead] Created distressed property lead and assigned to investor pipeline.'
     ]
+  },
+  {
+    id: 'shortcuts',
+    title: 'Keyboard Shortcuts & Quick Navigation',
+    category: 'Platform',
+    description: 'Power-user keyboard shortcuts for navigating the CRM, searching records, and running commands.',
+    steps: [
+      'Press Cmd+K (or Ctrl+K) anywhere to open the Command Palette.',
+      'When the palette is empty, see quick navigation links to top pages.',
+      'Type at least 2 characters to search leads, contacts, deals, and tasks.',
+      'Use arrow keys to navigate results and Enter to open the selected record.'
+    ],
+    simulationLogs: [
+      '⌥ [Palette] Opened command palette with Cmd+K.',
+      '🔍 [Search] Query "8485 Sherman" — found 1 matching lead.',
+      '⏎ [Navigate] Opening lead detail page for "8485 Sherman Ave".',
+      '✅ [Done] Command palette used in 1.2 seconds.'
+    ]
+  },
+  {
+    id: 'collaboration',
+    title: 'Team Chat & Internal Collaboration',
+    category: 'Communications',
+    description: 'Private direct messages and group chat channels for your team. Keep deal discussions in context.',
+    steps: [
+      'Open Team Chat from the sidebar or the Unified Inbox page.',
+      'Create a private DM with any team member or start a group channel.',
+      'Chat messages are persisted per workspace for compliance.',
+      'Reference deals and leads directly in chat messages.'
+    ],
+    simulationLogs: [
+      '💬 [Chat] Opened Team Chat — 3 active conversations.',
+      '👤 [DM] Started private chat with "Hank Mendez".',
+      '📢 [Group] Created group "Deal #45 — Closing Team" with 4 members.',
+      '✅ [Sync] Chat history synced and saved to workspace.'
+    ]
   }
 ];
 
