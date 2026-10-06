@@ -1,5 +1,20 @@
 ## [0.57.6] - 2026-10-06
 
+### Added
+- AI Learning & Memory controls page (settings/ai-memory) with conversation memory retention, learning preferences, custom instructions, and data export/delete
+- A/B variant email/SMS content override fields in leadG campaign setup UI (emailSubject, emailBody, smsBody per variant)
+- Loading and error states for AI Memory settings page
+
+### Changed
+- Settings sidebar tooltip now mentions AI Memory controls
+- TODO.md: marked chat, learning/memory, SEO, OG share widgets, CI builds as complete
+
+### Fixed
+- leadG A/B variant engine now supports per-variant email/SMS content overrides (previously only agent routing)
+
+
+## [0.57.6] - 2026-10-06
+
 ### UI Page Completion + Error Boundaries + Layout Hardening
 - **Root cause of dashboard 404s**: `requireWorkspaceAccess` in dashboard layout was uncaught — threw WorkspaceAccessError which crashed the layout. Pages with `error.tsx` recovered; pages without returned 404.
 - **Layout fix**: wrapped `requireWorkspaceAccess` + workspace query in try/catch — layout never crashes from access errors.

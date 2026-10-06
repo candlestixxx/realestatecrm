@@ -164,3 +164,22 @@ All 10 feature branches across 5 submodules have been reverse-merged with latest
 - Redis for media-workflow (gracefully degrades without it)
 - 3 deprecated GitHub repos need manual archiving (aicrm, realestateleadcaller, realestateprototype)
 - Multi-channel A/B testing in leadG not yet wired
+
+## Session 2026-10-06 (continued)
+
+### Completed
+- AI Learning & Memory controls (settings/ai-memory) — component, API, settings tab, loading/error states
+- A/B variant email/SMS content override UI in leadG campaign setup (was engine-only, now has UI fields)
+- CI/CD expanded to build all 5 submodules (leadG, contentplanner, foreclosureworkflow, media-workflow, legacyleads)
+- SEO infrastructure: sitemap.ts, robots.ts, Open Graph metadata on root layout
+- ShareWidget component on public property pages
+- Team chat (ChatRoom/ChatParticipant/ChatMessage Prisma models + TeamChat component + REST API)
+- TODO.md updated: 5 items marked complete
+
+### Next
+- Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, BS&A, HubSpot, Salesforce)
+- E2E integration tests
+- Load testing
+- Production deploy (see DEPLOY.md)
+- Archive deprecated GitHub repos (aicrm, realestateleadcaller, realestateprototype)
+- Cross-service API integration (contentplanner/legacyleads to main CRM)

@@ -88,10 +88,10 @@
 - [x] Update ROADMAP.md with completed Phase 2-12 features
 
 ### Remaining
-- [ ] Private and group chat
-- [ ] Learning and memory controls
-- [ ] SEO / Schema.org / Dynamic Sitemap
-- [ ] Social Media Open Graph + share widgets
+- [x] Private and group chat
+- [x] Learning and memory controls
+- [x] SEO / Schema.org / Dynamic Sitemap
+- [x] Social Media Open Graph + share widgets
 - [ ] Load testing and bug fixing
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, BS&A, HubSpot, Salesforce)
 - [ ] E2E integration tests
@@ -118,7 +118,7 @@
 - [x] Script reorganization (nondestructive archive)
 - [x] Move /workflows/* pages under /dashboard/ routes for consistent navigation
 - [x] Test system tray against live running services (fixed foreclosure env vars)
-- [ ] CI builds for all submodules
+- [x] CI builds for all submodules
 - [ ] Cross-service API integration (contentplanner/legacyleads to main CRM)
 - [ ] Live audio WebSocket monitor UI panel in dashboard
 
