@@ -413,6 +413,20 @@ const SECTIONS: Section[] = [
         tooltip: 'Guided multi-step processes with persistence. Each workflow session tracks progress and approvals.',
       },
       {
+        label: 'Listing Entry Wizard',
+        description: 'Step-by-step MLS listing creation with photo upload and status tracking.',
+        href: '/workflows/listing-entry',
+        icon: 'L',
+        tooltip: 'Guided listing entry with field validation, photo management, and MLS-ready output.',
+      },
+      {
+        label: 'Offer Draft Wizard',
+        description: 'Generate purchase agreements with e-sign and compliance checks.',
+        href: '/workflows/offer-draft',
+        icon: 'O',
+        tooltip: 'Draft offers with auto-filled terms, disclosure attachments, and e-signature routing.',
+      },
+      {
         label: 'Agent Studio',
         description: 'Configure AI agents with tools, memory, and deployment targets.',
         href: '/dashboard/agent-studio',

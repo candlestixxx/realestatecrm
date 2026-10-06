@@ -29,3 +29,33 @@ This document contains ideas for improvements, refactoring, new features, and pi
 
 - **Swagger / OpenAPI Specs:** If exposing an API for partner integrations, generate OpenAPI specs.
 - **CI/CD Actions:** Add GitHub Actions for automated Playwright end-to-end testing, linting, and type checking on every PR.
+
+## 5. Aggressive Expansion Ideas (2026-06-10)
+
+### Real-Time and Infrastructure
+- **Redis Cluster for Message Broker**: Install Memurai/Redis on Windows to enable full inter-service event messaging (media-workflow currently drops payloads).
+- **gRPC Microservice Mesh**: Replace REST calls between services with gRPC for type-safe, high-performance inter-service communication.
+- **Event Sourcing Pattern**: Use Redis Streams or Kafka for full event sourcing on all entity mutations.
+
+### AI and Automation
+- **Multi-Model Agent Routing**: Route different task types to specialized models (Gemini for content, GPT-4 for analysis, local Llama for privacy-sensitive data).
+- **Autonomous Lead Nurturing**: AI agent that monitors lead behavior and autonomously sends follow-ups and escalates hot leads.
+- **Predictive Deal Scoring**: ML model trained on historical deals to predict close probability and suggest next actions.
+- **Voice-First CRM**: Full voice control - dictation for notes, voice navigation, hands-free lead updates during showings.
+
+### Platform and Scale
+- **Plugin Architecture**: Allow third-party integrations via a plugin API with sandboxed execution.
+- **Multi-Brokerage White-Label**: Full white-label support with custom domains, branding, and feature flags per brokerage.
+- **Mobile-First Field Agent App**: React Native app with offline map, camera-based document capture, and GPS check-ins.
+
+### Data and Intelligence
+- **Market Heat AI**: Real-time market analysis combining MLS data, tax records, and social signals.
+- **Automated Comp Analysis**: AI generates comparative market analyses (CMAs) from MLS data and recent sales.
+- **Natural Language Report Builder**: Users ask for reports in plain English.
+- **Predictive Maintenance Alerts**: Predict maintenance needs from property age, weather, and tenant reports.
+
+### Revenue and Growth
+- **Embedded Mortgage Calculator**: In-app pre-qualification tool that captures leads and routes to partner mortgage brokers.
+- **Marketplace for Agent Services**: Agents can buy/sell leads, share referrals, and offer services.
+- **AI-Powered SEO Engine**: Automatic SEO optimization for agent websites with keyword research and ranking tracking.
+

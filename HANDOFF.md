@@ -1,3 +1,15 @@
+
+## v0.55.2 Build Process Improvements
+
+### New Root Scripts
+- **build-all.ps1** — Builds all 6 components (main CRM + 5 submodules) with pass/fail summary
+- **start-all.ps1** — Starts all 8 services with correct ports and env vars (NEXTAUTH_SECRET, etc.)
+- **check-status.ps1** — Quick health check of all 8 services (port + HTTP status)
+
+### Known Infrastructure Gaps
+1. **Redis not installed** — media-workflow MessageBroker gracefully degrades (drops payloads). Install Memurai or Redis for full inter-service messaging.
+2. **url.parse() deprecation** — foreclosure server.js uses legacy URL parsing (minor, no security impact in MVP).
+3. **Live Audio WS** health endpoint works (/health returns JSON) but root returns 404 (expected for WS).
 # HANDOFF v0.55.1 - 2026-06-10
 
 ## Session Summary: Full Service Verification & Script Cleanup
