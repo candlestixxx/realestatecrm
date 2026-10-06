@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const permissions = await prisma.partnerPermission.findMany({
     where,
     include: {
-      partner: { select: { id: true, name: true, company: true, type: true } },
+      partner: { select: { id: true, companyName: true, contactName: true, type: true } },
     },
     take: 100,
   });
@@ -28,8 +28,8 @@ export async function GET(request: NextRequest) {
     permissions: permissions.map(p => ({
       id: p.id,
       partnerId: p.partnerId,
-      partnerName: p.partner?.name,
-      partnerCompany: p.partner?.company,
+      partnerName: p.partner?.contactName,
+      partnerCompany: p.partner?.companyName,
       canViewLeads: p.canViewLeads,
       canViewDeals: p.canViewDeals,
       canViewContacts: p.canViewContacts,
