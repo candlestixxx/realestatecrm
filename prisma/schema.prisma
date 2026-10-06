@@ -24,6 +24,9 @@ model User {
   assignedTasks Task[]            @relation("TaskAssignee")
   workflows     WorkflowSession[]
   workspaces    WorkspaceMember[]
+  chatRooms     ChatRoom[]      @relation("ChatRoomCreator")
+  chatParticipations ChatParticipant[]
+  chatMessages  ChatMessage[]
   stakeholderIn DealStakeholder[]
   blogPosts     BlogPost[]
   smsAlertsMlsRelist   Boolean   @default(false)
@@ -34,6 +37,7 @@ model User {
 }
 
 model Workspace {
+  chatRooms    ChatRoom[]
   id             String            @id @default(cuid())
   name           String
   createdAt      DateTime          @default(now())
@@ -395,6 +399,48 @@ model Message {
   @@index([createdAt])
 }
 
+
+// Internal team chat — private DMs (type=DIRECT) and group channels (type=GROUP).
+// Separate from Message (which is external comms: email/SMS/social).
+model ChatRoom {
+  id          String            @id @default(cuid())
+  name        String?
+  type        String            @default("DIRECT") // DIRECT or GROUP
+  workspaceId String
+  createdById String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  workspace   Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User              @relation("ChatRoomCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  participants ChatParticipant[]
+  messages    ChatMessage[]
+
+  @@index([workspaceId, type])
+}
+
+model ChatParticipant {
+  id        String    @id @default(cuid())
+  roomId    String
+  userId    String
+  role      String    @default("MEMBER") // MEMBER or ADMIN
+  joinedAt  DateTime  @default(now())
+  room      ChatRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  roomId    String
+  senderId  String
+  body      String
+  createdAt DateTime    @default(now())
+  room      ChatRoom    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender    User        @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([roomId, createdAt])
+}
 
 model ApiKey {
   id        String   @id @default(cuid())

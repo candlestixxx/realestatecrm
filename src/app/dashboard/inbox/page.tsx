@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import TeamChat from "@/components/TeamChat";
 import toast from 'react-hot-toast';
 
 interface Message {
@@ -184,6 +185,8 @@ export default function UnifiedInboxPage() {
           ))}
         </div>
       )}
+      {/* Internal team chat */}
+      <TeamChat currentUserId="current-user" />
     </div>
   );
 }
