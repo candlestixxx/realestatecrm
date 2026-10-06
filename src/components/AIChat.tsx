@@ -205,6 +205,7 @@ export default function AIChat() {
               </button>
               <button
                 type="submit"
+                aria-label="Send message"
                 disabled={!input.trim() || isLoading}
                 className="px-3 py-2 bg-primary text-primary-foreground rounded-md disabled:opacity-50"
               >

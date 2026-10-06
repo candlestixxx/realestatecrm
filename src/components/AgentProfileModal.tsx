@@ -62,6 +62,7 @@ export default function AgentProfileModal({
             <p className="text-xs text-muted-foreground">Manage your credentials, branding, and billing center info.</p>
           </div>
           <button
+            aria-label="Close agent profile"
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted"
           >
