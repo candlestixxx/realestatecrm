@@ -1,3 +1,30 @@
+## [0.57.7] - 2026-10-06
+
+### Added
+- ServiceHealthGrid — real-time 8-service status widget in CommandCenter Platform section (auto-polls every 30s)
+- JSON-LD structured data on public pages (WebPage + RealEstateAgent schema.org)
+- E2E smoke test suite (scripts/e2e-smoke.js) — 21 endpoint checks across all 8 services
+
+### Changed
+- ROADMAP.md: SEO/JSON-LD and OG share widgets marked complete
+- Main CRM restarted to serve latest build (sitemap.xml, robots.txt now live)
+
+
+## [0.57.6] - 2026-10-06
+
+### Added
+- AI Learning & Memory controls page (settings/ai-memory) with conversation memory retention, learning preferences, custom instructions, and data export/delete
+- A/B variant email/SMS content override fields in leadG campaign setup UI (emailSubject, emailBody, smsBody per variant)
+- Loading and error states for AI Memory settings page
+
+### Changed
+- Settings sidebar tooltip now mentions AI Memory controls
+- TODO.md: marked chat, learning/memory, SEO, OG share widgets, CI builds as complete
+
+### Fixed
+- leadG A/B variant engine now supports per-variant email/SMS content overrides (previously only agent routing)
+
+
 ## [0.57.6] - 2026-10-06
 
 ### UI Page Completion + Error Boundaries + Layout Hardening

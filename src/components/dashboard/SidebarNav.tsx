@@ -233,7 +233,7 @@ const GROUPS: NavGroup[] = [
       {
         label: 'Settings',
         href: '/dashboard/settings',
-        tooltip: 'Email, voice, AI model keys, and MCP server configuration.',
+        tooltip: 'Email, voice, AI model keys, AI memory controls, and MCP server configuration.',
       },
       {
         label: 'Sync Queue',

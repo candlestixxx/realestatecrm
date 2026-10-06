@@ -98,11 +98,31 @@ export default async function PublicLandingPage(props: PageProps) {
     const workspaceId = workspaces[0]?.id || 'default';
 
     return (
-      <LandingPagePortalClient
-        pageTitle={`${agent.name} Site`}
-        blocksJson={JSON.stringify(agentBlocks)}
-        workspaceId={workspaceId}
-      />
+      <>
+        {/* JSON-LD for agent pages */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'RealEstateAgent',
+              name: agent.name,
+              email: agent.email,
+              telephone: agent.phone,
+              jobTitle: agent.role,
+              worksFor: {
+                '@type': 'Organization',
+                name: 'Excel Legacy Realty Group',
+              },
+            }),
+          }}
+        />
+        <LandingPagePortalClient
+          pageTitle={`${agent.name} Site`}
+          blocksJson={JSON.stringify(agentBlocks)}
+          workspaceId={workspaceId}
+        />
+      </>
     );
   }
 
@@ -116,6 +136,23 @@ export default async function PublicLandingPage(props: PageProps) {
 
   return (
     <>
+      {/* JSON-LD structured data for search engines */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            name: landingPage.title,
+            description: 'Excel Legacy Realty Group - ' + landingPage.title,
+            url: (process.env.NEXT_PUBLIC_APP_URL || '') + '/site/' + slug,
+            publisher: {
+              '@type': 'Organization',
+              name: 'Excel Legacy Realty Group',
+            },
+          }),
+        }}
+      />
       {landingPage.fbPixelId && (
         <script
           dangerouslySetInnerHTML={{

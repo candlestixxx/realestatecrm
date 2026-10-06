@@ -15,7 +15,7 @@
 - [x] Workspace as Segment / List model
 - [x] Bulk Lead Management & Dynamic Pagination
 - [x] Email / SMS / call logging (Forms and action infrastructure wired, timeline active)
-- [ ] Private and group chat
+- [x] Private and group chat
 - [x] Workflow engine (Foundation and initial drafts)
 - [x] Dashboard Workflow Performance Overview
 - [x] Lead routing rules + AI qualification engine (round-robin, LLM scoring)
@@ -31,7 +31,7 @@
 - [x] Voice assistant
 - [x] Speech provider selection
 - [x] Conversational mode
-- [ ] Learning and memory controls
+- [x] Learning and memory controls
 - [x] CRM timeline writeback from voice sessions (Voice→CRM webhook)
 
 ## Phase 4 — Social and marketing [COMPLETE]
@@ -115,9 +115,9 @@
 - [x] RESO Web API integration for IDX / MLS data syncing.
 - [x] Automated property page generation with SSR / ISR.
 - [x] Comprehensive lead capture forms mapped directly to CRM Leads.
-- [ ] SEO, Schema.org (JSON-LD), and Dynamic Sitemap infrastructure.
+- [x] SEO, Schema.org (JSON-LD), and Dynamic Sitemap infrastructure.
 - [x] Google Tag Manager, GA4, and Ads Conversion tracking support.
-- [ ] Social Media Open Graph integrations and dynamic share widgets.
+- [x] Social Media Open Graph integrations and dynamic share widgets.
 - [x] Headless CMS connection for localized real estate blogs.
 
 ## Phase 12 — Lofty.com Website Builder Parity
@@ -133,7 +133,7 @@
 
 ---
 
-_Last synced 2026-10-01 (v0.53.0) during repository synchronization protocol. Remaining open items above are intentionally deferred (chat, learning/memory controls)._
+_Last synced 2026-10-06 (v0.57.6). Chat, learning/memory, SEO/sitemap, and OG share widgets completed. Remaining: load testing, API keys, E2E tests, production deploy._
 
 ## Phase 13 — Repository Synchronization [COMPLETE — v0.55.0]
 - [x] Fetch all remotes + tags across main + 5 submodules
