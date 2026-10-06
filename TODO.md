@@ -138,6 +138,15 @@
 - [x] Help Center expanded from 4 to 10 topics covering all major features
 - [x] Analytics Studio consolidated into Reporting (unified tab)
 - [x] Full codebase scan for template literal bugs — 0 remaining
+- [x] Dashboard layout `requireWorkspaceAccess` uncaught — wrapped in try/catch (root cause of 404s)
+- [x] Added marketing/page.tsx + websites/page.tsx parent hub pages (sidebar links resolved)
+- [x] Added 28 error.tsx + loading.tsx files for 14 dashboard directories missing them
+- [x] AICRM contacts list page (search, quick-create, detail navigation)
+- [x] MediaWorkflow webhook/crm graceful degradation (202 when Redis unavailable)
+- [x] Pagination param clamping for 7 routes (page/limit/offset bounds)
+- [x] P2025 update→404 pattern for 6 CRUD handlers (listings/offers/partners/referrals/webhooks/leads)
+- [x] FK validation for child records (notes/relatives/tasks/documents/tags/properties/tasks)
+- [x] 94/94 UI pages GREEN across all 6 services
 
 ### Remaining Known Issues
 - [ ] Redis/Memurai for media-workflow (gracefully degrades without it)
