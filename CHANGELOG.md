@@ -1,3 +1,9 @@
+## [0.58.8] - 2026-10-06
+
+### Added
+- Global focus-visible styles for keyboard navigation accessibility
+
+
 ## [0.58.7] - 2026-10-06
 
 ### Fixed
