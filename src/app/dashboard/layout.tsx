@@ -67,7 +67,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-border bg-muted/30 flex flex-col hidden md:flex">
+      <aside aria-label="Main sidebar" className="w-64 border-r border-border bg-muted/30 flex flex-col hidden md:flex">
         <div className="h-16 flex items-center px-6 border-b border-border">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-sm bg-secondary flex items-center justify-center font-bold text-secondary-foreground text-xs">
