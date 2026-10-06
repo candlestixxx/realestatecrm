@@ -1,3 +1,11 @@
+## [0.58.5] - 2026-10-06
+
+### Added
+- LeadScoreWidget — predictive lead scoring UI in lead detail (wired to /api/scoring)
+- RoutingRulesWidget — lead routing rules management in SettingsTabs
+- Nav coverage scan + API usage scan scripts
+
+
 ## [0.58.4] - 2026-10-06
 
 ### Added
