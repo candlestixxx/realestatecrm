@@ -1,4 +1,16 @@
-## v0.58.0 - UI Condensation + FK/P2025 Completeness
+## v0.58.22 - Complete UI Quality Polish + Help Center + Error Handling
+
+**Recent work (v0.58.15-v0.58.22):**
+- LeadQualifyWidget: AI lead qualification button + grade/score/reasoning on lead detail
+- Website template picker in WebsiteBuilder (fetches from /api/websites/templates)
+- Error handling: try/catch for all unguarded fetch calls (AI memory, TeamChat, chat send, website save)
+- Empty states: 10+ data lists (DealDetail, LeadDetail, AgentCore, CommandPalette)
+- Help-center: 2 new topics (AI Qualification, Lead Routing Rules) — now 14 topics
+- ARIA: 7 icon-only buttons given aria-labels (SegmentsClient, AgentProfileModal, CampaignEditor, EditLeadModal, AIChat)
+- CI matrix: expanded to all 5 submodules (contentplanner, foreclosureworkflow, legacyleads/frontend)
+- Settings save race condition fix (setSaving before await)
+
+**All quality metrics at 100%:** loading states, error states, empty states, fetch error handling, ARIA labels, tooltips (all real pages), Prisma model wiring (39/40).
 
 **UI condensation**: Reduced dashboard subpage count from 50 to 46:
 - `marketing/text-codes` merged into `/dashboard/marketing` (extracted `TextCodes` component)
