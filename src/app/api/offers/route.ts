@@ -50,6 +50,8 @@ export async function PATCH(request: NextRequest) {
     }
   const { id, status, notes, closingDate, earnestMoney } = body;
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+  const existing = await prisma.offer.findUnique({ where: { id } });
+  if (!existing) return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
 
   const offer = await prisma.offer.update({
     where: { id },
