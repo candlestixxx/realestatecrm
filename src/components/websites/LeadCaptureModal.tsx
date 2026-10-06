@@ -13,6 +13,7 @@ export function LeadCaptureModal({ tenantName, triggerDelayMs = 15000, triggerSc
   const [isOpen, setIsOpen] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (hasTriggered) return;
@@ -94,6 +95,7 @@ export function LeadCaptureModal({ tenantName, triggerDelayMs = 15000, triggerSc
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
+                setSubmitting(true);
                 const formData = new FormData(e.currentTarget);
 
                 try {
@@ -119,6 +121,8 @@ export function LeadCaptureModal({ tenantName, triggerDelayMs = 15000, triggerSc
                 } catch (err) {
                   console.error('Lead capture error', err);
                   setSubmitted(true);
+                } finally {
+                  setSubmitting(false);
                 }
               }}
               className="space-y-4"
@@ -136,8 +140,8 @@ export function LeadCaptureModal({ tenantName, triggerDelayMs = 15000, triggerSc
                 <input type="tel" className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary outline-none transition-all" name="phone" placeholder="(555) 123-4567" />
               </div>
 
-              <button type="submit" className="w-full bg-primary text-primary-foreground font-bold py-3.5 rounded-lg hover:bg-primary/90 transition-colors mt-2 shadow-lg shadow-primary/20">
-                Unlock VIP Access
+              <button type="submit" disabled={submitting} className="w-full bg-primary text-primary-foreground font-bold py-3.5 rounded-lg hover:bg-primary/90 transition-colors mt-2 shadow-lg shadow-primary/20 disabled:opacity-50">
+                {submitting ? 'Submitting...' : 'Unlock VIP Access'}
               </button>
               <p className="text-[10px] text-center text-muted-foreground uppercase tracking-wider mt-4">
                 We respect your privacy. No spam.
