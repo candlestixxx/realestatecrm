@@ -3,6 +3,8 @@
 ### Added
 - ServiceHealthGrid — real-time 8-service status widget in CommandCenter Platform section (auto-polls every 30s)
 - JSON-LD structured data on public pages (WebPage + RealEstateAgent schema.org)
+- 8 new dashboard pages: vault (document storage), contracts (lease/earnest/purchase), chat (team messaging), client-portal (external dashboard), imports (CSV/Excel bulk), avatar (HeyGen AI video), canva (design integration), objections (AI scripts), property-data (MLS/RESO lookup)
+- CommandCenter: 10 new feature cards with tooltips in comms/marketing/platform sections
 - E2E smoke test suite (scripts/e2e-smoke.js) — 21 endpoint checks across all 8 services
 
 ### Changed
