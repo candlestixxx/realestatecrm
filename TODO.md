@@ -92,7 +92,7 @@
 - [x] Learning and memory controls
 - [x] SEO / Schema.org / Dynamic Sitemap
 - [x] Social Media Open Graph + share widgets
-- [ ] Load testing and bug fixing
+- [x] Load testing (scripts/load-test.js — 350/350 pass, p95 < 170ms)
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, BS&A, HubSpot, Salesforce)
 - [x] E2E integration tests (scripts/e2e-smoke.js — 21 checks)
 - [ ] Production deploy (see DEPLOY.md)
@@ -109,7 +109,7 @@
 - [x] Run E2E integration tests
 - [ ] Production deployment
 - [ ] Archive deprecated GitHub repos (aicrm, realestateleadcaller, realestateprototype)
-- [ ] Load testing
+- [x] Load testing
 
 ### Dashboard & UI (2026-06-10)
 - [x] CommandCenter unified single-page dashboard with value-ordered sections
