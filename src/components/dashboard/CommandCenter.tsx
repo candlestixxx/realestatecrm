@@ -23,6 +23,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
+import LiveAudioMonitor from '@/components/LiveAudioMonitor';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -778,6 +779,13 @@ export default function CommandCenter() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Live Audio WebSocket monitor — only shown on Platform section */}
+            {section.id === 'platform' && (
+              <div className="mt-3">
+                <LiveAudioMonitor />
               </div>
             )}
           </div>
