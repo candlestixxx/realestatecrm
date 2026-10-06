@@ -539,6 +539,7 @@ export default function CampaignsListClient({
                                 <button
                                   type="button"
                                   onClick={() => handleToggleAutoApply(c.id, c.autoApply)}
+                                  title="Toggle auto-apply — automatically enroll matching leads in this campaign"
                                   className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                                     c.autoApply ? 'bg-primary' : 'bg-muted'
                                   }`}
@@ -656,6 +657,7 @@ export default function CampaignsListClient({
                   <div className="pt-4 flex items-center gap-2 mt-4 border-t border-border/60">
                     <button
                       onClick={() => handleImportTemplate(tmpl)}
+                      title="Import this template as a new Smart Plan in your workspace"
                       className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-extrabold rounded-lg hover:bg-secondary/90 transition-all shadow-sm text-center"
                     >
                       Use Template
