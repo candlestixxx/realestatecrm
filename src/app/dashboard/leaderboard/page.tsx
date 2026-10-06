@@ -20,7 +20,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('/api/gamification?workspaceId=${getClientWorkspaceSlug()}&period=' + period)
+    fetch('/api/gamification?workspaceId=' + getClientWorkspaceSlug() + '&period=' + period)
       .then(r => r.json())
       .then(data => setEntries(data.leaderboard || []))
       .catch(console.error)
