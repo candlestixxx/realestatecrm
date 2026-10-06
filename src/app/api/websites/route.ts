@@ -39,6 +39,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'slug, title, workspaceId required' }, { status: 400 });
   }
 
+  // FK validation — workspaceId must exist or Prisma throws P2003 → 500
+  const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId } });
+  if (!workspace) {
+    return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
+  }
+
   const site = await prisma.agentSite.create({
     data: {
       slug, title,
@@ -58,6 +64,9 @@ export async function PATCH(request: NextRequest) {
     }
   const { id, ...data } = body;
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+  // P2025 guard — update on missing id throws → 500
+  const existing = await prisma.agentSite.findUnique({ where: { id } });
+  if (!existing) return NextResponse.json({ error: 'Website not found' }, { status: 404 });
   if (data.content) data.content = JSON.stringify(data.content);
   const site = await prisma.agentSite.update({ where: { id }, data });
   return NextResponse.json(site);
