@@ -75,7 +75,7 @@ export default function AnalyticsTab() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40 font-semibold text-foreground">
-                {COUNTY_DATA.map((row, idx) => (
+                {COUNTY_DATA.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No analytics data yet. Data appears after your site receives visitors.</div> : (COUNTY_DATA.map((row, idx) => (
                   <tr key={idx} className="hover:bg-muted/10 transition-colors">
                     <td className="px-4 py-3 flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-indigo-500" />
@@ -85,7 +85,7 @@ export default function AnalyticsTab() {
                     <td className="px-4 py-3">{row.leads}</td>
                     <td className="px-4 py-3 text-right text-indigo-500 font-extrabold">{row.rate}</td>
                   </tr>
-                ))}
+                )))}
               </tbody>
             </table>
           </div>
