@@ -1,3 +1,9 @@
+## [0.58.9] - 2026-10-06
+
+### Added
+- Loading states for AI memory, AI models, MCP settings, deal detail, lead table components
+
+
 ## [0.58.8] - 2026-10-06
 
 ### Added
