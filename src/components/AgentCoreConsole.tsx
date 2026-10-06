@@ -108,7 +108,7 @@ export default function AgentCoreConsole() {
           </div>
         )}
 
-        {messages.map((msg, i) => (
+        {messages.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No messages yet. Try a command above.</div> : messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] rounded-xl px-4 py-2.5 ${
               msg.role === 'user'

@@ -1079,7 +1079,7 @@ export default function LeadDetailLayoutClient({
                   ) : (
                     <span className="text-muted-foreground italic">No primary email</span>
                   )}
-                  {secondaryEmails.map((em, idx) => (
+                  {secondaryEmails.length === 0 ? <p className="text-sm text-gray-400 py-2">No secondary emails.</p> : secondaryEmails.map((em, idx) => (
                     <div key={idx} className="flex items-center justify-between text-foreground">
                       <span className="flex items-center gap-1.5 truncate">
                         <Mail className="w-3.5 h-3.5 text-muted-foreground/60" /> {em.value}
@@ -1143,7 +1143,7 @@ export default function LeadDetailLayoutClient({
                     </div>
                   )}
 
-                  {familyMembersList.map((mem, idx) => (
+                  {familyMembersList.length === 0 ? <p className="text-sm text-gray-400 py-2">No family members listed.</p> : familyMembersList.map((mem, idx) => (
                     <div key={idx} className="p-2 bg-muted/20 border border-border/40 rounded-lg flex justify-between items-center text-foreground">
                       <span>{mem.name}</span>
                       <span className="text-[9px] bg-muted border border-border px-1 rounded uppercase text-muted-foreground">{mem.relationship}</span>
