@@ -15,6 +15,11 @@
 ### Added
 - CommandPalette quick navigation — 10 page shortcuts shown when no query typed (Cmd+K)
 
+### Changed
+- Condensed `marketing/text-codes` into `/dashboard/marketing` — extracted `TextCodes` component, subpage redirects for bookmarks
+- Condensed `websites/builder` into `/dashboard/websites` — extracted `WebsiteBuilder` component, subpage redirects for bookmarks
+- Reduced dashboard subpage count from 50 to 46 (settings already tabbed, reporting/analytics already redirects)
+
 ### Verified
 - System tray: full quit + per-service Start/Stop/Restart confirmed
 - E2E smoke: 21/21 pass

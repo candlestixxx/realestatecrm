@@ -1,6 +1,14 @@
-## v0.57.9 - FK Validation + P2025 Guards + CommandCenter Completeness
+## v0.58.0 - UI Condensation + FK/P2025 Completeness
 
-**FK/P2025 fixes (8 routes)**: All now return 400/404 instead of 500:
+**UI condensation**: Reduced dashboard subpage count from 50 to 46:
+- `marketing/text-codes` merged into `/dashboard/marketing` (extracted `TextCodes` component)
+- `websites/builder` merged into `/dashboard/websites` (extracted `WebsiteBuilder` component)
+- Subpages now redirect to parent for bookmarks
+- Settings already tabbed (6 domains via `SettingsTabs`)
+- `reporting/analytics` already redirects to `reporting`
+- Workflows subpages are redirect wrappers to `/workflows/*`
+
+**FK/P2025 fixes (9 routes)**: All now return 400/404 instead of 500:
 - `deal-stakeholders` POST — dealId FK → 404 on missing Deal
 - `deal-requirements` POST — dealId FK → 404 on missing Deal
 - `search-alerts` POST — leadId FK → 404 on missing Lead
