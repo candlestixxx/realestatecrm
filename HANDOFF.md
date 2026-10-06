@@ -183,3 +183,22 @@ All 10 feature branches across 5 submodules have been reverse-merged with latest
 - Production deploy (see DEPLOY.md)
 - Archive deprecated GitHub repos (aicrm, realestateleadcaller, realestateprototype)
 - Cross-service API integration (contentplanner/legacyleads to main CRM)
+
+## Session 2026-10-06 (continued — tick 3)
+
+### Completed
+- Deal Requirements + Stakeholders tabs in deal detail (wired to /api/deal-requirements and /api/deal-stakeholders)
+- 7 new REST APIs exposing previously dark Prisma models
+- Loading/error states for 9 remote-added pages + sidebar nav entries
+- Archive scan/fix scripts organized
+
+### Verified
+- All 8 services healthy
+- Load test: 350/350 pass, p95 < 170ms
+- E2E smoke: 21/21 pass
+- All Prisma models confirmed in use (scan was false positive)
+
+### Next
+- Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
+- Add SearchAlert management UI to leads page (widget exists in detail only)
+- Production deploy
