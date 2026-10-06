@@ -357,19 +357,13 @@ const SECTIONS: Section[] = [
     tagline: 'Reporting, gamification, and full audit provenance',
     features: [
       {
-        label: 'Reporting Dashboard',
+        label: 'Reporting & Analytics',
         description: 'Lead/deal/listing/partner analytics with stage-value breakdowns.',
         href: '/dashboard/reporting',
         icon: '📊',
         tooltip: 'Live aggregates across every entity. Export-ready charts for broker reviews.',
       },
-      {
-        label: 'Analytics Studio',
-        description: 'Deeper funnel, source, and conversion analytics.',
-        href: '/dashboard/reporting/analytics',
-        icon: '📈',
-        tooltip: 'Funnel drop-off analysis, source attribution, and conversion cohort tracking.',
-      },
+      
       {
         label: 'Lead Scoring',
         description: 'Predictive scoring with recency, engagement, and deal-size features.',

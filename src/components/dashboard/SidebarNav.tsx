@@ -146,14 +146,9 @@ const GROUPS: NavGroup[] = [
     tooltip: 'Analytics, scoring, gamification, and compliance.',
     links: [
       {
-        label: 'Reporting',
+        label: 'Reporting & Analytics',
         href: '/dashboard/reporting',
-        tooltip: 'Lead/deal/listing/partner analytics with stage-value breakdowns.',
-      },
-      {
-        label: 'Analytics Studio',
-        href: '/dashboard/reporting/analytics',
-        tooltip: 'Funnel drop-off, source attribution, and conversion cohorts.',
+        tooltip: 'Lead/deal/listing/partner analytics with bar charts and compact stats. Tabs for Overview and Quick Stats.',
       },
       {
         label: 'Leaderboard',
