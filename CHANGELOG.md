@@ -1,3 +1,15 @@
+## [0.58.1] - 2026-10-06
+
+### Added
+- Help-center 10 to 12 topics: keyboard shortcuts + team collaboration
+- Loading states for 8 more pages (agent-studio, approvals, map, social, workflows, settings, help-center, marketing-studio)
+- Error states for deals/[id] and leads/[id] detail pages
+
+### Changed
+- Remote: TextCodes + WebsiteBuilder refactored into components
+- Remote: partner-permissions API auth guards
+
+
 ## [0.58.0] - 2026-10-06
 
 ### Added
