@@ -39,12 +39,17 @@ export default function WebsiteBuilder() {
   const [title, setTitle] = useState('My Agent Site');
   const [slug, setSlug] = useState('my-site');
   const [preview, setPreview] = useState(false);
+  const [templates, setTemplates] = useState<{ id: string; name: string; category: string | null }[]>([]);
 
   useEffect(() => {
     fetch('/api/websites?workspaceId=' + getClientWorkspaceSlug())
       .then(r => r.json())
       .then(setSites)
       .catch(console.error);
+    fetch('/api/websites/templates?workspaceId=' + getClientWorkspaceSlug())
+      .then(r => r.json())
+      .then(d => setTemplates(Array.isArray(d) ? d : []))
+      .catch(() => setTemplates([]));
   }, []);
 
   const addBlock = (type: string) => {
@@ -152,6 +157,33 @@ export default function WebsiteBuilder() {
       <div className="grid grid-cols-12 gap-4">
         {/* Block Palette */}
         <div className="col-span-2">
+          {templates.length > 0 && (
+            <div className="mb-4">
+              <h3 className="font-semibold text-sm text-gray-500 mb-2">
+                TEMPLATES
+                <span
+                  title="Start your site from a pre-built template. Click a template to load its blocks into the editor."
+                  aria-label="Website templates provide pre-built block layouts"
+                  className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle"
+                >?</span>
+              </h3>
+              <div className="space-y-1">
+                {templates.map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setTitle(t.name);
+                      setSlug(t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+                    }}
+                    className="w-full text-left bg-blue-50 border border-blue-200 rounded px-3 py-1.5 text-xs hover:bg-blue-100"
+                  >
+                    {t.name}
+                    {t.category && <span className="text-gray-400 ml-1">({t.category})</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <h3 className="font-semibold text-sm text-gray-500 mb-2">ADD BLOCKS</h3>
           <div className="space-y-2">
             {BLOCK_TYPES.map(bt => (
