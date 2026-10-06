@@ -411,7 +411,7 @@ export default function SegmentsClient({
             <div className="bg-muted/30 border border-border rounded-xl p-4 max-w-md animate-in slide-in-from-top-2">
               <div className="flex justify-between items-center mb-2">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-wide">Enroll Lead in Segment</h4>
-                <button onClick={() => setIsAddingLead(false)}>
+                <button aria-label="Close add lead form" onClick={() => setIsAddingLead(false)}>
                   <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                 </button>
               </div>
@@ -564,7 +564,7 @@ export default function SegmentsClient({
           <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-lg overflow-hidden flex flex-col">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
               <h3 className="font-bold text-md text-foreground">Mass SMS Broadcast</h3>
-              <button onClick={() => setIsSmsOpen(false)}>
+              <button aria-label="Close SMS dialog" onClick={() => setIsSmsOpen(false)}>
                 <X className="w-5 h-5 text-muted-foreground hover:text-foreground" />
               </button>
             </div>
@@ -609,7 +609,7 @@ export default function SegmentsClient({
           <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-lg overflow-hidden flex flex-col">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
               <h3 className="font-bold text-md text-foreground">Bulk Smart Plan Campaign Enrollment</h3>
-              <button onClick={() => setIsSmartPlanOpen(false)}>
+              <button aria-label="Close smart plan dialog" onClick={() => setIsSmartPlanOpen(false)}>
                 <X className="w-5 h-5 text-muted-foreground hover:text-foreground" />
               </button>
             </div>
