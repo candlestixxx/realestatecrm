@@ -110,3 +110,14 @@
 - [ ] Production deployment
 - [ ] Archive deprecated GitHub repos (aicrm, realestateleadcaller, realestateprototype)
 - [ ] Load testing
+
+### Dashboard & UI (2026-06-10)
+- [x] CommandCenter unified single-page dashboard with value-ordered sections
+- [x] Tooltips on all feature cards and section headers
+- [x] Workflow wizard pages linked (listing-entry, offer-draft)
+- [x] Script reorganization (nondestructive archive)
+- [ ] Move /workflows/* pages under /dashboard/ routes for consistent navigation
+- [ ] Test system tray against live running services
+- [ ] CI builds for all submodules
+- [ ] Cross-service API integration (contentplanner/legacyleads to main CRM)
+- [ ] Live audio WebSocket monitor UI panel in dashboard
