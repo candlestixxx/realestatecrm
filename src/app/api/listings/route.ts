@@ -68,6 +68,8 @@ export async function PATCH(request: NextRequest) {
     }
   const { id, ...data } = body;
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+  const existing = await prisma.listing.findUnique({ where: { id } });
+  if (!existing) return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
   const listing = await prisma.listing.update({ where: { id }, data });
   return NextResponse.json(listing);
 }

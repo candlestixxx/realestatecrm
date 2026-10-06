@@ -41,6 +41,8 @@ export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+  const existing = await prisma.partner.findUnique({ where: { id } });
+  if (!existing) return NextResponse.json({ error: 'Partner not found' }, { status: 404 });
   await prisma.partner.update({ where: { id }, data: { isActive: false } });
   return NextResponse.json({ success: true });
 }

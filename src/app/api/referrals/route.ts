@@ -45,6 +45,8 @@ export async function PATCH(request: NextRequest) {
     }
   const { id, status, commissionRate, notes } = body;
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+  const existing = await prisma.referral.findUnique({ where: { id } });
+  if (!existing) return NextResponse.json({ error: 'Referral not found' }, { status: 404 });
 
   const referral = await prisma.referral.update({
     where: { id },
