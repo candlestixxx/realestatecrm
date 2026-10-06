@@ -26,6 +26,7 @@ const SERVICES: Omit<ServiceStatus, 'status' | 'code'>[] = [
 ];
 
 export default function ServiceHealthGrid() {
+  const [dataLoading, setDataLoading] = useState(true);
   const [services, setServices] = useState<ServiceStatus[]>(
     SERVICES.map(s => ({ ...s, status: 'checking' as const }))
   );

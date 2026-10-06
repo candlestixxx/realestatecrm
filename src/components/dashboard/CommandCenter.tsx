@@ -599,6 +599,7 @@ const SECTIONS: Section[] = [
 // ---------------------------------------------------------------------------
 
 function useDashboardStats() {
+  const [dataLoading, setDataLoading] = useState(true);
   const [stats, setStats] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState(false);
 

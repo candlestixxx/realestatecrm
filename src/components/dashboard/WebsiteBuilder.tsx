@@ -33,6 +33,7 @@ const BLOCK_TYPES = [
 ];
 
 export default function WebsiteBuilder() {
+  const [dataLoading, setDataLoading] = useState(true);
   const [sites, setSites] = useState<Site[]>([]);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [title, setTitle] = useState('My Agent Site');
