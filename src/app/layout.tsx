@@ -15,9 +15,33 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'RealEstateCRM | Excel Legacy Realty Group',
+  title: {
+    default: 'RealEstateCRM | Excel Legacy Realty Group',
+    template: '%s | Excel Legacy CRM',
+  },
   description:
     'A modular TypeScript real estate operating system with workflow shells for offers, listings, and future MLS-connected automation.',
+  // Open Graph — drives link previews on Facebook, LinkedIn, Slack, iMessage
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    siteName: 'Excel Legacy CRM',
+    title: 'RealEstateCRM | Excel Legacy Realty Group',
+    description:
+      'AI-powered real estate CRM with lead management, transaction workflows, marketing automation, and voice agents.',
+  },
+  // Twitter/X card — summary_large_image requires an image; we use the summary type
+  twitter: {
+    card: 'summary',
+    title: 'RealEstateCRM | Excel Legacy Realty Group',
+    description:
+      'AI-powered real estate CRM with lead management, transaction workflows, and marketing automation.',
+  },
+  // Explicit robots meta as a safety net alongside robots.ts
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
