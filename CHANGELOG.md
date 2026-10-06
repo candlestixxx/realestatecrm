@@ -1,3 +1,15 @@
+## [0.58.0] - 2026-10-06
+
+### Added
+- CommandPalette quick navigation — 10 page shortcuts shown when no query typed (Cmd+K)
+
+### Verified
+- System tray: full quit + per-service Start/Stop/Restart confirmed
+- E2E smoke: 21/21 pass
+- All 8 services healthy
+- CRM restarted with latest build
+
+
 ## [0.57.9] - 2026-10-06
 
 ### Added
