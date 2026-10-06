@@ -1,13 +1,13 @@
 ﻿'use client';
 // AI Avatar — generate AI presenter videos for listings (HeyGen integration).
-// API: /api/avatar (POST with action field: list, generate, etc).
+// API: /api/avatar (POST with action field: create-session, speak, end-session).
 
 import { useState } from 'react';
 import { Video, Play, Loader2, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function AvatarPage() {
-  const [action, setAction] = useState('list');
+  const [action, setAction] = useState('create-session');
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -35,8 +35,9 @@ export default function AvatarPage() {
         <p className="text-muted-foreground mb-6 text-sm">Generate AI presenter videos for listings. Requires HEYGEN_API_KEY.</p>
         <div className="flex gap-2 items-center">
           <select value={action} onChange={e => setAction(e.target.value)} className="rounded-md border px-3 py-2 text-sm">
-            <option value="list">List Avatars</option>
-            <option value="generate">Generate Video</option>
+            <option value="create-session">Create Session</option>
+            <option value="speak">Speak</option>
+            <option value="end-session">End Session</option>
           </select>
           <button onClick={handleAction} disabled={loading} className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />} Run
