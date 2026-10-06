@@ -273,7 +273,7 @@ export default function SidebarNav() {
 
   return (
     <TooltipProvider delayDuration={150}>
-      <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
+      <nav aria-label="Dashboard navigation" className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
         {GROUPS.map((group) => (
           <div key={group.id}>
             <div className="flex items-center gap-1.5 px-2 mb-1.5">
