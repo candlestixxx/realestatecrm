@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     const { workspaceSlug: workspaceId, actorId } = await getWorkspaceScope(session);
 
     // Enforce authentication context existence
-    if (!actorId || !workspaceId || workspaceId === DEFAULT_WORKSPACE_SLUG) {
+    if (!actorId || !workspaceId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
