@@ -1962,8 +1962,25 @@ export default function LeadDetailLayoutClient({
                     <p className="text-sm font-bold text-foreground">Upload Documents</p>
                     <p className="text-xs text-muted-foreground mt-0.5">Drag and drop file folders here, or click to upload from local machine.</p>
                   </div>
-                  <button 
-                    onClick={() => toast.success('Mock File upload initialized.')}
+                  <button
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.onchange = async () => {
+                        const file = input.files?.[0];
+                        if (!file) return;
+                        try {
+                          const res = await fetch('/api/uploads', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ filename: file.name, size: file.size, contentType: file.type, leadId: lead.id }),
+                          });
+                          if (res.ok) toast.success('Document upload initialized');
+                          else toast.error('Upload failed — check AWS S3 configuration');
+                        } catch { toast.error('Network error'); }
+                      };
+                      input.click();
+                    }}
                     className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg shadow cursor-pointer"
                   >
                     Upload a Document
