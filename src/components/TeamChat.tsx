@@ -146,22 +146,24 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
           )}
           <button
             onClick={async () => {
-              const res = await fetch('/api/chat/rooms', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  type: newChatType,
-                  name: newChatName || undefined,
-                  participantIds: [],
-                }),
-              });
-              const data = await res.json();
-              if (data.room) {
-                setRooms((prev) => [data.room, ...prev]);
-                setActiveRoom(data.room);
-                setShowNewChat(false);
-                setNewChatName('');
-              }
+              try {
+                const res = await fetch('/api/chat/rooms', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    type: newChatType,
+                    name: newChatName || undefined,
+                    participantIds: [],
+                  }),
+                });
+                const data = await res.json();
+                if (data.room) {
+                  setRooms((prev) => [data.room, ...prev]);
+                  setActiveRoom(data.room);
+                  setShowNewChat(false);
+                  setNewChatName('');
+                }
+              } catch { /* network error */ }
             }}
             className="w-full px-3 py-1.5 bg-secondary text-secondary-foreground text-xs font-bold rounded-lg hover:bg-secondary/90"
           >

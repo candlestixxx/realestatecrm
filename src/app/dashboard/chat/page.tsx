@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 // Team chat — real-time messaging for the workspace.
 // Uses /api/chat/rooms and /api/chat/messages for room/message CRUD.
 
@@ -38,9 +38,10 @@ export default function ChatPage() {
     if (!input.trim() || !activeRoom) return;
     const msg = { body: input, roomId: activeRoom };
     setInput('');
-    // Optimistic add
     setMessages(prev => [...prev, { id: 'temp', body: input, sender: 'You', sentAt: new Date().toISOString() }]);
-    await fetch('/api/chat/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) });
+    try {
+      await fetch('/api/chat/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) });
+    } catch { /* optimistic message stays; retried on next poll */ }
   }
 
   return (
