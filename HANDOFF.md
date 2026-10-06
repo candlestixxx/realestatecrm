@@ -1,3 +1,30 @@
+## v0.57.6 - UI Page Completion + Error Boundaries + Layout Hardening
+
+**Root cause of dashboard 404s (RESOLVED)**: `requireWorkspaceAccess` in `src/app/dashboard/layout.tsx` was uncaught — threw WorkspaceAccessError which crashed the layout. Pages with `error.tsx` recovered (200 with error UI); pages without returned 404. Fix: wrapped in try/catch so layout never crashes from access errors.
+
+**UI pages completed**:
+- Added `marketing/page.tsx` + `websites/page.tsx` parent hub pages (sidebar links resolved)
+- Added 28 `error.tsx` + `loading.tsx` files for 14 dashboard directories missing them
+- AICRM contacts list page (`apps/aicrm/src/app/contacts/page.tsx`): search, quick-create, detail navigation
+- **94/94 UI pages GREEN** across all 6 services
+
+**API verification (2026-10-06)**:
+- Root CRM: 51 routes verified (22 top-level + 29 nested)
+- LeadG: 27 routes verified (13 webhooks + 14 nested)
+- LeadCaller: 18 routes verified (6 webhooks + 12 other)
+- MediaWorkflow: 3 routes verified
+- POST write paths: websites 201, gamification 200, others 401 (auth required)
+
+**Route structure discoveries**:
+- LG/LC webhooks are subdirectory routes (no root route.ts) — `/api/webhooks` 404 is correct
+- LG twilio has 7 subroutes: status/gather/token/voice/incoming/voicemail/transfer-complete
+- Root API has 50+ route directories, many with nested subroutes
+- `direct-mail` and `notification-settings` are UI-only (no API routes)
+
+**AICRM submodule pointer**: Remote merges keep dropping `apps/aicrm` gitlink. Must `git add apps/aicrm` after every merge. Commit `cd7a2f1` re-added it.
+
+**MediaWorkflow webhook/crm**: Now returns 202 with `queued:false` when Redis/MessageBroker unavailable (was 500). Commit `a37c7e9`.
+
 ## v0.55.3 - System Tray Fix
 
 **Key discovery**: System tray foreclosure config was broken - started with plain node server.js without NEXTAUTH_SECRET or PORT=3002. This would fail with NO_SECRET crash or port collision with Main CRM. Fixed to use start-3002.js wrapper with full env vars.
