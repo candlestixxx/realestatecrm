@@ -7,8 +7,10 @@ import { TrendingUp, RefreshCw } from 'lucide-react';
 
 interface ScoreResult {
   score: number;
+  probability: number;
+  tier: string;
   factors: { name: string; impact: number; detail: string }[];
-  recommendation: string;
+  recommendations: string[];
 }
 
 export default function LeadScoreWidget({ leadId }: { leadId: string }) {
@@ -46,10 +48,8 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
     return 'text-red-600';
   };
 
-  const getScoreLabel = (score: number) => {
-    if (score >= 70) return 'Hot';
-    if (score >= 40) return 'Warm';
-    return 'Cold';
+  const getScoreLabel = (tier: string) => {
+    return tier || 'Unknown';
   };
 
   return (
@@ -84,9 +84,9 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
             </div>
             <div>
               <div className="text-sm font-medium" style={{ color: getScoreColor(result.score) }}>
-                {getScoreLabel(result.score)}
+                {getScoreLabel(result.tier)}
               </div>
-              <div className="text-xs text-gray-500">out of 100</div>
+              <div className="text-xs text-gray-500">{result.probability}% conversion probability</div>
             </div>
             <TrendingUp className="w-5 h-5 ml-auto text-gray-400" />
           </div>
@@ -116,9 +116,14 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
             </div>
           )}
 
-          {result.recommendation && (
+          {result.recommendations && result.recommendations.length > 0 && (
             <div className="text-xs text-gray-600 bg-gray-50 rounded p-2">
-              <span className="font-medium">Recommendation:</span> {result.recommendation}
+              <div className="font-medium mb-1">Recommendations:</div>
+              <ul className="space-y-0.5">
+                {result.recommendations.map((r, i) => (
+                  <li key={i}>• {r}</li>
+                ))}
+              </ul>
             </div>
           )}
         </>
