@@ -39,6 +39,12 @@ export async function PUT(request: NextRequest) {
   const { workspaceId, provider, elevenLabsApiKey, elevenLabsVoiceId, openAiApiKey, openAiVoiceId } = body;
   const wsId = workspaceId || DEFAULT_WORKSPACE_SLUG;
 
+  // FK validation — workspaceId must exist or upsert create path throws P2003 → 500
+  const workspace = await prisma.workspace.findUnique({ where: { id: wsId } });
+  if (!workspace) {
+    return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
+  }
+
   // Build update data — only include fields that are provided
   const data: Record<string, unknown> = {};
   if (provider !== undefined) data.provider = provider;

@@ -60,6 +60,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'leadId and criteria required' }, { status: 400 });
   }
 
+  // FK validation — leadId must reference an existing Lead or Prisma throws P2003 → 500
+  const lead = await prisma.lead.findUnique({ where: { id: leadId } });
+  if (!lead) {
+    return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
+  }
+
   const alert = await prisma.searchAlert.create({
     data: {
       leadId,

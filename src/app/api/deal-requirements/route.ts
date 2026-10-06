@@ -37,6 +37,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'dealId and title required' }, { status: 400 });
   }
 
+  // FK validation — dealId must reference an existing Deal or Prisma throws P2003 → 500
+  const deal = await prisma.deal.findUnique({ where: { id: dealId } });
+  if (!deal) {
+    return NextResponse.json({ error: 'Deal not found' }, { status: 404 });
+  }
+
   const req = await prisma.dealRequirement.create({
     data: {
       dealId,
