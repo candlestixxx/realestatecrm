@@ -115,6 +115,7 @@ function ActionButton({ action, onClick }: { action: WorkflowAction; onClick: ()
 function SummaryCard({ item }: { item: SummaryItem }) {
   return (
     <div className="rounded-xl border border-border bg-muted/20 p-4">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Foreclosure Intake</h1> <span title="Process distressed property leads through foreclosure workflow. Track notice of default, auction dates, and investor pipeline." aria-label="About this section: Process distressed property leads through foreclosure workflow. Track notice of default, auction dates, and investor pipeline." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">

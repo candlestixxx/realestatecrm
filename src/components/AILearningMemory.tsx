@@ -61,6 +61,7 @@ export default function AILearningMemory() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">AI Memory</h1> <span title="Control what the AI remembers, learning preferences, and data retention. Export or delete your AI data." aria-label="About this section: Control what the AI remembers, learning preferences, and data retention. Export or delete your AI data." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       {/* Header */}
       <div className="border-b border-border/40 pb-4">
         <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
