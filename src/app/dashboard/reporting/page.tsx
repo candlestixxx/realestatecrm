@@ -19,7 +19,7 @@ export default function ReportingPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/reporting?workspaceId=${getClientWorkspaceSlug()}')
+    fetch('/api/reporting?workspaceId=' + getClientWorkspaceSlug())
       .then(r => r.json())
       .then(setData)
       .catch(console.error)
