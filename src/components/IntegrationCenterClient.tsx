@@ -145,6 +145,7 @@ export default function IntegrationCenterClient({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto text-foreground p-6">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Integration Center</h1> <span title="Connect third-party services including CRM systems, marketing tools, and communication platforms. Manage API keys and sync settings." aria-label="About this section: Connect third-party services including CRM systems, marketing tools, and communication platforms. Manage API keys and sync settings." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       
       {/* Banner Notice Alert */}
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">

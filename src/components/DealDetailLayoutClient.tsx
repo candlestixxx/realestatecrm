@@ -346,6 +346,7 @@ export default function DealDetailLayoutClient({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 select-none">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Deal Detail</h1> <span title="Full deal management with stage tracker, task list, requirements checklist, stakeholders, documents, and financial details." aria-label="About this section: Full deal management with stage tracker, task list, requirements checklist, stakeholders, documents, and financial details." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       
       {/* Top Header: back to pipeline link */}
       <div className="flex items-center justify-between gap-4 py-2 px-4 bg-card/60 border border-border/60 rounded-xl">
