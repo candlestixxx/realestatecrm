@@ -142,6 +142,15 @@
 - [x] Partner field names in `partner-permissions` GET (companyName/contactName not name/company)
 - [x] Avatar speak validation (text required → 400 not 500)
 
+### UI Condensation (2026-10-06, v0.58.0)
+- [x] Condensed `marketing/text-codes` into `/dashboard/marketing` (extracted `TextCodes` component)
+- [x] Condensed `websites/builder` into `/dashboard/websites` (extracted `WebsiteBuilder` component)
+- [x] Subpages redirect to parent for bookmarks
+- [x] Settings already tabbed (6 domains via `SettingsTabs`)
+- [x] `reporting/analytics` already redirects to `reporting`
+- [x] Workflows subpages are redirect wrappers to `/workflows/*`
+- [x] CommandPalette 10 quick-navigation shortcuts (Cmd+K)
+
 ### Bug Fixes Found & Applied (2026-10-06)
 - [x] Template literal bug in data-quality/page.tsx (single-quoted fetch URL)
 - [x] Template literal bug in leaderboard/page.tsx (single-quoted fetch URL)
