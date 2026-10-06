@@ -231,6 +231,44 @@ const VIDEOS: VideoTopic[] = [
       '📢 [Group] Created group "Deal #45 — Closing Team" with 4 members.',
       '✅ [Sync] Chat history synced and saved to workspace.'
     ]
+  },
+  {
+    id: 'ai-qualification',
+    title: 'AI Lead Qualification & Scoring',
+    category: 'AI Features',
+    description: 'Let AI score and grade your leads automatically based on engagement, fit, and behavior signals.',
+    steps: [
+      'Open any lead and go to the Searches tab.',
+      'Click "Qualify Lead" in the AI Qualification panel to run AI analysis.',
+      'Review the letter grade (A-F), score out of 100, and factor breakdown.',
+      'Use the Lead Score widget alongside for predictive conversion probability.',
+      'Follow the recommendations list to improve lead conversion.'
+    ],
+    simulationLogs: [
+      '🤖 [AI] Running lead qualification for "Sarah Johnson"...',
+      '📊 [Score] Score: 82/100 — Grade: A',
+      '💡 [Factors] High engagement (3 website visits), matches buyer profile.',
+      '✅ [Recommend] Schedule showing within 48 hours for best conversion.'
+    ]
+  },
+  {
+    id: 'routing',
+    title: 'Lead Routing Rules',
+    category: 'Automation',
+    description: 'Automatically assign incoming leads to agents based on rules like source, location, or price range.',
+    steps: [
+      'Go to Settings and open the "Lead Routing" tab.',
+      'Click "Create Rule" and name your routing rule.',
+      'Set the source filter (e.g., Zillow, Realtor.com, website).',
+      'Enter agent IDs to receive matching leads (comma-separated).',
+      'Toggle the rule active — new leads will auto-assign immediately.'
+    ],
+    simulationLogs: [
+      '⚙️ [Rule] Created routing rule "Zillow Westside".',
+      '🎯 [Match] New lead from Zillow matched rule — assigning to Agent #4.',
+      '📧 [Notify] Agent #4 notified of new lead assignment.',
+      '✅ [Done] Lead auto-assigned in 0.3s.'
+    ]
   }
 ];
 
