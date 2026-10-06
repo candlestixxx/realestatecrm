@@ -109,6 +109,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'action and userId required' }, { status: 400 });
   }
 
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
   const points = POINTS[action] || 2;
 
   await prisma.activity.create({
