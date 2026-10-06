@@ -708,9 +708,17 @@ export default function DealDetailLayoutClient({
                             Sign Document
                           </button>
                         )}
-                        <button 
-                          onClick={() => {
-                            toast.success(`Mock Upload: Document "${doc.title}" uploaded!`);
+                        <button
+                          onClick={async () => {
+                            try {
+                              const res = await fetch('/api/uploads', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ filename: doc.title, contentType: 'application/pdf', dealId: deal.id }),
+                              });
+                              if (res.ok) toast.success(`Document "${doc.title}" upload initialized`);
+                              else toast.error('Upload failed — check AWS S3 configuration');
+                            } catch { toast.error('Network error'); }
                             handleToggleDocStatus(doc.id, 'IN_PROGRESS', doc.signed);
                           }}
                           className="px-3 py-1.5 bg-muted border border-border rounded-lg text-xs font-bold hover:text-foreground cursor-pointer"
