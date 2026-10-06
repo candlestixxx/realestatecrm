@@ -1,3 +1,16 @@
+## [0.57.8] - 2026-10-06
+
+### Added
+- Deal Requirements + Stakeholders tabs in deal detail page (wired to new APIs)
+- Loading/error states for 9 new pages from remote (avatar, canva, chat, client-portal, contracts, imports, objections, property-data, vault)
+- Sidebar nav entries for Team Chat, Contracts, Document Vault
+- 7 new REST APIs: AuditLog, VoiceSettings, SearchAlert, WorkflowSession, PartnerPermission, DealRequirements, DealStakeholders
+
+### Changed
+- Audit API rewritten to use proper AuditLog model (was Activity JSON blobs)
+- Archived one-off scan/fix scripts to scripts/archive/
+
+
 ## [0.57.7] - 2026-10-06
 
 ### Added
