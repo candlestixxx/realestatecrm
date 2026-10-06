@@ -3,6 +3,9 @@
 ### Added
 - Empty states for pipeline-trigger, agent-site-chat, analytics, SEO blog, landing pages, workflow screen components
 
+### Fixed
+- Error boundaries + loading states for `deals/[id]` and `leads/[id]` detail pages — prevents 404 on layout crashes
+
 
 ## [0.58.3] - 2026-10-06
 
