@@ -1,3 +1,12 @@
+## [0.58.7] - 2026-10-06
+
+### Fixed
+- WorkflowStudio tooltip moved from SummaryCard to main title (dynamic per workflow type)
+
+### Added
+- Tooltip markers on workflow studio, AI models, email, MCP, AI memory, segments components
+
+
 ## [0.58.6] - 2026-10-06
 
 ### Fixed
