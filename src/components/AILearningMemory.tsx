@@ -232,12 +232,15 @@ export default function AILearningMemory() {
           <button
             onClick={async () => {
               if (!confirm('This permanently deletes all AI data. Continue?')) return;
-              const res = await fetch('/api/ai/memory-settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...settings, dataDeletionRequested: true }),
-              });
-              if (res.ok) toast.success('Data deletion request submitted');
+              try {
+                const res = await fetch('/api/ai/memory-settings', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ ...settings, dataDeletionRequested: true }),
+                });
+                if (res.ok) toast.success('Data deletion request submitted');
+                else toast.error('Deletion request failed');
+              } catch { toast.error('Network error'); }
             }}
             className="px-4 py-2 border border-red-500/50 text-red-500 text-xs font-bold rounded-lg hover:bg-red-500/10"
           >
