@@ -99,18 +99,21 @@
 - legacyleads: CLEAN (needs tsx global, SWC reinstall, lucide-react)
 
 ### What Isnt Working / Could Be Better
-1. **contentplanner/legacyleads/foreclosure submodule builds** not yet run in CI - build on demand
-2. **System tray** (scripts/system-tray.ps1) has Start/Stop/Restart/Quit but untested with running services
-3. **Live Audio WebSocket** on 8090 - root returns 404 (expected for WS, but no HTTP health endpoint)
+1. ~~contentplanner/legacyleads/foreclosure submodule builds not yet run in CI~~ — CI matrix expanded to all 5 submodules (v0.58.14)
+2. ~~System tray untested with running services~~ — tested, Start/Stop/Restart/Quit all verified (v0.58.x)
+3. ~~Live Audio WebSocket no HTTP health endpoint~~ — `/health` endpoint returns `{"status":"ok","activeCalls":N}` (verified 200)
 4. **Marketing/media workflows** at /workflows/* are outside /dashboard/* routes - not in unified CommandCenter section rail
 5. **3 deprecated GitHub repos** still need manual archiving (aicrm, realestateleadcaller, realestateprototype)
 
 ### Next Steps
-1. Test system tray against running services
-2. Add health check endpoint to live-audio-server
-3. Move /workflows/* pages into dashboard routes or add to CommandCenter
-4. Set up CI builds for all submodules
+1. ~~Test system tray against running services~~ — DONE (v0.58.x)
+2. ~~Add health check endpoint to live-audio-server~~ — DONE (`/health` verified)
+3. ~~Move /workflows/* pages into dashboard routes or add to CommandCenter~~ — DONE (redirect wrappers + CommandCenter)
+4. ~~Set up CI builds for all submodules~~ — DONE (all 5 in matrix, v0.58.14)
 5. Wire contentplanner/legacyleads APIs to main CRM for unified data
+6. Wire real API keys (needs user input)
+7. Production deploy (see DEPLOY.md)
+8. Archive deprecated GitHub repos (manual GitHub UI action)
 
 ---
 ﻿# HANDOFF.md — Multi-Agent Session Handoff
