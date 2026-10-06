@@ -1,3 +1,12 @@
+## [0.58.3] - 2026-10-06
+
+### Added
+- Tooltip markers on campaigns, integrations, websites, settings, lead-detail, deal-detail components
+- Tooltip markers on chat, vault, calendar, voice-settings pages
+- Header + tooltip for Team Chat and Document Vault pages
+- Total tooltip coverage: 33+ dashboard pages and components
+
+
 ## [0.58.2] - 2026-10-06
 
 ### Added
