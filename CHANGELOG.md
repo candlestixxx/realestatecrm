@@ -1,3 +1,11 @@
+## [0.55.3] - 2026-06-10
+
+### System Tray Fix & Navigation Improvements
+- **System tray foreclosure fix**: Added NODE_ENV=production, PORT=3002, NEXTAUTH_SECRET, NEXTAUTH_URL to startup command. Previously would fail with NO_SECRET or port collision.
+- **SidebarNav additions**: Listing Entry and Offer Draft wizard pages now accessible from Automation group.
+- **Merged remote P2025 fixes**: PATCH/DELETE return 404 on non-existent IDs in listings/offers/partners/referrals.
+- **Redis install attempted**: Memurai/Chocolatey install failed (MSI error 1603, timeout). Portable Redis download timed out. media-workflow gracefully degrades without Redis.
+
 ## [0.55.1] - 2026-06-10
 
 ### Script Cleanup, Bug Fixes & Full Service Verification

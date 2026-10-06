@@ -1,3 +1,10 @@
+## v0.55.3 - System Tray Fix
+
+**Key discovery**: System tray foreclosure config was broken - started with plain node server.js without NEXTAUTH_SECRET or PORT=3002. This would fail with NO_SECRET crash or port collision with Main CRM. Fixed to use start-3002.js wrapper with full env vars.
+
+**Redis installation blocked**: Memurai MSI failed (1603), Chocolatey timed out, GitHub download timed out. media-workflow drops MessageBroker payloads gracefully. Consider installing Redis manually or using Docker.
+
+**Repeated issue**: Remote merges keep re-adding apps/aicrm as a gitlink. Must git rm --cached apps/aicrm after every merge.
 
 ## v0.55.2 Build Process Improvements
 

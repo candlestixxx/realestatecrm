@@ -178,6 +178,16 @@ const GROUPS: NavGroup[] = [
         tooltip: 'State-machine wizards for deals, foreclosures, listing entry, offers.',
       },
       {
+        label: 'Listing Entry',
+        href: '/workflows/listing-entry',
+        tooltip: 'Step-by-step MLS listing creation wizard with photo upload and validation.',
+      },
+      {
+        label: 'Offer Draft',
+        href: '/workflows/offer-draft',
+        tooltip: 'Purchase agreement generator with e-sign routing and compliance checks.',
+      },
+      {
         label: 'Agent Studio',
         href: '/dashboard/agent-studio',
         tooltip: 'Configure AI agents with tools, memory, and deployment targets.',

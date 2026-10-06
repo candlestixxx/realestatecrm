@@ -71,11 +71,11 @@ $Services = [ordered]@{
     'foreclosure' = @{
         Label = 'Foreclosure Workflow'
         Port = 3002
-        Cmd = 'node server.js'
+        Cmd = 'set NODE_ENV=production && set PORT=3002 && set NEXTAUTH_SECRET=dev_secret_change_me && set NEXTAUTH_URL=http://localhost:3002 && node start-3002.js'
         WorkDir = (Join-Path $Root 'apps\foreclosureworkflow')
         HealthPath = '/login'
-        Log = 'server.log'
-        ErrLog = 'server-err.log'
+        Log = 'server.out.log'
+        ErrLog = 'server.err5.log'
     }
     'contentplanner' = @{
         Label = 'Content Planner (web)'
