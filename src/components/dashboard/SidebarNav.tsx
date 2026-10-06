@@ -64,9 +64,19 @@ const GROUPS: NavGroup[] = [
         tooltip: 'Stage-tracked revenue. Open a deal for offers, docs, and workflows.',
       },
       {
+        label: 'Contracts',
+        href: '/dashboard/contracts',
+        tooltip: 'Generate, deploy, and track real-estate contracts.',
+      },
+      {
         label: 'Unified Inbox',
         href: '/dashboard/inbox',
         tooltip: 'Email, SMS, social DMs, and voice notes in one thread per contact.',
+      },
+      {
+        label: 'Team Chat',
+        href: '/dashboard/chat',
+        tooltip: 'Private and group chat for internal team communication.',
       },
     ],
   },
@@ -239,6 +249,11 @@ const GROUPS: NavGroup[] = [
         label: 'Sync Queue',
         href: '/dashboard/sync-queue',
         tooltip: 'Outbound sync job history with retry status and error traces.',
+      },
+      {
+        label: 'Document Vault',
+        href: '/dashboard/vault',
+        tooltip: 'Secure storage for contracts, disclosures, and client documents.',
       },
       {
         label: 'Help Center',
