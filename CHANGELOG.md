@@ -1,3 +1,11 @@
+## [0.58.2] - 2026-10-06
+
+### Added
+- Loading states for dashboard root, agent-websites, agentcore (all pages now covered)
+- Empty states for ContactTable, LeadCampaignEnrollment, LeadAutomations, LeadIntelligence
+- Tooltip markers on 17 dashboard pages (partners, listings, social, audit, leaderboard, map, agent-studio, agentcore, approvals, data-quality, deals, help-center, inbox, marketing-studio, sync-queue, tasks, workflows)
+
+
 ## [0.58.1] - 2026-10-06
 
 ### Added
