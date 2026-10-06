@@ -104,12 +104,12 @@ export default function LeadContactInfoCard({ leadId, contact, source }: LeadCon
           </span>
           <p className="font-semibold text-xs text-primary mt-1">Primary Work:</p>
           <p className="font-medium truncate text-sm">{contact.email || 'No primary email'}</p>
-          {additionalEmails.map((em, idx) => (
+          {additionalEmails.length === 0 ? <div className="text-xs text-gray-400 italic">No additional emails.</div> : (additionalEmails.map((em, idx) => (
             <div key={idx} className="mt-1.5">
               <span className="font-semibold text-[10px] text-slate-400 capitalize">{em.label}:</span>
               <p className="text-xs text-muted-foreground truncate">{em.value}</p>
             </div>
-          ))}
+          )))}
         </div>
 
         {/* Phone Numbers */}
@@ -137,7 +137,7 @@ export default function LeadContactInfoCard({ leadId, contact, source }: LeadCon
               </div>
             )}
           </div>
-          {additionalPhones.map((ph, idx) => (
+          {additionalPhones.length === 0 ? <div className="text-xs text-gray-400 italic">No additional phone numbers.</div> : (additionalPhones.map((ph, idx) => (
             <div key={idx} className="mt-2.5">
               <span className="font-semibold text-[10px] text-slate-400 capitalize">{ph.label}:</span>
               <div className="flex items-center gap-2 mt-0.5">
@@ -158,7 +158,7 @@ export default function LeadContactInfoCard({ leadId, contact, source }: LeadCon
                 </div>
               </div>
             </div>
-          ))}
+          )))}
         </div>
 
         {/* Address */}
@@ -219,14 +219,14 @@ export default function LeadContactInfoCard({ leadId, contact, source }: LeadCon
             Family Members
           </h3>
           <div className="space-y-1.5">
-            {familyMembers.map((fm, idx) => (
+            {familyMembers.length === 0 ? <div className="text-xs text-gray-400 italic">No family members added.</div> : (familyMembers.map((fm, idx) => (
               <div key={idx} className="flex justify-between items-center text-xs bg-muted/20 p-2 rounded-lg border border-border/30">
                 <span className="font-medium">{fm.name}</span>
                 <span className="text-[10px] text-muted-foreground uppercase font-bold">
                   {fm.relationship} {fm.age ? `(Age ${fm.age})` : ''}
                 </span>
               </div>
-            ))}
+            )))}
           </div>
         </div>
       )}

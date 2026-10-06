@@ -207,7 +207,7 @@ export default function IntegrationCenterClient({
           <h3 className="text-sm font-black uppercase tracking-wider text-muted-foreground">Partner Products</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredPartners.map(p => (
+            {filteredPartners.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No integrations match your filter. Try a different category.</div> : (filteredPartners.map(p => (
               <div key={p.id} className="bg-card border border-border/60 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4 hover:border-border transition-colors">
                 <div className="space-y-3.5">
                   <div className="flex justify-between items-center">
@@ -246,7 +246,7 @@ export default function IntegrationCenterClient({
                   </button>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
 
         </div>
