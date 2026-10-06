@@ -143,6 +143,6 @@
 - [ ] Redis/Memurai for media-workflow (gracefully degrades without it)
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
 - [ ] Archive deprecated GitHub repos (manual GitHub UI action)
-- [ ] Multi-channel A/B testing in leadG (email/SMS variants)
+- [x] Multi-channel A/B testing in leadG (email/SMS variants) — wired 2026-10-06
 - [ ] CI/CD pipeline for automated builds and testing
 - [ ] Live audio WebSocket monitor UI panel in dashboard
