@@ -167,3 +167,50 @@ px kill-port 3000 or change port in package.json |
 | Prisma client errors | 
 px prisma generate after schema changes |
 | NextAuth errors | Ensure NEXTAUTH_SECRET and NEXTAUTH_URL are set |
+
+## Build and Run Scripts (2026-06-10)
+
+### Build All Components
+```powershell
+# Build main CRM + all 5 submodules (pass/fail summary)
+powershell -ExecutionPolicy Bypass -File build-all.ps1
+
+# Skip npm install (faster for incremental builds)
+powershell -ExecutionPolicy Bypass -File build-all.ps1 -SkipInstall
+```
+
+### Start All Services
+```powershell
+# Start all 8 services with correct ports and env vars
+powershell -ExecutionPolicy Bypass -File start-all.ps1
+```
+
+### Check Status
+```powershell
+# Quick health check of all services
+powershell -ExecutionPolicy Bypass -File check-status.ps1
+```
+
+### System Tray (GUI)
+```powershell
+# Interactive tray with Start/Stop/Restart/Quit per service
+npm run tray
+```
+
+### Service Ports
+| Port | Service | Notes |
+|------|---------|-------|
+| 3000 | Main CRM | Next.js production |
+| 3001 | LeadG | Next.js production |
+| 3002 | Foreclosure | NODE_ENV=production, NEXTAUTH_SECRET required |
+| 3003 | ContentPlanner | npx next start |
+| 3004 | Media Workflow | Node.js dist/index.js |
+| 3005 | LegacyLeads Web | Next.js production |
+| 3006 | LegacyLeads API | npx tsx (global tsx required) |
+| 8090 | Live Audio WS | WebSocket server |
+
+### Log Locations
+- Script-managed logs: `logs/` directory at project root
+- Service-specific: `apps/*/server*.log` and `apps/*/*.err*.log` 
+- System tray logs: same service directories
+
