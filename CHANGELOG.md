@@ -1,3 +1,13 @@
+## [0.55.1] - 2026-06-10
+
+### Script Cleanup, Bug Fixes & Full Service Verification
+- **All 8 services verified running**: Main CRM (3000), LeadG (3001), Foreclosure (3002), ContentPlanner (3003), Media Workflow (3004), LegacyLeads Frontend (3005), LegacyLeads Backend (3006), Live Audio WS (8090).
+- **Foreclosure NO_SECRET fix**: NextAuth crash resolved by setting NEXTAUTH_SECRET env var at startup.
+- **CommandCenter template literal fix**: Stats fetch URL used single quotes preventing variable interpolation. Fixed to string concatenation.
+- **Script reorganization** (nondestructive): Lofty integrations to scripts/integrations/lofty/, foreclosure pipelines to scripts/pipelines/foreclosure/, deprecated scripts to scripts/archive/. Added scripts/README.md.
+- **Stale submodule cleanup**: Removed re-added gitlinks for archived repos (aicrm, leadcaller, prototype) from remote merge.
+- **Remote merge integrated**: P2002 unique constraint handling (409 responses), batch JSON parse guards (400 not 500), validation fixes across 43+ API routes.
+
 ﻿
 ## [0.55.0] - 2026-06-10
 
