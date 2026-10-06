@@ -54,6 +54,7 @@ function LeadQuickMenu({
   onRefresh: () => void;
   triggerMode?: 'more' | 'tag';
 }) {
+  const [dataLoading, setDataLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [panel, setPanel] = useState<'main' | 'assign' | 'tags' | 'smartplan' | 'ai'>(triggerMode === 'tag' ? 'tags' : 'main');
   const [tagInput, setTagInput] = useState(lead.tags || '');

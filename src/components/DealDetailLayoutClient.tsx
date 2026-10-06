@@ -64,6 +64,7 @@ export default function DealDetailLayoutClient({
   addActivityAction: (formData: FormData) => Promise<any>;
 }) {
   const router = useRouter();
+  const [dataLoading, setDataLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
   // Active Tab
@@ -75,11 +76,11 @@ export default function DealDetailLayoutClient({
     fetch('/api/deal-requirements?dealId=' + deal.id)
       .then(r => r.json())
       .then(d => setRequirements(d.requirements || []))
-      .catch(() => {});
+      .catch(() => {}).finally(() => setDataLoading(false));
     fetch('/api/deal-stakeholders?dealId=' + deal.id)
       .then(r => r.json())
       .then(d => setStakeholders(d.stakeholders || []))
-      .catch(() => {});
+      .catch(() => {}).finally(() => setDataLoading(false));
   }, [deal.id]);
 
   // Interactive stages list
