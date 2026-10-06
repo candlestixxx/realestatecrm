@@ -19,6 +19,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'fileName and contentType required' }, { status: 400 });
   }
 
+  if (leadId) {
+    const lead = await prisma.lead.findUnique({ where: { id: leadId } });
+    if (!lead) return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
+  }
+  if (contactId) {
+    const contact = await prisma.contact.findUnique({ where: { id: contactId } });
+    if (!contact) return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
+  }
+
   const AWS_BUCKET = process.env.AWS_S3_BUCKET;
   const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
   const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID;
