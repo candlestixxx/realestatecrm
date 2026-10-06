@@ -1,3 +1,14 @@
+## [0.57.6] - 2026-10-06
+
+### UI Page Completion + Error Boundaries + Layout Hardening
+- **Root cause of dashboard 404s**: `requireWorkspaceAccess` in dashboard layout was uncaught — threw WorkspaceAccessError which crashed the layout. Pages with `error.tsx` recovered; pages without returned 404.
+- **Layout fix**: wrapped `requireWorkspaceAccess` + workspace query in try/catch — layout never crashes from access errors.
+- **New parent hub pages**: `marketing/page.tsx` (SMS text codes hub), `websites/page.tsx` (site builder hub) — sidebar links now resolve.
+- **28 error.tsx + loading.tsx files** added for 14 dashboard directories missing them: marketing, websites, text-codes, builder, reporting/analytics, settings/{ai-models,email,integrations,mcp,voice}, workflows/{foreclosure-intake,listing-entry,marketing-media,offer-draft}.
+- **AICRM contacts list page** (`apps/aicrm/src/app/contacts/page.tsx`): search, quick-create, detail navigation — main entry to contacts module.
+- **MediaWorkflow webhook/crm graceful degradation**: returns 202 with `queued:false` when Redis/MessageBroker unavailable (was 500).
+- **94/94 UI pages GREEN** across all 6 services (39 Root + 6 AICRM + 14 Foreclosure + 12 LeadCaller + 17 LeadG + 6 LegacyLeads).
+
 ## [0.55.4] - 2026-06-10
 
 ### Dashboard Route Consolidation
