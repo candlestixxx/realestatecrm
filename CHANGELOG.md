@@ -1,3 +1,9 @@
+## [0.58.12] - 2026-10-06
+
+### Added
+- Empty states for LeadScoreWidget factors and recommendations
+
+
 ## [0.58.11] - 2026-10-06
 
 ### Added
