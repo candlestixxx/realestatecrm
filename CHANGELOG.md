@@ -1,3 +1,16 @@
+## [0.57.9] - 2026-10-06
+
+### Added
+- Editable partner permission toggles in partners page (wired to PartnerPermission API)
+- CRM restarted with latest build for new routes
+
+### Verified
+- All 8 services healthy
+- E2E smoke: 21/21 pass
+- Zero template literal bugs across all submodules
+- All Prisma models confirmed in use (scan false positives resolved)
+
+
 ## [0.57.8] - 2026-10-06
 
 ### Added
