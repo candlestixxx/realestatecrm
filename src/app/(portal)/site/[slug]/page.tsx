@@ -1,10 +1,34 @@
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import prisma from '@/lib/prisma';
 import LandingPagePortalClient from '@/components/websites/LandingPagePortalClient';
+import ShareWidget from '@/components/ShareWidget';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+// Dynamic OG metadata per landing page — shared links render with
+// the page title and a rich preview on Facebook/LinkedIn/X.
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const { slug } = await props.params;
+  const landingPage = await prisma.landingPage.findUnique({ where: { slug }, select: { title: true, blocks: true } });
+  if (!landingPage) return { title: 'Page Not Found' };
+  return {
+    title: landingPage.title,
+    description: 'Excel Legacy Realty Group - ' + landingPage.title,
+    openGraph: {
+      title: landingPage.title,
+      description: 'Excel Legacy Realty Group - ' + landingPage.title,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: landingPage.title,
+      description: 'Excel Legacy Realty Group - ' + landingPage.title,
+    },
+  };
+}
 
 export default async function PublicLandingPage(props: PageProps) {
   const resolvedParams = await props.params;
@@ -115,6 +139,14 @@ export default async function PublicLandingPage(props: PageProps) {
         blocksJson={landingPage.blocks}
         workspaceId={landingPage.workspaceId}
       />
+      {/* Social share bar — drives organic traffic from shared links */}
+      <div className="max-w-4xl mx-auto px-4 py-4">
+        <ShareWidget
+          url={(process.env.NEXT_PUBLIC_APP_URL || '') + '/site/' + slug}
+          title={landingPage.title}
+          description={''}
+        />
+      </div>
     </>
   );
 }
