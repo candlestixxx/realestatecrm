@@ -85,6 +85,10 @@ export async function POST(request: NextRequest) {
   }
 
   if (action === 'speak') {
+    // Validate text before using .length — undefined text crashes with 500
+    if (!text || typeof text !== 'string') {
+      return NextResponse.json({ error: 'text is required for speak action' }, { status: 400 });
+    }
     // Send text to avatar for lip-sync
     return NextResponse.json({
       status: 'speaking',
