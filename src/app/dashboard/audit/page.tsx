@@ -43,7 +43,7 @@ export default function AuditPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Audit Trail</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Audit Trail <span title="Track all user actions and system events. Filter by action type, user, entity, and date range." aria-label="About this section: Track all user actions and system events. Filter by action type, user, entity, and date range." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
 
       {/* Filters */}
       <div className="flex gap-3 mb-6">

@@ -67,7 +67,7 @@ export default function LeadMapPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Lead Map</h1>
+          <h1 className="text-2xl font-bold text-foreground">Lead Map <span title="Visualize lead locations on an interactive map. Cluster markers by proximity and filter by lead status." aria-label="About this section: Visualize lead locations on an interactive map. Cluster markers by proximity and filter by lead status." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-sm text-muted-foreground mt-1">
             Geographic view of your leads with status and contact info.
           </p>

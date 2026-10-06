@@ -32,7 +32,7 @@ export default function LeaderboardPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Agent Leaderboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Agent Leaderboard <span title="Compare agent performance metrics including leads converted, deals closed, and revenue generated." aria-label="About this section: Compare agent performance metrics including leads converted, deals closed, and revenue generated." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
         <div className="flex gap-2">
           {['all', 'month', 'week'].map(p => (
             <button key={p} onClick={() => setPeriod(p)}

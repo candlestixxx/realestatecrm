@@ -93,7 +93,7 @@ export default function PartnersPage() {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Partner Network</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Partner Network <span title="Manage mortgage, title, insurance, and inspection partners. Track referrals, commissions, and permission levels for each partner." aria-label="About this section: Manage mortgage, title, insurance, and inspection partners. Track referrals, commissions, and permission levels for each partner." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
         <div className="flex gap-2">
           <button onClick={() => setShowReferralForm(true)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">+ Referral</button>
           <button onClick={() => setShowAddForm(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">+ Partner</button>

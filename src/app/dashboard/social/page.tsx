@@ -80,7 +80,7 @@ export default function SocialConnectionsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Social Connections</h1>
+        <h1 className="text-2xl font-bold text-foreground">Social Connections <span title="Connect social media accounts for automated content publishing. Manage Facebook, Instagram, LinkedIn, and Twitter/X." aria-label="About this section: Connect social media accounts for automated content publishing. Manage Facebook, Instagram, LinkedIn, and Twitter/X." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
         <p className="text-sm text-muted-foreground mt-1">
           Connect your social media accounts for unified publishing and inbox management.
         </p>
