@@ -116,3 +116,24 @@ All 10 feature branches across 5 submodules have been reverse-merged with latest
 - **Gemini**: Speed, bulk refactoring, massive context
 - **Claude**: UI/UX, documentation, deep feature execution
 - **GPT**: Architecture, systemic debugging, type enforcement
+
+
+## Session 2026-10-06 v0.57.5 — Continuous Autonomous Execution
+
+### Done
+- Analytics Studio consolidated into Reporting (removed separate route, unified tab)
+- Template literal bugs fixed in 3 files: data-quality, leaderboard, websites/builder
+  (single-quoted fetch URLs with dollar-brace expressions were NOT interpolating)
+- Help Center expanded from 4 to 10 topics: deals, workflows, reporting, voice, social, foreclosure
+- Marketing Studio hub verified — links all marketing tools including SMS Text Codes and Website Builder
+- Settings already consolidated via SettingsTabs (5 subpages tabbed into one surface)
+
+### Key Lesson
+- Single-quoted strings NEVER interpolate dollar-brace expressions in JS/TS.
+  fetch('/api/x?id=' + var) is correct; fetch('/api/x?id=${var}') is a bug.
+  This pattern appeared in 4 separate files — always scan after Write tool usage.
+
+### Remaining
+- Redis for media-workflow (gracefully degrades without it)
+- 3 deprecated GitHub repos need manual archiving (aicrm, realestateleadcaller, realestateprototype)
+- Multi-channel A/B testing in leadG not yet wired

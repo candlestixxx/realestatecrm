@@ -35,7 +35,7 @@ export default function WebsiteBuilderPage() {
   const [preview, setPreview] = useState(false);
 
   useEffect(() => {
-    fetch('/api/websites?workspaceId=${getClientWorkspaceSlug()}')
+    fetch('/api/websites?workspaceId=' + getClientWorkspaceSlug())
       .then(r => r.json())
       .then(setSites)
       .catch(console.error);

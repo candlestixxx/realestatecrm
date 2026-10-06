@@ -103,7 +103,7 @@ const GROUPS: NavGroup[] = [
       },
       {
         label: 'Media Studio',
-        href: '/workflows/marketing-media',
+        href: '/dashboard/workflows/marketing-media',
         tooltip: 'Photo → storyboard → AI promo video pipeline.',
       },
       {
@@ -130,7 +130,7 @@ const GROUPS: NavGroup[] = [
       },
       {
         label: 'Foreclosures',
-        href: '/workflows/foreclosure-intake',
+        href: '/dashboard/workflows/foreclosure-intake',
         tooltip: 'Macomb/Bay County foreclosure monitoring with tax-assessor prefill.',
       },
       {
@@ -146,14 +146,9 @@ const GROUPS: NavGroup[] = [
     tooltip: 'Analytics, scoring, gamification, and compliance.',
     links: [
       {
-        label: 'Reporting',
+        label: 'Reporting & Analytics',
         href: '/dashboard/reporting',
-        tooltip: 'Lead/deal/listing/partner analytics with stage-value breakdowns.',
-      },
-      {
-        label: 'Analytics Studio',
-        href: '/dashboard/reporting/analytics',
-        tooltip: 'Funnel drop-off, source attribution, and conversion cohorts.',
+        tooltip: 'Lead/deal/listing/partner analytics with bar charts and compact stats. Tabs for Overview and Quick Stats.',
       },
       {
         label: 'Leaderboard',
@@ -179,12 +174,12 @@ const GROUPS: NavGroup[] = [
       },
       {
         label: 'Listing Entry',
-        href: '/workflows/listing-entry',
+        href: '/dashboard/workflows/listing-entry',
         tooltip: 'Step-by-step MLS listing creation wizard with photo upload and validation.',
       },
       {
         label: 'Offer Draft',
-        href: '/workflows/offer-draft',
+        href: '/dashboard/workflows/offer-draft',
         tooltip: 'Purchase agreement generator with e-sign routing and compliance checks.',
       },
       {

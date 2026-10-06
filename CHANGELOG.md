@@ -1,3 +1,10 @@
+## [0.55.4] - 2026-06-10
+
+### Dashboard Route Consolidation
+- **Unified workflow routes**: foreclosure-intake, listing-entry, offer-draft, marketing-media now accessible under /dashboard/workflows/ via redirect wrappers. Original /workflows/* routes preserved.
+- **SidebarNav + CommandCenter**: all workflow wizard links now use unified /dashboard/workflows/ paths.
+- **Full dashboard navigation tree**: every page in the product is now reachable from within /dashboard/.
+
 ## [0.55.3] - 2026-06-10
 
 ### System Tray Fix & Navigation Improvements

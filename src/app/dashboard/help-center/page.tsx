@@ -87,8 +87,118 @@ const VIDEOS: VideoTopic[] = [
       '✉️ [Reply] Sending reply: "Thanks for inquiring! View list price & photos: http://localhost:3000/portal/site/8485-sherman"',
       '📈 [Analytics] SMS Code "8485SHERMAN" total hits updated to 15.'
     ]
+  },
+  {
+    id: 'deals',
+    title: 'Deal Pipeline & Transaction Management',
+    category: 'Sales Pipeline',
+    description: 'Track deals from lead to close with stage-based pipeline, offer management, and timeline activity logging.',
+    steps: [
+      'Navigate to Deals to see your pipeline board with stage columns.',
+      'Click any deal to open the detail view with full timeline and activity history.',
+      'Use the Offer Draft workflow to generate purchase agreements from deal data.',
+      'Move deals between stages by dragging or using the stage selector.'
+    ],
+    simulationLogs: [
+      '📋 [Pipeline] Deal "8485 Sherman Ave" moved from "Active" to "Under Contract".',
+      '📝 [Activity] Logged Note: "Buyer accepted counter-offer at $285,000".',
+      '📄 [Document] Generated Purchase Agreement draft for review.',
+      '✅ [Task] Created closing checklist task: "Order title search" (Due: Fri).'
+    ]
+  },
+  {
+    id: 'workflows',
+    title: 'Guided Workflows & Wizards',
+    category: 'Automation',
+    description: 'Step-by-step wizards for listing entry, offer drafting, foreclosure intake, and marketing media creation.',
+    steps: [
+      'Go to Workflows and select a wizard (Listing Entry, Offer Draft, Foreclosure Intake).',
+      'Follow the guided steps with validation at each stage.',
+      'Save progress at any step — wizards persist state across sessions.',
+      'Complete the wizard to auto-create CRM records and trigger follow-up actions.'
+    ],
+    simulationLogs: [
+      '🧙 [Wizard] Started "Listing Entry" workflow for 8485 Sherman Ave.',
+      '✅ [Validation] Property details validated: 3bd/2ba, 1,450 sqft.',
+      '📸 [Media] Upload slot ready for property photos (drag & drop).',
+      '🔄 [CRM Sync] Listing record created and synced to pipeline.'
+    ]
+  },
+  {
+    id: 'reporting',
+    title: 'Reporting & Analytics Studio',
+    category: 'Intelligence',
+    description: 'Real-time dashboards for pipeline health, campaign ROI, team performance, and custom report builder.',
+    steps: [
+      'Open Reporting to see the unified analytics dashboard.',
+      'Use date range filters to analyze trends over specific periods.',
+      'Export reports as CSV/PDF for stakeholder presentations.',
+      'Set up automated weekly report delivery via email.'
+    ],
+    simulationLogs: [
+      '📊 [Analytics] Computing metrics for period: Last 30 days.',
+      '📈 [Report] Pipeline value: $2.4M across 18 active deals.',
+      '💰 [ROI] Campaign "Expired Outreach" generated 12 leads at $8.33/lead.',
+      '📧 [Delivery] Scheduled weekly report to team@excellegacy.com.'
+    ]
+  },
+  {
+    id: 'voice',
+    title: 'AI Voice Agent & Live Calls',
+    category: 'AI & Automation',
+    description: 'AI-powered voice agent for inbound/outbound calls, lead qualification, appointment setting, and live audio monitoring.',
+    steps: [
+      'Configure voice agent scripts and qualification criteria in Settings > Voice.',
+      'Assign the agent to inbound lead phone numbers for auto-answering.',
+      'Monitor live calls in real-time with the Live Audio dashboard.',
+      'Review call transcripts and AI qualification scores on lead timelines.'
+    ],
+    simulationLogs: [
+      '📞 [Voice] Incoming call from +1 (586) 555-0142 — AI agent answering.',
+      '🤖 [Qualify] "Are you still looking to sell your property?" — Yes.',
+      '📅 [Appointment] Scheduled showing for Saturday 2pm.',
+      '📝 [CRM] Lead qualified (Score: 85/100) and routed to agent Harry Lum.'
+    ]
+  },
+  {
+    id: 'social',
+    title: 'Social Media & Content Studio',
+    category: 'Marketing',
+    description: 'AI content generation, social scheduling, brand voice management, and multi-platform publishing.',
+    steps: [
+      'Open Marketing Studio to access the AI Content Creator.',
+      'Set up your Brand Voice profile for consistent messaging.',
+      'Generate posts with AI using property data and market trends.',
+      'Schedule posts across Facebook, Instagram, LinkedIn, and Google Business.'
+    ],
+    simulationLogs: [
+      '✨ [AI] Generating post for "8485 Sherman Ave" using brand voice "Luxury Metro".',
+      '📝 [Content] Created: "Just listed! Stunning 3bd in prime location..." (247 chars).',
+      '📅 [Schedule] Queued for Facebook + Instagram — Tomorrow 9:00 AM.',
+      '📊 [Analytics] Previous post reach: 1,247 impressions, 23 engagements.'
+    ]
+  },
+  {
+    id: 'foreclosure',
+    title: 'Foreclosure Monitoring & Legal Intake',
+    category: 'Properties & Data',
+    description: 'Automated foreclosure notice monitoring, legal document parsing, and distressed property lead generation.',
+    steps: [
+      'Access the Foreclosure dashboard to see newly detected notices.',
+      'Use the Foreclosure Intake wizard to parse legal notices into CRM records.',
+      'Set up monitoring alerts for specific counties or zip codes.',
+      'Track auction dates and redemption periods on the property timeline.'
+    ],
+    simulationLogs: [
+      '🔍 [Monitor] Scanning Macomb County legal notices... Found 3 new filings.',
+      '📄 [Parser] Extracted: "8485 Sherman Ave, Warren MI 48089" — Case #2024-CV-1234.',
+      '⚠️ [Alert] Auction date: 2025-03-15 | Redemption period: 6 months.',
+      '👤 [Lead] Created distressed property lead and assigned to investor pipeline.'
+    ]
   }
 ];
+
+
 
 export default function HelpCenterPage() {
   const [activeTopic, setActiveTopic] = useState<VideoTopic>(VIDEOS[0]);
