@@ -94,7 +94,7 @@
 - [x] Social Media Open Graph + share widgets
 - [ ] Load testing and bug fixing
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, BS&A, HubSpot, Salesforce)
-- [ ] E2E integration tests
+- [x] E2E integration tests (scripts/e2e-smoke.js — 21 checks)
 - [ ] Production deploy (see DEPLOY.md)
 
 ## Repository Sync Tasks (v0.55.0)
@@ -106,7 +106,7 @@
 - [x] Version bump + changelog
 - [x] Generate submodule structural map
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, BS&A, Magnific, HubSpot, Salesforce)
-- [ ] Run E2E integration tests
+- [x] Run E2E integration tests
 - [ ] Production deployment
 - [ ] Archive deprecated GitHub repos (aicrm, realestateleadcaller, realestateprototype)
 - [ ] Load testing
@@ -119,8 +119,8 @@
 - [x] Move /workflows/* pages under /dashboard/ routes for consistent navigation
 - [x] Test system tray against live running services (fixed foreclosure env vars)
 - [x] CI builds for all submodules
-- [ ] Cross-service API integration (contentplanner/legacyleads to main CRM)
-- [ ] Live audio WebSocket monitor UI panel in dashboard
+- [x] Cross-service API integration (contentplanner/legacyleads to main CRM)
+- [x] Live audio WebSocket monitor UI panel in dashboard
 
 ### Bug Fixes Found & Applied (2026-06-10)
 - [x] Template literal bug in CommandCenter stats fetch (single quotes)
@@ -129,7 +129,7 @@
 - [x] Foreclosure url.parse() deprecation (WHATWG URL API)
 - [x] Stale submodule gitlinks (aicrm, leadcaller, prototype) from remote merges
 - [ ] Redis/Memurai installation for media-workflow MessageBroker
-- [ ] CI/CD pipeline for automated builds and testing
+- [x] CI/CD pipeline for automated builds and testing
 
 ### Bug Fixes Found & Applied (2026-10-06)
 - [x] Template literal bug in data-quality/page.tsx (single-quoted fetch URL)
@@ -153,5 +153,5 @@
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
 - [ ] Archive deprecated GitHub repos (manual GitHub UI action)
 - [x] Multi-channel A/B testing in leadG (email/SMS variants) — wired 2026-10-06
-- [ ] CI/CD pipeline for automated builds and testing
-- [ ] Live audio WebSocket monitor UI panel in dashboard
+- [x] CI/CD pipeline for automated builds and testing
+- [x] Live audio WebSocket monitor UI panel in dashboard
