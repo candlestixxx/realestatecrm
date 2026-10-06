@@ -1912,7 +1912,7 @@ export default function LeadDetailLayoutClient({
                       <p className="text-xs">Establish potential pipeline values by linking a deal record.</p>
                     </div>
                   ) : (
-                    lead.contact.deals.map(deal => (
+                    (lead.contact.deals || []).length === 0 ? <p className="text-sm text-gray-400 py-2">No deals yet.</p> : lead.contact.deals.map(deal => (
                       <div key={deal.id} className="p-4 border border-border/60 rounded-xl bg-card hover:border-border transition-colors flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/15 flex items-center justify-center">
@@ -2225,7 +2225,7 @@ export default function LeadDetailLayoutClient({
                 </div>
                 
                 <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                  {quickPhones.map((ph, idx) => (
+                  {quickPhones.length === 0 ? <p className="text-xs text-gray-400 py-1">No phone numbers.</p> : quickPhones.map((ph, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <select
                         value={ph.label}
@@ -2296,7 +2296,7 @@ export default function LeadDetailLayoutClient({
                 </div>
 
                 <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                  {quickEmails.map((em, idx) => (
+                  {quickEmails.length === 0 ? <p className="text-xs text-gray-400 py-1">No email addresses.</p> : quickEmails.map((em, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <select
                         value={em.label}
