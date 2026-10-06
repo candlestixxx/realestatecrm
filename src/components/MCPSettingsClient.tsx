@@ -61,6 +61,7 @@ export default function MCPSettingsClient() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">MCP Server</h1> <span title="Expose CRM tools to MCP-compatible agents (Claude, Cursor, etc.). Control which tools external agents may invoke." aria-label="About this section: Expose CRM tools to MCP-compatible agents (Claude, Cursor, etc.). Control which tools external agents may invoke." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       <div>
         <h1 className="text-2xl font-bold text-foreground">MCP Server</h1>
         <p className="text-sm text-muted-foreground mt-1">

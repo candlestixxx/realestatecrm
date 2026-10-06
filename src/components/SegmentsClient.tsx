@@ -213,6 +213,7 @@ export default function SegmentsClient({
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Segments</h1> <span title="Create and manage lead segments for targeted campaigns. Filter by status, source, location, and behavior." aria-label="About this section: Create and manage lead segments for targeted campaigns. Filter by status, source, location, and behavior." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       {/* 1. SECTOR VIEW: SEGMENTS DASHBOARD (No active segment selected) */}
       {!selectedSegmentId && (
         <>

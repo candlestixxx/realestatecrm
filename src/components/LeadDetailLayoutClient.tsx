@@ -13,6 +13,7 @@ import {
 import LeadStatusSelector from './LeadStatusSelector';
 import LeadTagsEditor from './LeadTagsEditor';
 import SearchAlertsWidget from './SearchAlertsWidget';
+import LeadScoreWidget from './LeadScoreWidget';
 import LeadAutomationsWidget from './LeadAutomationsWidget';
 import CommunicationsHub from './CommunicationsHub';
 import { createDealAction } from '@/lib/actions/deal';
@@ -1820,7 +1821,8 @@ export default function LeadDetailLayoutClient({
 
             {/* SEARCHES TAB */}
             {activeTab === 'searches' && (
-              <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm">
+              <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm space-y-6">
+                <LeadScoreWidget leadId={lead.id} />
                 <SearchAlertsWidget leadId={lead.id} alerts={lead.searchAlerts} />
               </div>
             )}

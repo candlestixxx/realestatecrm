@@ -1,3 +1,21 @@
+## [0.58.6] - 2026-10-06
+
+### Fixed
+- LeadScoreWidget API response shape (tier, probability, recommendations[])
+
+### Verified
+- Load test 350/350 pass (p95 under 232ms)
+- All 8 services healthy
+
+
+## [0.58.5] - 2026-10-06
+
+### Added
+- LeadScoreWidget — predictive lead scoring UI in lead detail (wired to /api/scoring)
+- RoutingRulesWidget — lead routing rules management in SettingsTabs
+- Nav coverage scan + API usage scan scripts
+
+
 ## [0.58.4] - 2026-10-06
 
 ### Added

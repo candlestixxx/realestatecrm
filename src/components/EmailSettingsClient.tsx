@@ -86,6 +86,7 @@ export default function EmailSettingsClient({ initialConfig }: { initialConfig: 
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Email Settings</h1> <span title="Configure email providers, SMTP settings, templates, and signature preferences." aria-label="About this section: Configure email providers, SMTP settings, templates, and signature preferences." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Email System Integration</h1>
         <p className="text-muted-foreground">Configure SMTP, Amazon SES, or Resend to send real marketing campaigns and triggers.</p>

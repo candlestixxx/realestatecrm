@@ -78,6 +78,7 @@ export default function AIModelsSettingsClient() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">AI Model Keys</h1> <span title="Configure API keys for Gemini, OpenAI, and custom model endpoints. Set default models per agent." aria-label="About this section: Configure API keys for Gemini, OpenAI, and custom model endpoints. Set default models per agent." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       <div>
         <h1 className="text-2xl font-bold text-foreground">AI Model Keys</h1>
         <p className="text-sm text-muted-foreground mt-1">

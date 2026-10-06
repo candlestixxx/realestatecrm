@@ -10,6 +10,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import RoutingRulesWidget from '@/components/RoutingRulesWidget';
 import {
   Tooltip,
   TooltipContent,
@@ -80,6 +81,15 @@ const TABS: SettingsTab[] = [
       'Expose CRM tools to MCP-compatible agents (Claude, Cursor, etc.). Controls which tools external agents may invoke.',
     href: '/dashboard/settings/mcp',
     icon: '🧩',
+  },
+  {
+    id: 'routing',
+    label: 'Lead Routing',
+    description: 'Automatic lead assignment rules for your team.',
+    tooltip:
+      'Create rules that automatically assign incoming leads to agents based on source, segment, or other criteria.',
+    href: '#routing',
+    icon: '🔀',
   },
 ];
 
@@ -161,19 +171,27 @@ export default function SettingsTabs() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Link
-              href={current.href}
-              className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-xs font-semibold hover:bg-primary/90 transition-colors"
-            >
-              Open full {current.label} page →
-            </Link>
-            <Link
-              href={current.href + '?embed=1'}
-              className="rounded-lg border border-border px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-            >
-              View raw configuration
-            </Link>
+            {current.id !== 'routing' && (
+              <>
+                <Link
+                  href={current.href}
+                  className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-xs font-semibold hover:bg-primary/90 transition-colors"
+                >
+                  Open full {current.label} page →
+                </Link>
+                <Link
+                  href={current.href + '?embed=1'}
+                  className="rounded-lg border border-border px-4 py-2 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                >
+                  View raw configuration
+                </Link>
+              </>
+            )}
           </div>
+
+          {current.id === 'routing' && (
+            <RoutingRulesWidget />
+          )}
 
           <div className="rounded-lg border border-border/60 bg-muted/30 p-4 text-xs text-muted-foreground leading-relaxed">
             <strong className="text-foreground">Tip:</strong> changes on the full

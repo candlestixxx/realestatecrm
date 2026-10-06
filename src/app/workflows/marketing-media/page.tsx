@@ -29,7 +29,7 @@ export default async function MarketingMediaPage(props: {
           <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary mb-4">
             Marketing Studio
           </div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2">Media Pipeline</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-2">Media Pipeline <span title="Generate and process marketing media including images, videos, and social content with FFmpeg pipeline." aria-label="About this section: Generate and process marketing media including images, videos, and social content with FFmpeg pipeline." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-lg text-muted-foreground max-w-3xl font-medium">
             Generate branded property variations, assemble reels, and publish to your landing pages and social channels seamlessly.
           </p>
