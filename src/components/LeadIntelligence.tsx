@@ -92,7 +92,7 @@ export function LeadIntelligence({
               <span className="text-primary text-lg">🌐</span> Found Social Profiles
             </h3>
             <div className="space-y-2">
-              {data.socialProfiles.map((p) => (
+              {socialProfiles.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No intelligence data available yet.</div> : (data.socialProfiles.map((p) => (
                 <div key={p.platform} className="flex justify-between items-center text-sm p-2 bg-background border border-border rounded-md">
                    <div className="flex flex-col">
                       <span className="font-medium">{p.platform}</span>
@@ -100,7 +100,7 @@ export function LeadIntelligence({
                    </div>
                    <span className="text-[10px] text-muted-foreground font-medium uppercase">{p.lastSeen}</span>
                 </div>
-              ))}
+              )))}
             </div>
           </div>
 

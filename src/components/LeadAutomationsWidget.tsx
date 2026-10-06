@@ -155,7 +155,7 @@ export default function LeadAutomationsWidget({
               <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest block">Outreach Sequence Execution</span>
               
               <div className="flex flex-col gap-2 pl-3 relative border-l-2 border-primary/20 py-2">
-                {activeSteps.map((step: any, idx: number) => (
+                {activeSteps.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No automations configured yet.</div> : (activeSteps.map((step: any, idx: number) => (
                   <div key={idx} className="flex items-start gap-3 relative">
                     <span className="w-4 h-4 rounded-full bg-primary/20 border border-primary text-primary text-[8px] font-black flex items-center justify-center shrink-0 mt-0.5 -ml-[19px]">
                       {idx + 1}
@@ -174,7 +174,7 @@ export default function LeadAutomationsWidget({
                       </p>
                     </div>
                   </div>
-                ))}
+                )))}
               </div>
             </div>
           </div>

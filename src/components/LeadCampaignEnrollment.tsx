@@ -63,11 +63,11 @@ export default function LeadCampaignEnrollment({
           className="w-full sm:w-48 bg-background border border-border rounded px-3 py-1.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 appearance-none h-[34px]"
         >
           <option value="">-- Unenrolled --</option>
-          {campaigns.map((c) => (
+          {campaigns.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No campaign enrollments yet.</div> : (campaigns.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
             </option>
-          ))}
+          )))}
         </select>
         {isUpdating && (
           <span className="w-2 h-2 bg-primary rounded-full animate-ping shrink-0"></span>

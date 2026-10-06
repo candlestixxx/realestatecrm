@@ -32,9 +32,9 @@ export function ContactTableClient({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
+    if (e.target.checked) {initialContacts.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No contacts yet. Add your first contact to get started.</div> : (
       setSelectedIds(new Set(initialContacts.map((c) => c.id)));
-    } else {
+    )} else {
       setSelectedIds(new Set());
     }
   };
