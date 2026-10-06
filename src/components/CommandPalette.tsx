@@ -164,7 +164,9 @@ export function CommandPalette() {
                     </Command.Group>
                   )}
 
-                  {results.map((result) => (
+                  {results.length === 0 && debouncedText ? (
+                    <div className="px-4 py-3 text-sm text-muted-foreground">No results for &quot;{debouncedText}&quot;</div>
+                  ) : results.map((result) => (
                     <Command.Item
                       key={`${result.type}-${result.id}`}
                       value={`${result.type}-${result.id}`}

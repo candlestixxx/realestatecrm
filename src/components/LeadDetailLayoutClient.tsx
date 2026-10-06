@@ -975,7 +975,7 @@ export default function LeadDetailLayoutClient({
                   className="mt-1 w-full bg-muted/40 hover:bg-muted/60 border border-border/80 rounded-lg px-2.5 py-1.5 text-xs text-foreground font-semibold focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer"
                 >
                   <option value="">-- Choose Segment --</option>
-                  {allSegments.map(s => (
+                  {allSegments.length === 0 ? <p className="text-sm text-gray-400 py-2">No segments available.</p> : allSegments.map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
                 </select>
@@ -1046,7 +1046,7 @@ export default function LeadDetailLayoutClient({
                   ) : (
                     <span className="text-muted-foreground italic">No primary phone</span>
                   )}
-                  {secondaryPhones.map((ph, idx) => (
+                  {secondaryPhones.length === 0 ? <p className="text-sm text-gray-400 py-2">No secondary phones.</p> : secondaryPhones.map((ph, idx) => (
                     <div key={idx} className="flex items-center justify-between text-foreground">
                       <span className="flex items-center gap-1.5">
                         <Phone className="w-3.5 h-3.5 text-muted-foreground/60" /> {ph.value}
@@ -1528,7 +1528,7 @@ export default function LeadDetailLayoutClient({
                       {lead.tasks.length === 0 ? (
                         <p className="text-xs text-muted-foreground text-center py-6">No pending follow-ups or tasks.</p>
                       ) : (
-                        lead.tasks.map(task => (
+                        (lead.tasks || []).length === 0 ? <p className="text-sm text-gray-400 py-2">No tasks yet.</p> : lead.tasks.map(task => (
                           <div key={task.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-start gap-2 group">
                             <input 
                               type="checkbox" 

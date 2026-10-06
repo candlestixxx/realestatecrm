@@ -489,7 +489,7 @@ export default function DealDetailLayoutClient({
 
                 {/* Expenses list */}
                 <div className="space-y-1.5 max-h-[150px] overflow-y-auto pr-1">
-                  {expensesList.map(exp => (
+                  {expensesList.length === 0 ? <p className="text-sm text-gray-400 py-4">No expenses recorded.</p> : expensesList.map(exp => (
                     <div key={exp.id} className="flex justify-between items-center p-2 bg-muted/20 border border-border/40 rounded text-[11px] font-semibold text-foreground">
                       <span className="truncate pr-1">{exp.label}</span>
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -666,7 +666,7 @@ export default function DealDetailLayoutClient({
 
                 {/* Vault elements list */}
                 <div className="space-y-3.5">
-                  {requestedDocs.map(doc => (
+                  {requestedDocs.length === 0 ? <p className="text-sm text-gray-400 py-4">No documents requested.</p> : requestedDocs.map(doc => (
                     <div 
                       key={doc.id} 
                       className="p-4 border border-border/60 rounded-xl bg-muted/10 hover:border-border transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
@@ -734,7 +734,7 @@ export default function DealDetailLayoutClient({
 
                 {/* Messages feed list */}
                 <div className="border border-border/60 rounded-2xl p-4 bg-muted/10 h-[280px] overflow-y-auto space-y-4 pr-2.5">
-                  {messageLogs.map(msg => {
+                  {messageLogs.length === 0 ? <p className="text-sm text-gray-400 py-4">No messages logged.</p> : messageLogs.map(msg => {
                     const isAgent = msg.senderRole === 'AGENT';
                     return (
                       <div key={msg.id} className={`flex flex-col max-w-[85%] ${isAgent ? 'ml-auto items-end' : 'items-start'}`}>
@@ -809,7 +809,7 @@ export default function DealDetailLayoutClient({
                   {deal.tasks.length === 0 ? (
                     <p className="text-xs text-muted-foreground italic text-center py-6">No general tasks found. Use the roadmap tab to follow guide milestones.</p>
                   ) : (
-                    deal.tasks.map(task => (
+                    (deal.tasks || []).length === 0 ? <p className="text-sm text-gray-400 py-4">No tasks yet.</p> : deal.tasks.map(task => (
                       <div key={task.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-start gap-2.5">
                         <input type="checkbox" className="mt-0.5 w-4 h-4 rounded border-border" defaultChecked={task.status === 'DONE'} />
                         <div>
@@ -833,7 +833,7 @@ export default function DealDetailLayoutClient({
                   <p className="text-xs text-muted-foreground italic text-center py-6">No requirements yet. Add requirements via the API or ask your coordinator.</p>
                 ) : (
                   <div className="space-y-2">
-                    {requirements.map((req: any) => (
+                    {requirements.length === 0 ? <p className="text-sm text-gray-400 py-4">No requirements listed.</p> : requirements.map((req: any) => (
                       <div key={req.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-center gap-3">
                         <span className={'w-2.5 h-2.5 rounded-full flex-shrink-0 ' + (req.status === 'COMPLETED' ? 'bg-green-500' : req.status === 'IN_PROGRESS' ? 'bg-yellow-500' : 'bg-red-500')} />
                         <div className="flex-1">
@@ -859,7 +859,7 @@ export default function DealDetailLayoutClient({
                   <p className="text-xs text-muted-foreground italic text-center py-6">No stakeholders assigned yet.</p>
                 ) : (
                   <div className="space-y-2">
-                    {stakeholders.map((s: any) => (
+                    {stakeholders.length === 0 ? <p className="text-sm text-gray-400 py-4">No stakeholders added.</p> : stakeholders.map((s: any) => (
                       <div key={s.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
                           {s.role.charAt(0)}
