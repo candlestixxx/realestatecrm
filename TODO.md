@@ -116,8 +116,17 @@
 - [x] Tooltips on all feature cards and section headers
 - [x] Workflow wizard pages linked (listing-entry, offer-draft)
 - [x] Script reorganization (nondestructive archive)
-- [ ] Move /workflows/* pages under /dashboard/ routes for consistent navigation
-- [ ] Test system tray against live running services
+- [x] Move /workflows/* pages under /dashboard/ routes for consistent navigation
+- [x] Test system tray against live running services (fixed foreclosure env vars)
 - [ ] CI builds for all submodules
 - [ ] Cross-service API integration (contentplanner/legacyleads to main CRM)
 - [ ] Live audio WebSocket monitor UI panel in dashboard
+
+### Bug Fixes Found & Applied (2026-06-10)
+- [x] Template literal bug in CommandCenter stats fetch (single quotes)
+- [x] Template literal bug in reporting/page.tsx and reporting/analytics/page.tsx
+- [x] System tray foreclosure missing NEXTAUTH_SECRET/PORT env vars
+- [x] Foreclosure url.parse() deprecation (WHATWG URL API)
+- [x] Stale submodule gitlinks (aicrm, leadcaller, prototype) from remote merges
+- [ ] Redis/Memurai installation for media-workflow MessageBroker
+- [ ] CI/CD pipeline for automated builds and testing
