@@ -131,6 +131,17 @@
 - [ ] Redis/Memurai installation for media-workflow MessageBroker
 - [x] CI/CD pipeline for automated builds and testing
 
+### Bug Fixes Found & Applied (2026-10-06, v0.57.9)
+- [x] FK validation on `deal-stakeholders` POST (dealId → 404)
+- [x] FK validation on `deal-requirements` POST (dealId → 404)
+- [x] FK validation on `search-alerts` POST (leadId → 404)
+- [x] P2025 guard + FK validation on `workflow-sessions` POST (update + workspaceId/userId/leadId/dealId)
+- [x] Malformed JSON guard on `ai/memory-settings` POST
+- [x] FK validation on `voice-settings` PUT (workspaceId → 404)
+- [x] FK validation + P2025 guard on `websites` POST/PATCH
+- [x] Partner field names in `partner-permissions` GET (companyName/contactName not name/company)
+- [x] Avatar speak validation (text required → 400 not 500)
+
 ### Bug Fixes Found & Applied (2026-10-06)
 - [x] Template literal bug in data-quality/page.tsx (single-quoted fetch URL)
 - [x] Template literal bug in leaderboard/page.tsx (single-quoted fetch URL)
