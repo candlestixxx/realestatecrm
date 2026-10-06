@@ -209,12 +209,15 @@ export default function AILearningMemory() {
           </div>
           <button
             onClick={async () => {
-              const res = await fetch('/api/ai/memory-settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...settings, dataExportRequested: true }),
-              });
-              if (res.ok) toast.success('Data export request submitted');
+              try {
+                const res = await fetch('/api/ai/memory-settings', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ ...settings, dataExportRequested: true }),
+                });
+                if (res.ok) toast.success('Data export request submitted');
+                else toast.error('Export request failed');
+              } catch { toast.error('Network error'); }
             }}
             className="px-4 py-2 border border-border text-xs font-bold rounded-lg hover:bg-muted"
           >

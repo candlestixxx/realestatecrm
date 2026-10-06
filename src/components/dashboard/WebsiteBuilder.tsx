@@ -80,15 +80,19 @@ export default function WebsiteBuilder() {
   };
 
   const saveSite = async () => {
-    await fetch('/api/websites', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        slug, title,
-        content: blocks,
-        workspaceId: getClientWorkspaceSlug(),
-      }),
-    });
+    try {
+      await fetch('/api/websites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug, title,
+          content: blocks,
+          workspaceId: getClientWorkspaceSlug(),
+        }),
+      });
+    } catch (e) {
+      console.error('Save failed:', e);
+    }
   };
 
   const renderPreview = () => {
