@@ -82,12 +82,12 @@ function SectionList({ section }: { section: BulletSection }) {
     <div className="rounded-xl border border-border bg-muted/30 p-4">
       <h4 className="text-sm font-semibold text-foreground">{section.title}</h4>
       <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-        {section.items.map((item) => (
+        {items.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No workflow steps configured yet.</div> : (section.items.map((item) => (
           <li key={item} className="flex items-start gap-2">
             <span className="mt-1 inline-block h-2 w-2 rounded-full bg-secondary" />
             <span>{item}</span>
           </li>
-        ))}
+        )))}
       </ul>
     </div>
   );

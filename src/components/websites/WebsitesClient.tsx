@@ -212,6 +212,7 @@ export default function WebsitesClient({
 
   return (
     <div className="flex bg-background rounded-3xl border border-border/60 overflow-hidden min-h-[700px] text-foreground">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Agent Websites</h1> <span title="Build and manage your real estate websites with drag-and-drop blocks. Configure IDX search, landing pages, and SEO settings." aria-label="About this section: Build and manage your real estate websites with drag-and-drop blocks. Configure IDX search, landing pages, and SEO settings." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       
       {/* Left Sidebar - Google Gemini Style */}
       <aside className="w-64 bg-muted/30 border-r border-border/60 flex flex-col shrink-0">

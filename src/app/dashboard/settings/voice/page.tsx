@@ -37,7 +37,7 @@ export default async function VoiceSettingsPage() {
     <div className="max-w-4xl mx-auto space-y-8 p-6 select-none">
       <div>
         <div className="flex items-center gap-2">
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Voice & Speech Settings</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Voice & Speech Settings <span title="Configure voice agent providers, API keys, speech-to-text, text-to-speech, and call recording preferences." aria-label="About this section: Configure voice agent providers, API keys, speech-to-text, text-to-speech, and call recording preferences." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
           <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded font-bold uppercase tracking-wide">
             Automations
           </span>

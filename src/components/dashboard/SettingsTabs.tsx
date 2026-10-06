@@ -109,6 +109,7 @@ export default function SettingsTabs() {
   return (
     <TooltipProvider delayDuration={200}>
       <div className="space-y-6 max-w-5xl mx-auto">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Settings</h1> <span title="Configure AI model keys, email, voice, MCP servers, integrations, and AI memory preferences." aria-label="About this section: Configure AI model keys, email, voice, MCP servers, integrations, and AI memory preferences." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground text-sm mt-1">

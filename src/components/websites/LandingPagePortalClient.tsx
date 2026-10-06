@@ -79,7 +79,7 @@ export default function LandingPagePortalClient({
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
       {/* Visual Blocks Render */}
       <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-12 space-y-12">
-        {blocks.map((block) => {
+        {blocks.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No landing pages yet. Create one to start capturing leads.</div> : (blocks.map((block) => {
           switch (block.type) {
             case 'HEADER':
               return (
@@ -262,7 +262,7 @@ export default function LandingPagePortalClient({
             default:
               return null;
           }
-        })}
+        }))}
       </div>
 
       {/* Footer */}

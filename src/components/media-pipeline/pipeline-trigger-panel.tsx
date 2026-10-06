@@ -98,11 +98,11 @@ export function PipelineTriggerPanel({ deals, activeListingId }: PipelineTrigger
               className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-secondary"
             >
               <option value="">-- Choose a Deal --</option>
-              {deals.map((deal) => (
+              {deals.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No pipeline runs yet. Trigger a pipeline to see results.</div> : (deals.map((deal) => (
                 <option key={deal.id} value={deal.id}>
                   {deal.title}
                 </option>
-              ))}
+              )))}
               <option value="custom">-- Enter Manual Address --</option>
             </select>
           </div>

@@ -49,6 +49,7 @@ export default function VaultPage() {
 
   return (
     <div className="p-6 max-w-4xl">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Document Vault</h1> <span title="Secure document storage and sharing. Upload contracts, disclosures, inspection reports, and other transaction documents." aria-label="About this section: Secure document storage and sharing. Upload contracts, disclosures, inspection reports, and other transaction documents." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Lock className="w-6 h-6 text-primary" /> Document Vault

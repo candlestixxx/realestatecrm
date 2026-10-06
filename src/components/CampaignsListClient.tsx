@@ -265,6 +265,7 @@ export default function CampaignsListClient({
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Campaigns</h1> <span title="Create and manage email, SMS, and multi-step campaigns. Set up A/B testing, audience segments, and automated sequences." aria-label="About this section: Create and manage email, SMS, and multi-step campaigns. Set up A/B testing, audience segments, and automated sequences." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       {/* Top Header & Navigation Segment matching Lofty layout */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4 bg-background">
         <div className="flex items-center gap-4">

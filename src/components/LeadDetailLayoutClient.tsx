@@ -725,6 +725,7 @@ export default function LeadDetailLayoutClient({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Lead Detail</h1> <span title="Complete lead profile with contact info, activity timeline, campaign enrollments, search alerts, and automation history." aria-label="About this section: Complete lead profile with contact info, activity timeline, campaign enrollments, search alerts, and automation history." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
       {/* Top Breadcrumb & Prev/Next Bar */}
       <div className="flex items-center justify-between gap-4 py-1.5 px-4 bg-card/65 backdrop-blur border border-border/60 rounded-xl shadow-sm">
         <div className="flex items-center gap-4">
