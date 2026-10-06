@@ -294,7 +294,7 @@ const SECTIONS: Section[] = [
       {
         label: 'Media Studio',
         description: 'Photo import, storyboard generation, AI promo videos, FFmpeg export.',
-        href: '/workflows/marketing-media',
+        href: '/dashboard/workflows/marketing-media',
         icon: '🎬',
         tooltip: 'Property photo → storyboard → rendered promo video pipeline with brand overlay.',
       },
@@ -323,7 +323,7 @@ const SECTIONS: Section[] = [
       {
         label: 'Foreclosure Pipeline',
         description: 'Macomb/Bay County foreclosure monitoring with tax-assessor prefill.',
-        href: '/workflows/foreclosure-intake',
+        href: '/dashboard/workflows/foreclosure-intake',
         icon: '⚖️',
         tooltip:
           'Automated daily intake from legal news + BS&A/Realcomp tax data. Watchlist with equity and auction-date scoring.',
@@ -415,14 +415,14 @@ const SECTIONS: Section[] = [
       {
         label: 'Listing Entry Wizard',
         description: 'Step-by-step MLS listing creation with photo upload and status tracking.',
-        href: '/workflows/listing-entry',
+        href: '/dashboard/workflows/listing-entry',
         icon: 'L',
         tooltip: 'Guided listing entry with field validation, photo management, and MLS-ready output.',
       },
       {
         label: 'Offer Draft Wizard',
         description: 'Generate purchase agreements with e-sign and compliance checks.',
-        href: '/workflows/offer-draft',
+        href: '/dashboard/workflows/offer-draft',
         icon: 'O',
         tooltip: 'Draft offers with auto-filled terms, disclosure attachments, and e-signature routing.',
       },
