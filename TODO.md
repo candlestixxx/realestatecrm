@@ -130,3 +130,19 @@
 - [x] Stale submodule gitlinks (aicrm, leadcaller, prototype) from remote merges
 - [ ] Redis/Memurai installation for media-workflow MessageBroker
 - [ ] CI/CD pipeline for automated builds and testing
+
+### Bug Fixes Found & Applied (2026-10-06)
+- [x] Template literal bug in data-quality/page.tsx (single-quoted fetch URL)
+- [x] Template literal bug in leaderboard/page.tsx (single-quoted fetch URL)
+- [x] Template literal bug in websites/builder/page.tsx (single-quoted fetch URL)
+- [x] Help Center expanded from 4 to 10 topics covering all major features
+- [x] Analytics Studio consolidated into Reporting (unified tab)
+- [x] Full codebase scan for template literal bugs — 0 remaining
+
+### Remaining Known Issues
+- [ ] Redis/Memurai for media-workflow (gracefully degrades without it)
+- [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
+- [ ] Archive deprecated GitHub repos (manual GitHub UI action)
+- [ ] Multi-channel A/B testing in leadG (email/SMS variants)
+- [ ] CI/CD pipeline for automated builds and testing
+- [ ] Live audio WebSocket monitor UI panel in dashboard
