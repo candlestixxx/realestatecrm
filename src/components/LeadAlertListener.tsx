@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { BellRing, BellOff, Volume2, VolumeX } from 'lucide-react';
+import { BellRing, Volume2, VolumeX } from 'lucide-react';
 
 export default function LeadAlertListener() {
   const lastCheckedRef = useRef<string>(new Date().toISOString());

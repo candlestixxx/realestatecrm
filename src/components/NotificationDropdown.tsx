@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Bell, Trash2, Check, ExternalLink } from 'lucide-react';
+import { Bell, Trash2, Check } from 'lucide-react';
 import Link from 'next/link';
 import { getNotificationsAction, markNotificationReadAction, markAllNotificationsReadAction, deleteNotificationAction } from '@/lib/actions/notification';
 

@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import AddTaskModal from './AddTaskModal';
 import AddLeadModal from './AddLeadModal';
 import { bulkEnrollLeadsInCampaignAction } from '@/lib/actions/campaign';
-import { deleteLeadAction, importLeadsBulkAction, assignLeadAction, enrollLeadInSmartPlanAction, updateLeadTagsAction, bulkUpdateLeadTagsAction, bulkAssignLeadAction } from '@/lib/actions/lead';
+import { deleteLeadAction, assignLeadAction, enrollLeadInSmartPlanAction, updateLeadTagsAction, bulkUpdateLeadTagsAction, bulkAssignLeadAction } from '@/lib/actions/lead';
 import { addLeadsToSegmentBulkAction } from '@/lib/actions/segment';
 
 type LeadRow = {

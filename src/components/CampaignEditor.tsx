@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { updateCampaignStepsAction, toggleCampaignStatusAction } from '@/lib/actions/campaign';
 import toast from 'react-hot-toast';
-import { Eye, MessageSquare, UserCheck, BarChart3, List, Settings, Play, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Settings } from 'lucide-react';
 
 type DelayUnit = 'SECOND' | 'MINUTE' | 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
 

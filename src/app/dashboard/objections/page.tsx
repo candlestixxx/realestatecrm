@@ -3,7 +3,7 @@
 // API: /api/objections (GET/POST objection scenarios and responses).
 
 import { useState, useEffect } from 'react';
-import { ShieldQuestion, Plus, Loader2, Info, MessageSquare } from 'lucide-react';
+import { ShieldQuestion, Loader2, Info, MessageSquare } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function ObjectionsPage() {

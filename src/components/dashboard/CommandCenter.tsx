@@ -22,7 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
+import { getClientWorkspaceSlug } from '@/lib/workspace-client';
 import LiveAudioMonitor from '@/components/LiveAudioMonitor';
 import ServiceHealthGrid from '@/components/ServiceHealthGrid';
 

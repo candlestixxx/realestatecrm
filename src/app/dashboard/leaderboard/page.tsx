@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
+import { getClientWorkspaceSlug } from '@/lib/workspace-client';
 
 interface LeaderboardEntry {
   userId: string;

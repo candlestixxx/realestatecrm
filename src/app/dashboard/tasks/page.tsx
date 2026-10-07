@@ -6,7 +6,7 @@ import type { Prisma } from '@prisma/client';
 import AddTaskModal from '@/components/AddTaskModal';
 import { addTaskAction } from '@/lib/actions/task';
 import Link from 'next/link';
-import { AppRole, isAtLeastRole } from '@/lib/permissions';
+import {} from '@/lib/permissions';
 
 export default async function TasksPage(props: {
   searchParams?: Promise<{ status?: string; q?: string; page?: string }>;

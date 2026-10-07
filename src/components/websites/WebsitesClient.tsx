@@ -8,7 +8,7 @@ import AICreatorTab from './AICreatorTab';
 import AnalyticsTab from './AnalyticsTab';
 import SEOBlogTab from './SEOBlogTab';
 import SocialAgentTab from './SocialAgentTab';
-import { Plus, Search, ChevronRight, LayoutGrid, Sparkles, BarChart3, Settings, Globe, FileText, ArrowLeft, Trash, Copy, BookOpen, Share2 } from 'lucide-react';
+import { Plus, Search, ChevronRight, LayoutGrid, Sparkles, BarChart3, Globe, Trash, Copy, BookOpen, Share2 } from 'lucide-react';
 
 type LandingPageBlock = {
   id: string;

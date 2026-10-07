@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
+import { withWorkspace } from '@/lib/workspace-client';
 
 interface AuditEntry {
   id: string;

@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getClientWorkspaceSlug } from '@/lib/workspace-client';
-import { Globe, Wrench, Eye, Edit3, Save, Plus, ArrowUp, ArrowDown, X } from 'lucide-react';
+import { Globe, Eye, Edit3, Save, ArrowUp, ArrowDown, X } from 'lucide-react';
 
 interface Site {
   id: string;

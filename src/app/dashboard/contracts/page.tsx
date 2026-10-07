@@ -3,7 +3,7 @@
 // API: /api/contracts (POST with template.type, parties, action).
 
 import { useState } from 'react';
-import { FileSignature, Plus, Loader2, Info } from 'lucide-react';
+import { FileSignature, Loader2, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const TEMPLATES = [

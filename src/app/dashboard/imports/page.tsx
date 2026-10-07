@@ -4,7 +4,7 @@
 
 import { useState, useRef } from 'react';
 import { Upload, FileSpreadsheet, CheckCircle, Loader2, Info } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function ImportsPage() {
   const [uploading, setUploading] = useState(false);

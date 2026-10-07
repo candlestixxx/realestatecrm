@@ -13,7 +13,7 @@ import { syncContactToVectorStore, syncLeadToVectorStore } from '@/lib/rag';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
 import AddLeadModal from '@/components/AddLeadModal';
-import { MyPlusImportModal } from '@/components/MyPlusImportModal';
+import {} from '@/components/MyPlusImportModal';
 import { seedSegmentsIfEmpty } from '@/lib/actions/segment';
 import { checkAndAutoEnrollLead } from '@/lib/campaign-processor';
 

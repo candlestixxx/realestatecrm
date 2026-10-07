@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Upload, FileText, Download, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { importCsvAction, quickAddLeadAction } from '@/lib/actions/imports';
+import { quickAddLeadAction } from '@/lib/actions/imports';
 
 type ImportResult = {
   success: boolean;

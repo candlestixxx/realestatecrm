@@ -2,7 +2,7 @@
 // Lead routing rules widget — manage automatic lead assignment rules via /api/routing.
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, RefreshCw, ArrowRight } from 'lucide-react';
+import { Plus, RefreshCw, ArrowRight } from 'lucide-react';
 
 interface RoutingRule {
   id: string;
