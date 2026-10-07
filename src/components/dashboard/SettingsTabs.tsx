@@ -91,6 +91,15 @@ const TABS: SettingsTab[] = [
     href: '#routing',
     icon: '🔀',
   },
+  {
+    id: 'folders',
+    label: 'Folder Monitoring',
+    description: 'Watch folders for auto-importing property photos and documents.',
+    tooltip:
+      'Monitor network shares, MLS downloads, and local folders for new files. Matching files are auto-imported into the CRM.',
+    href: '#folders',
+    icon: '📁',
+  },
 ];
 
 function InfoBadge({ text }: { text: string }) {
@@ -109,6 +118,38 @@ function InfoBadge({ text }: { text: string }) {
         <p className="text-xs leading-relaxed">{text}</p>
       </TooltipContent>
     </Tooltip>
+  );
+}
+
+function FolderMonitoringPanel() {
+  const [folders, setFolders] = useState<{ id: string; label: string; path: string; enabled: boolean }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    fetch('/api/folder-detection')
+      .then(r => r.json())
+      .then(d => setFolders(d.watchFolders || []))
+      .catch(() => setFolders([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p className="text-sm text-muted-foreground">Loading watch folders...</p>;
+  if (folders.length === 0) return <p className="text-sm text-muted-foreground">No watch folders configured.</p>;
+
+  return (
+    <div className="space-y-3">
+      {folders.map(f => (
+        <div key={f.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/30 p-3">
+          <div>
+            <div className="text-sm font-semibold">{f.label}</div>
+            <div className="text-xs text-muted-foreground font-mono">{f.path}</div>
+          </div>
+          <span className={'text-xs font-semibold px-2 py-1 rounded ' + (f.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500')}>
+            {f.enabled ? 'Active' : 'Inactive'}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -191,6 +232,10 @@ export default function SettingsTabs() {
 
           {current.id === 'routing' && (
             <RoutingRulesWidget />
+          )}
+
+          {current.id === 'folders' && (
+            <FolderMonitoringPanel />
           )}
 
           <div className="rounded-lg border border-border/60 bg-muted/30 p-4 text-xs text-muted-foreground leading-relaxed">
