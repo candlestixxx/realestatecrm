@@ -1,3 +1,5 @@
+## v0.58.24 - 2026-10-06
+- Empty states for 16 unguarded state-array .map() calls across 12 components (CampaignEditor, CampaignsListClient, EditLeadModal, LeadTableClient, LeadTagsEditor, TeamChat, WebsiteBuilder, AICreatorTab, SEOBlogTab, SocialAgentTab, WebsitesClient, workflow-studio)
 ## [0.58.12] - 2026-10-06
 
 ### Added
