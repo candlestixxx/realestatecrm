@@ -6,6 +6,66 @@ import { saveVoiceSettingsAction } from '@/lib/actions/voice-settings';
 import { VoiceConfig } from '@/lib/voice-config';
 import { Mic, Zap, Cpu, Loader2, Save } from 'lucide-react';
 
+function AccentMorphingTest() {
+  const [phone, setPhone] = useState('');
+  const [result, setResult] = useState<{ region?: string; accent?: string; voiceId?: string } | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleTest = async () => {
+    if (!phone.trim()) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/voice/accent-morphing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone.trim() }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setResult(data);
+      } else {
+        toast.error('Accent lookup failed');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="rounded-lg border border-border/60 bg-muted/30 p-4 space-y-3">
+      <div className="flex items-center gap-2">
+        <h3 className="text-sm font-semibold">Accent Morphing Test</h3>
+        <span title="Dynamically selects voice accent/ID based on the geo-location of the dialed phone number. Enter a US phone number to preview the assigned accent." aria-label="Accent Morphing: Dynamically selects voice accent based on phone number area code." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help">?</span>
+      </div>
+      <p className="text-xs text-muted-foreground">Enter a US phone number to preview the accent/voice assigned by area code.</p>
+      <div className="flex gap-2">
+        <input
+          value={phone}
+          onChange={e => setPhone(e.target.value)}
+          placeholder="+1 (555) 123-4567"
+          className="flex-1 rounded border border-border bg-background px-3 py-2 text-sm"
+        />
+        <button
+          onClick={handleTest}
+          disabled={loading || !phone.trim()}
+          className="rounded bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:bg-primary/90 disabled:opacity-50"
+        >
+          {loading ? 'Testing...' : 'Test'}
+        </button>
+      </div>
+      {result && (
+        <div className="text-xs space-y-1">
+          {result.region && <div><span className="text-muted-foreground">Region:</span> {result.region}</div>}
+          {result.accent && <div><span className="text-muted-foreground">Accent:</span> {result.accent}</div>}
+          {result.voiceId && <div><span className="text-muted-foreground">Voice ID:</span> {result.voiceId}</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function VoiceSettingsClient({ initialConfig }: { initialConfig: VoiceConfig }) {
   const [provider, setProvider] = useState<VoiceConfig['provider']>(initialConfig.provider);
 
@@ -207,6 +267,9 @@ export function VoiceSettingsClient({ initialConfig }: { initialConfig: VoiceCon
           </div>
         )}
       </div>
+
+      {/* Accent Morphing Test */}
+      <AccentMorphingTest />
 
       <div className="flex justify-end pt-4 border-t border-border/50">
         <button
