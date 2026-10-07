@@ -76,7 +76,10 @@ export default function LeadTagsEditor({
       
       <div className="flex flex-wrap gap-1.5 items-center min-h-[30px]">
         {/* Render existing hashtag chips */}
-        {tagsList.map((tag) => (
+        {tagsList.length === 0 ? (
+          <div className="text-sm text-muted-foreground py-2">No tags yet.</div>
+        ) : (
+          tagsList.map((tag) => (
           <span
             key={tag}
             className="flex items-center gap-1 pl-2 pr-1.5 py-0.5 text-[10px] font-bold rounded-lg bg-primary/10 text-primary border border-primary/20 uppercase tracking-tighter"
@@ -91,7 +94,8 @@ export default function LeadTagsEditor({
               ✕
             </button>
           </span>
-        ))}
+        ))
+        )}
 
         {/* Inline Input Creator */}
         {isAdding ? (

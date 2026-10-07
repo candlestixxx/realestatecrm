@@ -261,7 +261,10 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
             <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Your Posts Timeline</h3>
             
             <div className="space-y-6">
-              {posts.map(post => (
+              {posts.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No posts scheduled.</div>
+              ) : (
+                posts.map(post => (
                 <div key={post.id} className="bg-card border border-border/60 rounded-2xl overflow-hidden shadow-sm hover:border-border transition-colors">
                   
                   {/* Post top channels list and time */}
@@ -325,7 +328,8 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
                   </div>
 
                 </div>
-              ))}
+              ))
+              )}
             </div>
 
           </div>

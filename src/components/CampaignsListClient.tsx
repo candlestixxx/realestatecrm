@@ -341,7 +341,10 @@ export default function CampaignsListClient({
                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground block px-3 mb-1">
                   My Folders
                 </span>
-                {myFolders.map((folder, i) => (
+                {myFolders.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">No folders yet.</div>
+                ) : (
+                  myFolders.map((folder, i) => (
                   <button
                     key={i}
                     onClick={() => setSelectedFolder(folder)}
@@ -353,7 +356,8 @@ export default function CampaignsListClient({
                   >
                     <span className="truncate">📁 {folder}</span>
                   </button>
-                ))}
+                ))
+                )}
               </div>
 
               {/* COMPANY FOLDERS */}
@@ -361,7 +365,10 @@ export default function CampaignsListClient({
                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground block px-3 mb-1">
                   Company Folders
                 </span>
-                {companyFolders.map((folder, i) => (
+                {companyFolders.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">No company folders.</div>
+                ) : (
+                  companyFolders.map((folder, i) => (
                   <button
                     key={i}
                     onClick={() => setSelectedFolder(folder)}
@@ -373,7 +380,8 @@ export default function CampaignsListClient({
                   >
                     <span className="truncate">🏢 {folder}</span>
                   </button>
-                ))}
+                ))
+                )}
               </div>
             </div>
           </div>

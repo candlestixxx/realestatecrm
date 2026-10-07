@@ -172,7 +172,10 @@ export default function WebsiteBuilder() {
                 >?</span>
               </h3>
               <div className="space-y-1">
-                {templates.map(t => (
+                {templates.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">No templates available.</div>
+                ) : (
+                  templates.map(t => (
                   <button
                     key={t.id}
                     onClick={() => {
@@ -184,7 +187,8 @@ export default function WebsiteBuilder() {
                     {t.name}
                     {t.category && <span className="text-gray-400 ml-1">({t.category})</span>}
                   </button>
-                ))}
+                ))
+                )}
               </div>
             </div>
           )}
@@ -225,7 +229,10 @@ export default function WebsiteBuilder() {
                 <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Site Title" className="text-lg font-semibold w-full border rounded px-3 py-2 mb-2" />
                 <input value={slug} onChange={e => setSlug(e.target.value)} placeholder="url-slug" className="text-sm w-full border rounded px-3 py-2" />
               </div>
-              {blocks.map((block, i) => (
+              {blocks.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No blocks yet. Add your first content block.</div>
+              ) : (
+                blocks.map((block, i) => (
                 <div key={block.id} className="bg-white rounded-lg shadow border p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium text-gray-500 uppercase">{block.type}</span>
@@ -242,7 +249,8 @@ export default function WebsiteBuilder() {
                     rows={3}
                   />
                 </div>
-              ))}
+              ))
+              )}
               {blocks.length === 0 && (
                 <div className="text-center py-8 text-gray-400 border-2 border-dashed rounded-lg">
                   <p>Add blocks from the left panel to start building your site.</p>

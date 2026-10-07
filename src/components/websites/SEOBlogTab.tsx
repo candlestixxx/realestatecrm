@@ -418,7 +418,10 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
             </h3>
             
             <div className="space-y-3">
-              {articles.map(art => (
+              {articles.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No articles yet. Generate your first SEO article.</div>
+              ) : (
+                articles.map(art => (
                 <div key={art.id} className="p-3 border border-border/40 rounded-xl hover:border-border transition-colors flex flex-col gap-1.5">
                   <div className="flex justify-between items-start gap-2">
                     <span className="text-xs font-extrabold text-foreground leading-tight line-clamp-1">{art.title}</span>
@@ -433,7 +436,8 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                     <span>{art.createdAt}</span>
                   </div>
                 </div>
-              ))}
+              ))
+              )}
             </div>
           </div>
 

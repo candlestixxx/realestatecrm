@@ -436,7 +436,10 @@ export default function WebsitesClient({
                     </div>
 
                     <div className="space-y-4 min-h-[400px]">
-                      {blocks.map((block, idx) => (
+                      {blocks.length === 0 ? (
+                        <div className="text-sm text-muted-foreground py-2">No content blocks yet.</div>
+                      ) : (
+                        blocks.map((block, idx) => (
                         <div key={block.id} className="p-4.5 border border-border/60 rounded-xl bg-muted/15 relative space-y-4 group">
                           <div className="flex justify-between items-center pb-2 border-b border-border/30">
                             <span className="text-[10px] font-black uppercase tracking-widest text-primary">
@@ -527,7 +530,8 @@ export default function WebsitesClient({
                             />
                           )}
                         </div>
-                      ))}
+                      ))
+                      )}
                       {blocks.length === 0 && (
                         <div className="py-24 text-center border border-dashed border-border/60 rounded-xl text-muted-foreground italic text-xs">
                           Canvas layout is empty. Click elements on the left side to compile blocks.

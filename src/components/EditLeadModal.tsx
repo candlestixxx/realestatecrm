@@ -269,7 +269,10 @@ export default function EditLeadModal({ leadId, contact, onClose }: EditLeadModa
               </button>
             </div>
             <div className="space-y-2">
-              {additionalPhones.map((ph, idx) => (
+              {additionalPhones.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No additional phones.</div>
+              ) : (
+                additionalPhones.map((ph, idx) => (
                 <div key={idx} className="flex gap-2 items-center bg-muted/10 p-2 rounded-xl border border-border/30">
                   <select
                     value={ph.label}
@@ -296,7 +299,8 @@ export default function EditLeadModal({ leadId, contact, onClose }: EditLeadModa
                     Delete
                   </button>
                 </div>
-              ))}
+              ))
+              )}
               {additionalPhones.length === 0 && (
                 <p className="text-xs text-muted-foreground italic">No additional phone numbers.</p>
               )}
@@ -318,7 +322,10 @@ export default function EditLeadModal({ leadId, contact, onClose }: EditLeadModa
               </button>
             </div>
             <div className="space-y-2">
-              {additionalEmails.map((em, idx) => (
+              {additionalEmails.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No additional emails.</div>
+              ) : (
+                additionalEmails.map((em, idx) => (
                 <div key={idx} className="flex gap-2 items-center bg-muted/10 p-2 rounded-xl border border-border/30">
                   <select
                     value={em.label}
@@ -344,7 +351,8 @@ export default function EditLeadModal({ leadId, contact, onClose }: EditLeadModa
                     Delete
                   </button>
                 </div>
-              ))}
+              ))
+              )}
               {additionalEmails.length === 0 && (
                 <p className="text-xs text-muted-foreground italic">No additional emails.</p>
               )}
@@ -404,7 +412,10 @@ export default function EditLeadModal({ leadId, contact, onClose }: EditLeadModa
               </button>
             </div>
             <div className="space-y-3">
-              {familyMembers.map((fm, idx) => (
+              {familyMembers.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No family members listed.</div>
+              ) : (
+                familyMembers.map((fm, idx) => (
                 <div key={idx} className="grid grid-cols-12 gap-2 items-center bg-muted/10 p-2.5 border border-border/50 rounded-xl">
                   <div className="col-span-5 space-y-1">
                     <input
@@ -449,7 +460,8 @@ export default function EditLeadModal({ leadId, contact, onClose }: EditLeadModa
                     </button>
                   </div>
                 </div>
-              ))}
+              ))
+              )}
               {familyMembers.length === 0 && (
                 <p className="text-xs text-muted-foreground italic">No other family members added.</p>
               )}

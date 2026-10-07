@@ -240,7 +240,10 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
             <>
               {/* Chat history panel */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {chatHistory.map((msg, idx) => (
+                {chatHistory.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">Start a conversation to generate content.</div>
+                ) : (
+                  chatHistory.map((msg, idx) => (
                   <div 
                     key={idx} 
                     className={`flex flex-col max-w-[85%] rounded-2xl p-3.5 text-xs font-semibold leading-relaxed ${
@@ -261,7 +264,8 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                       </div>
                     )}
                   </div>
-                ))}
+                ))
+                )}
                 {isGenerating && (
                   <div className="flex max-w-[85%] rounded-2xl p-3.5 bg-muted/50 border border-border/40 text-muted-foreground animate-pulse text-xs font-semibold items-center gap-2">
                     <RefreshCw className="w-4 h-4 animate-spin" /> Compiling layout blocks...

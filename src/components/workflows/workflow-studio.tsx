@@ -206,7 +206,10 @@ function FieldEditor({
 function ActivityFeed({ activity }: { activity: WorkflowActivityEntry[] }) {
   return (
     <div className="space-y-3">
-      {activity.map((entry) => (
+      {activity.length === 0 ? (
+        <div className="text-sm text-muted-foreground py-2">No recent activity.</div>
+      ) : (
+        activity.map((entry) => (
         <div
           key={`${entry.timestamp}-${entry.title}`}
           className="rounded-xl border border-border bg-muted/20 p-3"
@@ -221,7 +224,8 @@ function ActivityFeed({ activity }: { activity: WorkflowActivityEntry[] }) {
             </span>
           </div>
         </div>
-      ))}
+      ))
+      )}
     </div>
   );
 }

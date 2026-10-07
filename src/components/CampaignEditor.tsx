@@ -313,7 +313,10 @@ export default function CampaignEditor({
                 </p>
               </div>
 
-              {steps.map((step, index) => (
+              {steps.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No steps yet. Add your first campaign step above.</div>
+              ) : (
+                steps.map((step, index) => (
                 <div key={step.id} className="w-full max-w-xl flex flex-col items-center">
                   <div className="w-0.5 h-6 bg-border"></div>
                   
@@ -401,7 +404,8 @@ export default function CampaignEditor({
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+              )}
 
               <div className="flex gap-2 mt-6">
                 <button onClick={() => handleAddStep('EMAIL')} className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-[10px] font-black uppercase cursor-pointer">

@@ -1196,7 +1196,10 @@ export function LeadTableClient({
               ))}
 
               {/* Custom views */}
-              {customViews.map(view => (
+              {customViews.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No custom views saved.</div>
+              ) : (
+                customViews.map(view => (
                 <div
                   key={view.name}
                   onClick={() => { setActiveView(view.name); setCurrentPage(1); }}
@@ -1215,7 +1218,8 @@ export function LeadTableClient({
                     ×
                   </span>
                 </div>
-              ))}
+              ))
+              )}
 
               {/* Add Custom View Button */}
               <button

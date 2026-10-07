@@ -215,7 +215,10 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
             <>
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
-                {messages.map((msg) => {
+                {messages.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">No messages yet. Start the conversation!</div>
+                ) : (
+                  messages.map((msg) => {
                   const isOwn = msg.sender.id === currentUserId;
                   return (
                     <div
@@ -245,7 +248,8 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
                       </div>
                     </div>
                   );
-                })}
+                })
+                )}
                 <div ref={bottomRef} />
               </div>
 
