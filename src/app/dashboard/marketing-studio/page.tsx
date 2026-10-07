@@ -78,21 +78,26 @@ const TOOLS = [
 ];
 
 function MarketingStats() {
-  const [stats, setStats] = useState({ posts: 0, campaigns: 0, scheduled: 0 });
+  const [stats, setStats] = useState({ posts: 0, campaigns: 0, scheduled: 0, views: 0, likes: 0, shares: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch contentplanner posts and campaigns (port 3003)
+    // Fetch contentplanner posts, campaigns, and analytics (port 3003)
     Promise.allSettled([
       fetch('http://localhost:3003/posts').then(r => r.ok ? r.json() : []).catch(() => []),
       fetch('http://localhost:3003/campaigns').then(r => r.ok ? r.json() : []).catch(() => []),
-    ]).then(([postsRes, campaignsRes]) => {
+      fetch('http://localhost:3003/analytics').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    ]).then(([postsRes, campaignsRes, analyticsRes]) => {
       const posts = postsRes.status === 'fulfilled' && Array.isArray(postsRes.value) ? postsRes.value : [];
       const campaigns = campaignsRes.status === 'fulfilled' && Array.isArray(campaignsRes.value) ? campaignsRes.value : [];
+      const analytics = analyticsRes.status === 'fulfilled' && typeof analyticsRes.value === 'object' ? analyticsRes.value : {};
       setStats({
         posts: posts.length,
         campaigns: campaigns.length,
         scheduled: posts.filter((p: { status?: string }) => p.status === 'SCHEDULED' || p.status === 'scheduled').length,
+        views: (analytics as { totalViews?: number }).totalViews || 0,
+        likes: (analytics as { totalLikes?: number }).totalLikes || 0,
+        shares: (analytics as { totalShares?: number }).totalShares || 0,
       });
     }).finally(() => setLoading(false));
   }, []);
@@ -103,7 +108,7 @@ function MarketingStats() {
         { label: 'Total Posts', value: loading ? '...' : String(stats.posts), icon: '📝' },
         { label: 'Scheduled', value: loading ? '...' : String(stats.scheduled), icon: '📅' },
         { label: 'Active Campaigns', value: loading ? '...' : String(stats.campaigns), icon: '🚀' },
-        { label: 'Content Tools', value: '7', icon: '📈' },
+        { label: 'Total Views', value: loading ? '...' : stats.views.toLocaleString(), icon: '👁️' },
       ].map(stat => (
         <div key={stat.label} className="bg-background border border-border rounded-xl p-4">
           <div className="flex items-center gap-2 mb-1">
