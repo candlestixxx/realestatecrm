@@ -269,6 +269,44 @@ const VIDEOS: VideoTopic[] = [
       '📧 [Notify] Agent #4 notified of new lead assignment.',
       '✅ [Done] Lead auto-assigned in 0.3s.'
     ]
+  },
+  {
+    id: 'export-and-trends',
+    title: 'Data Export & Market Trends',
+    category: 'Reporting',
+    description: 'Export your reporting data as CSV and view aggregated market trends across brokerages.',
+    steps: [
+      'Go to Reports & Analytics in the dashboard.',
+      'Click "Export CSV" in the top-right to download your current report data.',
+      'Scroll down to the "Market Trends" section for aggregated industry metrics.',
+      'View average deal value, total volume, average list price, and deals closed.',
+      'Use these benchmarks to compare your performance against the market.'
+    ],
+    simulationLogs: [
+      '📊 [Report] Loaded reporting dashboard with 5 summary cards.',
+      '📥 [Export] Generated CSV with 45 rows — downloaded as reporting-export.csv.',
+      '📈 [Trends] Market avg deal value: $312,000 — your avg: $345,000 (10% above).',
+      '✅ [Done] Export and trends loaded in 1.2s.'
+    ]
+  },
+  {
+    id: 'folders-and-comps',
+    title: 'Folder Monitoring & Comparable Sales',
+    category: 'Automation',
+    description: 'Auto-import property files from watched folders and view comparable sales for any listing.',
+    steps: [
+      'Go to Settings and open the "Folder Monitoring" tab.',
+      'View active watch folders (Network Share, MLS Downloads, Downloads, Desktop).',
+      'Matching files are auto-imported into the CRM.',
+      'Open any listing to see its Comparable Sales panel.',
+      'Comps show sold price, date, beds/baths, and square footage for nearby properties.'
+    ],
+    simulationLogs: [
+      '📁 [Watch] Folder monitoring active — 4 sources scanned.',
+      '📷 [Import] Found 3 new property photos in MLS Downloads — auto-imported.',
+      '🏘️ [Comps] Loaded 5 comparable sales for 123 Main St.',
+      '✅ [Done] Folder scan and comps loaded in 0.8s.'
+    ]
   }
 ];
 
