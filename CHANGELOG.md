@@ -1,3 +1,6 @@
+## v0.58.28 - 2026-10-07
+- Wire /api/mls/historical to listings page as Comparable Sales panel (4 APIs wired this session)
+- Remaining unused: /api/crm-records (server-action), /api/lead-gen/social (needs HubSpot keys), /api/voice/accent-morphing
 ## v0.58.27 - 2026-10-07
 - Wire /api/folder-detection to SettingsTabs as Folder Monitoring tab (8th tab)
 - 3 previously unused APIs now wired: /api/export, /api/syndication, /api/folder-detection
