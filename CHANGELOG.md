@@ -1,3 +1,6 @@
+## v0.58.29 - 2026-10-07
+- Wire /api/voice/accent-morphing to voice settings as Accent Morphing Test panel (5 APIs wired this session)
+- All user-facing unused APIs now wired (remaining: crm-records via server-action, lead-gen/social needs HubSpot keys)
 ## v0.58.28 - 2026-10-07
 - Wire /api/mls/historical to listings page as Comparable Sales panel (4 APIs wired this session)
 - Remaining unused: /api/crm-records (server-action), /api/lead-gen/social (needs HubSpot keys), /api/voice/accent-morphing
