@@ -1,3 +1,6 @@
+## v0.58.25 - 2026-10-06
+- AICreatorTab step 2 wizard blocks.map empty state fix (was double-guarded in preview)
+- Verified all state-array .map() calls now have empty states (3 remaining scan hits are false positives)
 ## v0.58.24 - 2026-10-06
 - Empty states for 16 unguarded state-array .map() calls across 12 components (CampaignEditor, CampaignsListClient, EditLeadModal, LeadTableClient, LeadTagsEditor, TeamChat, WebsiteBuilder, AICreatorTab, SEOBlogTab, SocialAgentTab, WebsitesClient, workflow-studio)
 ## [0.58.12] - 2026-10-06
