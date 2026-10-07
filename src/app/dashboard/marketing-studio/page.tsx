@@ -1,6 +1,6 @@
 'use client';
 
-import {} from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
@@ -77,6 +77,46 @@ const TOOLS = [
   },
 ];
 
+function MarketingStats() {
+  const [stats, setStats] = useState({ posts: 0, campaigns: 0, scheduled: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch contentplanner posts and campaigns (port 3003)
+    Promise.allSettled([
+      fetch('http://localhost:3003/posts').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('http://localhost:3003/campaigns').then(r => r.ok ? r.json() : []).catch(() => []),
+    ]).then(([postsRes, campaignsRes]) => {
+      const posts = postsRes.status === 'fulfilled' && Array.isArray(postsRes.value) ? postsRes.value : [];
+      const campaigns = campaignsRes.status === 'fulfilled' && Array.isArray(campaignsRes.value) ? campaignsRes.value : [];
+      setStats({
+        posts: posts.length,
+        campaigns: campaigns.length,
+        scheduled: posts.filter((p: { status?: string }) => p.status === 'SCHEDULED' || p.status === 'scheduled').length,
+      });
+    }).finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {[
+        { label: 'Total Posts', value: loading ? '...' : String(stats.posts), icon: '📝' },
+        { label: 'Scheduled', value: loading ? '...' : String(stats.scheduled), icon: '📅' },
+        { label: 'Active Campaigns', value: loading ? '...' : String(stats.campaigns), icon: '🚀' },
+        { label: 'Content Tools', value: '7', icon: '📈' },
+      ].map(stat => (
+        <div key={stat.label} className="bg-background border border-border rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-lg">{stat.icon}</span>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+          </div>
+          <p className="text-2xl font-extrabold text-foreground">{stat.value}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function MarketingStudioPage() {
   return (
     <div className="space-y-6">
@@ -88,22 +128,7 @@ export default function MarketingStudioPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Posts This Month', value: '24', icon: '📝' },
-          { label: 'Scheduled', value: '8', icon: '📅' },
-          { label: 'Active Campaigns', value: '3', icon: '🚀' },
-          { label: 'Total Reach', value: '12.4k', icon: '📈' },
-        ].map(stat => (
-          <div key={stat.label} className="bg-background border border-border rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">{stat.icon}</span>
-              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{stat.label}</span>
-            </div>
-            <p className="text-2xl font-extrabold text-foreground">{stat.value}</p>
-          </div>
-        ))}
-      </div>
+      <MarketingStats />
 
       {/* Tools Grid */}
       <div>
