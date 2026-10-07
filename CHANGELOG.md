@@ -1,3 +1,5 @@
+## v0.58.33 - 2026-10-07
+- Marketing Studio stats now fetch live data from ContentPlanner API (posts, scheduled, campaigns)
 ## v0.58.32 - 2026-10-07
 - ContentPlanner + LegacyLeads integration cards in Marketing Studio (HANDOFF item 5 progress)
 - ContentPlanner: Posts, Campaigns, Brand Kits, Analytics (port 3003)
