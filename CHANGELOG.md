@@ -1,3 +1,5 @@
+## v0.58.34 - 2026-10-07
+- ContentPlanner analytics (views/likes/shares) integrated into Marketing Studio stats
 ## v0.58.33 - 2026-10-07
 - Marketing Studio stats now fetch live data from ContentPlanner API (posts, scheduled, campaigns)
 ## v0.58.32 - 2026-10-07
