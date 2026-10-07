@@ -932,14 +932,10 @@ export function LeadTableClient({
   const handleBulkAssign = async (userId: string | null) => {
     if (selectedIds.size === 0) { toast.error('Select at least one lead.'); return; }
 
-    // Check if we need a full-database query instead (if selectAllMode is true)
-    if (selectAllMode) {
-      toast.error('Bulk assigning across all pages is coming soon. For now, please assign one page at a time by setting Per Page to "Show all".');
-      return;
-    }
+    // When selectAllMode is active, apply to all filtered leads (across pages)
+    const ids = selectAllMode ? displayLeads.map(l => l.id) : Array.from(selectedIds);
 
     setIsBulkAssigning(true);
-    const ids = Array.from(selectedIds);
     const res = await bulkAssignLeadAction(ids, userId);
     setIsBulkAssigning(false);
 
@@ -949,6 +945,7 @@ export function LeadTableClient({
       toast.success(`Assigned ${ids.length} lead(s).`);
       setShowBulkAssignPanel(false);
       setSelectedIds(new Set());
+      setSelectAllMode(false);
       router.refresh();
     }
   };
@@ -956,13 +953,10 @@ export function LeadTableClient({
   const handleBulkChangeTags = async () => {
     if (selectedIds.size === 0) { toast.error('Select at least one lead.'); return; }
 
-    if (selectAllMode) {
-      toast.error('Bulk tagging across all pages is coming soon. For now, please tag one page at a time by setting Per Page to "Show all".');
-      return;
-    }
+    // When selectAllMode is active, apply to all filtered leads (across pages)
+    const ids = selectAllMode ? displayLeads.map(l => l.id) : Array.from(selectedIds);
 
     setIsBulkTagSaving(true);
-    const ids = Array.from(selectedIds);
     const res = await bulkUpdateLeadTagsAction(ids, bulkTagInput);
     setIsBulkTagSaving(false);
 
@@ -973,6 +967,7 @@ export function LeadTableClient({
       setShowBulkTagPanel(false);
       setBulkTagInput('');
       setSelectedIds(new Set());
+      setSelectAllMode(false);
       router.refresh();
     }
   };

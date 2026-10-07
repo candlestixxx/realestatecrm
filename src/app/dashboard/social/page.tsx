@@ -43,8 +43,8 @@ export default function SocialConnectionsPage() {
   const connectPlatform = async (platform: string) => {
     setConnecting(platform);
     try {
-      // In production, this would redirect to OAuth flow
-      // For now, create a placeholder connection
+      // OAuth flow not yet configured for external providers — create a local connection record.
+      // When OAuth credentials are added to env vars, replace this with a redirect to the provider.
       const res = await fetch('/api/social', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +54,7 @@ export default function SocialConnectionsPage() {
         }),
       });
       if (!res.ok) throw new Error('Failed');
-      toast.success(`Connected to ${platform}!`);
+      toast.success(`Connected to ${platform} (simulated — OAuth pending).`);
       loadAccounts();
     } catch {
       toast.error(`Failed to connect ${platform}`);

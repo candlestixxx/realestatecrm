@@ -30,7 +30,7 @@ export default async function WorkflowsPage() {
       description: 'Quickly entry property data and prepare it for MLS and marketing.',
       href: '/workflows/listing-entry',
       icon: '📷',
-      status: 'Coming Soon',
+      status: 'Ready',
     },
     {
       id: 'marketing-media',
