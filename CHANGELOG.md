@@ -1,3 +1,6 @@
+## v0.58.27 - 2026-10-07
+- Wire /api/folder-detection to SettingsTabs as Folder Monitoring tab (8th tab)
+- 3 previously unused APIs now wired: /api/export, /api/syndication, /api/folder-detection
 ## v0.58.26 - 2026-10-07
 - Wire /api/export to reporting page as CSV export button
 - Wire /api/syndication to reporting page as Market Trends widget (avg deal value, volume, list price, deals closed)
