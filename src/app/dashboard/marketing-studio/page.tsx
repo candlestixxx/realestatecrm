@@ -133,6 +133,61 @@ export default function MarketingStudioPage() {
         </div>
       </div>
 
+      {/* Content Planner Integration */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Content Planner</h2>
+          <span title="Integrated content planning service (port 3003) for social posts, campaigns, brand kits, and analytics. Links open the Content Planner app." aria-label="Content Planner: Integrated content planning service for social posts, campaigns, brand kits, and analytics." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help">?</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { title: 'Posts', desc: 'Create and schedule social media posts.', icon: '📝', href: 'http://localhost:3003/posts' },
+            { title: 'Campaigns', desc: 'Manage content marketing campaigns.', icon: '🚀', href: 'http://localhost:3003/campaigns' },
+            { title: 'Brand Kits', desc: 'Configure brand voice and style guides.', icon: '🎨', href: 'http://localhost:3003/brand-kits' },
+            { title: 'Analytics', desc: 'Track content performance metrics.', icon: '📊', href: 'http://localhost:3003/analytics' },
+          ].map(item => (
+            <a
+              key={item.title}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-background border border-border rounded-xl p-4 hover:border-secondary/50 hover:shadow-md transition-all group"
+            >
+              <div className="text-2xl mb-2">{item.icon}</div>
+              <h3 className="text-sm font-bold text-foreground group-hover:text-secondary transition-colors">{item.title}</h3>
+              <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* LegacyLeads Integration */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">LegacyLeads</h2>
+          <span title="Lead generation and skip-tracing service (port 3005/3006) for property data, compliance, and credit management." aria-label="LegacyLeads: Lead generation and skip-tracing service for property data, compliance, and credit management." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help">?</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { title: 'Property Search', desc: 'Search MLS listings with advanced filters.', icon: '🏠', href: 'http://localhost:3005' },
+            { title: 'Skip Trace', desc: 'Find contact info for property owners.', icon: '🔍', href: 'http://localhost:3005' },
+            { title: 'Compliance', desc: 'TCPA compliance and DNC checks.', icon: '🛡️', href: 'http://localhost:3005' },
+          ].map(item => (
+            <a
+              key={item.title}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-background border border-border rounded-xl p-4 hover:border-secondary/50 hover:shadow-md transition-all group"
+            >
+              <div className="text-2xl mb-2">{item.icon}</div>
+              <h3 className="text-sm font-bold text-foreground group-hover:text-secondary transition-colors">{item.title}</h3>
+              <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+
       {/* Recent Activity */}
       <div>
         <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Quick Actions</h2>
