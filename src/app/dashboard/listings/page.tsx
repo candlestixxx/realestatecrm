@@ -35,6 +35,52 @@ const STATUS_COLORS: Record<string, string> = {
 
 const PROPERTY_TYPES = ['SINGLE_FAMILY', 'CONDO', 'TOWNHOUSE', 'MULTI_FAMILY', 'LAND', 'COMMERCIAL'];
 
+function CompsAnalysis({ address, city, zip }: { address: string; city: string | null; zip: string | null }) {
+  const [comps, setComps] = useState<{ id: string; address: string; soldPrice: number | null; soldDate: string | null; bedrooms: number | null; bathrooms: number | null; squareFeet: number | null }[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (!address && !city && !zip) return;
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (address) params.set('address', address);
+    if (city) params.set('city', city);
+    if (zip) params.set('zip', zip);
+    params.set('limit', '5');
+    fetch('/api/mls/historical?' + params.toString())
+      .then(r => r.json())
+      .then(d => setComps(d.listings || d || []))
+      .catch(() => setComps([]))
+      .finally(() => setLoading(false));
+  }, [address, city, zip]);
+
+  return (
+    <div className="mb-4">
+      <h3 className="font-semibold mb-2">Comparable Sales</h3>
+      {loading ? (
+        <p className="text-sm text-gray-500">Loading comps...</p>
+      ) : comps.length === 0 ? (
+        <p className="text-sm text-gray-500">No historical comps found for this area.</p>
+      ) : (
+        <div className="space-y-2">
+          {comps.map(c => (
+            <div key={c.id} className="flex items-center justify-between text-sm border-b pb-2">
+              <div>
+                <div className="font-medium">{c.address}</div>
+                <div className="text-xs text-gray-500">{c.bedrooms || '—'} bd / {c.bathrooms || '—'} ba / {c.squareFeet?.toLocaleString() || '—'} sqft</div>
+              </div>
+              <div className="text-right">
+                <div className="font-semibold">{c.soldPrice ? '$' + c.soldPrice.toLocaleString() : '—'}</div>
+                <div className="text-xs text-gray-500">{c.soldDate ? new Date(c.soldDate).toLocaleDateString() : ''}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ListingsPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -214,6 +260,9 @@ export default function ListingsPage() {
               <div><span className="text-sm text-gray-500">Property Type</span><div>{selected.propertyType?.replace('_', ' ') || '—'}</div></div>
             </div>
             {selected.description && <div className="mb-4 text-sm text-gray-600">{selected.description}</div>}
+
+            {/* Comps Analysis */}
+            <CompsAnalysis address={selected.address} city={selected.city} zip={selected.zip} />
 
             {/* Offers */}
             {selected.offers.length > 0 && (
