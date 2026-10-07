@@ -1,3 +1,6 @@
+## v0.58.26 - 2026-10-07
+- Wire /api/export to reporting page as CSV export button
+- Wire /api/syndication to reporting page as Market Trends widget (avg deal value, volume, list price, deals closed)
 ## v0.58.25 - 2026-10-06
 - AICreatorTab step 2 wizard blocks.map empty state fix (was double-guarded in preview)
 - Verified all state-array .map() calls now have empty states (3 remaining scan hits are false positives)
