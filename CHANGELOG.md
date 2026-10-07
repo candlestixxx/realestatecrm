@@ -1,3 +1,7 @@
+## v0.58.30 - 2026-10-07
+- Bulk assign/tag now works across all pages (selectAllMode uses displayLeads IDs)
+- Social connect toast clarifies simulated OAuth status
+- Listing Entry workflow status fixed: Coming Soon -> Ready (page exists at /workflows/listing-entry)
 ## v0.58.29 - 2026-10-07
 - Wire /api/voice/accent-morphing to voice settings as Accent Morphing Test panel (5 APIs wired this session)
 - All user-facing unused APIs now wired (remaining: crm-records via server-action, lead-gen/social needs HubSpot keys)
