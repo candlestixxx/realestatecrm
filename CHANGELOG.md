@@ -1,3 +1,7 @@
+## v0.58.32 - 2026-10-07
+- ContentPlanner + LegacyLeads integration cards in Marketing Studio (HANDOFF item 5 progress)
+- ContentPlanner: Posts, Campaigns, Brand Kits, Analytics (port 3003)
+- LegacyLeads: Property Search, Skip Trace, Compliance (port 3005)
 ## v0.58.31 - 2026-10-07
 - Remove 33 unused imports across 21 files (icons, actions, utils)
 ## v0.58.30 - 2026-10-07
