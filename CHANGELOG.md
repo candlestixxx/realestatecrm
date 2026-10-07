@@ -1,3 +1,5 @@
+## v0.58.35 - 2026-10-07
+- 2 new help topics: Data Export & Market Trends, Folder Monitoring & Comparable Sales (16 total)
 ## v0.58.34 - 2026-10-07
 - ContentPlanner analytics (views/likes/shares) integrated into Marketing Studio stats
 ## v0.58.33 - 2026-10-07
