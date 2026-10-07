@@ -378,7 +378,9 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                   />
                 </div>
 
-                {blocks.map((block, idx) => (
+                {blocks.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">No content blocks yet. Generate or add blocks above.</div>
+                ) : (blocks.map((block, idx) => (
                   <div key={block.id} className="p-4 border border-border/50 bg-muted/10 rounded-2xl space-y-3">
                     <span className="text-[9px] font-black uppercase tracking-widest text-indigo-500">{block.type} BLOCK</span>
                     
@@ -429,7 +431,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                       </div>
                     )}
                   </div>
-                ))}
+                )))}
               </div>
 
               <button
