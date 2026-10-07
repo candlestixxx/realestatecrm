@@ -134,6 +134,34 @@ export default function ReportingPage() {
                 {t.label}
               </button>
             ))}
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/export', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      type: 'reporting',
+                      format: 'csv',
+                      data: data.summary ? [data.summary] : [],
+                      filename: 'reporting-export',
+                    }),
+                  });
+                  if (res.ok) {
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'reporting-export.csv';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }
+                } catch { /* export failed */ }
+              }}
+              className="px-4 py-2 rounded-lg text-sm font-semibold bg-white border text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              Export CSV
+            </button>
           </div>
         </div>
 
