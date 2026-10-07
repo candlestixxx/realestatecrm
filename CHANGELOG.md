@@ -1,3 +1,5 @@
+## v0.58.31 - 2026-10-07
+- Remove 33 unused imports across 21 files (icons, actions, utils)
 ## v0.58.30 - 2026-10-07
 - Bulk assign/tag now works across all pages (selectAllMode uses displayLeads IDs)
 - Social connect toast clarifies simulated OAuth status
