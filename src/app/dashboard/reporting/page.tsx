@@ -48,6 +48,53 @@ function InfoBadge({ text }: { text: string }) {
   );
 }
 
+function MarketTrendsSection() {
+  const [trends, setTrends] = useState<{
+    leadTrends: { status: string; count: number }[];
+    dealStats: { avg: number | null; sum: number | null; count: number };
+    listingStats: { avgPrice: number | null; count: number };
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/syndication?timeframe=30d')
+      .then(r => r.json())
+      .then(d => setTrends(d))
+      .catch(() => setTrends(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p className="text-sm text-gray-500">Loading market trends...</p>;
+  if (!trends) return <p className="text-sm text-gray-500">Market trends unavailable.</p>;
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="bg-gray-50 rounded-lg p-4">
+        <div className="text-xs text-gray-500 mb-1">Avg Deal Value (30d)</div>
+        <div className="text-xl font-bold text-gray-900">
+          {trends.deals.avg ? '$' + trends.deals.avg.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '--'}
+        </div>
+      </div>
+      <div className="bg-gray-50 rounded-lg p-4">
+        <div className="text-xs text-gray-500 mb-1">Total Deal Volume (30d)</div>
+        <div className="text-xl font-bold text-gray-900">
+          {trends.deals.sum ? '$' + trends.deals.sum.toLocaleString() : '--'}
+        </div>
+      </div>
+      <div className="bg-gray-50 rounded-lg p-4">
+        <div className="text-xs text-gray-500 mb-1">Avg List Price (30d)</div>
+        <div className="text-xl font-bold text-gray-900">
+          {trends.listingStats.avgPrice ? '$' + trends.listingStats.avgPrice.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '--'}
+        </div>
+      </div>
+      <div className="bg-gray-50 rounded-lg p-4">
+        <div className="text-xs text-gray-500 mb-1">Deals Closed (30d)</div>
+        <div className="text-xl font-bold text-gray-900">{trends.deals.count}</div>
+      </div>
+    </div>
+  );
+}
+
 function BarList({ title, items, tooltip, valueFormat }: {
   title: string;
   items: { key: string; count: number; value?: number | null }[];
@@ -212,6 +259,15 @@ export default function ReportingPage() {
                 items={data.partners.referralsByStatus.map(s => ({ key: s.status, count: s._count }))}
                 tooltip="Partner referral pipeline. Tracks referrals from mortgage/title/insurance partners."
               />
+            </div>
+
+            {/* Market Trends (Syndicated) */}
+            <div className="bg-white rounded-lg border p-6 mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-lg font-semibold">Market Trends</h2>
+                <InfoBadge text="Aggregated, anonymized market data across all brokerages. Shows lead volume, deal activity, and listing stats for the selected timeframe." />
+              </div>
+              <MarketTrendsSection />
             </div>
 
             {/* Recent Activity */}
