@@ -1,3 +1,9 @@
+## v0.58.37 (2026-10-07)
+
+### Fixed
+- TeamChat currentUserId now uses real session user instead of hardcoded 'current-user'
+
+
 ## v0.58.36 (2026-10-07)
 
 ### Added
