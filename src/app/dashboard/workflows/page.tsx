@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
+import WorkflowSessionsPanel from '@/components/WorkflowSessionsPanel';
 
 export default async function WorkflowsPage() {
   const session = await getServerSession(authOptions);
@@ -80,6 +81,9 @@ export default async function WorkflowsPage() {
           </div>
         ))}
       </div>
+
+      {/* Resumable workflow sessions */}
+      <WorkflowSessionsPanel />
     </div>
   );
 }
