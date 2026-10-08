@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import TeamChat from "@/components/TeamChat";
 import toast from 'react-hot-toast';
 
@@ -28,6 +29,8 @@ const CHANNELS = [
 ];
 
 export default function UnifiedInboxPage() {
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id || 'current-user';
   const [messages, setMessages] = useState<Message[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeChannel, setActiveChannel] = useState('all');
@@ -186,7 +189,7 @@ export default function UnifiedInboxPage() {
         </div>
       )}
       {/* Internal team chat */}
-      <TeamChat currentUserId="current-user" />
+      <TeamChat currentUserId={currentUserId} />
     </div>
   );
 }
