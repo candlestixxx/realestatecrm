@@ -1,3 +1,14 @@
+## v0.58.36 (2026-10-07)
+
+### Added
+- ContentPlanner recent posts panel on social page (fetches from :3031/posts)
+- ContentPlanner API (port 3031) registered in system tray as 'Content Planner (API)'
+- start-api.bat launcher for ContentPlanner Express API
+
+### Fixed
+- @langchain/core module resolution broken in ContentPlanner (tsx/ts-node-dev exports map) - added document.cjs/documents.cjs + utils/tiktoken shims
+
+
 ## v0.58.35 - 2026-10-07
 - 2 new help topics: Data Export & Market Trends, Folder Monitoring & Comparable Sales (16 total)
 ## v0.58.34 - 2026-10-07
