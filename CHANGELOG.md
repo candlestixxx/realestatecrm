@@ -1,3 +1,10 @@
+## v0.58.38 (2026-10-07)
+
+### Added
+- Workflow Sessions resume panel on workflows page (wires /api/workflow-sessions)
+- Canva Connect button now POSTs to /api/canva with clear error on missing API key
+
+
 ## v0.58.37 (2026-10-07)
 
 ### Fixed
