@@ -86,6 +86,15 @@ $Services = [ordered]@{
         Log = 'server.log'
         ErrLog = 'server-err.log'
     }
+    'contentplanner-api' = @{
+        Label = 'Content Planner (API)'
+        Port = 3031
+        Cmd = 'cmd /c start-api.bat'
+        WorkDir = (Join-Path $Root 'apps\contentplanner\packages\api')
+        HealthPath = '/posts'
+        Log = 'server.log'
+        ErrLog = 'server-err.log'
+    }
     'media-workflow' = @{
         Label = 'Media Workflow API'
         Port = 3004

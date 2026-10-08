@@ -161,6 +161,80 @@ export default function SocialConnectionsPage() {
           })}
         </div>
       </div>
+
+      {/* Recent Posts from Content Planner */}
+      <RecentPostsSection />
+    </div>
+  );
+}
+
+interface PlannerPost {
+  id: string;
+  content: string;
+  status: string;
+  platform?: string | null;
+  scheduledAt?: string | null;
+  createdAt: string;
+}
+
+function RecentPostsSection() {
+  const [posts, setPosts] = useState<PlannerPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [apiUp, setApiUp] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:3031/posts')
+      .then(res => {
+        if (!res.ok) throw new Error('API down');
+        return res.json();
+      })
+      .then(data => {
+        setPosts(Array.isArray(data) ? data.slice(0, 8) : []);
+        setApiUp(true);
+      })
+      .catch(() => setApiUp(false))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Recent Posts</h2>
+        <span
+          title="Fetched from Content Planner API (port 3031). Shows your latest scheduled and draft posts."
+          aria-label="Recent posts are fetched from the Content Planner service on port 3031"
+          className="cursor-help text-muted-foreground text-xs"
+        >ⓘ</span>
+      </div>
+      {isLoading ? (
+        <div className="text-sm text-muted-foreground">Loading posts...</div>
+      ) : !apiUp ? (
+        <div className="text-sm text-muted-foreground border border-border rounded-xl p-4">
+          Content Planner API is not reachable. Start it from the system tray or run <code className="text-xs bg-muted px-1 rounded">start-api.bat</code> in <code className="text-xs bg-muted px-1 rounded">apps/contentplanner/packages/api</code>.
+        </div>
+      ) : posts.length === 0 ? (
+        <div className="text-sm text-muted-foreground border border-border rounded-xl p-4">
+          No posts yet. Create content in the <a href="http://localhost:3003" target="_blank" rel="noopener noreferrer" className="text-secondary underline">Content Planner</a>.
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {posts.map(post => (
+            <div key={post.id} className="bg-background border border-border rounded-xl p-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                  post.status === 'PUBLISHED' ? 'bg-green-500/15 text-green-500'
+                  : post.status === 'SCHEDULED' ? 'bg-blue-500/15 text-blue-500'
+                  : 'bg-gray-500/15 text-gray-500'
+                }`}>{post.status}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {new Date(post.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              <p className="text-xs text-foreground line-clamp-2">{post.content}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
