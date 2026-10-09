@@ -88,7 +88,7 @@ export default function SocialConnectionsPage() {
 
       {/* Connected Accounts */}
       <div>
-        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Connected Accounts</h2>
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Connected Accounts <span title="Social media accounts linked for unified publishing and inbox management." aria-label="About Connected Accounts: Social media accounts linked for publishing and inbox." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-1 align-middle">?</span></h2>
         {isLoading ? (
           <div className="text-center py-8 text-muted-foreground text-sm">Loading...</div>
         ) : accounts.length === 0 ? (
@@ -134,7 +134,7 @@ export default function SocialConnectionsPage() {
 
       {/* Available Platforms */}
       <div>
-        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Add Connection</h2>
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Add Connection <span title="Link a new social media platform account for posting and engagement tracking." aria-label="About Add Connection: Link a new social media platform." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-1 align-middle">?</span></h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {PLATFORMS.map(platform => {
             const isConnected = accounts.some(a => a.platform === platform.id && a.isActive);

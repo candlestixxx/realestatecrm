@@ -208,7 +208,7 @@ export default function MarketingStudioPage() {
 
       {/* Tools Grid */}
       <div>
-        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Tools & Channels</h2>
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Tools & Channels <span title="Links to all marketing tool pages within the CRM dashboard." aria-label="About Tools and Channels: Links to all marketing tool pages within the CRM dashboard." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-1 align-middle">?</span></h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {TOOLS.map(tool => (
             <Link
@@ -294,7 +294,7 @@ export default function MarketingStudioPage() {
 
       {/* Recent Activity */}
       <div>
-        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Quick Actions</h2>
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Quick Actions <span title="Shortcuts to common marketing tasks like generating content, scheduling posts, and creating campaigns." aria-label="About Quick Actions: Shortcuts to common marketing tasks." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-1 align-middle">?</span></h2>
         <div className="flex flex-wrap gap-3">
           <Link
             href="/dashboard/agent-websites?tab=ai-creator"
