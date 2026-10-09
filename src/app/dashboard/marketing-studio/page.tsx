@@ -79,14 +79,14 @@ const TOOLS = [
 
 function MarketingStats() {
   const [stats, setStats] = useState({ posts: 0, campaigns: 0, scheduled: 0, views: 0, likes: 0, shares: 0 });
+  const [platforms, setPlatforms] = useState<Array<{ platform: string; views: number; likes: number; shares: number }>>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch contentplanner posts, campaigns, and analytics (port 3003)
     Promise.allSettled([
-      fetch('http://localhost:3003/posts').then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('http://localhost:3003/campaigns').then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('http://localhost:3003/analytics').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+      fetch('http://localhost:3031/posts').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('http://localhost:3031/campaigns').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('http://localhost:3031/analytics').then(r => r.ok ? r.json() : {}).catch(() => ({})),
     ]).then(([postsRes, campaignsRes, analyticsRes]) => {
       const posts = postsRes.status === 'fulfilled' && Array.isArray(postsRes.value) ? postsRes.value : [];
       const campaigns = campaignsRes.status === 'fulfilled' && Array.isArray(campaignsRes.value) ? campaignsRes.value : [];
@@ -99,25 +99,50 @@ function MarketingStats() {
         likes: (analytics as { totalLikes?: number }).totalLikes || 0,
         shares: (analytics as { totalShares?: number }).totalShares || 0,
       });
+      const plats = (analytics as { platforms?: Array<{ platform: string; views: number; likes: number; shares: number }> }).platforms;
+      if (Array.isArray(plats)) setPlatforms(plats);
     }).finally(() => setLoading(false));
   }, []);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {[
-        { label: 'Total Posts', value: loading ? '...' : String(stats.posts), icon: '📝' },
-        { label: 'Scheduled', value: loading ? '...' : String(stats.scheduled), icon: '📅' },
-        { label: 'Active Campaigns', value: loading ? '...' : String(stats.campaigns), icon: '🚀' },
-        { label: 'Total Views', value: loading ? '...' : stats.views.toLocaleString(), icon: '👁️' },
-      ].map(stat => (
-        <div key={stat.label} className="bg-background border border-border rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-lg">{stat.icon}</span>
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Posts', value: loading ? '...' : String(stats.posts), icon: '📝' },
+          { label: 'Scheduled', value: loading ? '...' : String(stats.scheduled), icon: '📅' },
+          { label: 'Active Campaigns', value: loading ? '...' : String(stats.campaigns), icon: '🚀' },
+          { label: 'Total Views', value: loading ? '...' : stats.views.toLocaleString(), icon: '👁️' },
+        ].map(stat => (
+          <div key={stat.label} className="bg-background border border-border rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">{stat.icon}</span>
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+            </div>
+            <p className="text-2xl font-extrabold text-foreground">{stat.value}</p>
           </div>
-          <p className="text-2xl font-extrabold text-foreground">{stat.value}</p>
+        ))}
+      </div>
+      {!loading && platforms.length > 0 && (
+        <div className="bg-background border border-border rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg">📊</span>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Platform Breakdown</span>
+            <span title="Per-platform engagement metrics from the Content Planner analytics API." aria-label="About platform breakdown: Per-platform engagement metrics from the Content Planner analytics API." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help">?</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {platforms.map(p => (
+              <div key={p.platform} className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+                <span className="text-sm font-medium text-foreground">{p.platform}</span>
+                <div className="flex gap-3 text-xs text-muted-foreground">
+                  <span title="Views" className="cursor-help">{p.views} views</span>
+                  <span title="Likes" className="cursor-help">{p.likes} likes</span>
+                  <span title="Shares" className="cursor-help">{p.shares} shares</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }
