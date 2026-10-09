@@ -1,3 +1,15 @@
+## v0.58.40 (2026-10-07)
+
+### Fixed
+- ContentPlanner API startup: removed @langchain/textsplitters dependency (broken CJS exports-map under tsx/Node 26), replaced with pure-JS text chunking. Lazy-import scrapeUrlText to avoid module-load failures.
+- ContentPlanner API runs via ts-node-dev (local binary) instead of npx tsx which auto-restored deleted node_modules.
+
+## v0.58.39 (2026-10-07)
+
+### Added
+- 6 missing pages added to SidebarNav: Property Data, Data Imports, Canva Designs, Objection Handling, AI Avatar Video, Client Portal
+
+
 ## v0.58.38 (2026-10-07)
 
 ### Added
