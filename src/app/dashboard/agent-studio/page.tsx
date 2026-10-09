@@ -68,7 +68,7 @@ export default async function AgentStudioPage() {
           
           {/* Active Workflows */}
           <div className="bg-background border border-border rounded-2xl p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-bold">Autonomous AI Workflows</h2>
+            <h2 className="text-lg font-bold">Autonomous AI Workflows <span title="AI-powered workflows that run automatically based on triggers like new leads, deal stage changes, or scheduled times." aria-label="About Autonomous AI Workflows: AI-powered workflows that run automatically based on triggers." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h2>
             <div className="divide-y divide-border/60">
               {workflows.map(wf => (
                 <div key={wf.id} className="py-4 flex items-start justify-between gap-4">
