@@ -147,6 +147,52 @@ function MarketingStats() {
   );
 }
 
+function ContentPlannerNotifications() {
+  const [notifs, setNotifs] = useState<Array<{ id: string; message: string; read: boolean; createdAt: string }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:3031/notifications')
+      .then(r => r.ok ? r.json() : [])
+      .then((data: Array<{ id: string; message: string; read: boolean; createdAt: string }>) => setNotifs(Array.isArray(data) ? data : []))
+      .catch(() => setNotifs([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return null;
+  if (notifs.length === 0) return null;
+
+  const unread = notifs.filter(n => !n.read);
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
+          Content Planner Notifications
+          {unread.length > 0 && (
+            <span className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold">{unread.length}</span>
+          )}
+        </h2>
+        <span title="Notifications from the Content Planner service (port 3031) about campaigns, post publishing, and scheduling recommendations." aria-label="About these notifications: From the Content Planner service about campaigns, post publishing, and scheduling." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help">?</span>
+      </div>
+      <div className="space-y-2">
+        {notifs.slice(0, 5).map(n => (
+          <div
+            key={n.id}
+            className={'flex items-start gap-3 rounded-lg border px-3 py-2 ' + (n.read ? 'bg-muted/30 border-border opacity-60' : 'bg-background border-border')}
+          >
+            <span className="text-sm mt-0.5">{n.read ? '📭' : '📬'}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-foreground">{n.message}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{new Date(n.createdAt).toLocaleString()}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function MarketingStudioPage() {
   return (
     <div className="space-y-6">
@@ -215,6 +261,9 @@ export default function MarketingStudioPage() {
           ))}
         </div>
       </div>
+
+      {/* Content Planner Notifications */}
+      <ContentPlannerNotifications />
 
       {/* LegacyLeads Integration */}
       <div>
