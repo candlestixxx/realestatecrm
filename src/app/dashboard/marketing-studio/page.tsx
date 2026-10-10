@@ -193,6 +193,67 @@ function ContentPlannerNotifications() {
   );
 }
 
+function ContentPipeline() {
+  const [videos, setVideos] = useState<Array<{ id: string; title: string; createdAt: string }>>([]);
+  const [podcasts, setPodcasts] = useState<Array<{ id: string; title: string; createdAt: string }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.allSettled([
+      fetch('http://localhost:3031/video-projects').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('http://localhost:3031/podcasts').then(r => r.ok ? r.json() : []).catch(() => []),
+    ]).then(([vidRes, podRes]) => {
+      if (vidRes.status === 'fulfilled' && Array.isArray(vidRes.value)) setVideos(vidRes.value);
+      if (podRes.status === 'fulfilled' && Array.isArray(podRes.value)) setPodcasts(podRes.value);
+    }).finally(() => setLoading(false));
+  }, []);
+
+  if (loading || (videos.length === 0 && podcasts.length === 0)) return null;
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Content Pipeline</h2>
+        <span title="Recent video projects and podcast episodes from the Content Planner service (port 3031)." aria-label="About Content Pipeline: Recent video projects and podcast episodes from Content Planner." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help">?</span>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {videos.length > 0 && (
+          <div className="bg-background border border-border rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg">🎬</span>
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Video Projects</span>
+            </div>
+            <div className="space-y-2">
+              {videos.slice(0, 3).map(v => (
+                <div key={v.id} className="flex items-center justify-between bg-muted/30 rounded-lg px-3 py-2">
+                  <span className="text-sm text-foreground truncate">{v.title}</span>
+                  <span className="text-xs text-muted-foreground flex-shrink-0 ml-2">{new Date(v.createdAt).toLocaleDateString()}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {podcasts.length > 0 && (
+          <div className="bg-background border border-border rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg">🎙️</span>
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Podcast Episodes</span>
+            </div>
+            <div className="space-y-2">
+              {podcasts.slice(0, 3).map(p => (
+                <div key={p.id} className="flex items-center justify-between bg-muted/30 rounded-lg px-3 py-2">
+                  <span className="text-sm text-foreground truncate">{p.title}</span>
+                  <span className="text-xs text-muted-foreground flex-shrink-0 ml-2">{new Date(p.createdAt).toLocaleDateString()}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function MarketingStudioPage() {
   return (
     <div className="space-y-6">
@@ -264,6 +325,9 @@ export default function MarketingStudioPage() {
 
       {/* Content Planner Notifications */}
       <ContentPlannerNotifications />
+
+      {/* Content Pipeline */}
+      <ContentPipeline />
 
       {/* LegacyLeads Integration */}
       <div>
