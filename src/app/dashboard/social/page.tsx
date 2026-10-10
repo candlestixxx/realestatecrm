@@ -164,6 +164,56 @@ export default function SocialConnectionsPage() {
 
       {/* Recent Posts from Content Planner */}
       <RecentPostsSection />
+
+      {/* Social Analytics from Content Planner */}
+      <SocialAnalyticsSummary />
+    </div>
+  );
+}
+
+function SocialAnalyticsSummary() {
+  const [analytics, setAnalytics] = useState<{ totalViews: number; totalLikes: number; totalShares: number } | null>(null);
+
+  useEffect(() => {
+    fetch('http://localhost:3031/analytics')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && typeof data === 'object') {
+          setAnalytics({
+            totalViews: data.totalViews || 0,
+            totalLikes: data.totalLikes || 0,
+            totalShares: data.totalShares || 0,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  if (!analytics) return null;
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Engagement Overview</h2>
+        <span
+          title="Aggregated engagement metrics from the Content Planner analytics API (port 3031)."
+          aria-label="Engagement overview from Content Planner analytics"
+          className="cursor-help text-muted-foreground text-xs"
+        >ⓘ</span>
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { label: 'Total Views', value: analytics.totalViews.toLocaleString(), icon: '👁️' },
+          { label: 'Total Likes', value: analytics.totalLikes.toLocaleString(), icon: '❤️' },
+          { label: 'Total Shares', value: analytics.totalShares.toLocaleString(), icon: '🔄' },
+        ].map(s => (
+          <div key={s.label} className="bg-background border border-border rounded-xl p-4 text-center">
+            <div className="text-2xl mb-1">{s.icon}</div>
+            <p className="text-2xl font-extrabold text-foreground">{s.value}</p>
+            <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
