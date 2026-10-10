@@ -1,3 +1,11 @@
+## v0.58.42 (2026-10-07)
+
+### Added
+- ContentPlanner API (port 3031) added to ServiceHealthGrid for full 9-service visibility
+
+### Changed
+- Removed unused imports across 21 dashboard files (33 imports total)
+
 ## v0.58.41 (2026-10-07)
 
 ### Fixed
