@@ -1,6 +1,6 @@
 'use client';
 
-// ServiceHealthGrid — real-time status of all 8 sub-services.
+// ServiceHealthGrid — real-time status of all 9 sub-services.
 // Why: operators need at-a-glance visibility into which services are up/down
 // without leaving the dashboard. Polls each service every 30 seconds.
 
@@ -19,6 +19,7 @@ const SERVICES: Omit<ServiceStatus, 'status' | 'code'>[] = [
   { name: 'LeadG', port: 3001, url: 'http://localhost:3001' },
   { name: 'Foreclosure', port: 3002, url: 'http://localhost:3002' },
   { name: 'ContentPlanner', port: 3003, url: 'http://localhost:3003' },
+  { name: 'ContentPlanner API', port: 3031, url: 'http://localhost:3031/posts' },
   { name: 'MediaWorkflow', port: 3004, url: 'http://localhost:3004' },
   { name: 'LegacyLeads Web', port: 3005, url: 'http://localhost:3005' },
   { name: 'LegacyLeads API', port: 3006, url: 'http://localhost:3006/health' },
