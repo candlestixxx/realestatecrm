@@ -1,3 +1,13 @@
+## v0.58.41 (2026-10-07)
+
+### Fixed
+- MarketingStats now fetches from ContentPlanner Express API (port 3031) instead of Next.js web (port 3003) which does not serve JSON endpoints
+
+### Added
+- Platform breakdown section in Marketing Stats (per-platform views/likes/shares from ContentPlanner analytics API)
+- ContentPlanner notifications panel on Marketing Studio (unread badge, latest 5 notifications)
+- Tooltip markers on section headings in marketing-studio, social, and agent-studio
+
 ## v0.58.40 (2026-10-07)
 
 ### Fixed
