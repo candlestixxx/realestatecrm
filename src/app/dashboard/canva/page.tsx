@@ -2,7 +2,7 @@
 // Canva integration — design marketing materials with Canva templates.
 // API: /api/canva (POST design creation/management).
 
-import { useState } from 'react';
+import {} from 'react';
 import { Palette, ExternalLink, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
