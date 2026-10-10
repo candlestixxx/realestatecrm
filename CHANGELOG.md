@@ -6,6 +6,8 @@
 ### Added
 - Platform breakdown section in Marketing Stats (per-platform views/likes/shares from ContentPlanner analytics API)
 - ContentPlanner notifications panel on Marketing Studio (unread badge, latest 5 notifications)
+- Content Pipeline section on Marketing Studio (video projects + podcast episodes from ContentPlanner API)
+- Engagement Overview on social page (views/likes/shares from ContentPlanner analytics)
 - Tooltip markers on section headings in marketing-studio, social, and agent-studio
 
 ## v0.58.40 (2026-10-07)
