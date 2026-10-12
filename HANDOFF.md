@@ -33,7 +33,7 @@
   - `contentplanner`: package-lock only (optional `@next/swc-*` platform binaries auto-added)
   - Decide next session whether these are legit (commit) or should be reverted.
 - **10 redundant remote feature branches** NOT deleted (verified safe to delete; left intact to honor retention-first policy).
-- **Build phase**: build-all.ps1 not yet re-run this session (see below).
+- **Build phase**: COMPLETED — all 6 components built GREEN (root CRM, leadg, contentplanner, foreclosureworkflow, media-workflow, legacyleads frontend). No services were running beforehand, so nothing needed restarting/killing.
 
 ### Push status
 - Submodule commits pushed: `foreclosureworkflow` (29b2985), `media-workflow` (21c39b5), `legacyleads` (30d7028).
