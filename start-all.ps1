@@ -56,7 +56,7 @@ Start-Service "foreclosure" 3002 "node start-3002.js" "apps\foreclosureworkflow"
 Start-Service "contentplanner" 3003 "npx next start -p 3003" "apps\contentplanner\apps\web" @{}
 
 # Port 3004 — Media Workflow
-Start-Service "media-workflow" 3004 "node dist\index.js" "apps\media-workflow" @{ PORT = "3004" }
+Start-Service "media-workflow" 3004 "node dist\src\index.js" "apps\media-workflow" @{ PORT = "3004" }
 
 # Port 3005 — LegacyLeads Frontend
 Start-Service "legacyleads-web" 3005 "npx next start -p 3005" "apps\legacyleads\frontend" @{

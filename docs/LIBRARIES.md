@@ -53,15 +53,15 @@ This document lists the major libraries, frameworks, and submodules used in the 
 ## 0.39.0 Audit
 - Confirmed versions for major dependencies: Next.js (16.2.6), React (19.0.0), Tailwind CSS (3.4.1), Prisma (6.19.3), NextAuth.js (4.24.11).
 
-## Git Submodules — Structural Map (verified 2026-10-01, v0.53.0)
+## Git Submodules — Structural Map (verified 2026-10-09, v0.58.43)
 
 | Path | Remote URL | Pinned Commit | Branch | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| `apps/leadg` | https://github.com/candlestixxx/leadG.git | `d592b04` | `main` | Active — Voice agent (campaigns, calls, A/B testing) |
-| `apps/contentplanner` | https://github.com/candlestixxx/socialmediacontentplanner.git | `a5c2028` | `main` | Active — Content studio (AI generation, billing, social) |
-| `apps/foreclosureworkflow` | https://github.com/candlestixxx/forclosureworkflow.git | `9e1dca0` | `main` | Active — Foreclosure monitoring + tax assessors |
-| `apps/media-workflow` | https://github.com/candlestixxx/re-agent-workflow-media-1.git | `15cf986` | `main` | Active — Media pipeline + AI compliance |
-| `apps/legacyleads` | https://github.com/candlestixxx/LegacyLeads.git | `08cd887` | `main` | Active — Skip-tracing, Mapbox, TCPA |
+| `apps/leadg` | https://github.com/candlestixxx/leadG.git | `1e14cca` | `main` | Active — Voice agent (campaigns, calls, A/B testing) |
+| `apps/contentplanner` | https://github.com/candlestixxx/socialmediacontentplanner.git | `271ee93` | `main` | Active — Content studio (AI generation, billing, social) |
+| `apps/foreclosureworkflow` | https://github.com/candlestixxx/forclosureworkflow.git | `29b2985` | `main` | Active — Foreclosure monitoring + tax assessors |
+| `apps/media-workflow` | https://github.com/candlestixxx/re-agent-workflow-media-1.git | `21c39b5` | `main` | Active — Media pipeline + AI compliance |
+| `apps/legacyleads` | https://github.com/candlestixxx/LegacyLeads.git | `30d7028` | `main` | Active — Skip-tracing, Mapbox, TCPA |
 
 ### Archived Submodules (removed from .gitmodules 2026-06-10; features fully merged)
 

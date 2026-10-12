@@ -1,3 +1,14 @@
+## v0.58.43 (2026-10-09)
+
+### Changed
+- Repository synchronization: all 5 submodules fast-forwarded to latest `origin/main` (foreclosureworkflow +2, legacyleads +1, media-workflow +3; leadg gitlink advanced 2 commits to `origin/main`)
+- Committed submodule launcher scripts (`foreclosureworkflow/start-3002.js|.bat`, `media-workflow/start-3004.bat`) and gitignored transient logs
+- `start-all.ps1` media-workflow start path corrected (`dist/index.js` → `dist/src/index.js`)
+- Version string synchronized across `VERSION.md`, `package.json`, `package-lock.json` (0.54.0 → 0.58.43)
+
+### Notes
+- All feature branches across all 5 submodules verified as fully merged (ancestors of `main`, zero unique commits) — no forward-merge or cherry-pick required
+
 ## v0.58.42 (2026-10-07)
 
 ### Added

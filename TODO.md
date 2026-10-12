@@ -178,3 +178,18 @@
 - [x] Multi-channel A/B testing in leadG (email/SMS variants) — wired 2026-10-06
 - [x] CI/CD pipeline for automated builds and testing
 - [x] Live audio WebSocket monitor UI panel in dashboard
+
+### Repository Sync (2026-10-09, v0.58.43)
+- [x] Fetch all remotes + tags (root + 5 submodules; no nested submodules)
+- [x] Fast-forward submodule mains to origin/main (foreclosureworkflow +2, legacyleads +1, media-workflow +3)
+- [x] leadg gitlink advanced 2 commits to origin/main (1e14cca)
+- [x] Verified all 10 feature branches fully merged (zero unique commits) — no cherry-pick needed
+- [x] Commit submodule launchers (start-3002, start-3004) + gitignore transient logs
+- [x] Fix start-all.ps1 media-workflow path (dist/index.js → dist/src/index.js)
+- [x] Version bump → 0.58.43 (VERSION.md / package.json / package-lock.json / CHANGELOG)
+- [x] Regenerate docs/SUBMODULE_MAP.md + docs/LIBRARIES.md
+
+### Follow-ups for next session
+- [ ] Decide on uncommitted submodule dependency bumps (lucide-react ^1.16→^1.52 in foreclosureworkflow; lucide-react ^1.25→^1.52 + @next/swc-win32-x64-msvc in legacyleads/frontend) — left uncommitted to avoid polluting shared repos
+- [ ] Archive the 10 redundant remote feature branches (manual GitHub UI or `git push origin --delete`)
+- [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)

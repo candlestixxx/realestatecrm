@@ -1,3 +1,46 @@
+## v0.58.43 — Repository Synchronization & Intelligent Merge (2026-10-09)
+
+**Task:** EXECUTIVE PROTOCOL — comprehensive local/remote repo refresh, recursive submodule sync, dual-direction branch reconciliation, version bump, docs, push, build.
+
+### Completed
+
+**STEP 1 — Upstream tracking & submodule sanitization**
+- Fetched all remotes + tags on root and all 5 submodules (no nested submodules exist).
+- Upstream: `robertpelloni/realestatecrm` and `candlestixxx/realestatecrm` resolve to the **identical** `main` HEAD (`62fbdc6`) — no divergent upstream to merge. (Prior note in `docs/LIBRARIES.md` saying "Not a fork — no upstream parent" confirmed.)
+- Fast-forwarded submodule `main` branches to `origin/main`:
+  - `foreclosureworkflow` `04699e0` → `b890e53` (+2: P2025 `updateMany` email/sms fix)
+  - `legacyleads` `d2c49c5` → `ec79893` (+1: JSON error for malformed bodies)
+  - `media-workflow` `3559d64` → `a37c7e9` (+3: Redis graceful degradation, JSON errors, log cleanup)
+  - `leadg` gitlink pin advanced `2e9feb0` → `1e14cca` (2 commits to `origin/main`)
+  - `contentplanner` already at `origin/main` (`271ee93`) — no change.
+
+**STEP 2 — Dual-direction intelligent merge engine**
+- Interrogated **all 10 feature branches** across submodules. **Result: zero unique commits** — every one is an ancestor of `main` (ahead=0), i.e. already fully merged. No forward-merge, cherry-pick, or reverse-merge was necessary. Full table in `docs/SUBMODULE_MAP.md`.
+
+**STEP 3 — Cleanup, docs, version, push**
+- Committed submodule launchers: `foreclosureworkflow/start-3002.js|.bat`, `media-workflow/start-3004.bat`.
+- Gitignored transient `*.log` in `foreclosureworkflow`, `media-workflow`, `legacyleads`.
+- Fixed `start-all.ps1` media-workflow path (`dist/index.js` → `dist/src/index.js`).
+- Version bump **0.54.0 → 0.58.43** in `VERSION.md`, `package.json`, `package-lock.json`; new CHANGELOG entry.
+- Regenerated `docs/SUBMODULE_MAP.md` + updated `docs/LIBRARIES.md`; updated `ROADMAP.md` (Phase 14) + `TODO.md`.
+- Untracked build artifact `tsconfig.tsbuildinfo` (now gitignored); added `build-out.txt` etc. to `.gitignore`.
+- Retention: committed `.hypernexus` session/audit/log changes, `catalog.db`, `hypernexus.db`, `scripts/archive/*.py` diagnostics, `scripts/system-tray.ps1` contentplanner path fix.
+
+### NOT done / left for next agent (deliberately)
+- **Uncommitted submodule dependency bumps** (pre-existing, from prior `npm install` runs — left in working tree, NOT committed to avoid polluting shared submodule repos):
+  - `foreclosureworkflow`: `lucide-react ^1.16.0 → ^1.52.0` (package.json + lock)
+  - `legacyleads/frontend`: `lucide-react ^1.25.0 → ^1.52.0` + added `@next/swc-win32-x64-msvc ^16.3.8` (package.json + lock)
+  - `contentplanner`: package-lock only (optional `@next/swc-*` platform binaries auto-added)
+  - Decide next session whether these are legit (commit) or should be reverted.
+- **10 redundant remote feature branches** NOT deleted (verified safe to delete; left intact to honor retention-first policy).
+- **Build phase**: build-all.ps1 not yet re-run this session (see below).
+
+### Push status
+- Submodule commits pushed: `foreclosureworkflow` (29b2985), `media-workflow` (21c39b5), `legacyleads` (30d7028).
+- Root commit + push completed after this write (version bump named in commit).
+
+---
+
 ## v0.58.22 - Complete UI Quality Polish + Help Center + Error Handling
 
 **Recent work (v0.58.15-v0.58.22):**
