@@ -164,18 +164,22 @@ const VIDEOS: VideoTopic[] = [
     id: 'social',
     title: 'Social Media & Content Studio',
     category: 'Marketing',
-    description: 'AI content generation, social scheduling, brand voice management, and multi-platform publishing.',
+    description: 'AI content generation, social scheduling, brand voice management, multi-platform publishing, video/podcast pipeline, and engagement analytics.',
     steps: [
       'Open Marketing Studio to access the AI Content Creator.',
       'Set up your Brand Voice profile for consistent messaging.',
       'Generate posts with AI using property data and market trends.',
-      'Schedule posts across Facebook, Instagram, LinkedIn, and Google Business.'
+      'Schedule posts across Facebook, Instagram, LinkedIn, and Google Business.',
+      'View the Content Pipeline for video projects and podcast episodes.',
+      'Check Social Analytics on the Social page for engagement metrics (views, likes, shares).'
     ],
     simulationLogs: [
       '✨ [AI] Generating post for "8485 Sherman Ave" using brand voice "Luxury Metro".',
       '📝 [Content] Created: "Just listed! Stunning 3bd in prime location..." (247 chars).',
       '📅 [Schedule] Queued for Facebook + Instagram — Tomorrow 9:00 AM.',
-      '📊 [Analytics] Previous post reach: 1,247 impressions, 23 engagements.'
+      '📊 [Analytics] Previous post reach: 1,247 impressions, 23 engagements.',
+      '🎬 [Pipeline] Video project "Top 5 SaaS Tools" — script ready for rendering.',
+      '🎙️ [Pipeline] Podcast "The Future of AI" — outline generated, ready to record.'
     ]
   },
   {
