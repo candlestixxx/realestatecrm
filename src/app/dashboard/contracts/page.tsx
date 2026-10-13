@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 // Contract management — generate, deploy, and track real-estate contracts.
 // API: /api/contracts (POST with template.type, parties, action).
 
@@ -28,6 +28,8 @@ export default function ContractsPage() {
       });
       const data = await res.json();
       setResult(data.error || data.message || JSON.stringify(data).substring(0, 200));
+    } catch {
+      setResult('Request failed. Please try again.');
     } finally { setGenerating(false); }
   }
 
@@ -36,6 +38,7 @@ export default function ContractsPage() {
       <div className="p-6 max-w-4xl">
         <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
           <FileSignature className="w-6 h-6 text-primary" /> Contracts
+          <span title="Generate, deploy, and track real-estate contracts. Choose a template, fill in parties, then generate or deploy via e-signature or on-chain." aria-label="About contracts" className="cursor-help inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] font-bold text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors ml-1">?</span>
         </h1>
         <p className="text-muted-foreground mb-6 text-sm">Generate, deploy, and track real-estate contracts on-chain or via e-signature.</p>
 
@@ -54,7 +57,9 @@ export default function ContractsPage() {
         </div>
 
         <div className="rounded-lg border p-4 mb-4">
-          <h2 className="font-semibold mb-3">Parties</h2>
+          <h2 className="font-semibold mb-3 flex items-center gap-1">Parties
+            <span title="Define the buyer and seller for this contract. Role, name, and email are used for e-signature routing." aria-label="About parties" className="cursor-help inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] font-bold text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">?</span>
+          </h2>
           {parties.map((p, i) => (
             <div key={i} className="grid grid-cols-3 gap-2 mb-2">
               <input placeholder="Role" value={p.role} onChange={e => { const np = [...parties]; np[i].role = e.target.value; setParties(np); }} className="rounded-md border px-3 py-2 text-sm" />
@@ -65,8 +70,12 @@ export default function ContractsPage() {
         </div>
 
         <div className="flex gap-2">
-          {['deploy', 'execute', 'dispute'].map(action => (
-            <button key={action} onClick={() => handleGenerate(action)} disabled={generating}
+          {[
+            { action: 'deploy', tip: 'Deploy the contract to the blockchain for immutable record-keeping.' },
+            { action: 'execute', tip: 'Execute the contract — triggers e-signature requests to all parties.' },
+            { action: 'dispute', tip: 'File a dispute on this contract. Creates a compliance review task.' },
+          ].map(({ action, tip }) => (
+            <button key={action} onClick={() => handleGenerate(action)} disabled={generating} title={tip}
               className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 capitalize">
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : action}
             </button>
