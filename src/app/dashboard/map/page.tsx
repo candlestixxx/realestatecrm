@@ -225,7 +225,9 @@ export default function LeadMapPage() {
 
           {/* Lead List */}
           <div className="mt-4 space-y-1 max-h-[300px] overflow-y-auto">
-            {filteredLeads.slice(0, 20).map(lead => (
+            {filteredLeads.length === 0 ? (
+              <p className="text-xs text-muted-foreground text-center py-4">No leads with coordinates for this filter.</p>
+            ) : filteredLeads.slice(0, 20).map(lead => (
               <div
                 key={lead.id}
                 onClick={() => setSelectedLead(lead)}
