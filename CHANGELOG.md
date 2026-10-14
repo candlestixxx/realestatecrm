@@ -1,3 +1,16 @@
+## v0.58.44 (2026-10-09)
+
+### Added
+- `start-all.bat` — one-command startup for all 9 services with log redirection
+
+### Fixed
+- Contracts page: heading tooltips, action button tips (deploy/execute/dispute), try/catch on generate handler
+- Map page: lead list empty state guard when filter yields no results
+- Imports page: aria-label on hidden file input for accessibility
+
+### Changed
+- Help Center social topic expanded to cover Content Pipeline (videos/podcasts) and Social Analytics engagement metrics
+
 ## v0.58.43 (2026-10-09)
 
 ### Changed
