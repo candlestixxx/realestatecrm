@@ -1,3 +1,9 @@
+## v0.58.45 (2026-10-09)
+
+### Changed
+- Social page Connect button now tries ContentPlanner OAuth flow (`/social/auth-url`) first, falls back to local record when mock keys are detected
+- Archived 12 unused legacy components to `src/components/_archive/` (superseded by LeadDetailLayoutClient)
+
 ## v0.58.44 (2026-10-09)
 
 ### Added
