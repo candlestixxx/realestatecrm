@@ -43,21 +43,33 @@ export default function SocialConnectionsPage() {
   const connectPlatform = async (platform: string) => {
     setConnecting(platform);
     try {
-      // OAuth flow not yet configured for external providers — create a local connection record.
-      // When OAuth credentials are added to env vars, replace this with a redirect to the provider.
+      // Try ContentPlanner OAuth flow first (works when real API keys are configured).
+      try {
+        const oauthRes = await fetch('http://localhost:3031/social/auth-url?provider=' + platform.toLowerCase());
+        if (oauthRes.ok) {
+          const oauthData = await oauthRes.json();
+          if (oauthData.authUrl && !oauthData.authUrl.includes('MOCK_')) {
+            window.open(oauthData.authUrl, '_blank');
+            toast.success('Redirecting to ' + platform + ' authorization...');
+            return;
+          }
+        }
+      } catch { /* ContentPlanner API may be down — fall through to local record */ }
+
+      // Fallback: create a local connection record.
       const res = await fetch('/api/social', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           platform,
-          accountName: `@${platform}_account`,
+          accountName: '@' + platform + '_account',
         }),
       });
       if (!res.ok) throw new Error('Failed');
-      toast.success(`Connected to ${platform} (simulated — OAuth pending).`);
+      toast.success('Connected to ' + platform + ' (local record — OAuth keys pending).');
       loadAccounts();
     } catch {
-      toast.error(`Failed to connect ${platform}`);
+      toast.error('Failed to connect ' + platform);
     } finally {
       setConnecting(null);
     }
