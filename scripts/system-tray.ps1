@@ -305,6 +305,13 @@ $miStopAll.Add_Click({ Stop-AllServices })
 
 $menu.Items.Add((New-Object System.Windows.Forms.ToolStripSeparator))
 
+$miWatchdog = $menu.Items.Add('Start Watchdog (auto-restart)')
+$miWatchdog.Add_Click({
+    Start-Process -FilePath 'powershell.exe' -ArgumentList '-ExecutionPolicy','Bypass','-File', (Join-Path $Root 'scripts\watch-services.ps1') -WindowStyle Minimized
+})
+
+$menu.Items.Add((New-Object System.Windows.Forms.ToolStripSeparator))
+
 $miExit = $menu.Items.Add('Exit Tray (keep servers running)')
 $miExit.Add_Click({
     $tray.Visible = $false
