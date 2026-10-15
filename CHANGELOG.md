@@ -1,3 +1,8 @@
+## v0.58.48 (2026-10-09)
+
+### Fixed
+- **Accessibility**: added `type="button"` to 470 buttons across 127 files — prevents unintended form submission (HTML default is `type="submit"`)
+
 ## v0.58.47 (2026-10-09)
 
 ### Fixed
