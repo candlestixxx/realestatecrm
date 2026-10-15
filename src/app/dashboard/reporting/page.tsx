@@ -36,7 +36,7 @@ function InfoBadge({ text }: { text: string }) {
         <button
           type="button"
           aria-label="More information"
-          className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] font-bold text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+          className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] font-bold text-muted-foreground hover:bg-muted hover:text-muted-foreground transition-colors"
         >
           i
         </button>
@@ -64,32 +64,32 @@ function MarketTrendsSection() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-sm text-gray-500">Loading market trends...</p>;
-  if (!trends) return <p className="text-sm text-gray-500">Market trends unavailable.</p>;
+  if (loading) return <p className="text-sm text-muted-foreground">Loading market trends...</p>;
+  if (!trends) return <p className="text-sm text-muted-foreground">Market trends unavailable.</p>;
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div className="bg-gray-50 rounded-lg p-4">
-        <div className="text-xs text-gray-500 mb-1">Avg Deal Value (30d)</div>
-        <div className="text-xl font-bold text-gray-900">
+      <div className="bg-muted/30 rounded-lg p-4">
+        <div className="text-xs text-muted-foreground mb-1">Avg Deal Value (30d)</div>
+        <div className="text-xl font-bold text-foreground">
           {trends.deals.avg ? '$' + trends.deals.avg.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '--'}
         </div>
       </div>
-      <div className="bg-gray-50 rounded-lg p-4">
-        <div className="text-xs text-gray-500 mb-1">Total Deal Volume (30d)</div>
-        <div className="text-xl font-bold text-gray-900">
+      <div className="bg-muted/30 rounded-lg p-4">
+        <div className="text-xs text-muted-foreground mb-1">Total Deal Volume (30d)</div>
+        <div className="text-xl font-bold text-foreground">
           {trends.deals.sum ? '$' + trends.deals.sum.toLocaleString() : '--'}
         </div>
       </div>
-      <div className="bg-gray-50 rounded-lg p-4">
-        <div className="text-xs text-gray-500 mb-1">Avg List Price (30d)</div>
-        <div className="text-xl font-bold text-gray-900">
+      <div className="bg-muted/30 rounded-lg p-4">
+        <div className="text-xs text-muted-foreground mb-1">Avg List Price (30d)</div>
+        <div className="text-xl font-bold text-foreground">
           {trends.listingStats.avgPrice ? '$' + trends.listingStats.avgPrice.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '--'}
         </div>
       </div>
-      <div className="bg-gray-50 rounded-lg p-4">
-        <div className="text-xs text-gray-500 mb-1">Deals Closed (30d)</div>
-        <div className="text-xl font-bold text-gray-900">{trends.deals.count}</div>
+      <div className="bg-muted/30 rounded-lg p-4">
+        <div className="text-xs text-muted-foreground mb-1">Deals Closed (30d)</div>
+        <div className="text-xl font-bold text-foreground">{trends.deals.count}</div>
       </div>
     </div>
   );
@@ -103,7 +103,7 @@ function BarList({ title, items, tooltip, valueFormat }: {
 }) {
   const max = Math.max(...items.map(x => x.count), 1);
   return (
-    <div className="bg-white rounded-lg border p-6">
+    <div className="bg-card rounded-lg border p-6">
       <div className="flex items-center gap-2 mb-4">
         <h2 className="text-lg font-semibold">{title}</h2>
         <InfoBadge text={tooltip} />
@@ -111,8 +111,8 @@ function BarList({ title, items, tooltip, valueFormat }: {
       <div className="space-y-3">
         {items.map((s, i) => (
           <div key={s.key} className="flex items-center gap-3">
-            <div className="w-24 text-sm text-gray-600">{s.key.replace('_', ' ')}</div>
-            <div className="flex-1 bg-gray-100 rounded-full h-6">
+            <div className="w-24 text-sm text-muted-foreground">{s.key.replace('_', ' ')}</div>
+            <div className="flex-1 bg-muted rounded-full h-6">
               <div
                 className="rounded-full h-6 flex items-center px-2 text-xs text-white"
                 style={{ width: Math.max((s.count / max) * 100, 8) + '%', backgroundColor: BAR_COLORS[i % BAR_COLORS.length] }}
@@ -121,11 +121,11 @@ function BarList({ title, items, tooltip, valueFormat }: {
               </div>
             </div>
             {valueFormat && (
-              <div className="w-20 text-sm text-gray-500 text-right">{valueFormat(s.value)}</div>
+              <div className="w-20 text-sm text-muted-foreground text-right">{valueFormat(s.value)}</div>
             )}
           </div>
         ))}
-        {items.length === 0 && <p className="text-sm text-gray-500">No data yet.</p>}
+        {items.length === 0 && <p className="text-sm text-muted-foreground">No data yet.</p>}
       </div>
     </div>
   );
@@ -144,8 +144,8 @@ export default function ReportingPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="p-6 text-center text-gray-500">Loading reports...</div>;
-  if (!data) return <div className="p-6 text-center text-gray-500">Failed to load reports.</div>;
+  if (loading) return <div className="p-6 text-center text-muted-foreground">Loading reports...</div>;
+  if (!data) return <div className="p-6 text-center text-muted-foreground">Failed to load reports.</div>;
 
   const money = (v: number | null | undefined) => v ? '$' + (v / 1000).toFixed(0) + 'k' : '--';
 
@@ -154,10 +154,10 @@ export default function ReportingPage() {
       <div className="p-6 max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <h1 className="text-2xl font-bold text-foreground">Reports & Analytics</h1>
+            <p className="text-sm text-muted-foreground mt-1">
               All business metrics in one place. Hover the{' '}
-              <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] font-bold align-middle">
+              <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] font-bold align-middle">
                 i
               </span>{' '}
               badges for guidance.
@@ -175,7 +175,7 @@ export default function ReportingPage() {
                   'px-4 py-2 rounded-lg text-sm font-semibold transition-colors ' +
                   (tab === t.id
                     ? 'bg-blue-600 text-white'
-                    : 'bg-white border text-gray-600 hover:bg-gray-50')
+                    : 'bg-card border text-muted-foreground hover:bg-muted/30')
                 }
               >
                 {t.label}
@@ -205,7 +205,7 @@ export default function ReportingPage() {
                   }
                 } catch { /* export failed */ }
               }}
-              className="px-4 py-2 rounded-lg text-sm font-semibold bg-white border text-gray-600 hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-semibold bg-card border text-muted-foreground hover:bg-muted/30 transition-colors"
             >
               Export CSV
             </button>
@@ -223,13 +223,13 @@ export default function ReportingPage() {
                 { label: 'Listings', value: data.listings.total, color: 'bg-yellow-500', tip: 'MLS listings tracked.' },
                 { label: 'Partners', value: data.partners.total, color: 'bg-red-500', tip: 'Mortgage/title/insurance partners.' },
               ].map(card => (
-                <div key={card.label} className="bg-white rounded-lg border p-4">
+                <div key={card.label} className="bg-card rounded-lg border p-4">
                   <div className={'w-10 h-10 rounded-lg flex items-center justify-center text-white mb-2 ' + card.color}>
                     <span className="text-lg font-bold">{card.label[0]}</span>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">{card.value}</div>
+                  <div className="text-2xl font-bold text-foreground">{card.value}</div>
                   <div className="flex items-center gap-1.5">
-                    <div className="text-sm text-gray-500">{card.label}</div>
+                    <div className="text-sm text-muted-foreground">{card.label}</div>
                     <InfoBadge text={card.tip} />
                   </div>
                 </div>
@@ -262,7 +262,7 @@ export default function ReportingPage() {
             </div>
 
             {/* Market Trends (Syndicated) */}
-            <div className="bg-white rounded-lg border p-6 mb-8">
+            <div className="bg-card rounded-lg border p-6 mb-8">
               <div className="flex items-center gap-2 mb-4">
                 <h2 className="text-lg font-semibold">Market Trends</h2>
                 <InfoBadge text="Aggregated, anonymized market data across all brokerages. Shows lead volume, deal activity, and listing stats for the selected timeframe." />
@@ -271,23 +271,23 @@ export default function ReportingPage() {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-white rounded-lg border p-6">
+            <div className="bg-card rounded-lg border p-6">
               <div className="flex items-center gap-2 mb-4">
                 <h2 className="text-lg font-semibold">Recent Activity</h2>
                 <InfoBadge text="Latest mutations across all entities. Audit trail provides the full immutable log." />
               </div>
               {data.recentActivity.length === 0 ? (
-                <p className="text-sm text-gray-500">No recent activity.</p>
+                <p className="text-sm text-muted-foreground">No recent activity.</p>
               ) : (
                 <div className="space-y-3">
                   {data.recentActivity.map(a => (
                     <div key={a.id} className="flex items-start gap-3 border-b pb-3 last:border-0">
                       <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
                       <div className="flex-1">
-                        <div className="text-sm font-medium text-gray-900">{a.type}</div>
-                        <div className="text-sm text-gray-500">{a.content}</div>
+                        <div className="text-sm font-medium text-foreground">{a.type}</div>
+                        <div className="text-sm text-muted-foreground">{a.content}</div>
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-muted-foreground">
                         {a.user?.name || 'System'} &middot; {new Date(a.createdAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -309,50 +309,50 @@ export default function ReportingPage() {
                 { label: 'Listings', value: data.listings.total, color: 'bg-indigo-500' },
                 { label: 'Partners', value: data.partners.total, color: 'bg-pink-500' },
               ].map(c => (
-                <div key={c.label} className="bg-white rounded-lg shadow border p-4">
+                <div key={c.label} className="bg-card rounded-lg shadow border p-4">
                   <div className={'w-8 h-1 rounded ' + c.color + ' mb-2'} />
-                  <p className="text-xs text-gray-500">{c.label}</p>
-                  <p className="text-xl font-bold text-gray-900">{c.value}</p>
+                  <p className="text-xs text-muted-foreground">{c.label}</p>
+                  <p className="text-xl font-bold text-foreground">{c.value}</p>
                 </div>
               ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow border p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Leads by Status</h3>
+              <div className="bg-card rounded-lg shadow border p-4">
+                <h3 className="font-semibold text-foreground mb-3">Leads by Status</h3>
                 {data.leads.byStatus.map(s => (
                   <div key={s.status} className="flex items-center justify-between py-1.5 border-b last:border-0">
-                    <span className="text-sm text-gray-600">{s.status}</span>
+                    <span className="text-sm text-muted-foreground">{s.status}</span>
                     <span className="text-sm font-medium">{s._count}</span>
                   </div>
                 ))}
               </div>
-              <div className="bg-white rounded-lg shadow border p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Deals by Stage</h3>
+              <div className="bg-card rounded-lg shadow border p-4">
+                <h3 className="font-semibold text-foreground mb-3">Deals by Stage</h3>
                 {data.deals.byStage.map(s => (
                   <div key={s.stage} className="flex items-center justify-between py-1.5 border-b last:border-0">
-                    <span className="text-sm text-gray-600">{s.stage}</span>
+                    <span className="text-sm text-muted-foreground">{s.stage}</span>
                     <span className="text-sm font-medium">
                       {s._count} &middot; ${s._sum.value?.toLocaleString() || 0}
                     </span>
                   </div>
                 ))}
               </div>
-              <div className="bg-white rounded-lg shadow border p-4 lg:col-span-2">
-                <h3 className="font-semibold text-gray-900 mb-3">Recent Activity</h3>
+              <div className="bg-card rounded-lg shadow border p-4 lg:col-span-2">
+                <h3 className="font-semibold text-foreground mb-3">Recent Activity</h3>
                 {data.recentActivity.map(a => (
                   <div key={a.id} className="flex items-start gap-3 py-2 border-b last:border-0">
-                    <span className="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-600 shrink-0">{a.type}</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground shrink-0">{a.type}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-800 truncate">{a.content}</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-sm text-foreground truncate">{a.content}</p>
+                      <p className="text-xs text-muted-foreground">
                         {a.user?.name || 'System'} &middot; {new Date(a.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                 ))}
                 {data.recentActivity.length === 0 && (
-                  <p className="text-sm text-gray-400">No recent activity.</p>
+                  <p className="text-sm text-muted-foreground">No recent activity.</p>
                 )}
               </div>
             </div>

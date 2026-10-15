@@ -126,7 +126,7 @@ function MarketingStats() {
           <div className="flex items-center gap-2 mb-3">
             <span className="text-lg">📊</span>
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Platform Breakdown</span>
-            <span title="Per-platform engagement metrics from the Content Planner analytics API." aria-label="About platform breakdown: Per-platform engagement metrics from the Content Planner analytics API." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help">?</span>
+            <span title="Per-platform engagement metrics from the Content Planner analytics API." aria-label="About platform breakdown: Per-platform engagement metrics from the Content Planner analytics API." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help">?</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {platforms.map(p => (
@@ -257,7 +257,7 @@ export default function MarketingStudioPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Marketing Studio <span title="Central hub for all marketing tools including campaigns, content planning, social media, text codes, and website builder." aria-label="About this section: Central hub for all marketing tools including campaigns, content planning, social media, text codes, and website builder." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+        <h1 className="text-2xl font-bold text-foreground">Marketing Studio <span title="Central hub for all marketing tools including campaigns, content planning, social media, text codes, and website builder." aria-label="About this section: Central hub for all marketing tools including campaigns, content planning, social media, text codes, and website builder." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
         <p className="text-sm text-muted-foreground mt-1">
           Your central hub for content creation, social media, and marketing automation.
         </p>

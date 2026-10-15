@@ -99,7 +99,7 @@ export default function SidebarAIAssistant() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No messages yet. Ask the AI assistant for help.</div> : (messages.map((m) => (
+            {messages.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No messages yet. Ask the AI assistant for help.</div> : (messages.map((m) => (
               <div
                 key={m.id}
                 className={`flex flex-col max-w-[85%] ${

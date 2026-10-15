@@ -29,7 +29,7 @@ const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-green-100 text-green-800',
   PENDING: 'bg-yellow-100 text-yellow-800',
   SOLD: 'bg-blue-100 text-blue-800',
-  EXPIRED: 'bg-gray-100 text-gray-800',
+  EXPIRED: 'bg-muted text-foreground',
   WITHDRAWN: 'bg-red-100 text-red-800',
 };
 
@@ -58,20 +58,20 @@ function CompsAnalysis({ address, city, zip }: { address: string; city: string |
     <div className="mb-4">
       <h3 className="font-semibold mb-2">Comparable Sales</h3>
       {loading ? (
-        <p className="text-sm text-gray-500">Loading comps...</p>
+        <p className="text-sm text-muted-foreground">Loading comps...</p>
       ) : comps.length === 0 ? (
-        <p className="text-sm text-gray-500">No historical comps found for this area.</p>
+        <p className="text-sm text-muted-foreground">No historical comps found for this area.</p>
       ) : (
         <div className="space-y-2">
           {comps.map(c => (
             <div key={c.id} className="flex items-center justify-between text-sm border-b pb-2">
               <div>
                 <div className="font-medium">{c.address}</div>
-                <div className="text-xs text-gray-500">{c.bedrooms || '—'} bd / {c.bathrooms || '—'} ba / {c.squareFeet?.toLocaleString() || '—'} sqft</div>
+                <div className="text-xs text-muted-foreground">{c.bedrooms || '—'} bd / {c.bathrooms || '—'} ba / {c.squareFeet?.toLocaleString() || '—'} sqft</div>
               </div>
               <div className="text-right">
                 <div className="font-semibold">{c.soldPrice ? '$' + c.soldPrice.toLocaleString() : '—'}</div>
-                <div className="text-xs text-gray-500">{c.soldDate ? new Date(c.soldDate).toLocaleDateString() : ''}</div>
+                <div className="text-xs text-muted-foreground">{c.soldDate ? new Date(c.soldDate).toLocaleDateString() : ''}</div>
               </div>
             </div>
           ))}
@@ -178,14 +178,14 @@ export default function ListingsPage() {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">MLS Listing Search <span title="Search MLS listings by location, price, and property type. Create offers and track listing activity." aria-label="About this section: Search MLS listings by location, price, and property type. Create offers and track listing activity." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+        <h1 className="text-2xl font-bold text-foreground">MLS Listing Search <span title="Search MLS listings by location, price, and property type. Create offers and track listing activity." aria-label="About this section: Search MLS listings by location, price, and property type. Create offers and track listing activity." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
         <button onClick={() => setShowEntryForm(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
           + New Listing
         </button>
       </div>
 
       {/* MLS Search Filters */}
-      <div className="bg-white rounded-lg border p-4 mb-6">
+      <div className="bg-card rounded-lg border p-4 mb-6">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
           <select value={filters.status} onChange={e => setFilters(f => ({ ...f, status: e.target.value }))} className="border rounded px-3 py-2 text-sm">
             <option value="ALL">All Status</option>
@@ -205,31 +205,31 @@ export default function ListingsPage() {
           <input placeholder="Min Sqft" type="number" value={filters.minSqft} onChange={e => setFilters(f => ({ ...f, minSqft: e.target.value }))} className="border rounded px-3 py-2 text-sm" />
           <input placeholder="City" value={filters.city} onChange={e => setFilters(f => ({ ...f, city: e.target.value }))} className="border rounded px-3 py-2 text-sm" />
           <input placeholder="ZIP" value={filters.zip} onChange={e => setFilters(f => ({ ...f, zip: e.target.value }))} className="border rounded px-3 py-2 text-sm" />
-          <button onClick={() => setFilters({ status: 'ALL', propertyType: '', minPrice: '', maxPrice: '', minBeds: '', minBaths: '', minSqft: '', city: '', zip: '' })} className="text-sm text-gray-500 hover:text-gray-700">Reset</button>
+          <button onClick={() => setFilters({ status: 'ALL', propertyType: '', minPrice: '', maxPrice: '', minBeds: '', minBaths: '', minSqft: '', city: '', zip: '' })} className="text-sm text-muted-foreground hover:text-foreground">Reset</button>
         </div>
       </div>
 
       {/* Listing Grid */}
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading listings...</div>
+        <div className="text-center py-12 text-muted-foreground">Loading listings...</div>
       ) : listings.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">No listings match your criteria.</div>
+        <div className="text-center py-12 text-muted-foreground">No listings match your criteria.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {listings.map(l => (
-            <div key={l.id} onClick={() => setSelected(l)} className="bg-white rounded-lg border hover:shadow-md cursor-pointer transition-shadow">
-              <div className="h-48 bg-gray-100 rounded-t-lg flex items-center justify-center text-gray-400">
+            <div key={l.id} onClick={() => setSelected(l)} className="bg-card rounded-lg border hover:shadow-md cursor-pointer transition-shadow">
+              <div className="h-48 bg-muted rounded-t-lg flex items-center justify-center text-muted-foreground">
                 {l.photos ? <img src={JSON.parse(l.photos)[0]} alt="" className="h-full w-full object-cover rounded-t-lg" /> : 'No Photo'}
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className={'px-2 py-1 rounded-full text-xs font-medium ' + (STATUS_COLORS[l.status] || 'bg-gray-100')}>{l.status}</span>
-                  {l.mlsNumber && <span className="text-xs text-gray-400">MLS #{l.mlsNumber}</span>}
+                  <span className={'px-2 py-1 rounded-full text-xs font-medium ' + (STATUS_COLORS[l.status] || 'bg-muted')}>{l.status}</span>
+                  {l.mlsNumber && <span className="text-xs text-muted-foreground">MLS #{l.mlsNumber}</span>}
                 </div>
-                <div className="text-lg font-semibold text-gray-900">{l.listPrice ? '$' + l.listPrice.toLocaleString() : 'Price TBD'}</div>
-                <div className="text-sm text-gray-600">{l.address}</div>
-                <div className="text-sm text-gray-500">{l.city}, {l.state} {l.zip}</div>
-                <div className="flex gap-3 mt-2 text-xs text-gray-500">
+                <div className="text-lg font-semibold text-foreground">{l.listPrice ? '$' + l.listPrice.toLocaleString() : 'Price TBD'}</div>
+                <div className="text-sm text-muted-foreground">{l.address}</div>
+                <div className="text-sm text-muted-foreground">{l.city}, {l.state} {l.zip}</div>
+                <div className="flex gap-3 mt-2 text-xs text-muted-foreground">
                   {l.bedrooms && <span>{l.bedrooms} bd</span>}
                   {l.bathrooms && <span>{l.bathrooms} ba</span>}
                   {l.squareFeet && <span>{l.squareFeet.toLocaleString()} sqft</span>}
@@ -246,20 +246,20 @@ export default function ListingsPage() {
       {/* Listing Detail Modal */}
       {selected && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelected(null)}>
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-card rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">{selected.address}</h2>
-              <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+              <button onClick={() => setSelected(null)} className="text-muted-foreground hover:text-muted-foreground">✕</button>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
-              <div><span className="text-sm text-gray-500">Price</span><div className="text-lg font-semibold">{selected.listPrice ? '$' + selected.listPrice.toLocaleString() : 'TBD'}</div></div>
-              <div><span className="text-sm text-gray-500">Status</span><div><span className={'px-2 py-1 rounded-full text-xs ' + (STATUS_COLORS[selected.status] || '')}>{selected.status}</span></div></div>
-              <div><span className="text-sm text-gray-500">Beds / Baths</span><div>{selected.bedrooms || '—'} / {selected.bathrooms || '—'}</div></div>
-              <div><span className="text-sm text-gray-500">Square Feet</span><div>{selected.squareFeet?.toLocaleString() || '—'}</div></div>
-              <div><span className="text-sm text-gray-500">Year Built</span><div>{selected.yearBuilt || '—'}</div></div>
-              <div><span className="text-sm text-gray-500">Property Type</span><div>{selected.propertyType?.replace('_', ' ') || '—'}</div></div>
+              <div><span className="text-sm text-muted-foreground">Price</span><div className="text-lg font-semibold">{selected.listPrice ? '$' + selected.listPrice.toLocaleString() : 'TBD'}</div></div>
+              <div><span className="text-sm text-muted-foreground">Status</span><div><span className={'px-2 py-1 rounded-full text-xs ' + (STATUS_COLORS[selected.status] || '')}>{selected.status}</span></div></div>
+              <div><span className="text-sm text-muted-foreground">Beds / Baths</span><div>{selected.bedrooms || '—'} / {selected.bathrooms || '—'}</div></div>
+              <div><span className="text-sm text-muted-foreground">Square Feet</span><div>{selected.squareFeet?.toLocaleString() || '—'}</div></div>
+              <div><span className="text-sm text-muted-foreground">Year Built</span><div>{selected.yearBuilt || '—'}</div></div>
+              <div><span className="text-sm text-muted-foreground">Property Type</span><div>{selected.propertyType?.replace('_', ' ') || '—'}</div></div>
             </div>
-            {selected.description && <div className="mb-4 text-sm text-gray-600">{selected.description}</div>}
+            {selected.description && <div className="mb-4 text-sm text-muted-foreground">{selected.description}</div>}
 
             {/* Comps Analysis */}
             <CompsAnalysis address={selected.address} city={selected.city} zip={selected.zip} />
@@ -287,7 +287,7 @@ export default function ListingsPage() {
       {/* Listing Entry Form Modal */}
       {showEntryForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowEntryForm(false)}>
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-card rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-4">New Listing Entry</h2>
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -304,7 +304,7 @@ export default function ListingsPage() {
                 { key: 'yearBuilt', label: 'Year Built', type: 'number' },
               ].map(f => (
                 <div key={f.key} className={f.col === 2 ? 'col-span-2' : ''}>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{f.label}</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">{f.label}</label>
                   <input
                     type={f.type || 'text'}
                     value={(entryForm as any)[f.key]}
@@ -314,18 +314,18 @@ export default function ListingsPage() {
                 </div>
               ))}
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Property Type</label>
                 <select value={entryForm.propertyType} onChange={e => setEntryForm(p => ({ ...p, propertyType: e.target.value }))} className="w-full border rounded px-3 py-2 text-sm">
                   {PROPERTY_TYPES.map(t => <option key={t} value={t}>{t.replace('_', ' ')}</option>)}
                 </select>
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Description</label>
                 <textarea value={entryForm.description} onChange={e => setEntryForm(p => ({ ...p, description: e.target.value }))} rows={3} className="w-full border rounded px-3 py-2 text-sm" />
               </div>
             </div>
             <div className="flex gap-3 mt-4">
-              <button onClick={() => setShowEntryForm(false)} className="flex-1 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+              <button onClick={() => setShowEntryForm(false)} className="flex-1 py-2 border rounded-lg text-foreground hover:bg-muted/30">Cancel</button>
               <button onClick={submitEntry} className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Create Listing</button>
             </div>
           </div>
@@ -335,36 +335,36 @@ export default function ListingsPage() {
       {/* Offer Writing Form Modal */}
       {showOfferForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowOfferForm(false)}>
-          <div className="bg-white rounded-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-card rounded-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-4">Write Offer</h2>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Offer Amount ($)</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Offer Amount ($)</label>
                 <input type="number" value={offerForm.amount} onChange={e => setOfferForm(p => ({ ...p, amount: e.target.value }))} className="w-full border rounded px-3 py-2" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Buyer Contact ID</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Buyer Contact ID</label>
                 <input value={offerForm.buyerContactId} onChange={e => setOfferForm(p => ({ ...p, buyerContactId: e.target.value }))} className="w-full border rounded px-3 py-2" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Earnest Money ($)</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Earnest Money ($)</label>
                 <input type="number" value={offerForm.earnestMoney} onChange={e => setOfferForm(p => ({ ...p, earnestMoney: e.target.value }))} className="w-full border rounded px-3 py-2" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Closing Date</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Closing Date</label>
                 <input type="date" value={offerForm.closingDate} onChange={e => setOfferForm(p => ({ ...p, closingDate: e.target.value }))} className="w-full border rounded px-3 py-2" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Contingencies (comma-separated)</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Contingencies (comma-separated)</label>
                 <input value={offerForm.contingencies} onChange={e => setOfferForm(p => ({ ...p, contingencies: e.target.value }))} placeholder="Inspection, Financing, Appraisal" className="w-full border rounded px-3 py-2" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Notes</label>
                 <textarea value={offerForm.notes} onChange={e => setOfferForm(p => ({ ...p, notes: e.target.value }))} rows={2} className="w-full border rounded px-3 py-2" />
               </div>
             </div>
             <div className="flex gap-3 mt-4">
-              <button onClick={() => setShowOfferForm(false)} className="flex-1 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+              <button onClick={() => setShowOfferForm(false)} className="flex-1 py-2 border rounded-lg text-foreground hover:bg-muted/30">Cancel</button>
               <button onClick={submitOffer} className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Submit Offer</button>
             </div>
           </div>

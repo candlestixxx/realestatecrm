@@ -727,7 +727,7 @@ export default function LeadDetailLayoutClient({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Lead Detail</h1> <span title="Complete lead profile with contact info, activity timeline, campaign enrollments, search alerts, and automation history." aria-label="About this section: Complete lead profile with contact info, activity timeline, campaign enrollments, search alerts, and automation history." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Lead Detail</h1> <span title="Complete lead profile with contact info, activity timeline, campaign enrollments, search alerts, and automation history." aria-label="About this section: Complete lead profile with contact info, activity timeline, campaign enrollments, search alerts, and automation history." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       {/* Top Breadcrumb & Prev/Next Bar */}
       <div className="flex items-center justify-between gap-4 py-1.5 px-4 bg-card/65 backdrop-blur border border-border/60 rounded-xl shadow-sm">
         <div className="flex items-center gap-4">
@@ -975,7 +975,7 @@ export default function LeadDetailLayoutClient({
                   className="mt-1 w-full bg-muted/40 hover:bg-muted/60 border border-border/80 rounded-lg px-2.5 py-1.5 text-xs text-foreground font-semibold focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer"
                 >
                   <option value="">-- Choose Segment --</option>
-                  {allSegments.length === 0 ? <p className="text-sm text-gray-400 py-2">No segments available.</p> : allSegments.map(s => (
+                  {allSegments.length === 0 ? <p className="text-sm text-muted-foreground py-2">No segments available.</p> : allSegments.map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
                 </select>
@@ -1046,7 +1046,7 @@ export default function LeadDetailLayoutClient({
                   ) : (
                     <span className="text-muted-foreground italic">No primary phone</span>
                   )}
-                  {secondaryPhones.length === 0 ? <p className="text-sm text-gray-400 py-2">No secondary phones.</p> : secondaryPhones.map((ph, idx) => (
+                  {secondaryPhones.length === 0 ? <p className="text-sm text-muted-foreground py-2">No secondary phones.</p> : secondaryPhones.map((ph, idx) => (
                     <div key={idx} className="flex items-center justify-between text-foreground">
                       <span className="flex items-center gap-1.5">
                         <Phone className="w-3.5 h-3.5 text-muted-foreground/60" /> {ph.value}
@@ -1079,7 +1079,7 @@ export default function LeadDetailLayoutClient({
                   ) : (
                     <span className="text-muted-foreground italic">No primary email</span>
                   )}
-                  {secondaryEmails.length === 0 ? <p className="text-sm text-gray-400 py-2">No secondary emails.</p> : secondaryEmails.map((em, idx) => (
+                  {secondaryEmails.length === 0 ? <p className="text-sm text-muted-foreground py-2">No secondary emails.</p> : secondaryEmails.map((em, idx) => (
                     <div key={idx} className="flex items-center justify-between text-foreground">
                       <span className="flex items-center gap-1.5 truncate">
                         <Mail className="w-3.5 h-3.5 text-muted-foreground/60" /> {em.value}
@@ -1143,7 +1143,7 @@ export default function LeadDetailLayoutClient({
                     </div>
                   )}
 
-                  {familyMembersList.length === 0 ? <p className="text-sm text-gray-400 py-2">No family members listed.</p> : familyMembersList.map((mem, idx) => (
+                  {familyMembersList.length === 0 ? <p className="text-sm text-muted-foreground py-2">No family members listed.</p> : familyMembersList.map((mem, idx) => (
                     <div key={idx} className="p-2 bg-muted/20 border border-border/40 rounded-lg flex justify-between items-center text-foreground">
                       <span>{mem.name}</span>
                       <span className="text-[9px] bg-muted border border-border px-1 rounded uppercase text-muted-foreground">{mem.relationship}</span>
@@ -1528,7 +1528,7 @@ export default function LeadDetailLayoutClient({
                       {lead.tasks.length === 0 ? (
                         <p className="text-xs text-muted-foreground text-center py-6">No pending follow-ups or tasks.</p>
                       ) : (
-                        (lead.tasks || []).length === 0 ? <p className="text-sm text-gray-400 py-2">No tasks yet.</p> : lead.tasks.map(task => (
+                        (lead.tasks || []).length === 0 ? <p className="text-sm text-muted-foreground py-2">No tasks yet.</p> : lead.tasks.map(task => (
                           <div key={task.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-start gap-2 group">
                             <input 
                               type="checkbox" 
@@ -1912,7 +1912,7 @@ export default function LeadDetailLayoutClient({
                       <p className="text-xs">Establish potential pipeline values by linking a deal record.</p>
                     </div>
                   ) : (
-                    (lead.contact.deals || []).length === 0 ? <p className="text-sm text-gray-400 py-2">No deals yet.</p> : lead.contact.deals.map(deal => (
+                    (lead.contact.deals || []).length === 0 ? <p className="text-sm text-muted-foreground py-2">No deals yet.</p> : lead.contact.deals.map(deal => (
                       <div key={deal.id} className="p-4 border border-border/60 rounded-xl bg-card hover:border-border transition-colors flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/15 flex items-center justify-center">
@@ -2242,7 +2242,7 @@ export default function LeadDetailLayoutClient({
                 </div>
                 
                 <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                  {quickPhones.length === 0 ? <p className="text-xs text-gray-400 py-1">No phone numbers.</p> : quickPhones.map((ph, idx) => (
+                  {quickPhones.length === 0 ? <p className="text-xs text-muted-foreground py-1">No phone numbers.</p> : quickPhones.map((ph, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <select
                         value={ph.label}
@@ -2313,7 +2313,7 @@ export default function LeadDetailLayoutClient({
                 </div>
 
                 <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                  {quickEmails.length === 0 ? <p className="text-xs text-gray-400 py-1">No email addresses.</p> : quickEmails.map((em, idx) => (
+                  {quickEmails.length === 0 ? <p className="text-xs text-muted-foreground py-1">No email addresses.</p> : quickEmails.map((em, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <select
                         value={em.label}

@@ -93,9 +93,9 @@ export default function PartnersPage() {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Partner Network <span title="Manage mortgage, title, insurance, and inspection partners. Track referrals, commissions, and permission levels for each partner." aria-label="About this section: Manage mortgage, title, insurance, and inspection partners. Track referrals, commissions, and permission levels for each partner." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+        <h1 className="text-2xl font-bold text-foreground">Partner Network <span title="Manage mortgage, title, insurance, and inspection partners. Track referrals, commissions, and permission levels for each partner." aria-label="About this section: Manage mortgage, title, insurance, and inspection partners. Track referrals, commissions, and permission levels for each partner." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
         <div className="flex gap-2">
-          <button onClick={() => setShowReferralForm(true)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">+ Referral</button>
+          <button onClick={() => setShowReferralForm(true)} className="px-4 py-2 border rounded-lg hover:bg-muted/30">+ Referral</button>
           <button onClick={() => setShowAddForm(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">+ Partner</button>
         </div>
       </div>
@@ -103,7 +103,7 @@ export default function PartnersPage() {
       {/* Type Filter */}
       <div className="flex gap-2 mb-6">
         {['', 'MORTGAGE', 'TITLE', 'INSURANCE', 'INSPECTION', 'LEGAL'].map(t => (
-          <button key={t} onClick={() => setFilterType(t)} className={'px-3 py-1.5 rounded-full text-sm ' + (filterType === t ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')}>
+          <button key={t} onClick={() => setFilterType(t)} className={'px-3 py-1.5 rounded-full text-sm ' + (filterType === t ? 'bg-blue-600 text-white' : 'bg-muted text-foreground hover:bg-muted')}>
             {t || 'All'}
           </button>
         ))}
@@ -111,22 +111,22 @@ export default function PartnersPage() {
 
       {/* Partner Grid */}
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading partners...</div>
+        <div className="text-center py-12 text-muted-foreground">Loading partners...</div>
       ) : partners.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">No partners found. Add your first partner to get started.</div>
+        <div className="text-center py-12 text-muted-foreground">No partners found. Add your first partner to get started.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {partners.map(p => (
-            <div key={p.id} onClick={() => setSelectedPartner(p)} className="bg-white rounded-lg border p-5 hover:shadow-md cursor-pointer">
+            <div key={p.id} onClick={() => setSelectedPartner(p)} className="bg-card rounded-lg border p-5 hover:shadow-md cursor-pointer">
               <div className="flex items-center justify-between mb-3">
-                <span className={'px-2 py-1 rounded-full text-xs font-medium ' + (TYPE_COLORS[p.type] || 'bg-gray-100')}>{p.type}</span>
-                <span className="text-xs text-gray-400">{p.referrals.length} referrals</span>
+                <span className={'px-2 py-1 rounded-full text-xs font-medium ' + (TYPE_COLORS[p.type] || 'bg-muted')}>{p.type}</span>
+                <span className="text-xs text-muted-foreground">{p.referrals.length} referrals</span>
               </div>
-              <h3 className="font-semibold text-gray-900">{p.companyName}</h3>
-              <p className="text-sm text-gray-600">{p.contactName}</p>
-              {p.email && <p className="text-sm text-gray-500">{p.email}</p>}
-              {p.phone && <p className="text-sm text-gray-500">{p.phone}</p>}
-              {p.licenseNumber && <p className="text-xs text-gray-400 mt-1">License: {p.licenseNumber}</p>}
+              <h3 className="font-semibold text-foreground">{p.companyName}</h3>
+              <p className="text-sm text-muted-foreground">{p.contactName}</p>
+              {p.email && <p className="text-sm text-muted-foreground">{p.email}</p>}
+              {p.phone && <p className="text-sm text-muted-foreground">{p.phone}</p>}
+              {p.licenseNumber && <p className="text-xs text-muted-foreground mt-1">License: {p.licenseNumber}</p>}
             </div>
           ))}
         </div>
@@ -135,17 +135,17 @@ export default function PartnersPage() {
       {/* Partner Detail Modal */}
       {selectedPartner && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedPartner(null)}>
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-card rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">{selectedPartner.companyName}</h2>
-              <button onClick={() => setSelectedPartner(null)} className="text-gray-400 hover:text-gray-600">X</button>
+              <button onClick={() => setSelectedPartner(null)} className="text-muted-foreground hover:text-muted-foreground">X</button>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div><span className="text-sm text-gray-500">Contact</span><div>{selectedPartner.contactName}</div></div>
-              <div><span className="text-sm text-gray-500">Type</span><div><span className={'px-2 py-1 rounded-full text-xs ' + (TYPE_COLORS[selectedPartner.type] || '')}>{selectedPartner.type}</span></div></div>
-              <div><span className="text-sm text-gray-500">Email</span><div>{selectedPartner.email || '—'}</div></div>
-              <div><span className="text-sm text-gray-500">Phone</span><div>{selectedPartner.phone || '—'}</div></div>
+              <div><span className="text-sm text-muted-foreground">Contact</span><div>{selectedPartner.contactName}</div></div>
+              <div><span className="text-sm text-muted-foreground">Type</span><div><span className={'px-2 py-1 rounded-full text-xs ' + (TYPE_COLORS[selectedPartner.type] || '')}>{selectedPartner.type}</span></div></div>
+              <div><span className="text-sm text-muted-foreground">Email</span><div>{selectedPartner.email || '—'}</div></div>
+              <div><span className="text-sm text-muted-foreground">Phone</span><div>{selectedPartner.phone || '—'}</div></div>
             </div>
 
             {/* Permissions */}
@@ -173,7 +173,7 @@ export default function PartnersPage() {
                           });
                         } catch {}
                       }}
-                      className={'px-2 py-1 rounded text-xs cursor-pointer transition-colors ' + (val ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200')}
+                      className={'px-2 py-1 rounded text-xs cursor-pointer transition-colors ' + (val ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-muted text-muted-foreground hover:bg-muted')}
                       title={'Click to toggle ' + k.replace('can', '').replace(/([A-Z])/g, ' $1').trim()}
                     >
                       {k.replace('can', '').replace(/([A-Z])/g, ' $1').trim()} {val ? 'Yes' : 'No'}
@@ -187,12 +187,12 @@ export default function PartnersPage() {
             <div>
               <h3 className="font-semibold mb-2">Referrals ({selectedPartner.referrals.length})</h3>
               {selectedPartner.referrals.length === 0 ? (
-                <p className="text-sm text-gray-500">No referrals yet.</p>
+                <p className="text-sm text-muted-foreground">No referrals yet.</p>
               ) : (
                 selectedPartner.referrals.map(r => (
                   <div key={r.id} className="flex items-center justify-between border rounded p-2 mb-1">
                     <span className="text-sm">{r.type}</span>
-                    <span className={'px-2 py-1 rounded text-xs ' + (REFERRAL_STATUS[r.status] || 'bg-gray-100')}>{r.status}</span>
+                    <span className={'px-2 py-1 rounded text-xs ' + (REFERRAL_STATUS[r.status] || 'bg-muted')}>{r.status}</span>
                   </div>
                 ))
               )}
@@ -204,7 +204,7 @@ export default function PartnersPage() {
       {/* Add Partner Modal */}
       {showAddForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowAddForm(false)}>
-          <div className="bg-white rounded-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-card rounded-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-4">Add Partner</h2>
             <div className="space-y-3">
               <input placeholder="Company Name" value={partnerForm.companyName} onChange={e => setPartnerForm(p => ({ ...p, companyName: e.target.value }))} className="w-full border rounded px-3 py-2" />
@@ -231,7 +231,7 @@ export default function PartnersPage() {
       {/* Add Referral Modal */}
       {showReferralForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowReferralForm(false)}>
-          <div className="bg-white rounded-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-card rounded-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-4">Create Referral</h2>
             <div className="space-y-3">
               <select value={referralForm.type} onChange={e => setReferralForm(p => ({ ...p, type: e.target.value }))} className="w-full border rounded px-3 py-2">

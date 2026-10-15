@@ -29,7 +29,7 @@ const TYPE_LABELS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   IN_PROGRESS: 'bg-blue-500/15 text-blue-500',
   COMPLETED: 'bg-green-500/15 text-green-500',
-  ABANDONED: 'bg-gray-500/15 text-gray-500',
+  ABANDONED: 'bg-muted/15 text-muted-foreground',
 };
 
 export default function WorkflowSessionsPanel() {
@@ -90,7 +90,7 @@ export default function WorkflowSessionsPanel() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm font-bold text-foreground">{TYPE_LABELS[s.type] || s.type}</span>
-                    <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${STATUS_COLORS[s.status] || 'bg-gray-500/15 text-gray-500'}`}>
+                    <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${STATUS_COLORS[s.status] || 'bg-muted/15 text-muted-foreground'}`}>
                       {s.status}
                     </span>
                   </div>

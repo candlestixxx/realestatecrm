@@ -43,7 +43,7 @@ export default function AuditPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Audit Trail <span title="Track all user actions and system events. Filter by action type, user, entity, and date range." aria-label="About this section: Track all user actions and system events. Filter by action type, user, entity, and date range." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">Audit Trail <span title="Track all user actions and system events. Filter by action type, user, entity, and date range." aria-label="About this section: Track all user actions and system events. Filter by action type, user, entity, and date range." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
 
       {/* Filters */}
       <div className="flex gap-3 mb-6">
@@ -65,33 +65,33 @@ export default function AuditPage() {
 
       {/* Audit Table */}
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading audit trail...</div>
+        <div className="text-center py-12 text-muted-foreground">Loading audit trail...</div>
       ) : entries.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">No audit entries found.</div>
+        <div className="text-center py-12 text-muted-foreground">No audit entries found.</div>
       ) : (
-        <div className="bg-white rounded-lg border overflow-hidden">
+        <div className="bg-card rounded-lg border overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted/30">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Timestamp</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Entity</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Changes</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Timestamp</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Action</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Entity</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Changes</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">User</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {entries.map(e => (
-                <tr key={e.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-600">{new Date(e.timestamp).toLocaleString()}</td>
+                <tr key={e.id} className="hover:bg-muted/30">
+                  <td className="px-4 py-3 text-sm text-muted-foreground">{new Date(e.timestamp).toLocaleString()}</td>
                   <td className="px-4 py-3">
-                    <span className={'px-2 py-1 rounded-full text-xs font-medium ' + (ACTION_COLORS[e.action] || 'bg-gray-100')}>{e.action}</span>
+                    <span className={'px-2 py-1 rounded-full text-xs font-medium ' + (ACTION_COLORS[e.action] || 'bg-muted')}>{e.action}</span>
                   </td>
                   <td className="px-4 py-3 text-sm">
-                    <div className="font-medium text-gray-900">{e.entityType}</div>
-                    <div className="text-gray-500 text-xs">{e.entityId}</div>
+                    <div className="font-medium text-foreground">{e.entityType}</div>
+                    <div className="text-muted-foreground text-xs">{e.entityId}</div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
                     {e.changes ? (
                       <div className="space-y-1">
                         {Object.entries(e.changes).map(([field, change]) => (
@@ -102,7 +102,7 @@ export default function AuditPage() {
                       </div>
                     ) : '—'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{e.user?.name || e.user?.email || 'System'}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">{e.user?.name || e.user?.email || 'System'}</td>
                 </tr>
               ))}
             </tbody>

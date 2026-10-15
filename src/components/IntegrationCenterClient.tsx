@@ -145,7 +145,7 @@ export default function IntegrationCenterClient({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto text-foreground p-6">
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Integration Center</h1> <span title="Connect third-party services including CRM systems, marketing tools, and communication platforms. Manage API keys and sync settings." aria-label="About this section: Connect third-party services including CRM systems, marketing tools, and communication platforms. Manage API keys and sync settings." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Integration Center</h1> <span title="Connect third-party services including CRM systems, marketing tools, and communication platforms. Manage API keys and sync settings." aria-label="About this section: Connect third-party services including CRM systems, marketing tools, and communication platforms. Manage API keys and sync settings." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       
       {/* Banner Notice Alert */}
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -207,7 +207,7 @@ export default function IntegrationCenterClient({
           <h3 className="text-sm font-black uppercase tracking-wider text-muted-foreground">Partner Products</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredPartners.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No integrations match your filter. Try a different category.</div> : (filteredPartners.map(p => (
+            {filteredPartners.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No integrations match your filter. Try a different category.</div> : (filteredPartners.map(p => (
               <div key={p.id} className="bg-card border border-border/60 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4 hover:border-border transition-colors">
                 <div className="space-y-3.5">
                   <div className="flex justify-between items-center">

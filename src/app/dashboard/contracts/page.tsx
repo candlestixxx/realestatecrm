@@ -38,7 +38,7 @@ export default function ContractsPage() {
       <div className="p-6 max-w-4xl">
         <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
           <FileSignature className="w-6 h-6 text-primary" /> Contracts
-          <span title="Generate, deploy, and track real-estate contracts. Choose a template, fill in parties, then generate or deploy via e-signature or on-chain." aria-label="About contracts" className="cursor-help inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] font-bold text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors ml-1">?</span>
+          <span title="Generate, deploy, and track real-estate contracts. Choose a template, fill in parties, then generate or deploy via e-signature or on-chain." aria-label="About contracts" className="cursor-help inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] font-bold text-muted-foreground hover:bg-muted hover:text-muted-foreground transition-colors ml-1">?</span>
         </h1>
         <p className="text-muted-foreground mb-6 text-sm">Generate, deploy, and track real-estate contracts on-chain or via e-signature.</p>
 
@@ -58,7 +58,7 @@ export default function ContractsPage() {
 
         <div className="rounded-lg border p-4 mb-4">
           <h2 className="font-semibold mb-3 flex items-center gap-1">Parties
-            <span title="Define the buyer and seller for this contract. Role, name, and email are used for e-signature routing." aria-label="About parties" className="cursor-help inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] font-bold text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">?</span>
+            <span title="Define the buyer and seller for this contract. Role, name, and email are used for e-signature routing." aria-label="About parties" className="cursor-help inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] font-bold text-muted-foreground hover:bg-muted hover:text-muted-foreground transition-colors">?</span>
           </h2>
           {parties.map((p, i) => (
             <div key={i} className="grid grid-cols-3 gap-2 mb-2">

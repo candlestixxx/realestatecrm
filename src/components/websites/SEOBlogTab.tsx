@@ -246,7 +246,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
 
                 <div className="space-y-3">
                   <label className="block text-[10px] font-black uppercase">Section Headings (H2 / Outlines)</label>
-                  {headings.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No blog posts yet. Create your first post to improve SEO.</div> : (headings.map((heading, idx) => (
+                  {headings.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No blog posts yet. Create your first post to improve SEO.</div> : (headings.map((heading, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <span className="w-5 h-5 rounded-md bg-muted text-[10px] font-black flex items-center justify-center text-muted-foreground">
                         {idx + 1}

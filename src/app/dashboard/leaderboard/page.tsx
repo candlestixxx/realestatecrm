@@ -32,11 +32,11 @@ export default function LeaderboardPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Agent Leaderboard <span title="Compare agent performance metrics including leads converted, deals closed, and revenue generated." aria-label="About this section: Compare agent performance metrics including leads converted, deals closed, and revenue generated." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+        <h1 className="text-2xl font-bold text-foreground">Agent Leaderboard <span title="Compare agent performance metrics including leads converted, deals closed, and revenue generated." aria-label="About this section: Compare agent performance metrics including leads converted, deals closed, and revenue generated." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
         <div className="flex gap-2">
           {['all', 'month', 'week'].map(p => (
             <button key={p} onClick={() => setPeriod(p)}
-              className={'px-3 py-1.5 rounded-full text-sm ' + (period === p ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')}>
+              className={'px-3 py-1.5 rounded-full text-sm ' + (period === p ? 'bg-blue-600 text-white' : 'bg-muted text-foreground hover:bg-muted')}>
               {p === 'all' ? 'All Time' : p === 'month' ? 'This Month' : 'This Week'}
             </button>
           ))}
@@ -44,21 +44,21 @@ export default function LeaderboardPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading leaderboard...</div>
+        <div className="text-center py-12 text-muted-foreground">Loading leaderboard...</div>
       ) : entries.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">No activity data yet.</div>
+        <div className="text-center py-12 text-muted-foreground">No activity data yet.</div>
       ) : (
         <div className="space-y-3">
           {entries.map((entry, i) => (
             <div key={entry.userId}
-              className={'bg-white rounded-lg border p-4 flex items-center gap-4 ' + (i < 3 ? 'ring-2 ring-blue-100' : '')}>
+              className={'bg-card rounded-lg border p-4 flex items-center gap-4 ' + (i < 3 ? 'ring-2 ring-blue-100' : '')}>
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold"
                 style={{ backgroundColor: i === 0 ? '#FEF3C7' : i === 1 ? '#F3F4F6' : i === 2 ? '#FED7AA' : '#F3F4F6' }}>
                 {i < 3 ? MEDALS[i] : entry.rank}
               </div>
               <div className="flex-1">
-                <div className="font-semibold text-gray-900">{entry.name}</div>
-                <div className="text-sm text-gray-500">{entry.email}</div>
+                <div className="font-semibold text-foreground">{entry.name}</div>
+                <div className="text-sm text-muted-foreground">{entry.email}</div>
                 {entry.badges.length > 0 && (
                   <div className="flex gap-1.5 mt-1.5">
                     {entry.badges.map(b => (
@@ -69,7 +69,7 @@ export default function LeaderboardPage() {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-blue-600">{entry.points}</div>
-                <div className="text-xs text-gray-500">points</div>
+                <div className="text-xs text-muted-foreground">points</div>
               </div>
             </div>
           ))}

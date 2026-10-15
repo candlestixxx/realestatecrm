@@ -239,7 +239,7 @@ export default function AgentCoreWorkflowBuilder() {
                     className="text-xs text-secondary hover:underline font-bold">+ Add Action</button>
                 </div>
                 <div className="space-y-3">
-                  {actions.length === 0 ? <p className="text-xs text-gray-400 py-2">No actions configured.</p> : actions.map((action, idx) => (
+                  {actions.length === 0 ? <p className="text-xs text-muted-foreground py-2">No actions configured.</p> : actions.map((action, idx) => (
                     <div key={idx} className="p-3 bg-muted/30 border border-border rounded-lg space-y-2">
                       <div className="flex items-center justify-between">
                         <select value={action.type} onChange={e => updateAction(idx, { type: e.target.value as WorkflowAction['type'] })}

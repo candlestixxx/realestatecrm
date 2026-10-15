@@ -40,7 +40,7 @@ export function AccessibleButton({
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { label: string; variant?: 'primary' | 'secondary' | 'danger' }) {
   const styles = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+    secondary: 'bg-muted text-foreground hover:bg-muted',
     danger: 'bg-red-600 text-white hover:bg-red-700',
   };
   return (
@@ -70,7 +70,7 @@ export function AccessibleTable({
       <thead>
         <tr>
           {headers.map((h, i) => (
-            <th key={i} scope="col" className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-2">
+            <th key={i} scope="col" className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-2">
               {h}
             </th>
           ))}

@@ -53,9 +53,9 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
   };
 
   return (
-    <div className="bg-white rounded-lg border p-4">
+    <div className="bg-card rounded-lg border p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-semibold text-sm text-gray-700">Predictive Lead Score</h3>
+        <h3 className="font-semibold text-sm text-foreground">Predictive Lead Score</h3>
         <button
           onClick={fetchScore}
           disabled={loading}
@@ -71,7 +71,7 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
       )}
 
       {loading && !result && (
-        <div className="flex items-center gap-2 text-gray-500 text-sm">
+        <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <RefreshCw className="w-4 h-4 animate-spin" /> Calculating...
         </div>
       )}
@@ -86,13 +86,13 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
               <div className="text-sm font-medium" style={{ color: getScoreColor(result.score) }}>
                 {getScoreLabel(result.tier)}
               </div>
-              <div className="text-xs text-gray-500">{result.probability}% conversion probability</div>
+              <div className="text-xs text-muted-foreground">{result.probability}% conversion probability</div>
             </div>
-            <TrendingUp className="w-5 h-5 ml-auto text-gray-400" />
+            <TrendingUp className="w-5 h-5 ml-auto text-muted-foreground" />
           </div>
 
           {/* Score bar */}
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+          <div className="w-full bg-muted rounded-full h-2 mb-3">
             <div
               className="h-2 rounded-full transition-all"
               style={{
@@ -104,10 +104,10 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
 
           {result.factors && result.factors.length > 0 && (
             <div className="space-y-1.5 mb-3">
-              <div className="text-xs font-medium text-gray-500 uppercase">Score Factors</div>
-              {result.factors.length === 0 ? <div className="text-xs text-gray-400 italic">No score factors available.</div> : (result.factors.map((f, i) => (
+              <div className="text-xs font-medium text-muted-foreground uppercase">Score Factors</div>
+              {result.factors.length === 0 ? <div className="text-xs text-muted-foreground italic">No score factors available.</div> : (result.factors.map((f, i) => (
                 <div key={i} className="flex items-center justify-between text-xs">
-                  <span className="text-gray-600">{f.name}</span>
+                  <span className="text-muted-foreground">{f.name}</span>
                   <span className={f.impact >= 0 ? 'text-green-600' : 'text-red-600'}>
                     {f.impact >= 0 ? '+' : ''}{f.impact}
                   </span>
@@ -117,10 +117,10 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
           )}
 
           {result.recommendations && result.recommendations.length > 0 && (
-            <div className="text-xs text-gray-600 bg-gray-50 rounded p-2">
+            <div className="text-xs text-muted-foreground bg-muted/30 rounded p-2">
               <div className="font-medium mb-1">Recommendations:</div>
               <ul className="space-y-0.5">
-                {result.recommendations.length === 0 ? <div className="text-xs text-gray-400 italic">No recommendations at this time.</div> : (result.recommendations.map((r, i) => (
+                {result.recommendations.length === 0 ? <div className="text-xs text-muted-foreground italic">No recommendations at this time.</div> : (result.recommendations.map((r, i) => (
                   <li key={i}>• {r}</li>
                 )))}
               </ul>

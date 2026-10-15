@@ -34,10 +34,10 @@ export default function DataQualityPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Data Quality Dashboard <span title="Monitor data completeness, accuracy, and freshness across contacts, leads, and deals. Identify duplicates and missing fields." aria-label="About this section: Monitor data completeness, accuracy, and freshness across contacts, leads, and deals. Identify duplicates and missing fields." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">Data Quality Dashboard <span title="Monitor data completeness, accuracy, and freshness across contacts, leads, and deals. Identify duplicates and missing fields." aria-label="About this section: Monitor data completeness, accuracy, and freshness across contacts, leads, and deals. Identify duplicates and missing fields." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
 
       {/* Overall Score */}
-      <div className="bg-white rounded-lg border p-6 mb-6">
+      <div className="bg-card rounded-lg border p-6 mb-6">
         <div className="flex items-center gap-6">
           <div className="relative w-24 h-24">
             <svg viewBox="0 0 36 36" className="w-24 h-24 -rotate-90">
@@ -51,38 +51,38 @@ export default function DataQualityPage() {
           </div>
           <div>
             <h2 className="text-lg font-semibold">Overall Data Health</h2>
-            <p className="text-gray-500">Completeness, accuracy, and consistency across all records.</p>
+            <p className="text-muted-foreground">Completeness, accuracy, and consistency across all records.</p>
           </div>
         </div>
       </div>
 
       {/* Metrics Grid */}
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Analyzing data quality...</div>
+        <div className="text-center py-12 text-muted-foreground">Analyzing data quality...</div>
       ) : metrics.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">No data quality metrics available.</div>
+        <div className="text-center py-12 text-muted-foreground">No data quality metrics available.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {metrics.map(m => (
-            <div key={m.label} className="bg-white rounded-lg border p-5">
+            <div key={m.label} className="bg-card rounded-lg border p-5">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900">{m.label}</h3>
+                <h3 className="font-semibold text-foreground">{m.label}</h3>
                 <span className={'px-2 py-1 rounded-full text-sm font-medium ' + (m.score >= 80 ? 'bg-green-100 text-green-800' : m.score >= 60 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800')}>
                   {m.score}%
                 </span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+              <div className="w-full bg-muted rounded-full h-2 mb-4">
                 <div className="rounded-full h-2" style={{ width: m.score + '%', backgroundColor: m.score >= 80 ? '#10B981' : m.score >= 60 ? '#F59E0B' : '#EF4444' }} />
               </div>
               {m.issues.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Issues ({m.total} records checked)</h4>
+                  <h4 className="text-sm font-medium text-foreground mb-2">Issues ({m.total} records checked)</h4>
                   {m.issues.map(issue => (
                     <div key={issue.field} className="flex items-center justify-between py-1.5 border-b last:border-0">
-                      <span className="text-sm text-gray-600">{issue.field}</span>
+                      <span className="text-sm text-muted-foreground">{issue.field}</span>
                       <div className="flex items-center gap-2">
                         <span className={'px-2 py-0.5 rounded text-xs ' + SEVERITY_COLORS[issue.severity]}>{issue.severity}</span>
-                        <span className="text-sm text-gray-500">{issue.count}</span>
+                        <span className="text-sm text-muted-foreground">{issue.count}</span>
                       </div>
                     </div>
                   ))}

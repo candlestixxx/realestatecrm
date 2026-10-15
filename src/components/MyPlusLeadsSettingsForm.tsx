@@ -84,7 +84,7 @@ export function MyPlusLeadsSettingsForm({ initialData, workspaceId }: Props) {
           }`}
         >
           <span
-            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+            className={`inline-block h-4 w-4 transform rounded-full bg-card shadow transition-transform ${
               isActive ? 'translate-x-6' : 'translate-x-1'
             }`}
           />

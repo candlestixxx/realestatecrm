@@ -111,7 +111,7 @@ export default function AIChat() {
         <div className="fixed bottom-6 right-6 w-full max-w-sm sm:w-[450px] h-[600px] bg-background border border-border shadow-2xl rounded-2xl flex flex-col z-50 overflow-hidden">
           <div className="bg-primary p-4 flex justify-between items-center text-primary-foreground">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+              <div className="w-2 h-2 rounded-full bg-card animate-pulse"></div>
               <h3 className="font-bold text-sm tracking-tight uppercase">Gemini AI Command Center</h3>
             </div>
             <button
@@ -130,7 +130,7 @@ export default function AIChat() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/5">
-            {messages.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No messages yet. Start a conversation with the AI assistant.</div> : (messages.map((m) => (
+            {messages.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No messages yet. Start a conversation with the AI assistant.</div> : (messages.map((m) => (
               <div
                 key={m.id}
                 className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
@@ -139,7 +139,7 @@ export default function AIChat() {
                   className={`max-w-[85%] rounded-2xl p-4 text-sm shadow-sm ${
                     m.role === 'user' 
                       ? 'bg-primary text-primary-foreground rounded-br-none' 
-                      : 'bg-white dark:bg-muted/30 border border-border rounded-bl-none'
+                      : 'bg-card dark:bg-muted/30 border border-border rounded-bl-none'
                   }`}
                 >
                   {m.content}

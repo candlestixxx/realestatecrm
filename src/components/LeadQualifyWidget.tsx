@@ -75,14 +75,14 @@ export default function LeadQualifyWidget({ leadId }: { leadId: string }) {
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
+    <div className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-900">
+        <h3 className="text-sm font-semibold text-foreground">
           AI Qualification
           <span
             title="Run AI-powered lead qualification to score and grade this lead based on engagement, fit, and behavior signals."
             aria-label="AI qualification scores leads A-F based on engagement, fit, and behavior"
-            className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle"
+            className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle"
           >
             ?
           </span>
@@ -97,20 +97,20 @@ export default function LeadQualifyWidget({ leadId }: { leadId: string }) {
       </div>
 
       {initialLoading ? (
-        <div className="mt-3 text-xs text-gray-400">Loading qualification...</div>
+        <div className="mt-3 text-xs text-muted-foreground">Loading qualification...</div>
       ) : qual ? (
         <div className="mt-3 space-y-2">
           <div className="flex items-center gap-3">
-            <span className={'text-lg font-bold px-2 py-0.5 rounded border ' + (gradeColor[qual.grade] || 'text-gray-700 bg-gray-50 border-gray-200')}>
+            <span className={'text-lg font-bold px-2 py-0.5 rounded border ' + (gradeColor[qual.grade] || 'text-foreground bg-muted/30 border-border')}>
               Grade {qual.grade}
             </span>
-            <span className="text-sm text-gray-600">Score: {qual.score}/100</span>
+            <span className="text-sm text-muted-foreground">Score: {qual.score}/100</span>
           </div>
           {qual.reasoning && (
-            <p className="text-xs text-gray-600">{qual.reasoning}</p>
+            <p className="text-xs text-muted-foreground">{qual.reasoning}</p>
           )}
           {qual.factors.length > 0 && (
-            <ul className="text-xs text-gray-500 list-disc list-inside">
+            <ul className="text-xs text-muted-foreground list-disc list-inside">
               {qual.factors.map((f, i) => (
                 <li key={i}>{f}</li>
               ))}
@@ -118,7 +118,7 @@ export default function LeadQualifyWidget({ leadId }: { leadId: string }) {
           )}
         </div>
       ) : (
-        <div className="mt-3 text-xs text-gray-400">
+        <div className="mt-3 text-xs text-muted-foreground">
           No qualification yet. Click &quot;Qualify Lead&quot; to run AI qualification.
         </div>
       )}

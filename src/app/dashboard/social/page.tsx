@@ -17,7 +17,7 @@ const PLATFORMS = [
   { id: 'instagram', name: 'Instagram', icon: '📸', color: 'bg-pink-500' },
   { id: 'linkedin', name: 'LinkedIn', icon: '💼', color: 'bg-indigo-600' },
   { id: 'twitter', name: 'X (Twitter)', icon: '🐦', color: 'bg-black' },
-  { id: 'tiktok', name: 'TikTok', icon: '🎵', color: 'bg-gray-900' },
+  { id: 'tiktok', name: 'TikTok', icon: '🎵', color: 'bg-card' },
   { id: 'gmb', name: 'Google Business', icon: '📍', color: 'bg-green-600' },
 ];
 
@@ -87,12 +87,12 @@ export default function SocialConnectionsPage() {
   };
 
   const getPlatformInfo = (platform: string) =>
-    PLATFORMS.find(p => p.id === platform) || { id: platform, name: platform, icon: '🔗', color: 'bg-gray-500' };
+    PLATFORMS.find(p => p.id === platform) || { id: platform, name: platform, icon: '🔗', color: 'bg-muted' };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Social Connections <span title="Connect social media accounts for automated content publishing. Manage Facebook, Instagram, LinkedIn, and Twitter/X." aria-label="About this section: Connect social media accounts for automated content publishing. Manage Facebook, Instagram, LinkedIn, and Twitter/X." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+        <h1 className="text-2xl font-bold text-foreground">Social Connections <span title="Connect social media accounts for automated content publishing. Manage Facebook, Instagram, LinkedIn, and Twitter/X." aria-label="About this section: Connect social media accounts for automated content publishing. Manage Facebook, Instagram, LinkedIn, and Twitter/X." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
         <p className="text-sm text-muted-foreground mt-1">
           Connect your social media accounts for unified publishing and inbox management.
         </p>
@@ -124,7 +124,7 @@ export default function SocialConnectionsPage() {
                         <p className="text-xs text-muted-foreground">{account.accountName}</p>
                       </div>
                     </div>
-                    <span className={`text-[9px] px-2 py-1 rounded-full font-bold uppercase ${account.isActive ? 'bg-green-500/15 text-green-500' : 'bg-gray-500/15 text-gray-500'}`}>
+                    <span className={`text-[9px] px-2 py-1 rounded-full font-bold uppercase ${account.isActive ? 'bg-green-500/15 text-green-500' : 'bg-muted/15 text-muted-foreground'}`}>
                       {account.isActive ? 'Active' : 'Paused'}
                     </span>
                   </div>
@@ -286,7 +286,7 @@ function RecentPostsSection() {
                 <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${
                   post.status === 'PUBLISHED' ? 'bg-green-500/15 text-green-500'
                   : post.status === 'SCHEDULED' ? 'bg-blue-500/15 text-blue-500'
-                  : 'bg-gray-500/15 text-gray-500'
+                  : 'bg-muted/15 text-muted-foreground'
                 }`}>{post.status}</span>
                 <span className="text-[10px] text-muted-foreground">
                   {new Date(post.createdAt).toLocaleDateString()}

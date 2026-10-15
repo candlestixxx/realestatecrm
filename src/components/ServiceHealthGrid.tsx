@@ -67,9 +67,9 @@ export default function ServiceHealthGrid() {
   const upCount = services.filter(s => s.status === 'up').length;
 
   return (
-    <div className="bg-white rounded-lg border p-4">
+    <div className="bg-card rounded-lg border p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-700">Service Health</h3>
+        <h3 className="text-sm font-semibold text-foreground">Service Health</h3>
         <span className={'text-xs px-2 py-1 rounded-full ' + (upCount === services.length ? 'bg-green-100 text-green-700' : upCount > 0 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700')}>
           {upCount}/{services.length} online
         </span>
@@ -91,7 +91,7 @@ export default function ServiceHealthGrid() {
                   : 'bg-yellow-400 animate-pulse')
               }
             />
-            <span className="text-gray-700 truncate">{svc.name}</span>
+            <span className="text-foreground truncate">{svc.name}</span>
           </div>
         ))}
       </div>
