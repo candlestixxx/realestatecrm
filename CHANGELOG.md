@@ -1,3 +1,12 @@
+## v0.58.46 (2026-10-09)
+
+### Added
+- `scripts/watch-services.ps1` — auto-restart watchdog for all 9 services (checks every 60s)
+- System tray "Start Watchdog" menu item
+
+### Fixed
+- `start-all.bat` — removed `/min` flag (breaks non-interactive contexts) and blocking `timeout`
+
 ## v0.58.45 (2026-10-09)
 
 ### Changed
