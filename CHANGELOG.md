@@ -1,3 +1,8 @@
+## v0.58.47 (2026-10-09)
+
+### Fixed
+- **Dark mode**: replaced all 316 hardcoded `bg-white`, `text-gray-*`, `bg-gray-*`, `border-gray-*` classes across 83 files with theme tokens (`bg-card`, `text-muted-foreground`, `text-foreground`, `border-border`, `bg-muted`) — dark mode now renders correctly everywhere
+
 ## v0.58.46 (2026-10-09)
 
 ### Added
