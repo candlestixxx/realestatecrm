@@ -96,7 +96,7 @@ export function CommandPalette() {
 
   return (
     <>
-      <button
+      <button type="button"
         onClick={() => setOpen(true)}
         className="flex items-center text-sm text-muted-foreground bg-muted/50 hover:bg-muted transition-colors px-3 py-1.5 rounded-md border border-border shrink-0 select-none cursor-pointer"
       >

@@ -789,7 +789,7 @@ export default function LeadDetailLayoutClient({
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2.5 shrink-0 self-end md:self-auto">
-          <button 
+          <button type="button" 
             onClick={() => {
               setNoteType('CALL');
               setNoteContent('Scheduled verify criteria follow-up call.');
@@ -800,7 +800,7 @@ export default function LeadDetailLayoutClient({
           >
             <Calendar className="w-3.5 h-3.5" /> Log Call Option
           </button>
-          <button 
+          <button type="button" 
             onClick={() => {
               setActiveTab('communications');
               toast.success('Redirecting to Chat dialer...');
@@ -837,7 +837,7 @@ export default function LeadDetailLayoutClient({
               </span>
               
               <div className="absolute top-0 right-0 flex items-center gap-1">
-                <button 
+                <button type="button" 
                   onClick={() => {
                     setEditFirstName(lead.contact.firstName);
                     setEditLastName(lead.contact.lastName || '');
@@ -857,7 +857,7 @@ export default function LeadDetailLayoutClient({
 
                 {/* 3-dots Menu Button */}
                 <div className="relative inline-block" ref={dropdownRef}>
-                  <button 
+                  <button type="button" 
                     onClick={() => setShowMoreDropdown(!showMoreDropdown)}
                     className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors cursor-pointer font-black text-sm leading-none"
                     title="More options"
@@ -871,28 +871,28 @@ export default function LeadDetailLayoutClient({
                       <div>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider mb-1.5 border-b border-border/40 pb-1">Lead Nurturing</p>
                         <div className="grid grid-cols-1 gap-1">
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Mailer tool opened!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📬 Send Mailers</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Market snapshot configured!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📊 Add Market Snapshots</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Market reports added!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📈 Add Market Reports</button>
-                          <button onClick={() => { setShowMoreDropdown(false); setActiveTab('automations'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🎯 Add Smart Plans</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Welcome email scheduled!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">✉️ Send Welcome Email</button>
-                          <button onClick={() => { setShowMoreDropdown(false); setShowAddTask(true); setActiveTab('overview'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📅 Add Task</button>
-                          <button onClick={() => { setShowMoreDropdown(false); setShowAddShowing(true); setActiveTab('overview'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">⏰ Add Appointment / Showing</button>
-                          <button onClick={() => { setShowMoreDropdown(false); setActiveTab('documents'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📁 Add Document</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Linked to Microsoft Teams!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">👥 Send to Microsoft Teams</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('AI Sales Agent activated!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🤖 Activate Sales Agent</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Closely Link Sent!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🔗 Send Closely Link</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Mailing label generated!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🏷️ Mailing Label</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Consent Request Sent!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">✅ Send Consent Request</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Mailer tool opened!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📬 Send Mailers</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Market snapshot configured!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📊 Add Market Snapshots</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Market reports added!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📈 Add Market Reports</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); setActiveTab('automations'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🎯 Add Smart Plans</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Welcome email scheduled!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">✉️ Send Welcome Email</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); setShowAddTask(true); setActiveTab('overview'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📅 Add Task</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); setShowAddShowing(true); setActiveTab('overview'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">⏰ Add Appointment / Showing</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); setActiveTab('documents'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📁 Add Document</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Linked to Microsoft Teams!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">👥 Send to Microsoft Teams</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('AI Sales Agent activated!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🤖 Activate Sales Agent</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Closely Link Sent!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🔗 Send Closely Link</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Mailing label generated!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🏷️ Mailing Label</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Consent Request Sent!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">✅ Send Consent Request</button>
                         </div>
                       </div>
 
                       <div>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider mb-1.5 border-b border-border/40 pb-1">Lead Closing</p>
                         <div className="grid grid-cols-1 gap-1">
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('CMA Builder opened!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📋 Create CMA</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Listing presentation tool launched!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📝 Create Listing Presentation</button>
-                          <button onClick={() => { setShowMoreDropdown(false); setShowAddDeal(true); setActiveTab('transactions'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">💼 Create Transaction</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('CMA Builder opened!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📋 Create CMA</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Listing presentation tool launched!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📝 Create Listing Presentation</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); setShowAddDeal(true); setActiveTab('transactions'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">💼 Create Transaction</button>
                         </div>
                       </div>
 
@@ -923,8 +923,8 @@ export default function LeadDetailLayoutClient({
                       <div>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider mb-1.5 border-b border-border/40 pb-1">Others</p>
                         <div className="grid grid-cols-1 gap-1">
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Lead details exported to clipboard!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🔗 Share Lead</button>
-                          <button 
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Lead details exported to clipboard!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🔗 Share Lead</button>
+                          <button type="button" 
                             onClick={() => {
                               setShowMoreDropdown(false);
                               setEditFirstName(lead.contact.firstName);
@@ -948,7 +948,7 @@ export default function LeadDetailLayoutClient({
                   )}
                 </div>
 
-                <button 
+                <button type="button" 
                   onClick={handleDeleteLead}
                   className="p-1 hover:bg-red-500/10 rounded text-red-500 hover:text-red-400 transition-colors cursor-pointer"
                   title="Delete lead"
@@ -984,7 +984,7 @@ export default function LeadDetailLayoutClient({
 
             {/* Quick Action Dial Bar */}
             <div className="grid grid-cols-3 gap-2 py-1 border-t border-b border-border/60">
-              <button 
+              <button type="button" 
                 onClick={() => {
                   setNoteType('CALL');
                   setActiveTab('overview');
@@ -996,7 +996,7 @@ export default function LeadDetailLayoutClient({
                 <span className="text-[9px] font-bold mt-1">Call</span>
               </button>
               
-              <button 
+              <button type="button" 
                 onClick={() => {
                   setNoteType('SMS');
                   setActiveTab('overview');
@@ -1008,7 +1008,7 @@ export default function LeadDetailLayoutClient({
                 <span className="text-[9px] font-bold mt-1">Text</span>
               </button>
 
-              <button 
+              <button type="button" 
                 onClick={() => {
                   setNoteType('EMAIL');
                   setActiveTab('overview');
@@ -1028,7 +1028,7 @@ export default function LeadDetailLayoutClient({
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Phone Numbers</span>
-                  <button 
+                  <button type="button" 
                     onClick={openPhonesEmailsEditor}
                     className="text-[10px] text-primary hover:underline font-bold cursor-pointer"
                   >
@@ -1061,7 +1061,7 @@ export default function LeadDetailLayoutClient({
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Email Addresses</span>
-                  <button 
+                  <button type="button" 
                     onClick={openPhonesEmailsEditor}
                     className="text-[10px] text-primary hover:underline font-bold cursor-pointer"
                   >
@@ -1124,7 +1124,7 @@ export default function LeadDetailLayoutClient({
               <div className="pt-2 border-t border-border/40 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Family & Spouse</span>
-                  <button 
+                  <button type="button" 
                     onClick={() => setShowAddFamily(true)}
                     className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer"
                   >
@@ -1240,7 +1240,7 @@ export default function LeadDetailLayoutClient({
               { id: 'automations', label: 'Automations & Plans' },
               { id: 'communications', label: 'Communications Dialer' },
             ].map(tab => (
-              <button
+              <button type="button"
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
@@ -1367,7 +1367,7 @@ export default function LeadDetailLayoutClient({
                         { id: 'DOCUMENT', label: 'Docs' },
                         { id: 'PINNED', label: '📌 Pinned' },
                       ].map(chip => (
-                        <button
+                        <button type="button"
                           key={chip.id}
                           onClick={() => setTimelineFilter(chip.id)}
                           className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer ${
@@ -1426,7 +1426,7 @@ export default function LeadDetailLayoutClient({
                               {act.formattedContent || act.content}
                             </p>
                             <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/20">
-                              <button
+                              <button type="button"
                                 onClick={() => handleTogglePin(act.id)}
                                 className={`text-[10px] font-bold flex items-center gap-1 px-2 py-0.5 rounded transition-colors cursor-pointer ${act.isPinned ? 'text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
                                 title={act.isPinned ? 'Unpin' : 'Pin to top'}
@@ -1434,7 +1434,7 @@ export default function LeadDetailLayoutClient({
                                 {act.isPinned ? <PinOff className="w-3 h-3" /> : <Pin className="w-3 h-3" />}
                                 {act.isPinned ? 'Unpin' : 'Pin'}
                               </button>
-                              <button
+                              <button type="button"
                                 onClick={() => handleDeleteActivity(act.id)}
                                 className="text-[10px] font-bold text-red-500 hover:text-red-400 flex items-center gap-1 px-2 py-0.5 rounded hover:bg-red-500/10 transition-colors cursor-pointer"
                                 title="Delete"
@@ -1458,7 +1458,7 @@ export default function LeadDetailLayoutClient({
                   <div className="bg-card border border-border/60 rounded-2xl p-4.5 shadow-sm space-y-4">
                     <div className="flex items-center justify-between border-b border-border/40 pb-2">
                       <span className="text-xs font-black text-foreground uppercase tracking-wider">Pending Tasks</span>
-                      <button 
+                      <button type="button" 
                         onClick={() => setShowAddTask(!showAddTask)}
                         className="p-1 hover:bg-muted text-primary rounded cursor-pointer"
                         title="Add Task"
@@ -1558,13 +1558,13 @@ export default function LeadDetailLayoutClient({
                               )}
                               {/* Edit/Delete buttons - show on hover */}
                               <div className="flex items-center gap-2 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
+                                <button type="button"
                                   onClick={() => openEditTask(task)}
                                   className="text-[9px] font-bold text-muted-foreground hover:text-foreground px-1.5 py-0.5 hover:bg-muted rounded transition-colors cursor-pointer"
                                 >
                                   ✏️ Edit
                                 </button>
-                                <button
+                                <button type="button"
                                   onClick={() => handleDeleteTask(task.id)}
                                   className="text-[9px] font-bold text-red-500 hover:text-red-400 px-1.5 py-0.5 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
                                 >
@@ -1582,7 +1582,7 @@ export default function LeadDetailLayoutClient({
                           <div className="bg-card border border-border max-w-sm w-full rounded-2xl p-5 shadow-xl space-y-4">
                             <div className="flex justify-between items-center border-b border-border/50 pb-2">
                               <h4 className="font-bold text-sm text-foreground">✏️ Edit Task</h4>
-                              <button onClick={() => setEditingTaskId(null)} className="p-1 hover:bg-muted rounded text-muted-foreground">
+                              <button type="button" onClick={() => setEditingTaskId(null)} className="p-1 hover:bg-muted rounded text-muted-foreground">
                                 <X className="w-4 h-4" />
                               </button>
                             </div>
@@ -1633,7 +1633,7 @@ export default function LeadDetailLayoutClient({
                   <div className="bg-card border border-border/60 rounded-2xl p-4.5 shadow-sm space-y-4">
                     <div className="flex items-center justify-between border-b border-border/40 pb-2">
                       <span className="text-xs font-black text-foreground uppercase tracking-wider">Scheduled Showings</span>
-                      <button 
+                      <button type="button" 
                         onClick={() => setShowAddShowing(!showAddShowing)}
                         className="p-1 hover:bg-muted text-primary rounded cursor-pointer"
                         title="Schedule Showing"
@@ -1723,7 +1723,7 @@ export default function LeadDetailLayoutClient({
                     <h3 className="font-extrabold text-base text-foreground">Owned Properties</h3>
                     <p className="text-xs text-muted-foreground">Known real estate assets and mailing addresses verified for {lead.contact.firstName}.</p>
                   </div>
-                  <button 
+                  <button type="button" 
                     onClick={() => {
                       toast.success('Simulated: Added secondary property fields!');
                     }}
@@ -1743,7 +1743,7 @@ export default function LeadDetailLayoutClient({
                       These <strong className="text-indigo-400 font-extrabold">2 properties</strong> could be your next listings — start nurturing them today
                     </span>
                   </div>
-                  <button 
+                  <button type="button" 
                     onClick={() => toast.success('Smart plans activated for nurturing owned properties!')} 
                     className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black rounded-lg uppercase tracking-wider cursor-pointer"
                   >
@@ -1783,12 +1783,12 @@ export default function LeadDetailLayoutClient({
                       <h4 className="font-extrabold text-sm text-foreground truncate">{lead.contact.address || '45409 North Ave, Macomb, MI 48042'}</h4>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
                         <span>EST. <strong className="text-foreground">--</strong></span>
-                        <button onClick={() => toast.success('Valuation criteria updated')} className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer">
+                        <button type="button" onClick={() => toast.success('Valuation criteria updated')} className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer">
                           Unlock equity, loan & interest rate &rsaquo;
                         </button>
                       </div>
                     </div>
-                    <button onClick={() => toast.success('Options drawer opened')} className="text-muted-foreground hover:text-foreground font-extrabold text-sm p-1.5 bg-muted hover:bg-muted/80 border border-border/80 rounded-lg cursor-pointer">
+                    <button type="button" onClick={() => toast.success('Options drawer opened')} className="text-muted-foreground hover:text-foreground font-extrabold text-sm p-1.5 bg-muted hover:bg-muted/80 border border-border/80 rounded-lg cursor-pointer">
                       •••
                     </button>
                   </div>
@@ -1805,12 +1805,12 @@ export default function LeadDetailLayoutClient({
                         <span>EST. <strong className="text-foreground">--</strong></span>
                         <span>3 beds | 2 baths | 1386 sqft</span>
                         <span className="text-muted-foreground/45">&bull;</span>
-                        <button onClick={() => toast.success('Equity metrics loaded')} className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer">
+                        <button type="button" onClick={() => toast.success('Equity metrics loaded')} className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer">
                           Unlock equity, loan & interest rate &rsaquo;
                         </button>
                       </div>
                     </div>
-                    <button onClick={() => toast.success('Options drawer opened')} className="text-muted-foreground hover:text-foreground font-extrabold text-sm p-1.5 bg-muted hover:bg-muted/80 border border-border/80 rounded-lg cursor-pointer">
+                    <button type="button" onClick={() => toast.success('Options drawer opened')} className="text-muted-foreground hover:text-foreground font-extrabold text-sm p-1.5 bg-muted hover:bg-muted/80 border border-border/80 rounded-lg cursor-pointer">
                       •••
                     </button>
                   </div>
@@ -1837,7 +1837,7 @@ export default function LeadDetailLayoutClient({
                     <h3 className="font-extrabold text-base text-foreground">Transactions & Deals Connection</h3>
                     <p className="text-xs text-muted-foreground">Manage deal stage pipelines and transaction values for this lead.</p>
                   </div>
-                  <button 
+                  <button type="button" 
                     onClick={() => setShowAddDeal(!showAddDeal)}
                     className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer"
                   >
@@ -1946,7 +1946,7 @@ export default function LeadDetailLayoutClient({
                     <h3 className="font-extrabold text-base text-foreground">Documents Upload Hub</h3>
                     <p className="text-xs text-muted-foreground">Store contracts, disclosures, and scan documents linked to this lead.</p>
                   </div>
-                  <button 
+                  <button type="button" 
                     onClick={() => toast.success('Select a cloud provider to authorize.')}
                     className="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold rounded-lg transition-colors cursor-pointer"
                   >
@@ -1962,7 +1962,7 @@ export default function LeadDetailLayoutClient({
                     <p className="text-sm font-bold text-foreground">Upload Documents</p>
                     <p className="text-xs text-muted-foreground mt-0.5">Drag and drop file folders here, or click to upload from local machine.</p>
                   </div>
-                  <button
+                  <button type="button"
                     onClick={() => {
                       const input = document.createElement('input');
                       input.type = 'file';
@@ -1996,7 +1996,7 @@ export default function LeadDetailLayoutClient({
                     { name: 'DocuSign', icon: '📝' },
                     { name: 'Onedrive', icon: '☁️' },
                   ].map(prov => (
-                    <button 
+                    <button type="button" 
                       key={prov.name}
                       onClick={() => toast.success(`Simulating integration with ${prov.name}`)}
                       className="p-3 bg-muted/30 border border-border/60 hover:bg-muted/50 rounded-xl text-center space-y-1 transition-colors cursor-pointer"
@@ -2029,7 +2029,7 @@ export default function LeadDetailLayoutClient({
                       )}
                     </h4>
                     <p className="text-xs text-muted-foreground">Send real-time neighborhood metrics, pricing comps, and local trends dynamically.</p>
-                    <button 
+                    <button type="button" 
                       onClick={() => setShowMarketSnapshotModal(true)}
                       className="text-xs font-bold text-primary hover:underline cursor-pointer"
                     >
@@ -2051,7 +2051,7 @@ export default function LeadDetailLayoutClient({
                       )}
                     </h4>
                     <p className="text-xs text-muted-foreground">Automated monthly CMA equity updates and property valuation metrics.</p>
-                    <button 
+                    <button type="button" 
                       onClick={() => setShowValuationModal(true)}
                       className="text-xs font-bold text-primary hover:underline cursor-pointer"
                     >
@@ -2087,7 +2087,7 @@ export default function LeadDetailLayoutClient({
               <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
                 ✏️ Edit Lead Contact Details
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setIsEditingContact(false)}
                 className="p-1 hover:bg-muted rounded text-muted-foreground"
               >
@@ -2213,7 +2213,7 @@ export default function LeadDetailLayoutClient({
               <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
                 📞 Manage Phones & Emails
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setIsEditingPhonesEmails(false)}
                 className="p-1 hover:bg-muted rounded text-muted-foreground cursor-pointer"
               >
@@ -2389,7 +2389,7 @@ export default function LeadDetailLayoutClient({
               <h4 className="font-extrabold text-sm text-foreground flex items-center gap-1.5">
                 <UserPlus className="w-4 h-4 text-primary" /> Add Family Contact
               </h4>
-              <button 
+              <button type="button" 
                 onClick={() => setShowAddFamily(false)}
                 className="p-1 hover:bg-muted rounded text-muted-foreground"
               >
@@ -2474,7 +2474,7 @@ export default function LeadDetailLayoutClient({
               <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
                 📊 Configure Neighborhood Market Snapshot
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setShowMarketSnapshotModal(false)}
                 className="p-1 hover:bg-muted rounded text-muted-foreground"
               >
@@ -2537,7 +2537,7 @@ export default function LeadDetailLayoutClient({
               <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
                 📈 Configure Homeowner Valuation Report
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setShowValuationModal(false)}
                 className="p-1 hover:bg-muted rounded text-muted-foreground"
               >

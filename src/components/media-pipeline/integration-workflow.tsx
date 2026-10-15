@@ -21,7 +21,7 @@ export function IntegrationWorkflow({ listingId }: { listingId?: string }) {
           <div className="flex justify-between"><span>Status:</span> <span className="font-semibold text-green-500">Connected</span></div>
           <div className="flex justify-between"><span>Target:</span> <span>123-main-st.realestatecrm.com</span></div>
         </div>
-        <button className="w-full bg-secondary text-secondary-foreground py-2 rounded-md font-semibold hover:bg-secondary/90 transition-colors">
+        <button type="button" className="w-full bg-secondary text-secondary-foreground py-2 rounded-md font-semibold hover:bg-secondary/90 transition-colors">
           Sync to CRM Site
         </button>
       </div>
@@ -53,7 +53,7 @@ export function IntegrationWorkflow({ listingId }: { listingId?: string }) {
           </div>
         </div>
 
-        <button className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 rounded-md font-semibold hover:bg-primary/90 transition-colors">
+        <button type="button" className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 rounded-md font-semibold hover:bg-primary/90 transition-colors">
           <Send className="w-4 h-4" />
           Draft Social Posts
         </button>

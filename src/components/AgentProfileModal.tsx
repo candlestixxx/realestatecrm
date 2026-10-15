@@ -61,7 +61,7 @@ export default function AgentProfileModal({
             <h3 className="text-lg font-bold text-foreground">Lofty Agent & Company Setup</h3>
             <p className="text-xs text-muted-foreground">Manage your credentials, branding, and billing center info.</p>
           </div>
-          <button
+          <button type="button"
             aria-label="Close agent profile"
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted"
@@ -74,7 +74,7 @@ export default function AgentProfileModal({
 
         {/* Navigation Tabs */}
         <div className="flex border-b border-border bg-muted/10 px-4">
-          <button
+          <button type="button"
             onClick={() => setActiveTab('profile')}
             className={`px-4 py-3 text-sm font-semibold border-b-2 transition-all ${
               activeTab === 'profile'
@@ -84,7 +84,7 @@ export default function AgentProfileModal({
           >
             👤 Agent Profile
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab('company')}
             className={`px-4 py-3 text-sm font-semibold border-b-2 transition-all ${
               activeTab === 'company'
@@ -94,7 +94,7 @@ export default function AgentProfileModal({
           >
             🏢 Company Profile
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab('billing')}
             className={`px-4 py-3 text-sm font-semibold border-b-2 transition-all ${
               activeTab === 'billing'
@@ -264,13 +264,13 @@ export default function AgentProfileModal({
 
         {/* Footer */}
         <div className="p-6 border-t border-border flex justify-end gap-3 bg-muted/10">
-          <button
+          <button type="button"
             onClick={onClose}
             className="px-4 py-2 border border-border hover:bg-muted text-sm font-semibold rounded-lg transition-colors"
           >
             Cancel
           </button>
-          <button
+          <button type="button"
             onClick={handleSave}
             className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold rounded-lg transition-colors"
           >

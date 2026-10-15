@@ -135,7 +135,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
 
         <div className="flex items-center gap-4">
           <div className="flex bg-muted/60 border border-border/60 rounded-xl p-1 gap-1 text-[10px] font-black uppercase tracking-wider">
-            <button
+            <button type="button"
               onClick={() => setSubTab('planner')}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 subTab === 'planner' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -143,7 +143,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
             >
               <Calendar className="w-3.5 h-3.5" /> Planner
             </button>
-            <button
+            <button type="button"
               onClick={() => setSubTab('posts')}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 subTab === 'posts' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -151,7 +151,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
             >
               <List className="w-3.5 h-3.5" /> Posts
             </button>
-            <button
+            <button type="button"
               onClick={() => setSubTab('listing-feed')}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 subTab === 'listing-feed' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -161,7 +161,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
             </button>
           </div>
 
-          <button
+          <button type="button"
             onClick={() => setShowComposer(true)}
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] px-4.5 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
           >
@@ -173,7 +173,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
       {/* Walkthrough Instructions */}
       {showWalkthrough && (
         <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-5 relative animate-fadeIn flex flex-col md:flex-row gap-5 shadow-xs">
-          <button 
+          <button type="button" 
             onClick={() => setShowWalkthrough(false)}
             className="absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             title="Dismiss walkthrough"
@@ -313,12 +313,12 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
 
                   {/* Actions card footer */}
                   <div className="px-5 py-3 border-t border-border/40 bg-muted/10 flex justify-between items-center">
-                    <button
+                    <button type="button"
                       className="bg-indigo-600/10 text-indigo-500 hover:bg-indigo-600/20 font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
                     >
                       <Megaphone className="w-3 h-3" /> Boost Post
                     </button>
-                    <button
+                    <button type="button"
                       onClick={() => handleDeletePost(post.id)}
                       className="text-muted-foreground hover:text-rose-500 transition-colors p-1.5 cursor-pointer"
                       title="Delete Post"
@@ -357,7 +357,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
               <h3 className="text-sm font-black text-foreground uppercase tracking-wider">
                 Create Social Post Composer
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setShowComposer(false)}
                 className="text-muted-foreground hover:text-foreground text-sm cursor-pointer"
               >

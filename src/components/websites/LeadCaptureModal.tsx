@@ -66,7 +66,7 @@ export function LeadCaptureModal({ tenantName, triggerDelayMs = 15000, triggerSc
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
       <div className="bg-background border border-border shadow-2xl rounded-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
         <div className="relative bg-primary px-6 py-8 text-center text-primary-foreground">
-          <button
+          <button type="button"
             onClick={() => setIsOpen(false)}
             className="absolute top-4 right-4 text-primary-foreground/70 hover:text-primary-foreground transition-colors"
           >
@@ -84,7 +84,7 @@ export function LeadCaptureModal({ tenantName, triggerDelayMs = 15000, triggerSc
               </div>
               <h3 className="text-xl font-bold">You&apos;re on the list!</h3>
               <p className="text-muted-foreground text-sm">We&apos;ll be in touch shortly.</p>
-              <button
+              <button type="button"
                 onClick={() => setIsOpen(false)}
                 className="mt-4 px-6 py-2 bg-muted text-muted-foreground hover:bg-muted/80 rounded-lg font-medium transition-colors"
               >

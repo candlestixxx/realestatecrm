@@ -96,7 +96,7 @@ export default function AgentCoreConsole() {
             <p className="text-sm text-muted-foreground mb-4">Type a natural-language command to control your CRM.</p>
             <div className="flex flex-wrap justify-center gap-2">
               {EXAMPLE_COMMANDS.map(cmd => (
-                <button
+                <button type="button"
                   key={cmd}
                   onClick={() => sendCommand(cmd)}
                   className="px-3 py-1.5 text-xs bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-full border border-border transition-colors"

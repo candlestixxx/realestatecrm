@@ -85,7 +85,7 @@ export default function LeadTagsEditor({
             className="flex items-center gap-1 pl-2 pr-1.5 py-0.5 text-[10px] font-bold rounded-lg bg-primary/10 text-primary border border-primary/20 uppercase tracking-tighter"
           >
             <span>{tag}</span>
-            <button
+            <button type="button"
               onClick={() => handleDeleteTag(tag)}
               disabled={isSaving}
               className="w-3.5 h-3.5 rounded-full flex items-center justify-center hover:bg-primary/20 transition-colors text-[8px] font-black"
@@ -117,7 +117,7 @@ export default function LeadTagsEditor({
             disabled={isSaving}
           />
         ) : (
-          <button
+          <button type="button"
             onClick={() => setIsAdding(true)}
             disabled={isSaving}
             className="px-2 py-0.5 text-[10px] font-bold rounded-lg bg-muted border border-border text-muted-foreground hover:text-foreground transition-all cursor-pointer h-[22px]"

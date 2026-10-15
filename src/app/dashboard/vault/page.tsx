@@ -54,7 +54,7 @@ export default function VaultPage() {
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Lock className="w-6 h-6 text-primary" /> Document Vault
         </h1>
-        <button onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90">
+        <button type="button" onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90">
           <Plus className="w-4 h-4" /> New Document
         </button>
       </div>
@@ -87,8 +87,8 @@ export default function VaultPage() {
               <p className="font-medium truncate">{d.title}</p>
               <p className="text-xs text-muted-foreground">Created {new Date(d.createdAt).toLocaleDateString()}</p>
             </div>
-            <button className="p-1.5 hover:bg-muted rounded" title="Download"><Download className="w-4 h-4" /></button>
-            <button className="p-1.5 hover:bg-destructive/10 rounded text-destructive" title="Delete"><Trash2 className="w-4 h-4" /></button>
+            <button type="button" className="p-1.5 hover:bg-muted rounded" title="Download"><Download className="w-4 h-4" /></button>
+            <button type="button" className="p-1.5 hover:bg-destructive/10 rounded text-destructive" title="Delete"><Trash2 className="w-4 h-4" /></button>
           </div>
         ))}
       </div>

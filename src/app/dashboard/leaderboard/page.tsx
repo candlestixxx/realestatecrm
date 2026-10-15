@@ -35,7 +35,7 @@ export default function LeaderboardPage() {
         <h1 className="text-2xl font-bold text-foreground">Agent Leaderboard <span title="Compare agent performance metrics including leads converted, deals closed, and revenue generated." aria-label="About this section: Compare agent performance metrics including leads converted, deals closed, and revenue generated." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
         <div className="flex gap-2">
           {['all', 'month', 'week'].map(p => (
-            <button key={p} onClick={() => setPeriod(p)}
+            <button type="button" key={p} onClick={() => setPeriod(p)}
               className={'px-3 py-1.5 rounded-full text-sm ' + (period === p ? 'bg-blue-600 text-white' : 'bg-muted text-foreground hover:bg-muted')}>
               {p === 'all' ? 'All Time' : p === 'month' ? 'This Month' : 'This Week'}
             </button>

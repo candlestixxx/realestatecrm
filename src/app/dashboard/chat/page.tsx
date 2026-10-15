@@ -54,10 +54,10 @@ export default function ChatPage() {
         <div className="w-56 border rounded-lg p-3 shrink-0 overflow-y-auto">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-muted-foreground">Rooms</span>
-            <button className="p-1 hover:bg-muted rounded" title="New room"><Plus className="w-4 h-4" /></button>
+            <button type="button" className="p-1 hover:bg-muted rounded" title="New room"><Plus className="w-4 h-4" /></button>
           </div>
           {rooms.map(r => (
-            <button key={r.id} onClick={() => setActiveRoom(r.id)}
+            <button type="button" key={r.id} onClick={() => setActiveRoom(r.id)}
               className={`w-full text-left px-3 py-2 rounded-md text-sm mb-1 transition-colors ${activeRoom === r.id ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted'}`}>
               <Users className="w-3.5 h-3.5 inline mr-1.5" />{r.name}
             </button>
@@ -79,7 +79,7 @@ export default function ChatPage() {
             <input placeholder="Type a message..." value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
               className="flex-1 rounded-md border px-3 py-2 text-sm" />
-            <button onClick={handleSend} className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90">
+            <button type="button" onClick={handleSend} className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90">
               <Send className="w-4 h-4" />
             </button>
           </div>

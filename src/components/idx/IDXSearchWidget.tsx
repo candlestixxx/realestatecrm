@@ -67,7 +67,7 @@ export default function IDXSearchWidget({ domain = '' }: { domain?: string }) {
           <option value="">Any Baths</option>
           {[1,1.5,2,2.5,3,3.5,4].map(n => <option key={n} value={n}>{n}+ baths</option>)}
         </select>
-        <button onClick={() => setPage(1)} className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700">Search</button>
+        <button type="button" onClick={() => setPage(1)} className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700">Search</button>
       </div>
 
       {/* Results */}
@@ -100,9 +100,9 @@ export default function IDXSearchWidget({ domain = '' }: { domain?: string }) {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center gap-2">
-          <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-4 py-2 border rounded-lg disabled:opacity-50">Previous</button>
+          <button type="button" disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-4 py-2 border rounded-lg disabled:opacity-50">Previous</button>
           <span className="px-4 py-2 text-muted-foreground">Page {page} of {totalPages}</span>
-          <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="px-4 py-2 border rounded-lg disabled:opacity-50">Next</button>
+          <button type="button" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="px-4 py-2 border rounded-lg disabled:opacity-50">Next</button>
         </div>
       )}
     </div>

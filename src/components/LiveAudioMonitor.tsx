@@ -86,7 +86,7 @@ export default function LiveAudioMonitor() {
             Live Audio WS
           </span>
         </div>
-        <button
+        <button type="button"
           onClick={connect}
           className="text-xs text-secondary hover:underline font-medium"
           aria-label="Reconnect to live audio WebSocket"

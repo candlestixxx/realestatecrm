@@ -98,7 +98,7 @@ export default function AIChat() {
   return (
     <>
       {!isOpen && (
-        <button
+        <button type="button"
           onClick={() => setIsOpen(true)}
           className="fixed bottom-6 right-6 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center hover:bg-primary/90 transition-transform hover:scale-105 z-50"
           aria-label="Open AI Assistant"
@@ -114,7 +114,7 @@ export default function AIChat() {
               <div className="w-2 h-2 rounded-full bg-card animate-pulse"></div>
               <h3 className="font-bold text-sm tracking-tight uppercase">Gemini AI Command Center</h3>
             </div>
-            <button
+            <button type="button"
               onClick={() => setIsOpen(false)}
               className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
             >

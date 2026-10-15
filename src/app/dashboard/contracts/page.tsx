@@ -44,7 +44,7 @@ export default function ContractsPage() {
 
         <div className="grid gap-4 sm:grid-cols-3 mb-6">
           {TEMPLATES.map(t => (
-            <button key={t.type} onClick={() => setSelected(t.type)}
+            <button type="button" key={t.type} onClick={() => setSelected(t.type)}
               className={`rounded-lg border p-4 text-left transition-colors ${selected === t.type ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'}`}>
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-medium">{t.label}</span>
@@ -75,7 +75,7 @@ export default function ContractsPage() {
             { action: 'execute', tip: 'Execute the contract — triggers e-signature requests to all parties.' },
             { action: 'dispute', tip: 'File a dispute on this contract. Creates a compliance review task.' },
           ].map(({ action, tip }) => (
-            <button key={action} onClick={() => handleGenerate(action)} disabled={generating} title={tip}
+            <button type="button" key={action} onClick={() => handleGenerate(action)} disabled={generating} title={tip}
               className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 capitalize">
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : action}
             </button>

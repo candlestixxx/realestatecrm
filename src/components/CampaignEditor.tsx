@@ -173,7 +173,7 @@ export default function CampaignEditor({
 
           {/* Sub-tab Switches */}
           <div className="flex bg-muted/65 border border-border/60 rounded-xl p-1 gap-1 text-[10px] font-black uppercase tracking-wider select-none">
-            <button
+            <button type="button"
               onClick={() => setEditorTab('builder')}
               className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
                 editorTab === 'builder' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -181,7 +181,7 @@ export default function CampaignEditor({
             >
               Builder
             </button>
-            <button
+            <button type="button"
               onClick={() => setEditorTab('performance')}
               className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
                 editorTab === 'performance' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -189,7 +189,7 @@ export default function CampaignEditor({
             >
               Performance
             </button>
-            <button
+            <button type="button"
               onClick={() => setEditorTab('enrollments')}
               className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
                 editorTab === 'enrollments' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -199,7 +199,7 @@ export default function CampaignEditor({
             </button>
           </div>
 
-          <button aria-label="Close campaign editor" onClick={onClose} className="text-muted-foreground hover:text-foreground cursor-pointer">
+          <button type="button" aria-label="Close campaign editor" onClick={onClose} className="text-muted-foreground hover:text-foreground cursor-pointer">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
@@ -325,7 +325,7 @@ export default function CampaignEditor({
                       <span className="font-extrabold text-xs text-foreground uppercase tracking-wide">
                         {step.type === 'EMAIL' ? '✉️ Email Step' : step.type === 'SMS' ? '💬 SMS Text Step' : '📋 Task Step'}
                       </span>
-                      <button 
+                      <button type="button" 
                         onClick={() => handleDeleteStep(index)}
                         className="text-xs font-black text-rose-500 uppercase cursor-pointer"
                       >
@@ -408,10 +408,10 @@ export default function CampaignEditor({
               )}
 
               <div className="flex gap-2 mt-6">
-                <button onClick={() => handleAddStep('EMAIL')} className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-[10px] font-black uppercase cursor-pointer">
+                <button type="button" onClick={() => handleAddStep('EMAIL')} className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-[10px] font-black uppercase cursor-pointer">
                   + Email Step
                 </button>
-                <button onClick={() => handleAddStep('SMS')} className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-[10px] font-black uppercase cursor-pointer">
+                <button type="button" onClick={() => handleAddStep('SMS')} className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-[10px] font-black uppercase cursor-pointer">
                   + SMS Step
                 </button>
               </div>
@@ -427,7 +427,7 @@ export default function CampaignEditor({
               <h4 className="text-sm font-black uppercase text-foreground">Email & SMS Performance</h4>
               <div className="flex gap-2 text-[10px] font-black uppercase tracking-wider">
                 {['Today', 'Yesterday', '7D', '30D', 'Default'].map(d => (
-                  <button key={d} className="px-3 py-1.5 bg-background border border-border/60 hover:border-border rounded-lg text-muted-foreground hover:text-foreground cursor-pointer">
+                  <button type="button" key={d} className="px-3 py-1.5 bg-background border border-border/60 hover:border-border rounded-lg text-muted-foreground hover:text-foreground cursor-pointer">
                     {d}
                   </button>
                 ))}
@@ -510,10 +510,10 @@ export default function CampaignEditor({
                       </td>
                       <td className="px-5 py-3.5">{lead.date}</td>
                       <td className="px-5 py-3.5 text-right font-black uppercase text-[9px]">
-                        <button className="text-indigo-500 hover:underline mr-3 cursor-pointer">
+                        <button type="button" className="text-indigo-500 hover:underline mr-3 cursor-pointer">
                           {lead.status === 'PAUSED' ? 'Resume' : 'Pause'}
                         </button>
-                        <button className="text-rose-500 hover:underline cursor-pointer">Unenroll</button>
+                        <button type="button" className="text-rose-500 hover:underline cursor-pointer">Unenroll</button>
                       </td>
                     </tr>
                   ))}
@@ -530,13 +530,13 @@ export default function CampaignEditor({
           </span>
           
           <div className="flex gap-2">
-            <button
+            <button type="button"
               onClick={onClose}
               className="px-4 py-2 border border-border hover:bg-muted rounded-lg text-xs font-medium transition-colors cursor-pointer"
             >
               Cancel
             </button>
-            <button
+            <button type="button"
               onClick={handleSave}
               disabled={isSaving}
               className="px-6 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95 transition-all shadow-md disabled:opacity-50 cursor-pointer"

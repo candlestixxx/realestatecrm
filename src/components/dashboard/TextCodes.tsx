@@ -127,7 +127,7 @@ export default function TextCodes() {
             Create high-converting sign rider keyword codes to capture mobile leads directly from physical listing signs.
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={() => setShowCreateModal(true)}
           className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs px-4.5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-1.5 cursor-pointer w-fit"
         >
@@ -197,7 +197,7 @@ export default function TextCodes() {
                     </span>
                   </td>
                   <td className="px-5 py-4.5 text-center">
-                    <button
+                    <button type="button"
                       onClick={() => toggleStatus(code.id)}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase border cursor-pointer transition-colors ${
                         code.status === 'ACTIVE'
@@ -211,14 +211,14 @@ export default function TextCodes() {
                   </td>
                   <td className="px-5 py-4.5 text-right">
                     <div className="flex items-center justify-end gap-1.5">
-                      <button
+                      <button type="button"
                         onClick={() => handleCopyLink(`Text "${code.keyword}" to ${code.phoneNumber}`, code.id)}
                         className="p-1.5 hover:bg-muted/80 rounded-lg text-muted-foreground hover:text-indigo-500 transition-colors cursor-pointer"
                         title="Copy Rider Instructions"
                       >
                         {copiedId === code.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
-                      <button
+                      <button type="button"
                         onClick={() => handleDelete(code.id)}
                         className="p-1.5 hover:bg-muted/80 rounded-lg text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer"
                         title="Delete Code"
@@ -249,7 +249,7 @@ export default function TextCodes() {
               <h3 className="text-base font-black text-foreground uppercase tracking-wider flex items-center gap-1.5">
                 💬 Create Sign Rider SMS Code
               </h3>
-              <button
+              <button type="button"
                 onClick={() => setShowCreateModal(false)}
                 className="text-muted-foreground hover:text-foreground text-sm cursor-pointer"
               >

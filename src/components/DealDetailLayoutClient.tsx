@@ -380,7 +380,7 @@ export default function DealDetailLayoutClient({
               const isPassed = stages.findIndex(s => s.id === deal.stage) >= idx;
 
               return (
-                <button
+                <button type="button"
                   key={stg.id}
                   onClick={() => handleStageChange(stg.id)}
                   className={`w-full text-center py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
@@ -494,7 +494,7 @@ export default function DealDetailLayoutClient({
                       <span className="truncate pr-1">{exp.label}</span>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <span className="font-bold text-red-400">-${exp.amount}</span>
-                        <button 
+                        <button type="button" 
                           onClick={() => handleDeleteExpense(exp.id)}
                           className="text-muted-foreground hover:text-red-400 transition-colors"
                           title="Delete expense"
@@ -527,7 +527,7 @@ export default function DealDetailLayoutClient({
               { id: 'requirements', label: 'Requirements' },
               { id: 'stakeholders', label: 'Stakeholders' },
             ].map(tab => (
-              <button
+              <button type="button"
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
@@ -679,7 +679,7 @@ export default function DealDetailLayoutClient({
                           <h4 className="font-extrabold text-xs text-foreground">{doc.title}</h4>
                           <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1">
                             <span>Status:</span>
-                            <button 
+                            <button type="button" 
                               onClick={() => handleToggleDocStatus(doc.id, doc.status, doc.signed)}
                               className={`px-1.5 py-0.5 rounded font-black uppercase text-[8px] border transition-all ${
                                 doc.status === 'COMPLETED' 
@@ -701,14 +701,14 @@ export default function DealDetailLayoutClient({
                             <Check className="w-3.5 h-3.5 text-emerald-400" /> Signed
                           </span>
                         ) : (
-                          <button 
+                          <button type="button" 
                             onClick={() => handleSignDoc(doc.id, doc.title, doc.status)}
                             className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg shadow cursor-pointer"
                           >
                             Sign Document
                           </button>
                         )}
-                        <button
+                        <button type="button"
                           onClick={async () => {
                             try {
                               const res = await fetch('/api/uploads', {

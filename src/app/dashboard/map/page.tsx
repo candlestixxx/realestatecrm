@@ -74,7 +74,7 @@ export default function LeadMapPage() {
         </div>
         <div className="flex items-center gap-2">
           {['all', 'hot', 'active', 'cold', 'preforeclosure'].map(f => (
-            <button
+            <button type="button"
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold capitalize transition-colors ${
@@ -190,7 +190,7 @@ export default function LeadMapPage() {
                 >
                   View Lead
                 </a>
-                <button
+                <button type="button"
                   onClick={async () => {
                     if (!selectedLead.address) { toast.error('No address on file'); return; }
                     try {

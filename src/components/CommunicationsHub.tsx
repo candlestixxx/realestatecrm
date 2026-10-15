@@ -40,7 +40,7 @@ export default function CommunicationsHub({
     return (
       <div className="w-12 border-l border-border h-full bg-card flex flex-col items-center py-4 justify-between transition-all duration-300 select-none shadow-sm shrink-0">
         <div className="flex flex-col items-center gap-6 w-full">
-          <button
+          <button type="button"
             onClick={toggleCollapse}
             className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-all cursor-pointer"
             title="Expand Communications Hub"
@@ -50,7 +50,7 @@ export default function CommunicationsHub({
 
           <div className="h-[1px] w-8 bg-border" />
 
-          <button
+          <button type="button"
             onClick={() => {
               setMode('sms');
               toggleCollapse();
@@ -61,7 +61,7 @@ export default function CommunicationsHub({
             <span className="text-lg block">📱</span>
           </button>
 
-          <button
+          <button type="button"
             onClick={() => {
               setMode('email');
               toggleCollapse();
@@ -72,7 +72,7 @@ export default function CommunicationsHub({
             <span className="text-lg block">✉️</span>
           </button>
 
-          <button
+          <button type="button"
             onClick={() => {
               setMode('video');
               toggleCollapse();
@@ -102,7 +102,7 @@ export default function CommunicationsHub({
             <p className="text-[10px] text-muted-foreground">Manage client interactions</p>
           </div>
         </div>
-        <button
+        <button type="button"
           onClick={toggleCollapse}
           className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-all cursor-pointer"
           title="Collapse Panel"
@@ -114,21 +114,21 @@ export default function CommunicationsHub({
       <div className="p-4 space-y-6">
         {/* Mode Selectors */}
         <div className="grid grid-cols-3 gap-2">
-          <button
+          <button type="button"
             onClick={() => setMode('sms')}
             className={`flex flex-col items-center justify-center py-3 px-2 border rounded-xl transition-all ${mode === 'sms' ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary' : 'border-border hover:bg-muted/10'}`}
           >
             <span className="text-xl mb-1">📱</span>
             <span className="font-extrabold text-[10px] uppercase tracking-wider">SMS</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => setMode('email')}
             className={`flex flex-col items-center justify-center py-3 px-2 border rounded-xl transition-all ${mode === 'email' ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary' : 'border-border hover:bg-muted/10'}`}
           >
             <span className="text-xl mb-1">✉️</span>
             <span className="font-extrabold text-[10px] uppercase tracking-wider">Email</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => setMode('video')}
             className={`flex flex-col items-center justify-center py-3 px-2 border rounded-xl transition-all ${mode === 'video' ? 'border-secondary bg-secondary/5 text-secondary ring-1 ring-secondary' : 'border-border hover:bg-muted/10'}`}
           >

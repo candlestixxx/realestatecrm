@@ -308,14 +308,14 @@ export default function SyncQueuePage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button
+          <button type="button"
             onClick={handleEnqueueAll}
             disabled={actionLoading === 'enqueue'}
             className="px-4 py-2 bg-muted text-foreground font-medium rounded-md hover:bg-muted/80 transition-colors disabled:opacity-50"
           >
             {actionLoading === 'enqueue' ? 'Adding...' : 'Enqueue All Preforeclosure'}
           </button>
-          <button
+          <button type="button"
             onClick={handleGetNext}
             disabled={actionLoading === 'next' || stats?.queued === 0}
             className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
@@ -377,7 +377,7 @@ export default function SyncQueuePage() {
                 className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </label>
-            <button
+            <button type="button"
               onClick={handleVerifyLoftyKey}
               disabled={actionLoading === 'verify-lofty'}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium disabled:opacity-50"
@@ -445,7 +445,7 @@ export default function SyncQueuePage() {
             <h2 className="text-lg font-bold text-primary">
               🔵 Active Sync: {activeItem.firstName} {activeItem.lastName}
             </h2>
-            <button
+            <button type="button"
               onClick={() => {
                 setActiveItem(null);
                 setSyncPlan(null);
@@ -517,7 +517,7 @@ export default function SyncQueuePage() {
               Open in MyPlus →
             </a>
 
-            <button
+            <button type="button"
               onClick={() => handleVerifyActiveLead(activeItem.id)}
               disabled={actionLoading === `verify-${activeItem.id}`}
               className="px-4 py-2 bg-blue-500/20 text-blue-700 border border-blue-500/30 rounded-md hover:bg-blue-500/30 transition-colors text-sm font-medium disabled:opacity-50"
@@ -533,7 +533,7 @@ export default function SyncQueuePage() {
                 placeholder="Lofty Contact ID (optional)"
                 className="px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-primary"
               />
-              <button
+              <button type="button"
                 onClick={() => handleCompleteSync(activeItem.id)}
                 disabled={actionLoading === `complete-${activeItem.id}`}
                 className="px-4 py-2 bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 rounded-md hover:bg-emerald-500/30 transition-colors text-sm font-medium disabled:opacity-50"
@@ -542,7 +542,7 @@ export default function SyncQueuePage() {
               </button>
             </div>
 
-            <button
+            <button type="button"
               onClick={() =>
                 handleFailSync(activeItem.id, 'Manual fail — lead not found in MyPlus or sync error')
               }
@@ -552,7 +552,7 @@ export default function SyncQueuePage() {
               ✕ Mark Failed
             </button>
 
-            <button
+            <button type="button"
               onClick={() => handleSkip(activeItem.id)}
               disabled={actionLoading === `skip-${activeItem.id}`}
               className="px-4 py-2 bg-muted text-muted-foreground border border-border rounded-md hover:bg-muted/80 transition-colors text-sm font-medium disabled:opacity-50"
@@ -566,7 +566,7 @@ export default function SyncQueuePage() {
       {/* Filter Tabs */}
       <div className="flex gap-2 flex-wrap">
         {(['ALL', 'QUEUED', 'FINDING', 'SYNCED', 'FAILED', 'SKIPPED'] as const).map((s) => (
-          <button
+          <button type="button"
             key={s}
             onClick={() => setFilter(s)}
             className={`px-3 py-1 text-xs rounded-full font-medium border transition-colors ${
@@ -630,7 +630,7 @@ export default function SyncQueuePage() {
                     <div className="flex gap-2 justify-end">
                       {item.status === 'QUEUED' && (
                         <>
-                          <button
+                          <button type="button"
                             onClick={() => {
                               setActiveItem(item);
                               setSyncPlan({
@@ -643,7 +643,7 @@ export default function SyncQueuePage() {
                           >
                             Sync
                           </button>
-                          <button
+                          <button type="button"
                             onClick={() => handleSkip(item.id)}
                             className="text-muted-foreground hover:text-foreground text-xs"
                           >

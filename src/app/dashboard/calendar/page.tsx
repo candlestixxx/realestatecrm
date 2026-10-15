@@ -65,14 +65,14 @@ export default function PublishingCalendarPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => navigateMonth(-1)}
+          <button type="button" onClick={() => navigateMonth(-1)}
             className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors">
             ←
           </button>
           <span className="text-lg font-bold text-foreground min-w-[180px] text-center">
             {MONTHS[month]} {year}
           </span>
-          <button onClick={() => navigateMonth(1)}
+          <button type="button" onClick={() => navigateMonth(1)}
             className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors">
             →
           </button>

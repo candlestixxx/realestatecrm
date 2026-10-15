@@ -117,7 +117,7 @@ export function MyPlusImportModal() {
 
   if (!isOpen) {
     return (
-      <button
+      <button type="button"
         onClick={() => { setIsOpen(true); resetForm(); }}
         className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors shadow text-sm"
       >
@@ -138,7 +138,7 @@ export function MyPlusImportModal() {
               Import Expired, FSBO, and other lead lists into the CRM
             </p>
           </div>
-          <button
+          <button type="button"
             onClick={() => setIsOpen(false)}
             className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
           >
@@ -148,7 +148,7 @@ export function MyPlusImportModal() {
 
         {/* Tabs */}
         <div className="flex border-b border-border bg-muted/20">
-          <button
+          <button type="button"
             onClick={() => setActiveTab('csv')}
             className={`flex-1 px-4 py-3 text-sm font-semibold text-center transition-colors ${
               activeTab === 'csv'
@@ -159,7 +159,7 @@ export function MyPlusImportModal() {
             <Upload className="w-4 h-4 inline-block mr-1.5" />
             CSV Import (Bulk)
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab('quick')}
             className={`flex-1 px-4 py-3 text-sm font-semibold text-center transition-colors ${
               activeTab === 'quick'
@@ -192,7 +192,7 @@ export function MyPlusImportModal() {
                 <label className="text-xs font-semibold text-muted-foreground block mb-1.5">List Type</label>
                 <div className="grid grid-cols-3 gap-2">
                   {['Expired', 'FSBO', 'Preforeclosure'].map(type => (
-                    <button
+                    <button type="button"
                       key={type}
                       onClick={() => setListType(type)}
                       className={`px-3 py-2 rounded-lg text-xs font-semibold border transition-colors ${
@@ -235,7 +235,7 @@ export function MyPlusImportModal() {
               </div>
 
               {/* Import Button */}
-              <button
+              <button type="button"
                 onClick={handleCsvImport}
                 disabled={!file || importing}
                 className="w-full py-3 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"

@@ -85,7 +85,7 @@ export default function MCPSettingsClient() {
               value={endpointUrl}
               className="flex-1 px-3 py-2 text-sm bg-muted/50 border border-border rounded-lg text-foreground font-mono"
             />
-            <button onClick={() => copyToClipboard(endpointUrl, 'Endpoint URL')}
+            <button type="button" onClick={() => copyToClipboard(endpointUrl, 'Endpoint URL')}
               className="px-3 py-2 text-xs font-bold text-secondary border border-border rounded-lg hover:bg-muted transition-colors">
               Copy
             </button>
@@ -108,7 +108,7 @@ export default function MCPSettingsClient() {
               placeholder="Enter MCP_TOKEN value to test"
               className="flex-1 px-3 py-2 text-sm bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground"
             />
-            <button onClick={() => setShowToken(!showToken)}
+            <button type="button" onClick={() => setShowToken(!showToken)}
               className="px-3 py-2 text-xs font-bold text-muted-foreground border border-border rounded-lg hover:bg-muted transition-colors">
               {showToken ? 'Hide' : 'Show'}
             </button>
@@ -117,7 +117,7 @@ export default function MCPSettingsClient() {
 
         {/* Test */}
         <div>
-          <button onClick={testConnection} disabled={testing}
+          <button type="button" onClick={testConnection} disabled={testing}
             className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-bold rounded-lg hover:bg-secondary/90 disabled:opacity-50 transition-colors">
             {testing ? 'Testing...' : 'Test Connection'}
           </button>
@@ -157,7 +157,7 @@ export default function MCPSettingsClient() {
     }
   }
 }`}</pre>
-        <button onClick={() => copyToClipboard(JSON.stringify({
+        <button type="button" onClick={() => copyToClipboard(JSON.stringify({
           mcpServers: {
             'agentcore-crm': {
               url: endpointUrl || 'https://your-domain.com/api/mcp',

@@ -179,7 +179,7 @@ export default function ListingsPage() {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">MLS Listing Search <span title="Search MLS listings by location, price, and property type. Create offers and track listing activity." aria-label="About this section: Search MLS listings by location, price, and property type. Create offers and track listing activity." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
-        <button onClick={() => setShowEntryForm(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <button type="button" onClick={() => setShowEntryForm(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
           + New Listing
         </button>
       </div>
@@ -205,7 +205,7 @@ export default function ListingsPage() {
           <input placeholder="Min Sqft" type="number" value={filters.minSqft} onChange={e => setFilters(f => ({ ...f, minSqft: e.target.value }))} className="border rounded px-3 py-2 text-sm" />
           <input placeholder="City" value={filters.city} onChange={e => setFilters(f => ({ ...f, city: e.target.value }))} className="border rounded px-3 py-2 text-sm" />
           <input placeholder="ZIP" value={filters.zip} onChange={e => setFilters(f => ({ ...f, zip: e.target.value }))} className="border rounded px-3 py-2 text-sm" />
-          <button onClick={() => setFilters({ status: 'ALL', propertyType: '', minPrice: '', maxPrice: '', minBeds: '', minBaths: '', minSqft: '', city: '', zip: '' })} className="text-sm text-muted-foreground hover:text-foreground">Reset</button>
+          <button type="button" onClick={() => setFilters({ status: 'ALL', propertyType: '', minPrice: '', maxPrice: '', minBeds: '', minBaths: '', minSqft: '', city: '', zip: '' })} className="text-sm text-muted-foreground hover:text-foreground">Reset</button>
         </div>
       </div>
 
@@ -249,7 +249,7 @@ export default function ListingsPage() {
           <div className="bg-card rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">{selected.address}</h2>
-              <button onClick={() => setSelected(null)} className="text-muted-foreground hover:text-muted-foreground">✕</button>
+              <button type="button" onClick={() => setSelected(null)} className="text-muted-foreground hover:text-muted-foreground">✕</button>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div><span className="text-sm text-muted-foreground">Price</span><div className="text-lg font-semibold">{selected.listPrice ? '$' + selected.listPrice.toLocaleString() : 'TBD'}</div></div>
@@ -277,7 +277,7 @@ export default function ListingsPage() {
               </div>
             )}
 
-            <button onClick={() => { setShowOfferForm(true); setSelected(null); }} className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <button type="button" onClick={() => { setShowOfferForm(true); setSelected(null); }} className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
               Write Offer
             </button>
           </div>
@@ -325,8 +325,8 @@ export default function ListingsPage() {
               </div>
             </div>
             <div className="flex gap-3 mt-4">
-              <button onClick={() => setShowEntryForm(false)} className="flex-1 py-2 border rounded-lg text-foreground hover:bg-muted/30">Cancel</button>
-              <button onClick={submitEntry} className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Create Listing</button>
+              <button type="button" onClick={() => setShowEntryForm(false)} className="flex-1 py-2 border rounded-lg text-foreground hover:bg-muted/30">Cancel</button>
+              <button type="button" onClick={submitEntry} className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Create Listing</button>
             </div>
           </div>
         </div>
@@ -364,8 +364,8 @@ export default function ListingsPage() {
               </div>
             </div>
             <div className="flex gap-3 mt-4">
-              <button onClick={() => setShowOfferForm(false)} className="flex-1 py-2 border rounded-lg text-foreground hover:bg-muted/30">Cancel</button>
-              <button onClick={submitOffer} className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Submit Offer</button>
+              <button type="button" onClick={() => setShowOfferForm(false)} className="flex-1 py-2 border rounded-lg text-foreground hover:bg-muted/30">Cancel</button>
+              <button type="button" onClick={submitOffer} className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Submit Offer</button>
             </div>
           </div>
         </div>

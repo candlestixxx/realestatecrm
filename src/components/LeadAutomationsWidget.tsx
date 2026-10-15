@@ -110,7 +110,7 @@ export default function LeadAutomationsWidget({
             <p className="text-xs text-muted-foreground">Automate follow-up campaigns and client outreach workflow paths.</p>
           </div>
           {!activePlanId && (
-            <button
+            <button type="button"
               onClick={() => {
                 if (campaigns.length > 0) {
                   setSelectedPlanId(campaigns[0].id);
@@ -137,7 +137,7 @@ export default function LeadAutomationsWidget({
                 </p>
               </div>
 
-              <button
+              <button type="button"
                 onClick={() => {
                   if (confirm('Are you sure you want to STOP and remove this Smart Plan? All scheduled pending actions will be cleared.')) {
                     handleEnroll(null);
@@ -182,7 +182,7 @@ export default function LeadAutomationsWidget({
           <div className="text-center py-10 border border-dashed border-border rounded-xl bg-muted/5">
             <span className="text-2xl block mb-2">🤖</span>
             <p className="text-xs text-muted-foreground italic mb-4">No Smart Plan currently applied to this lead.</p>
-            <button
+            <button type="button"
               onClick={() => {
                 if (campaigns.length > 0) {
                   setSelectedPlanId(campaigns[0].id);
@@ -205,7 +205,7 @@ export default function LeadAutomationsWidget({
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted/10 shrink-0">
               <h3 className="font-black text-sm uppercase tracking-wider text-foreground">Apply New Plan</h3>
-              <button 
+              <button type="button" 
                 onClick={() => setShowApplyModal(false)}
                 className="text-muted-foreground hover:text-foreground text-sm font-bold"
               >
@@ -220,7 +220,7 @@ export default function LeadAutomationsWidget({
               <div className="w-72 border-r border-border flex flex-col overflow-hidden shrink-0">
                 {/* Categories tabs */}
                 <div className="flex border-b border-border text-[10px] uppercase font-bold text-center select-none bg-muted/20 shrink-0">
-                  <button
+                  <button type="button"
                     onClick={() => setPlanCategory('company')}
                     className={`flex-1 py-2.5 border-b-2 transition-all ${
                       planCategory === 'company' ? 'border-primary text-primary bg-background' : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -228,7 +228,7 @@ export default function LeadAutomationsWidget({
                   >
                     Company Plans
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setPlanCategory('office')}
                     className={`flex-1 py-2.5 border-b-2 transition-all ${
                       planCategory === 'office' ? 'border-primary text-primary bg-background' : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -236,7 +236,7 @@ export default function LeadAutomationsWidget({
                   >
                     Office Plans
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setPlanCategory('my')}
                     className={`flex-1 py-2.5 border-b-2 transition-all ${
                       planCategory === 'my' ? 'border-primary text-primary bg-background' : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -260,7 +260,7 @@ export default function LeadAutomationsWidget({
                 {/* Vertical Scroll List */}
                 <div className="flex-1 overflow-y-auto divide-y divide-border/60">
                   {filteredCampaigns.map((plan) => (
-                    <button
+                    <button type="button"
                       key={plan.id}
                       onClick={() => setSelectedPlanId(plan.id)}
                       className={`w-full text-left p-3 text-xs block transition-all ${

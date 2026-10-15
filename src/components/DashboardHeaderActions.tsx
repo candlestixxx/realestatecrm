@@ -28,7 +28,7 @@ export function DashboardHeaderActions() {
   if (!mounted) {
     return (
       <div className="flex items-center gap-4">
-        <button className="text-sm font-medium px-4 py-2 rounded-md bg-primary text-primary-foreground opacity-50 cursor-not-allowed">
+        <button type="button" className="text-sm font-medium px-4 py-2 rounded-md bg-primary text-primary-foreground opacity-50 cursor-not-allowed">
           + New Deal / Action
         </button>
       </div>
@@ -49,7 +49,7 @@ export function DashboardHeaderActions() {
 
   return (
     <div className="flex items-center gap-2">
-      <button
+      <button type="button"
         onClick={() => setProfileOpen(true)}
         className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors border border-border"
         title="Agent & Company Settings"
@@ -61,7 +61,7 @@ export function DashboardHeaderActions() {
       </button>
 
       <div className="relative" ref={dropdownRef}>
-        <button
+        <button type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors whitespace-nowrap"
         >
@@ -76,7 +76,7 @@ export function DashboardHeaderActions() {
             </div>
             <div className="p-2 space-y-1">
               {actions.map((action, idx) => (
-                <button
+                <button type="button"
                   key={idx}
                   onClick={() => handleAction(action.path)}
                   className="w-full text-left flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors"

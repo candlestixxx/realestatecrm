@@ -43,7 +43,7 @@ export function AgentSiteChatWidget({ tenantName }: { tenantName?: string }) {
               <Bot className="w-5 h-5" />
               <span className="font-bold text-sm">AI Assistant</span>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+            <button type="button" onClick={() => setIsOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -92,7 +92,7 @@ export function AgentSiteChatWidget({ tenantName }: { tenantName?: string }) {
           </form>
         </div>
       ) : (
-        <button
+        <button type="button"
           onClick={() => setIsOpen(true)}
           className="bg-primary text-primary-foreground rounded-full w-14 h-14 flex items-center justify-center shadow-xl hover:scale-105 transition-transform animate-in zoom-in duration-300"
         >

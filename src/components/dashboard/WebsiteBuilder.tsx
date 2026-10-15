@@ -148,11 +148,11 @@ export default function WebsiteBuilder() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setPreview(!preview)} className="flex items-center gap-1 bg-muted text-foreground px-4 py-2 rounded text-sm hover:bg-muted">
+          <button type="button" onClick={() => setPreview(!preview)} className="flex items-center gap-1 bg-muted text-foreground px-4 py-2 rounded text-sm hover:bg-muted">
             {preview ? <Edit3 className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             {preview ? 'Edit' : 'Preview'}
           </button>
-          <button onClick={saveSite} className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+          <button type="button" onClick={saveSite} className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
             <Save className="w-4 h-4" /> Save Site
           </button>
         </div>
@@ -176,7 +176,7 @@ export default function WebsiteBuilder() {
                   <div className="text-sm text-muted-foreground py-2">No templates available.</div>
                 ) : (
                   templates.map(t => (
-                  <button
+                  <button type="button"
                     key={t.id}
                     onClick={() => {
                       setTitle(t.name);
@@ -195,7 +195,7 @@ export default function WebsiteBuilder() {
           <h3 className="font-semibold text-sm text-muted-foreground mb-2">ADD BLOCKS</h3>
           <div className="space-y-2">
             {BLOCK_TYPES.map(bt => (
-              <button
+              <button type="button"
                 key={bt.type}
                 onClick={() => addBlock(bt.type)}
                 className="w-full text-left bg-card border rounded px-3 py-2 text-sm hover:bg-muted/30"
@@ -237,9 +237,9 @@ export default function WebsiteBuilder() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium text-muted-foreground uppercase">{block.type}</span>
                     <div className="flex gap-1">
-                      <button onClick={() => moveBlock(block.id, -1)} className="text-muted-foreground hover:text-muted-foreground text-sm" disabled={i === 0}><ArrowUp className="w-4 h-4" /></button>
-                      <button onClick={() => moveBlock(block.id, 1)} className="text-muted-foreground hover:text-muted-foreground text-sm" disabled={i === blocks.length - 1}><ArrowDown className="w-4 h-4" /></button>
-                      <button onClick={() => removeBlock(block.id)} className="text-red-400 hover:text-red-600 text-sm ml-2"><X className="w-4 h-4" /></button>
+                      <button type="button" onClick={() => moveBlock(block.id, -1)} className="text-muted-foreground hover:text-muted-foreground text-sm" disabled={i === 0}><ArrowUp className="w-4 h-4" /></button>
+                      <button type="button" onClick={() => moveBlock(block.id, 1)} className="text-muted-foreground hover:text-muted-foreground text-sm" disabled={i === blocks.length - 1}><ArrowDown className="w-4 h-4" /></button>
+                      <button type="button" onClick={() => removeBlock(block.id)} className="text-red-400 hover:text-red-600 text-sm ml-2"><X className="w-4 h-4" /></button>
                     </div>
                   </div>
                   <textarea

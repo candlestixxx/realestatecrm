@@ -43,7 +43,7 @@ export default function MassOutreachModal({
 
   return (
     <>
-      <button
+      <button type="button"
         onClick={() => setIsOpen(true)}
         className="text-[11px] font-bold text-primary hover:underline"
       >
@@ -58,7 +58,7 @@ export default function MassOutreachModal({
                 <h3 className="font-bold text-md text-foreground">Mass Email Campaign</h3>
                 <p className="text-xs text-muted-foreground">Targeting List: <strong className="text-foreground">{segmentName}</strong></p>
               </div>
-              <button 
+              <button type="button" 
                 onClick={() => setIsOpen(false)} 
                 className="text-muted-foreground hover:text-foreground"
               >

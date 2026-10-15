@@ -114,7 +114,7 @@ export function ImageWorkflow({ listingId }: ImageWorkflowProps) {
           </h3>
           <p className="text-sm text-muted-foreground">Select a source photo and generate branded Day/Night variants via Magnific AI.</p>
         </div>
-        <button
+        <button type="button"
           onClick={handleGenerate}
           disabled={isGenerating}
           className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md font-semibold hover:bg-primary/90 disabled:opacity-50"
@@ -165,10 +165,10 @@ export function ImageWorkflow({ listingId }: ImageWorkflowProps) {
 
                     {variant.status === 'REVIEW' && (
                       <div className="flex gap-2">
-                        <button onClick={() => updateStatus(variant.id, 'REJECTED')} className="p-2 border border-border rounded-md hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/50 transition-colors">
+                        <button type="button" onClick={() => updateStatus(variant.id, 'REJECTED')} className="p-2 border border-border rounded-md hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/50 transition-colors">
                           <X className="w-4 h-4" />
                         </button>
-                        <button onClick={() => updateStatus(variant.id, 'APPROVED')} className="p-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+                        <button type="button" onClick={() => updateStatus(variant.id, 'APPROVED')} className="p-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
                           <Check className="w-4 h-4" />
                         </button>
                       </div>

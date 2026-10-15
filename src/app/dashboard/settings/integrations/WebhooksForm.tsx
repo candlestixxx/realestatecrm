@@ -137,7 +137,7 @@ export function WebhooksForm() {
         </div>
 
         <div className="flex justify-end">
-          <button
+          <button type="button"
             onClick={handleSaveSettings}
             className="px-6 py-2.5 bg-primary text-primary-foreground text-xs font-bold rounded-xl hover:bg-primary/95 transition-all shadow-md cursor-pointer"
           >
@@ -167,7 +167,7 @@ export function WebhooksForm() {
                 <div key={provider} className="space-y-1.5 border-t border-border/40 pt-3 first:border-0 first:pt-0">
                   <div className="flex justify-between items-center">
                     <span className="font-extrabold text-foreground">{title}</span>
-                    <button
+                    <button type="button"
                       onClick={() => handleTestIngest(provider)}
                       className="text-[9px] font-black uppercase text-primary hover:underline"
                     >
@@ -180,7 +180,7 @@ export function WebhooksForm() {
                       value={url}
                       className="w-full bg-muted/20 border border-border rounded px-2 py-1 text-[10px] font-mono pr-8 select-all"
                     />
-                    <button
+                    <button type="button"
                       onClick={() => {
                         navigator.clipboard.writeText(url);
                         toast.success(`${title} Webhook copied!`);

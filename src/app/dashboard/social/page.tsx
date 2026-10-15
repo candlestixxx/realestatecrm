@@ -132,7 +132,7 @@ export default function SocialConnectionsPage() {
                     <span className="text-[10px] text-muted-foreground">
                       {account.lastSyncAt ? `Synced ${new Date(account.lastSyncAt).toLocaleDateString()}` : 'Never synced'}
                     </span>
-                    <button onClick={() => disconnect(account.id)}
+                    <button type="button" onClick={() => disconnect(account.id)}
                       className="text-xs text-red-500 hover:underline">
                       Disconnect
                     </button>
@@ -151,7 +151,7 @@ export default function SocialConnectionsPage() {
           {PLATFORMS.map(platform => {
             const isConnected = accounts.some(a => a.platform === platform.id && a.isActive);
             return (
-              <button
+              <button type="button"
                 key={platform.id}
                 onClick={() => !isConnected && connectPlatform(platform.id)}
                 disabled={isConnected || connecting === platform.id}

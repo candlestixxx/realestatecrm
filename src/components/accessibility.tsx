@@ -44,7 +44,7 @@ export function AccessibleButton({
     danger: 'bg-red-600 text-white hover:bg-red-700',
   };
   return (
-    <button
+    <button type="button"
       onClick={onClick}
       aria-label={label}
       className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${styles[variant]}`}

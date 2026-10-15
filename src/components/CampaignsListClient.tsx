@@ -273,7 +273,7 @@ export default function CampaignsListClient({
 
           {/* Tabs switch */}
           <div className="bg-muted/50 border border-border p-1 rounded-lg flex items-center">
-            <button
+            <button type="button"
               onClick={() => setActiveTab('plans')}
               className={`px-4 py-1 text-xs font-bold rounded-md transition-all ${
                 activeTab === 'plans' 
@@ -283,7 +283,7 @@ export default function CampaignsListClient({
             >
               Plans
             </button>
-            <button
+            <button type="button"
               onClick={() => setActiveTab('library')}
               className={`px-4 py-1 text-xs font-bold rounded-md transition-all ${
                 activeTab === 'library' 
@@ -296,7 +296,7 @@ export default function CampaignsListClient({
           </div>
         </div>
 
-        <button
+        <button type="button"
           onClick={() => setIsAdding(true)}
           className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95 transition-colors shadow-sm"
         >
@@ -322,7 +322,7 @@ export default function CampaignsListClient({
 
             {/* Folder Lists */}
             <div className="space-y-4">
-              <button
+              <button type="button"
                 onClick={() => setSelectedFolder('all')}
                 className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold flex items-center justify-between transition-colors ${
                   selectedFolder === 'all' 
@@ -345,7 +345,7 @@ export default function CampaignsListClient({
                   <div className="text-sm text-muted-foreground py-2">No folders yet.</div>
                 ) : (
                   myFolders.map((folder, i) => (
-                  <button
+                  <button type="button"
                     key={i}
                     onClick={() => setSelectedFolder(folder)}
                     className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
@@ -369,7 +369,7 @@ export default function CampaignsListClient({
                   <div className="text-sm text-muted-foreground py-2">No company folders.</div>
                 ) : (
                   companyFolders.map((folder, i) => (
-                  <button
+                  <button type="button"
                     key={i}
                     onClick={() => setSelectedFolder(folder)}
                     className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
@@ -398,16 +398,16 @@ export default function CampaignsListClient({
                   className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none"
                 />
                 <div className="flex gap-2 justify-end">
-                  <button onClick={() => setShowAddFolder(false)} className="px-2 py-1 text-[10px] text-muted-foreground hover:underline">
+                  <button type="button" onClick={() => setShowAddFolder(false)} className="px-2 py-1 text-[10px] text-muted-foreground hover:underline">
                     Cancel
                   </button>
-                  <button onClick={handleAddFolder} className="px-3 py-1 bg-secondary text-secondary-foreground text-[10px] rounded font-bold hover:bg-secondary/90">
+                  <button type="button" onClick={handleAddFolder} className="px-3 py-1 bg-secondary text-secondary-foreground text-[10px] rounded font-bold hover:bg-secondary/90">
                     Add
                   </button>
                 </div>
               </div>
             ) : (
-              <button
+              <button type="button"
                 onClick={() => setShowAddFolder(true)}
                 className="w-full text-left px-3 py-1.5 text-xs text-primary font-bold hover:underline flex items-center gap-1.5"
               >
@@ -429,7 +429,7 @@ export default function CampaignsListClient({
               <div className="flex items-center justify-between border border-border bg-muted/20 px-4 py-2 rounded-xl text-xs">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] uppercase font-bold text-muted-foreground mr-2 select-none">Lead Type Filter:</span>
-                  <button
+                  <button type="button"
                     onClick={() => setLeadTypeFilter('ALL')}
                     className={`px-3 py-1 text-[10px] font-bold rounded-lg uppercase transition-all ${
                       leadTypeFilter === 'ALL'
@@ -439,7 +439,7 @@ export default function CampaignsListClient({
                   >
                     All Types
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setLeadTypeFilter('BUYER')}
                     className={`px-3 py-1 text-[10px] font-bold rounded-lg uppercase transition-all ${
                       leadTypeFilter === 'BUYER'
@@ -449,7 +449,7 @@ export default function CampaignsListClient({
                   >
                     Buyer
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setLeadTypeFilter('SELLER')}
                     className={`px-3 py-1 text-[10px] font-bold rounded-lg uppercase transition-all ${
                       leadTypeFilter === 'SELLER'
@@ -562,28 +562,28 @@ export default function CampaignsListClient({
                             </td>
                             <td className="p-3 text-right">
                               <div className="flex items-center justify-end gap-2.5">
-                                <button
+                                <button type="button"
                                   onClick={() => setShowMetricsCampaignId(c.id)}
                                   className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-green-500 transition-all"
                                   title="Reporting & Analytics"
                                 >
                                   <Activity className="w-4 h-4" />
                                 </button>
-                                <button
+                                <button type="button"
                                   onClick={() => setActiveCampaignId(c.id)}
                                   className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-primary transition-all"
                                   title="View Flowchart Canvas"
                                 >
                                   <Eye className="w-4 h-4" />
                                 </button>
-                                <button
+                                <button type="button"
                                   onClick={() => setActiveCampaignId(c.id)}
                                   className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-all"
                                   title="Configure Settings"
                                 >
                                   <Settings className="w-4 h-4" />
                                 </button>
-                                <button
+                                <button type="button"
                                   onClick={() => handleDeleteCampaign(c.id)}
                                   className="p-1 hover:bg-red-500/10 rounded text-muted-foreground hover:text-red-500 transition-all"
                                   title="Delete"
@@ -663,14 +663,14 @@ export default function CampaignsListClient({
                   </div>
 
                   <div className="pt-4 flex items-center gap-2 mt-4 border-t border-border/60">
-                    <button
+                    <button type="button"
                       onClick={() => handleImportTemplate(tmpl)}
                       title="Import this template as a new Smart Plan in your workspace"
                       className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-extrabold rounded-lg hover:bg-secondary/90 transition-all shadow-sm text-center"
                     >
                       Use Template
                     </button>
-                    <button
+                    <button type="button"
                       onClick={() => {
                         // Mock details preview
                         toast.success(`Opening preview for: ${tmpl.name}`);
@@ -709,7 +709,7 @@ export default function CampaignsListClient({
           <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-lg overflow-hidden flex flex-col">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
               <h3 className="font-bold text-md text-foreground">Create New Smart Plan</h3>
-              <button onClick={() => setIsAdding(false)} className="text-muted-foreground hover:text-foreground">
+              <button type="button" onClick={() => setIsAdding(false)} className="text-muted-foreground hover:text-foreground">
                 ✕
               </button>
             </div>
@@ -799,7 +799,7 @@ export default function CampaignsListClient({
                   <p className="text-[10px] text-muted-foreground">{metricsCampaign.name}</p>
                 </div>
               </div>
-              <button onClick={() => setShowMetricsCampaignId(null)} className="text-muted-foreground hover:text-foreground text-sm font-bold">
+              <button type="button" onClick={() => setShowMetricsCampaignId(null)} className="text-muted-foreground hover:text-foreground text-sm font-bold">
                 ✕
               </button>
             </div>
@@ -933,7 +933,7 @@ export default function CampaignsListClient({
             </div>
 
             <div className="p-4 border-t border-border bg-muted/10 flex justify-end shrink-0">
-              <button
+              <button type="button"
                 onClick={() => setShowMetricsCampaignId(null)}
                 className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95 transition-all shadow-md"
               >

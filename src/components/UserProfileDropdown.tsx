@@ -41,7 +41,7 @@ export default function UserProfileDropdown({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
+      <button type="button"
         onClick={() => setIsOpen(prev => !prev)}
         className="w-9 h-9 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center font-bold text-sm hover:bg-primary/30 transition-all shadow-sm cursor-pointer select-none"
       >
@@ -62,11 +62,11 @@ export default function UserProfileDropdown({
 
             {/* Quick account action buttons */}
             <div className="flex gap-2 pt-2.5 w-full">
-              <button className="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 border border-border/80 hover:bg-muted text-[10px] font-black rounded-lg transition-colors cursor-pointer text-foreground">
+              <button type="button" className="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 border border-border/80 hover:bg-muted text-[10px] font-black rounded-lg transition-colors cursor-pointer text-foreground">
                 <Plus className="w-3 h-3" />
                 Add Account
               </button>
-              <button className="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 border border-border/80 hover:bg-muted text-[10px] font-black rounded-lg transition-colors cursor-pointer text-foreground">
+              <button type="button" className="flex-1 flex items-center justify-center gap-1 px-2.5 py-1.5 border border-border/80 hover:bg-muted text-[10px] font-black rounded-lg transition-colors cursor-pointer text-foreground">
                 <Shuffle className="w-3 h-3" />
                 Switch Account
               </button>
@@ -75,15 +75,15 @@ export default function UserProfileDropdown({
 
           {/* Settings / System menus */}
           <div className="py-2.5 space-y-1 px-2 border-b border-border/40">
-            <button className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-muted text-xs font-bold rounded-lg text-muted-foreground hover:text-foreground transition-all cursor-pointer">
+            <button type="button" className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-muted text-xs font-bold rounded-lg text-muted-foreground hover:text-foreground transition-all cursor-pointer">
               <CreditCard className="w-4 h-4" />
               Billing Center
             </button>
-            <button className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-muted text-xs font-bold rounded-lg text-muted-foreground hover:text-foreground transition-all cursor-pointer">
+            <button type="button" className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-muted text-xs font-bold rounded-lg text-muted-foreground hover:text-foreground transition-all cursor-pointer">
               <RefreshCw className="w-4 h-4" />
               Product Updates
             </button>
-            <button className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-muted text-xs font-bold rounded-lg text-muted-foreground hover:text-foreground transition-all cursor-pointer">
+            <button type="button" className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-muted text-xs font-bold rounded-lg text-muted-foreground hover:text-foreground transition-all cursor-pointer">
               <Gift className="w-4 h-4" />
               Earn Rewards
             </button>
@@ -91,7 +91,7 @@ export default function UserProfileDropdown({
 
           {/* Logout button */}
           <div className="pt-2 px-2">
-            <button
+            <button type="button"
               onClick={handleLogout}
               className="w-full flex items-center gap-2.5 px-3 py-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white text-xs font-black rounded-lg transition-all cursor-pointer"
             >

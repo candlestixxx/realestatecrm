@@ -32,7 +32,7 @@ export default function CreateSegmentModal({
 
   return (
     <>
-      <button
+      <button type="button"
         onClick={() => setIsOpen(true)}
         className="px-4 py-2 border border-border bg-background text-foreground font-medium rounded-md hover:bg-muted transition-colors"
       >
@@ -44,7 +44,7 @@ export default function CreateSegmentModal({
           <div className="bg-background rounded-2xl border border-border shadow-2xl p-6 w-full max-w-md animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">Create New Segment</h2>
-              <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <button type="button" onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>

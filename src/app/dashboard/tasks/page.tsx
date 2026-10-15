@@ -141,10 +141,10 @@ export default async function TasksPage(props: {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right flex justify-end gap-3">
-                    <button className="text-muted-foreground hover:text-foreground transition-colors">
+                    <button type="button" className="text-muted-foreground hover:text-foreground transition-colors">
                       Complete
                     </button>
-                    <button className="text-primary hover:underline text-sm font-medium">
+                    <button type="button" className="text-primary hover:underline text-sm font-medium">
                       Edit
                     </button>
                   </td>

@@ -56,7 +56,7 @@ export default function LeadScoreWidget({ leadId }: { leadId: string }) {
     <div className="bg-card rounded-lg border p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm text-foreground">Predictive Lead Score</h3>
-        <button
+        <button type="button"
           onClick={fetchScore}
           disabled={loading}
           className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1"

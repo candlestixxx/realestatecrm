@@ -81,10 +81,10 @@ export default function RoutingRulesWidget() {
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-sm text-foreground">Lead Routing Rules</h3>
         <div className="flex gap-2">
-          <button onClick={fetchRules} className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+          <button type="button" onClick={fetchRules} className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
             <RefreshCw className="w-3 h-3" /> Refresh
           </button>
-          <button
+          <button type="button"
             onClick={() => setShowForm(!showForm)}
             className="text-xs bg-indigo-600 text-white px-2 py-1 rounded hover:bg-indigo-700 flex items-center gap-1"
           >
@@ -123,7 +123,7 @@ export default function RoutingRulesWidget() {
             onChange={e => setForm(f => ({ ...f, agentIds: e.target.value }))}
             className="w-full text-xs border rounded px-2 py-1.5"
           />
-          <button onClick={createRule} className="w-full bg-indigo-600 text-white text-xs py-1.5 rounded hover:bg-indigo-700">
+          <button type="button" onClick={createRule} className="w-full bg-indigo-600 text-white text-xs py-1.5 rounded hover:bg-indigo-700">
             Create Rule
           </button>
         </div>
@@ -158,7 +158,7 @@ export default function RoutingRulesWidget() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button
+                <button type="button"
                   onClick={() => toggleRule(rule.id, !rule.isActive)}
                   className="text-xs text-muted-foreground hover:text-foreground"
                   title={rule.isActive ? 'Deactivate' : 'Activate'}

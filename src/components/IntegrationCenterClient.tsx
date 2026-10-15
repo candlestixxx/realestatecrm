@@ -155,7 +155,7 @@ export default function IntegrationCenterClient({
             We strongly advise that you select a unique email sending domain for improved deliverability and SPF settings.
           </span>
         </div>
-        <button 
+        <button type="button" 
           onClick={() => toast.success('Redirecting to domain configuration setup...')}
           className="bg-amber-500 hover:bg-amber-600 text-white font-black uppercase text-[10px] tracking-wider px-4 py-2.5 rounded-xl transition-colors cursor-pointer w-fit shrink-0"
         >
@@ -175,7 +175,7 @@ export default function IntegrationCenterClient({
         <div className="lg:col-span-3 space-y-1">
           <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider px-3 block mb-2">App Categories</span>
           {CATEGORIES.map(cat => (
-            <button
+            <button type="button"
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
@@ -221,7 +221,7 @@ export default function IntegrationCenterClient({
                       </div>
                     </div>
 
-                    <button
+                    <button type="button"
                       onClick={() => toggleConnection(p.id)}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-black uppercase border cursor-pointer transition-colors ${
                         p.connected
@@ -238,7 +238,7 @@ export default function IntegrationCenterClient({
                 </div>
 
                 <div className="pt-3 border-t border-border/40 flex justify-between items-center text-[10px] font-black uppercase tracking-wider">
-                  <button 
+                  <button type="button" 
                     onClick={() => toggleConnection(p.id)}
                     className="text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer"
                   >
@@ -268,7 +268,7 @@ export default function IntegrationCenterClient({
                 <span className="text-xs font-bold text-foreground">Email Notifications</span>
                 <span className="text-[10px] text-muted-foreground font-semibold leading-normal">Send email alerts to assigned agent</span>
               </div>
-              <button
+              <button type="button"
                 onClick={() => handleUpdatePrefs(smsAlerts, !emailAlerts)}
                 disabled={isUpdatingPrefs}
                 className="cursor-pointer shrink-0"
@@ -286,7 +286,7 @@ export default function IntegrationCenterClient({
                 <span className="text-xs font-bold text-foreground">SMS Notifications (Charges Apply)</span>
                 <span className="text-[10px] text-muted-foreground font-semibold leading-normal">Send text alerts to agent's cell phone</span>
               </div>
-              <button
+              <button type="button"
                 onClick={() => handleUpdatePrefs(!smsAlerts, emailAlerts)}
                 disabled={isUpdatingPrefs}
                 className="cursor-pointer shrink-0"
@@ -311,7 +311,7 @@ export default function IntegrationCenterClient({
               <h3 className="text-base font-black text-foreground uppercase tracking-wider">
                 🎯 Configure MyPlusLeads Integration
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setActivePartnerConfig(null)}
                 className="text-muted-foreground hover:text-foreground text-sm cursor-pointer"
               >

@@ -117,7 +117,7 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <h2 className="text-sm font-bold text-foreground">💬 Team Chat</h2>
-        <button
+        <button type="button"
           onClick={() => setShowNewChat(!showNewChat)}
           className="text-xs text-secondary hover:underline font-medium"
         >
@@ -144,7 +144,7 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
               className="w-full px-3 py-1.5 text-xs border border-border rounded-lg bg-background"
             />
           )}
-          <button
+          <button type="button"
             onClick={async () => {
               try {
                 const res = await fetch('/api/chat/rooms', {
@@ -183,7 +183,7 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
             </div>
           ) : (
             rooms.map((room) => (
-              <button
+              <button type="button"
                 key={room.id}
                 onClick={() => setActiveRoom(room)}
                 className={
@@ -267,7 +267,7 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
                   placeholder="Type a message..."
                   className="flex-1 px-3 py-2 text-xs border border-border rounded-lg bg-background"
                 />
-                <button
+                <button type="button"
                   onClick={sendMessage}
                   disabled={!newMessage.trim()}
                   className="px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold rounded-lg hover:bg-secondary/90 disabled:opacity-50"

@@ -118,7 +118,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
       {/* Walkthrough Instructions */}
       {showWalkthrough && (
         <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-5 relative animate-fadeIn flex flex-col md:flex-row gap-5 shadow-xs">
-          <button 
+          <button type="button" 
             onClick={() => setShowWalkthrough(false)}
             className="absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             title="Dismiss walkthrough"
@@ -225,7 +225,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                   <BookOpen className="w-5 h-5 text-indigo-500" />
                   <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">Review & Edit Article Outline</h3>
                 </div>
-                <button
+                <button type="button"
                   onClick={() => setPhase(1)}
                   className="text-xs font-bold text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer"
                 >
@@ -259,7 +259,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                       />
                     </div>
                   )))}
-                  <button
+                  <button type="button"
                     onClick={handleAddHeading}
                     className="text-[10px] font-black text-indigo-500 hover:text-indigo-600 uppercase flex items-center gap-1 cursor-pointer mt-1"
                   >
@@ -281,7 +281,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                   />
                 </div>
 
-                <button
+                <button type="button"
                   onClick={() => setPhase(3)}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
                 >
@@ -298,7 +298,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                   <Settings className="w-5 h-5 text-indigo-500" />
                   <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">Publish Meta & Tracking Credentials</h3>
                 </div>
-                <button
+                <button type="button"
                   onClick={() => setPhase(2)}
                   className="text-xs font-bold text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer"
                 >
@@ -358,13 +358,13 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                 </div>
 
                 <div className="flex gap-3 pt-3 border-t border-border/40">
-                  <button
+                  <button type="button"
                     onClick={() => handlePublish('DRAFT')}
                     className="flex-1 py-3 bg-muted hover:bg-muted/80 text-foreground font-black uppercase tracking-widest text-[10px] rounded-xl transition-all cursor-pointer"
                   >
                     Save Draft
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => handlePublish('PUBLISHED')}
                     className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-md cursor-pointer"
                   >

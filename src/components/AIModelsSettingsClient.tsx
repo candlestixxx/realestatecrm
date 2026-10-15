@@ -109,7 +109,7 @@ export default function AIModelsSettingsClient() {
                   <span className="text-[10px] px-2 py-1 rounded-full bg-green-500/15 text-green-500 font-bold uppercase">
                     Configured
                   </span>
-                  <button onClick={() => deleteKey(provider.id)}
+                  <button type="button" onClick={() => deleteKey(provider.id)}
                     className="text-xs text-red-500 hover:underline">
                     Remove
                   </button>
@@ -125,7 +125,7 @@ export default function AIModelsSettingsClient() {
                 placeholder={isConfigured(provider.id) ? '••••••••  (enter new key to replace)' : provider.placeholder}
                 className="flex-1 px-3 py-2 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary/50 text-foreground placeholder:text-muted-foreground"
               />
-              <button
+              <button type="button"
                 onClick={() => saveKey(provider.id)}
                 disabled={saving === provider.id || !keys[provider.id]?.trim()}
                 className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-bold rounded-lg hover:bg-secondary/90 disabled:opacity-50 transition-colors"

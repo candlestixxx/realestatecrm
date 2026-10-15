@@ -95,15 +95,15 @@ export default function PartnersPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Partner Network <span title="Manage mortgage, title, insurance, and inspection partners. Track referrals, commissions, and permission levels for each partner." aria-label="About this section: Manage mortgage, title, insurance, and inspection partners. Track referrals, commissions, and permission levels for each partner." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
         <div className="flex gap-2">
-          <button onClick={() => setShowReferralForm(true)} className="px-4 py-2 border rounded-lg hover:bg-muted/30">+ Referral</button>
-          <button onClick={() => setShowAddForm(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">+ Partner</button>
+          <button type="button" onClick={() => setShowReferralForm(true)} className="px-4 py-2 border rounded-lg hover:bg-muted/30">+ Referral</button>
+          <button type="button" onClick={() => setShowAddForm(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">+ Partner</button>
         </div>
       </div>
 
       {/* Type Filter */}
       <div className="flex gap-2 mb-6">
         {['', 'MORTGAGE', 'TITLE', 'INSURANCE', 'INSPECTION', 'LEGAL'].map(t => (
-          <button key={t} onClick={() => setFilterType(t)} className={'px-3 py-1.5 rounded-full text-sm ' + (filterType === t ? 'bg-blue-600 text-white' : 'bg-muted text-foreground hover:bg-muted')}>
+          <button type="button" key={t} onClick={() => setFilterType(t)} className={'px-3 py-1.5 rounded-full text-sm ' + (filterType === t ? 'bg-blue-600 text-white' : 'bg-muted text-foreground hover:bg-muted')}>
             {t || 'All'}
           </button>
         ))}
@@ -138,7 +138,7 @@ export default function PartnersPage() {
           <div className="bg-card rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">{selectedPartner.companyName}</h2>
-              <button onClick={() => setSelectedPartner(null)} className="text-muted-foreground hover:text-muted-foreground">X</button>
+              <button type="button" onClick={() => setSelectedPartner(null)} className="text-muted-foreground hover:text-muted-foreground">X</button>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
@@ -155,7 +155,7 @@ export default function PartnersPage() {
                 {(['canViewLeads', 'canViewDeals', 'canViewContacts', 'canCreateReferral', 'canEditReferral'] as const).map(k => {
                   const val = selectedPartner.permissions[0]?.[k] || false;
                   return (
-                    <button
+                    <button type="button"
                       key={k}
                       onClick={async () => {
                         const body: any = { partnerId: selectedPartner.id };
@@ -221,8 +221,8 @@ export default function PartnersPage() {
               <textarea placeholder="Notes" value={partnerForm.notes} onChange={e => setPartnerForm(p => ({ ...p, notes: e.target.value }))} rows={2} className="w-full border rounded px-3 py-2" />
             </div>
             <div className="flex gap-3 mt-4">
-              <button onClick={() => setShowAddForm(false)} className="flex-1 py-2 border rounded-lg">Cancel</button>
-              <button onClick={submitPartner} className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Add Partner</button>
+              <button type="button" onClick={() => setShowAddForm(false)} className="flex-1 py-2 border rounded-lg">Cancel</button>
+              <button type="button" onClick={submitPartner} className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Add Partner</button>
             </div>
           </div>
         </div>
@@ -247,8 +247,8 @@ export default function PartnersPage() {
               <textarea placeholder="Notes" value={referralForm.notes} onChange={e => setReferralForm(p => ({ ...p, notes: e.target.value }))} rows={2} className="w-full border rounded px-3 py-2" />
             </div>
             <div className="flex gap-3 mt-4">
-              <button onClick={() => setShowReferralForm(false)} className="flex-1 py-2 border rounded-lg">Cancel</button>
-              <button onClick={submitReferral} className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Create Referral</button>
+              <button type="button" onClick={() => setShowReferralForm(false)} className="flex-1 py-2 border rounded-lg">Cancel</button>
+              <button type="button" onClick={submitReferral} className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Create Referral</button>
             </div>
           </div>
         </div>

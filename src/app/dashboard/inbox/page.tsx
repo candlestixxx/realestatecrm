@@ -101,7 +101,7 @@ export default function UnifiedInboxPage() {
               {unreadCount} unread
             </span>
           )}
-          <button
+          <button type="button"
             onClick={markAllRead}
             className="px-4 py-2 text-sm text-secondary border border-border rounded-lg hover:bg-muted transition-colors"
           >
@@ -113,7 +113,7 @@ export default function UnifiedInboxPage() {
       {/* Channel Filters */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {CHANNELS.map(channel => (
-          <button
+          <button type="button"
             key={channel.id}
             onClick={() => setActiveChannel(channel.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-colors ${

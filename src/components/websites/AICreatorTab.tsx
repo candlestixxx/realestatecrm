@@ -344,7 +344,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
               {blocks.length > 0 && (
                 <div className="p-4 bg-indigo-500/5 border-t border-border/40 flex justify-between items-center shrink-0">
                   <span className="text-[10px] font-black text-indigo-500 uppercase tracking-wider">Outline Compiled!</span>
-                  <button
+                  <button type="button"
                     onClick={() => setWizardStep(2)}
                     className="bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-[9px] px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1"
                   >
@@ -359,7 +359,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
             <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn p-4 space-y-4">
               <div className="flex justify-between items-center border-b border-border/40 pb-2">
                 <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">Step 2: Modify Block Outlines</h3>
-                <button 
+                <button type="button" 
                   onClick={() => setWizardStep(1)}
                   className="text-[10px] font-black uppercase text-muted-foreground hover:text-foreground flex items-center gap-0.5 cursor-pointer"
                 >
@@ -434,7 +434,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                 )))}
               </div>
 
-              <button
+              <button type="button"
                 onClick={() => setWizardStep(3)}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
               >
@@ -447,7 +447,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
             <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn p-4 space-y-4">
               <div className="flex justify-between items-center border-b border-border/40 pb-2">
                 <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">Step 3: Tracking & Publishing</h3>
-                <button 
+                <button type="button" 
                   onClick={() => setWizardStep(2)}
                   className="text-[10px] font-black uppercase text-muted-foreground hover:text-foreground flex items-center gap-0.5 cursor-pointer"
                 >
@@ -524,13 +524,13 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
               </div>
 
               <div className="flex gap-3 pt-3 border-t border-border/40 shrink-0">
-                <button
+                <button type="button"
                   onClick={() => handleSavePage('DRAFT')}
                   className="flex-1 py-3 bg-muted hover:bg-muted/80 text-foreground font-black uppercase tracking-widest text-[10px] rounded-xl transition-all cursor-pointer"
                 >
                   Save Draft
                 </button>
-                <button
+                <button type="button"
                   onClick={() => handleSavePage('PUBLISHED')}
                   className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-md cursor-pointer"
                 >
@@ -598,7 +598,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                       <input type="text" disabled placeholder="First Name" className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-[10px] opacity-70" />
                       <input type="text" disabled placeholder="Email Address" className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-[10px] opacity-70" />
                     </div>
-                    <button disabled className="w-full py-2 bg-indigo-600 rounded-lg font-black text-[10px] uppercase tracking-wider text-white opacity-90">
+                    <button type="button" disabled className="w-full py-2 bg-indigo-600 rounded-lg font-black text-[10px] uppercase tracking-wider text-white opacity-90">
                       {block.ctaText || 'Submit Inbound Contact'}
                     </button>
                   </div>
@@ -621,7 +621,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-2xl w-full max-w-2xl shadow-2xl p-8 space-y-6 relative text-center">
             
-            <button
+            <button type="button"
               onClick={() => {
                 setShowPublishedModal(false);
                 setWizardStep(1);
@@ -653,7 +653,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                   <span className="text-[10px] font-black uppercase text-indigo-500 tracking-wider">Post to your social channels</span>
                   <p className="text-[11px] text-muted-foreground font-semibold leading-relaxed">Direct leads from your social profiles to your new landing page campaign.</p>
                 </div>
-                <button
+                <button type="button"
                   onClick={() => {
                     setShowPublishedModal(false);
                     setWizardStep(1);
@@ -672,7 +672,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                   <span className="text-[10px] font-black uppercase text-indigo-500 tracking-wider">Boost your landing page</span>
                   <p className="text-[11px] text-muted-foreground font-semibold leading-relaxed">A one-time low cost could help you get thousands of impressions from your social channel.</p>
                 </div>
-                <button
+                <button type="button"
                   onClick={() => {
                     toast.success('Campaign boost initialized successfully!');
                     setShowPublishedModal(false);

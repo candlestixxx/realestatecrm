@@ -72,7 +72,7 @@ export default function NotificationDropdown() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
+      <button type="button"
         onClick={() => {
           setIsOpen(!isOpen);
           fetchNotifications();
@@ -100,7 +100,7 @@ export default function NotificationDropdown() {
               )}
             </div>
             {unreadCount > 0 && (
-              <button
+              <button type="button"
                 onClick={handleMarkAllRead}
                 className="text-[10px] font-bold text-primary hover:underline uppercase tracking-wider cursor-pointer"
               >
@@ -140,7 +140,7 @@ export default function NotificationDropdown() {
 
                   <div className="flex flex-col gap-1 items-center shrink-0 pt-0.5">
                     {!notif.isRead && (
-                      <button
+                      <button type="button"
                         onClick={(e) => handleMarkAsRead(notif.id, e)}
                         className="p-1 hover:bg-primary/20 rounded text-primary transition-colors cursor-pointer"
                         title="Mark as Read"
@@ -148,7 +148,7 @@ export default function NotificationDropdown() {
                         <Check className="w-3.5 h-3.5" />
                       </button>
                     )}
-                    <button
+                    <button type="button"
                       onClick={(e) => handleDelete(notif.id, e)}
                       className="p-1 hover:bg-rose-500/15 rounded text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer"
                       title="Delete Notification"

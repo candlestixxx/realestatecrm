@@ -168,7 +168,7 @@ export default function ReportingPage() {
               { id: 'overview' as const, label: 'Overview' },
               { id: 'stats' as const, label: 'Quick Stats' },
             ]).map(t => (
-              <button
+              <button type="button"
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className={
@@ -181,7 +181,7 @@ export default function ReportingPage() {
                 {t.label}
               </button>
             ))}
-            <button
+            <button type="button"
               onClick={async () => {
                 try {
                   const res = await fetch('/api/export', {

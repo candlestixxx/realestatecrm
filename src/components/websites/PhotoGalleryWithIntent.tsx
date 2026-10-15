@@ -39,14 +39,14 @@ export function PhotoGalleryWithIntent({ images }: PhotoGalleryProps) {
 
       {images.length > 1 && (
         <>
-          <button
+          <button type="button"
             onClick={prevImage}
             disabled={currentIdx === 0}
             className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0"
           >
             ←
           </button>
-          <button
+          <button type="button"
             onClick={nextImage}
             disabled={currentIdx === images.length - 1}
             className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0"

@@ -100,7 +100,7 @@ export default function WorkflowSessionsPanel() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Link href={resumeHref(s)} className="text-xs text-primary hover:underline font-medium">Resume</Link>
-                  <button onClick={() => discard(s.id)} className="text-xs text-red-500 hover:underline">Discard</button>
+                  <button type="button" onClick={() => discard(s.id)} className="text-xs text-red-500 hover:underline">Discard</button>
                 </div>
               </div>
             ))}

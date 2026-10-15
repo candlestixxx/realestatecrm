@@ -8,7 +8,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         </div>
         <nav className="flex items-center gap-4">
           <span className="text-sm font-medium text-muted-foreground">Support</span>
-          <button className="text-sm font-medium hover:text-primary transition-colors">
+          <button type="button" className="text-sm font-medium hover:text-primary transition-colors">
             Sign Out
           </button>
         </nav>

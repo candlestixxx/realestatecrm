@@ -355,7 +355,7 @@ export default function HelpCenterPage() {
         <div className="lg:col-span-1 space-y-3">
           <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider px-2 block mb-1">Select Help Topic</span>
           {VIDEOS.map(video => (
-            <button
+            <button type="button"
               key={video.id}
               onClick={() => {
                 setActiveTopic(video);
@@ -430,7 +430,7 @@ export default function HelpCenterPage() {
                     Click play to run a live visual console simulation showing this feature in action.
                   </p>
                 </div>
-                <button
+                <button type="button"
                   onClick={startSimulation}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer shadow"
                 >

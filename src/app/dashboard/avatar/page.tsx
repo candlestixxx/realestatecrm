@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 // AI Avatar — generate AI presenter videos for listings (HeyGen integration).
 // API: /api/avatar (POST with action field: create-session, speak, end-session).
 
@@ -39,7 +39,7 @@ export default function AvatarPage() {
             <option value="speak">Speak</option>
             <option value="end-session">End Session</option>
           </select>
-          <button onClick={handleAction} disabled={loading} className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5">
+          <button type="button" onClick={handleAction} disabled={loading} className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />} Run
           </button>
         </div>
