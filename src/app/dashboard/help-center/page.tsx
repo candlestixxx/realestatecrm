@@ -400,17 +400,17 @@ export default function HelpCenterPage() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Main Visualizer */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col aspect-video relative group">
+          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-2xl flex flex-col aspect-video relative group">
             
             {/* Overlay simulation */}
             {isPlaying ? (
-              <div className="flex-1 flex flex-col justify-end p-6 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent">
+              <div className="flex-1 flex flex-col justify-end p-6 bg-gradient-to-t from-muted via-muted/60 to-transparent">
                 <div className="space-y-2 max-w-lg">
                   <span className="text-[9px] font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded uppercase tracking-wider w-fit">
                     ⚡ Live CRM Operations Log Simulation
                   </span>
                   
-                  <div className="space-y-1.5 font-mono text-[11px] text-slate-300 min-h-[120px] transition-all">
+                  <div className="space-y-1.5 font-mono text-[11px] text-muted-foreground min-h-[120px] transition-all">
                     {activeTopic.simulationLogs.slice(0, currentStep + 1).map((log, index) => (
                       <div key={index} className="animate-fadeIn truncate">
                         {log}
@@ -420,13 +420,13 @@ export default function HelpCenterPage() {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-slate-900 space-y-4">
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-card space-y-4">
                 <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0 group-hover:scale-110 transition-transform">
                   <Play className="w-6 h-6 fill-primary" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-extrabold text-sm text-slate-200">Interactive Walk-Through Player</h4>
-                  <p className="text-[11px] text-slate-400 max-w-sm">
+                  <h4 className="font-extrabold text-sm text-muted-foreground">Interactive Walk-Through Player</h4>
+                  <p className="text-[11px] text-muted-foreground max-w-sm">
                     Click play to run a live visual console simulation showing this feature in action.
                   </p>
                 </div>
@@ -440,7 +440,7 @@ export default function HelpCenterPage() {
             )}
 
             {/* Video Progress Bar */}
-            <div className="h-1 bg-slate-800 w-full relative">
+            <div className="h-1 bg-card w-full relative">
               <div 
                 className="h-full bg-primary transition-all duration-500" 
                 style={{ width: `${((currentStep + (isPlaying ? 1 : 0)) / activeTopic.simulationLogs.length) * 100}%` }}

@@ -645,7 +645,7 @@ export default function CampaignsListClient({
                               s.type === 'EMAIL' ? 'bg-blue-500/10 text-blue-500 border-blue-500/25' :
                               s.type === 'SMS' ? 'bg-green-500/10 text-green-500 border-green-500/25' :
                               s.type === 'CALL' ? 'bg-amber-500/10 text-amber-500 border-amber-500/25' :
-                              'bg-slate-500/10 text-slate-500 border-slate-500/25'
+                              'bg-muted/10 text-muted-foreground border-border/25'
                             }`}
                             title={`Step ${sIdx + 1}: ${s.type}`}
                           >

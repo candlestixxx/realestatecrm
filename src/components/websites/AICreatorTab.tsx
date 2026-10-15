@@ -543,33 +543,33 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
         </div>
 
         {/* Right Preview Column (Assembles dynamically on block update) */}
-        <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[580px] relative">
+        <div className="lg:col-span-7 bg-card border border-border rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[580px] relative">
           
-          <div className="px-4 py-3 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-[10px] text-slate-400 font-bold">
+          <div className="px-4 py-3 bg-card border-b border-border flex justify-between items-center text-[10px] text-muted-foreground font-bold">
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
             </span>
-            <span className="font-mono bg-slate-900 px-3 py-1 rounded border border-slate-850">
+            <span className="font-mono bg-card px-3 py-1 rounded border border-border">
               {subdomain}.excellegacy.com/{generatedSlug}
             </span>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 text-slate-100 select-none bg-slate-900/50">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 text-foreground select-none bg-card/50">
             {blocks.map(block => (
-              <div key={block.id} className="p-5 bg-slate-950/80 border border-slate-850 rounded-2xl space-y-3">
+              <div key={block.id} className="p-5 bg-card/80 border border-border rounded-2xl space-y-3">
                 {block.type === 'HEADER' && (
                   <div className="text-center space-y-2">
                     <h2 className="text-lg font-black text-white">{block.title || 'Brand Presentation Heading'}</h2>
-                    <p className="text-[11px] text-slate-400 font-semibold">{block.subtitle}</p>
+                    <p className="text-[11px] text-muted-foreground font-semibold">{block.subtitle}</p>
                   </div>
                 )}
                 
                 {block.type === 'VIDEO' && (
                   <div className="space-y-2">
                     <span className="text-[9px] font-black uppercase tracking-wider text-rose-400">Featured Tour Video</span>
-                    <div className="aspect-video bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center">
+                    <div className="aspect-video bg-card border border-border rounded-xl flex items-center justify-center">
                       <Play className="w-8 h-8 text-rose-500 fill-rose-500 animate-pulse" />
                     </div>
                   </div>
@@ -581,7 +581,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                       <MapPin className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
                       <div>
                         <span className="text-xs font-black text-white">{block.address || 'MI Area Realcomp Sync Listing'}</span>
-                        <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{block.remarks}</p>
+                        <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{block.remarks}</p>
                       </div>
                     </div>
                     <div className="flex gap-4 text-[10px] font-black text-indigo-400 uppercase tracking-wider">
@@ -595,8 +595,8 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                 {block.type === 'LEAD_CAPTURE' && (
                   <div className="space-y-3 pt-2">
                     <div className="space-y-2">
-                      <input type="text" disabled placeholder="First Name" className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-[10px] opacity-70" />
-                      <input type="text" disabled placeholder="Email Address" className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-[10px] opacity-70" />
+                      <input type="text" disabled placeholder="First Name" className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-[10px] opacity-70" />
+                      <input type="text" disabled placeholder="Email Address" className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-[10px] opacity-70" />
                     </div>
                     <button disabled className="w-full py-2 bg-indigo-600 rounded-lg font-black text-[10px] uppercase tracking-wider text-white opacity-90">
                       {block.ctaText || 'Submit Inbound Contact'}
@@ -607,7 +607,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
             ))}
             
             {blocks.length === 0 && (
-              <div className="h-full flex items-center justify-center text-slate-500 italic font-semibold text-xs text-center">
+              <div className="h-full flex items-center justify-center text-muted-foreground italic font-semibold text-xs text-center">
                 Awaiting prompt input to compile website canvas...
               </div>
             )}
