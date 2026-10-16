@@ -123,10 +123,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <LeadAlertListener />
       <AIChat />
       <OnboardingTour />
-      <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&libraries=places,drawing`}
-        strategy="afterInteractive"
-      />
+      {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
+        <Script
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places,drawing`}
+          strategy="afterInteractive"
+        />
+      )}
     </div>
   );
 }
