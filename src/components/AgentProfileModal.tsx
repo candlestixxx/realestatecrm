@@ -21,7 +21,7 @@ export default function AgentProfileModal({
   const [company, setCompany] = useState({
     companyName: 'Excel Legacy Realty',
     address: '123 Cyberdyne Way, Sterling Heights, MI 48310',
-    website: 'https://excellegacyrealty.com',
+    website: 'https://excellegacyrealtygroup.site',
     taxId: 'XX-XXXXXXX',
   });
   const [billing, setBilling] = useState({

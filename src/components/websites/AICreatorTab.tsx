@@ -552,7 +552,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
             </span>
             <span className="font-mono bg-card px-3 py-1 rounded border border-border">
-              {subdomain}.excellegacy.com/{generatedSlug}
+              {subdomain}.excellegacyrealtygroup.site/{generatedSlug}
             </span>
           </div>
 

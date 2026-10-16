@@ -7,7 +7,7 @@ import { EmailConfig } from '@/lib/email-config';
 
 export default function EmailSettingsClient({ initialConfig }: { initialConfig: EmailConfig }) {
   const [provider, setProvider] = useState<EmailConfig['provider']>(initialConfig.provider);
-  const [fromEmail, setFromEmail] = useState(initialConfig.fromEmail || 'info@excellegacy.com');
+  const [fromEmail, setFromEmail] = useState(initialConfig.fromEmail || 'info@excellegacyrealtygroup.site');
 
   // AWS SES State
   const [awsAccessKey, setAwsAccessKey] = useState(initialConfig.awsAccessKey || '');
@@ -119,7 +119,7 @@ export default function EmailSettingsClient({ initialConfig }: { initialConfig: 
                 type="email"
                 value={fromEmail}
                 onChange={(e) => setFromEmail(e.target.value)}
-                placeholder="info@excellegacy.com"
+                placeholder="info@excellegacyrealtygroup.site"
                 className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none"
               />
               <p className="text-[10px] text-muted-foreground italic">Note: In SMTP, this should match your mail username. In SES, this email address must be verified.</p>

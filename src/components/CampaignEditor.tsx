@@ -495,7 +495,7 @@ export default function CampaignEditor({
                 </thead>
                 <tbody className="divide-y divide-border/30">
                   {[
-                    { name: 'Lauren Lee', email: 'lauren@excellegacy.com', step: 'Step 2 of 4 (Email)', status: 'ACTIVE', date: '2026-07-12' },
+                    { name: 'Lauren Lee', email: 'lauren@excellegacyrealtygroup.site', step: 'Step 2 of 4 (Email)', status: 'ACTIVE', date: '2026-07-12' },
                     { name: 'Frank Ferguson', email: 'frank@legacyhomes.com', step: 'Step 4 of 4 (General Task)', status: 'COMPLETED', date: '2026-07-10' },
                     { name: 'Paul Peterson', email: 'paul@realcomp.com', step: 'Step 1 of 4 (SMS)', status: 'PAUSED', date: '2026-07-08' },
                   ].map((lead, i) => (

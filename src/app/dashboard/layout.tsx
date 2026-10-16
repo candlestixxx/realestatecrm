@@ -107,7 +107,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               </span>
               <UserProfileDropdown 
                 userName={session?.user?.name || 'User'} 
-                userEmail={session?.user?.email || 'user@excellegacy.com'} 
+                userEmail={session?.user?.email || 'user@excellegacyrealtygroup.site'} 
               />
             </div>
           </div>

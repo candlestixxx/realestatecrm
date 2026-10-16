@@ -26,7 +26,7 @@ async function main() {
     data: {
       id: 'universal-admin',
       name: 'Universal Admin',
-      email: 'admin@excellegacy.com',
+      email: 'admin@excellegacyrealtygroup.site',
       role: 'OWNER',
     },
   });

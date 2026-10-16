@@ -139,7 +139,7 @@ const VIDEOS: VideoTopic[] = [
       '📊 [Analytics] Computing metrics for period: Last 30 days.',
       '📈 [Report] Pipeline value: $2.4M across 18 active deals.',
       '💰 [ROI] Campaign "Expired Outreach" generated 12 leads at $8.33/lead.',
-      '📧 [Delivery] Scheduled weekly report to team@excellegacy.com.'
+      '📧 [Delivery] Scheduled weekly report to team@excellegacyrealtygroup.site.'
     ]
   },
   {

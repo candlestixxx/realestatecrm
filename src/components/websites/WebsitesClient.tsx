@@ -580,7 +580,7 @@ export default function WebsitesClient({
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Custom Subdomain mapping (Optional)</label>
-                <input name="subdomain" placeholder="e.g. valuation.excellegacy.com" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
+                <input name="subdomain" placeholder="e.g. valuation.excellegacyrealtygroup.site" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
               </div>
 
               <div className="flex justify-end gap-2 pt-4">

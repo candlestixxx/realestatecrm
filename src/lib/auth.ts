@@ -71,7 +71,7 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'email', placeholder: 'lum@excellegacy.com' },
+        email: { label: 'Email', type: 'email', placeholder: 'lum@excellegacyrealtygroup.site' },
         username: { label: 'Username', type: 'text', placeholder: 'lum' },
         password: { label: 'Password', type: 'password' },
       },
@@ -83,11 +83,11 @@ export const authOptions: NextAuthOptions = {
         const demoPassword = process.env.AUTH_DEMO_PASSWORD?.trim() || process.env.MIREALSOURCE_PASSWORD?.trim() || '';
 
         // Universal Admin for Dev
-        if (identifier === 'admin@excellegacy.com' && password === 'admin123') {
+        if (identifier === 'admin@excellegacyrealtygroup.site' && password === 'admin123') {
           return {
             id: 'universal-admin',
             name: 'Universal Admin',
-            email: 'admin@excellegacy.com',
+            email: 'admin@excellegacyrealtygroup.site',
             role: 'OWNER',
             workspaceSlug: DEFAULT_WORKSPACE_SLUG,
             workspaceId: DEFAULT_WORKSPACE_SLUG,

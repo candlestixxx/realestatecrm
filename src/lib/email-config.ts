@@ -28,7 +28,7 @@ export async function getEmailConfig(): Promise<EmailConfig> {
       awsAccessKey: process.env.AWS_ACCESS_KEY_ID || '',
       awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY || '',
       awsRegion: process.env.AWS_REGION || 'us-east-1',
-      fromEmail: process.env.AWS_SES_FROM_EMAIL || 'info@excellegacy.com',
+      fromEmail: process.env.AWS_SES_FROM_EMAIL || 'info@excellegacyrealtygroup.site',
       resendApiKey: process.env.RESEND_API_KEY || '',
     };
   }
