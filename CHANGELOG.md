@@ -1,3 +1,8 @@
+## v0.58.49 (2026-10-09)
+
+### Fixed
+- **Critical**: fixed Server Components render error (digest `3737717021`) on all dashboard pages — `access` variable was block-scoped inside `try` but used outside it in `DashboardLayout`. Hoisted to outer scope with null safety.
+
 ## v0.58.48 (2026-10-09)
 
 ### Fixed
