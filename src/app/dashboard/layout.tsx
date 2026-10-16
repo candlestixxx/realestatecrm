@@ -51,8 +51,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // variant that fails instanceof checks). Catch here so the layout never crashes
   // — individual pages handle their own access denials via error.tsx boundaries.
   let workspaces: { id: string; name: string; slug: string }[] = [];
+  let access: Awaited<ReturnType<typeof requireWorkspaceAccess>> | null = null;
   try {
-    const access = await requireWorkspaceAccess(session);
+    access = await requireWorkspaceAccess(session);
     workspaces = await prisma.workspace.findMany({
       where: {
         members: {
@@ -100,9 +101,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <div className="flex items-center gap-4">
               <ThemeToggle />
               <NotificationDropdown />
-              <WorkspaceSwitcher workspaces={workspaces} activeSlug={access.workspaceSlug} />
+              <WorkspaceSwitcher workspaces={workspaces} activeSlug={access?.workspaceSlug || ''} />
               <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-secondary/15 text-secondary border border-secondary/30 uppercase tracking-wider">
-                {access.workspaceRole.replace('REALTOR_', '').replace('_', ' ')} Seat
+                {(access?.workspaceRole ?? 'REALTOR_AGENT').replace('REALTOR_', '').replace('_', ' ')} Seat
               </span>
               <UserProfileDropdown 
                 userName={session?.user?.name || 'User'} 
