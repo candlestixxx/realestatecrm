@@ -2,6 +2,8 @@
 
 ### Fixed
 - **Critical**: fixed Server Components render error (digest `3737717021`) on all dashboard pages — `access` variable was block-scoped inside `try` but used outside it in `DashboardLayout`. Hoisted to outer scope with null safety.
+- **Lead alerts**: created missing `/api/leads/latest-unread` (GET) and `/api/leads/[id]/read` (POST) API routes — `LeadAlertListener` was polling a 404 endpoint every 10 minutes
+- **Google Maps**: only load Maps script when `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` is configured — eliminates `NoApiKeys`/`InvalidKey` console warnings
 
 ## v0.58.48 (2026-10-09)
 
