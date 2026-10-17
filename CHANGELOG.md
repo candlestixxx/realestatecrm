@@ -1,3 +1,17 @@
+## v0.58.50 (2026-10-17)
+
+### Fixed
+- **Missing React hook imports**: added `useState`/`useEffect`/`useRef` imports to 5 files (marketing-studio, canva, LeadDetailLayoutClient, SettingsTabs) — fixes `ReferenceError: useState is not defined` in production
+- **`/api/posts` 404**: created route for publishing calendar — reads from BlogPost model, maps to calendar's expected shape
+- **`/api/contracts` 400**: fixed payload shape mismatch — UI sends `{ template: { type }, parties, action }` but API expected `{ template, workspaceId, action }`. Now auto-resolves workspaceId from session and normalizes template shape
+- **`/api/chat/rooms` 500**: added try/catch graceful degradation + created missing ChatRoom/ChatParticipant/ChatMessage tables in production SQLite
+- **DATABASE_URL mismatch on prod**: `.env` had `file:./dev.db` resolving to wrong path — fixed to `file:/var/www/excellegacyrealtygroup/prisma/dev.db`
+- **Domain rebrand**: all references updated to `excellegacyrealtygroup.site` with SSL cert deployed
+
+### Deployment
+- Production at `https://excellegacyrealtygroup.site` via PM2 + nginx + Let's Encrypt SSL
+- Standalone Next.js build on port 3210, proxied through nginx
+
 ## v0.58.49 (2026-10-09)
 
 ### Fixed
