@@ -13,7 +13,7 @@ start "audio-8090" cmd /c "node scripts\live-audio-server.mjs > live-audio.log 2
 
 echo [3/9] LeadG (3001)...
 cd /d "%ROOT%\apps\leadg"
-start "leadg-3001" cmd /c "node node_modules\next\dist\bin\next start -p 3001 > server.log 2> server-err.log"
+start "leadg-3001" cmd /c "set PORT=3001 && node .next\standalone\server.js > server.log 2> server-err.log"
 
 echo [4/9] Foreclosure (3002)...
 cd /d "%ROOT%\apps\foreclosureworkflow"
