@@ -584,7 +584,7 @@ export default function WebsitesClient({
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
-                <button
+                <button type="button"
                   type="button"
                   onClick={() => setIsCreating(false)}
                   className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-md transition-colors"

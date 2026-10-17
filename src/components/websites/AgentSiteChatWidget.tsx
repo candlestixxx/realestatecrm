@@ -82,7 +82,7 @@ export function AgentSiteChatWidget({ tenantName }: { tenantName?: string }) {
               placeholder="Type your message..."
               className="flex-1 bg-muted/50 border border-border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
             />
-            <button
+            <button type="button"
               type="submit"
               disabled={!input.trim() || isLoading}
               className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-50 transition-opacity"

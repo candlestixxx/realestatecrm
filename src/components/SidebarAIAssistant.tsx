@@ -166,7 +166,7 @@ export default function SidebarAIAssistant() {
               placeholder="Ask anything..."
               className="flex-1 bg-muted/30 border border-border rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
             />
-            <button
+            <button type="button"
               type="submit"
               className="px-3 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg text-xs hover:bg-primary/90 transition-colors"
             >

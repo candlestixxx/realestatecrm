@@ -194,7 +194,7 @@ export default function AIChat() {
                 className="flex-1 bg-muted/30 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 disabled={isLoading}
               />
-              <button
+              <button type="button"
                 type="button"
                 onClick={toggleVoiceMode}
                 disabled={isTranscribing}
@@ -203,7 +203,7 @@ export default function AIChat() {
               >
                 {isTranscribing ? <Loader2 className="w-4 h-4 animate-spin" /> : isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
               </button>
-              <button
+              <button type="button"
                 type="submit"
                 aria-label="Send message"
                 disabled={!input.trim() || isLoading}

@@ -477,7 +477,7 @@ export default function DealDetailLayoutClient({
                       onChange={(e) => setExpenseAmount(e.target.value)}
                       className="w-full bg-muted/40 border border-border/80 rounded px-2 py-1 text-xs focus:outline-none"
                     />
-                    <button
+                    <button type="button"
                       type="submit"
                       disabled={isAddingExpense}
                       className="px-3 bg-primary text-primary-foreground text-xs font-bold rounded hover:opacity-90 shrink-0 cursor-pointer"
@@ -654,7 +654,7 @@ export default function DealDetailLayoutClient({
                       onChange={(e) => setNewDocTitle(e.target.value)}
                       className="bg-muted/40 border border-border/80 rounded px-2.5 py-1.5 text-xs text-foreground focus:outline-none"
                     />
-                    <button 
+                    <button type="button" 
                       type="submit"
                       disabled={isRequestingDoc}
                       className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded transition-colors cursor-pointer"

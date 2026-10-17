@@ -159,7 +159,7 @@ export default function AgentCoreConsole() {
             className="flex-1 px-4 py-2.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary/50 text-foreground placeholder:text-muted-foreground"
             disabled={isLoading}
           />
-          <button
+          <button type="button"
             type="submit"
             disabled={isLoading || !input.trim()}
             className="px-5 py-2.5 bg-secondary text-secondary-foreground text-sm font-bold rounded-lg hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"

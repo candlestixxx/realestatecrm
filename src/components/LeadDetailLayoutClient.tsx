@@ -2226,7 +2226,7 @@ export default function LeadDetailLayoutClient({
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Phone Numbers</label>
-                  <button
+                  <button type="button"
                     type="button"
                     onClick={() => {
                       if (quickPhones.length >= 10) {

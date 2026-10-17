@@ -293,7 +293,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
 
               {/* Chat input box */}
               <form onSubmit={(e) => handleSendPrompt(e)} className="p-4 border-t border-border/40 flex gap-2 relative bg-muted/10 items-center">
-                <button
+                <button type="button"
                   type="button"
                   onClick={() => setShowHelperMenu(!showHelperMenu)}
                   className="bg-muted hover:bg-muted/80 p-2.5 rounded-xl border border-border/60 text-muted-foreground cursor-pointer flex items-center justify-center shrink-0"

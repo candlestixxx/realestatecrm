@@ -340,7 +340,9 @@ export default function ReportingPage() {
               </div>
               <div className="bg-card rounded-lg shadow border p-4 lg:col-span-2">
                 <h3 className="font-semibold text-foreground mb-3">Recent Activity</h3>
-                {data.recentActivity.map(a => (
+                {!data.recentActivity?.length ? (
+                  <p className="text-sm text-muted-foreground">No recent activity.</p>
+                ) : data.recentActivity.map(a => (
                   <div key={a.id} className="flex items-start gap-3 py-2 border-b last:border-0">
                     <span className="px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground shrink-0">{a.type}</span>
                     <div className="flex-1 min-w-0">
@@ -351,9 +353,6 @@ export default function ReportingPage() {
                     </div>
                   </div>
                 ))}
-                {data.recentActivity.length === 0 && (
-                  <p className="text-sm text-muted-foreground">No recent activity.</p>
-                )}
               </div>
             </div>
           </>

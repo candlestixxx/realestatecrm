@@ -584,7 +584,7 @@ export default function SegmentsClient({
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button
+                <button type="button"
                   type="button"
                   onClick={() => setIsSmsOpen(false)}
                   className="px-4 py-2 border border-border rounded-lg text-xs font-bold text-muted-foreground hover:bg-muted/20 transition-colors"

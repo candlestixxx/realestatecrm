@@ -91,7 +91,7 @@ export default async function TasksPage(props: {
             <option value="DONE">Done</option>
           </select>
           <input type="hidden" name="page" value={currentPage} />
-          <button
+          <button type="button"
             type="submit"
             className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/90 transition-colors"
           >

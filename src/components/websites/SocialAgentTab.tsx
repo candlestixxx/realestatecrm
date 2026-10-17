@@ -369,7 +369,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <label className="text-[10px] font-black uppercase">Post Message Content</label>
-                  <button
+                  <button type="button"
                     type="button"
                     onClick={() => setSpellCheckEnabled(!spellCheckEnabled)}
                     className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider transition-colors cursor-pointer border ${

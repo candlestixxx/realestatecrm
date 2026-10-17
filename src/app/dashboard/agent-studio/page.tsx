@@ -85,7 +85,7 @@ export default async function AgentStudioPage() {
                   <form action={handleToggle}>
                     <input type="hidden" name="id" value={wf.id} />
                     <input type="hidden" name="active" value={String(wf.isActive)} />
-                    <button
+                    <button type="button"
                       type="submit"
                       className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all uppercase tracking-wider cursor-pointer ${
                         wf.isActive

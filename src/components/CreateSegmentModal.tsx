@@ -66,14 +66,14 @@ export default function CreateSegmentModal({
               </div>
 
               <div className="flex justify-end gap-2 pt-6">
-                <button
+                <button type="button"
                   type="button"
                   onClick={() => setIsOpen(false)}
                   className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-md transition-colors"
                 >
                   Cancel
                 </button>
-                <button
+                <button type="button"
                   type="submit"
                   disabled={isSubmitting}
                   className="px-4 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-md hover:bg-primary/90 transition-colors shadow-lg disabled:opacity-50"
