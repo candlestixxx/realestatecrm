@@ -193,3 +193,27 @@
 - [x] Decide on uncommitted submodule dependency bumps (lucide-react ^1.16→^1.52 in foreclosureworkflow; lucide-react ^1.25→^1.52 + @next/swc-win32-x64-msvc in legacyleads/frontend) — committed v0.58.45
 - [x] Archive the 10 redundant remote feature branches (fast-forwarded to origin/main v0.58.46)
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
+
+### Production Deploy (2026-10-16/17, v0.58.50)
+- [x] Deploy realestatecrm to Hetzner as `excellegacyrealtygroup.site` (HTTPS + SSL)
+- [x] Domain rebrand (13 files)
+- [x] Auth working on prod (CredentialsProvider)
+- [x] Fix 5 missing React hook imports (useState/useEffect/useRef)
+- [x] Create `/api/posts` route (was 404)
+- [x] Fix `/api/contracts` payload normalization (was 400)
+- [x] Fix `/api/chat/rooms` error handling (was 500)
+- [x] Fix posts route to use existing Prisma model
+- [x] Create missing ChatRoom/ChatParticipant/ChatMessage tables in SQLite
+- [x] Fix DATABASE_URL path (was ./dev.db, now prisma/dev.db)
+- [x] LeadG standalone output fix in system-tray.ps1 + start-all.bat
+- [x] All 4 bug-fix endpoints verified on prod (200)
+- [x] Tooltip markers added to remaining dashboard pages
+- [x] Loading + error states verified on all 51 pages
+
+### Remaining Production Gaps
+- [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
+- [ ] Deploy 8 sub-services to Hetzner
+- [ ] Google Maps API key (`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`)
+- [ ] HubSpot OAuth for `/api/lead-gen/social`
+- [ ] Legacyleads `/listings` mock data to real data
+- [ ] Redis/Memurai for media-workflow MessageBroker

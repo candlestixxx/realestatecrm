@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import AgentCoreConsole from '@/components/AgentCoreConsole';
 import AgentCoreWorkflowBuilder from '@/components/AgentCoreWorkflowBuilder';
+import VoiceCommandPanel from '@/components/VoiceCommandPanel';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -64,6 +65,9 @@ export default function AgentCorePage() {
 
       {/* Console */}
       <AgentCoreConsole />
+
+      {/* Voice Command Panel */}
+      <VoiceCommandPanel />
 
       {/* Workflow Builder */}
       <AgentCoreWorkflowBuilder />

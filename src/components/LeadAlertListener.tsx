@@ -158,6 +158,8 @@ export default function LeadAlertListener() {
                         onClick={(e) => {
                           e.preventDefault();
                           toast.dismiss(t.id);
+                          // Mark lead as read when user views it
+                          fetch(`/api/leads/${lead.id}/read`, { method: 'POST' }).catch(() => {});
                           window.location.href = `/dashboard/leads/${lead.id}`;
                         }}
                         className="flex-1 border border-transparent rounded-none rounded-tr-2xl px-4 py-2 flex items-center justify-center text-xs font-black text-indigo-500 hover:text-indigo-600 focus:outline-hidden hover:bg-muted/30 select-none uppercase tracking-wider text-center"
