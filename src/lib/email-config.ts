@@ -51,7 +51,7 @@ export async function sendMail({
   const config = await getEmailConfig();
 
   if (config.provider === 'SIMULATION') {
-    console.log(`[Email API] [SIMULATION] Sending email to ${to}: Subject: "${subject}", Content: "${message}"`);
+    // console.log(`[Email API] [SIMULATION] Sending email to ${to}: Subject: "${subject}", Content: "${message}"`);
     await new Promise((resolve) => setTimeout(resolve, 800));
     return { success: true, mode: 'SIMULATION' };
   }
@@ -63,7 +63,7 @@ export async function sendMail({
 
     if (!accessKey || !secretKey) {
       console.warn('AWS SES Access Key or Secret Key is missing. Falling back to Simulation.');
-      console.log(`[Email API] [SIMULATION-FALLBACK] Sending email to ${to}: Subject: "${subject}"`);
+      // console.log(`[Email API] [SIMULATION-FALLBACK] Sending email to ${to}: Subject: "${subject}"`);
       return { success: false, error: 'AWS SES Access Key or Secret Key is missing.' };
     }
 
@@ -98,7 +98,7 @@ export async function sendMail({
     const apiKey = config.resendApiKey || process.env.RESEND_API_KEY;
     if (!apiKey) {
       console.warn('Resend API Key is missing. Falling back to Simulation.');
-      console.log(`[Email API] [SIMULATION-FALLBACK] Sending email to ${to}: Subject: "${subject}"`);
+      // console.log(`[Email API] [SIMULATION-FALLBACK] Sending email to ${to}: Subject: "${subject}"`);
       return { success: false, error: 'Resend API Key is missing.' };
     }
 
@@ -133,7 +133,7 @@ export async function sendMail({
   if (config.provider === 'SMTP') {
     if (!config.smtpServer || !config.smtpUser || !config.smtpPass) {
       console.warn('SMTP Configuration is missing credentials. Falling back to Simulation.');
-      console.log(`[Email API] [SIMULATION-FALLBACK] Sending email to ${to}: Subject: "${subject}"`);
+      // console.log(`[Email API] [SIMULATION-FALLBACK] Sending email to ${to}: Subject: "${subject}"`);
       return { success: false, error: 'SMTP Configuration is missing credentials.' };
     }
 

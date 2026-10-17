@@ -91,14 +91,14 @@ export async function GET(request: Request) {
         if (lead.user) {
           // A. Email alert log
           if (lead.user.emailAlertsMlsRelist) {
-            console.log(`[MLS Scrubber] Email alert sent to agent ${lead.user.email}: Listing ${lead.contact.address} is active.`);
+            // console.log(`[MLS Scrubber] Email alert sent to agent ${lead.user.email}: Listing ${lead.contact.address} is active.`);
           }
 
           // B. SMS alert log
           if (lead.user.smsAlertsMlsRelist && lead.user.email) {
             try {
               // Retrieve Twilio number or configuration to send SMS alert
-              console.log(`[MLS Scrubber] Sending SMS alert to agent: "Property at ${lead.contact.address} is active on MLS. Drip stopped."`);
+              // console.log(`[MLS Scrubber] Sending SMS alert to agent: "Property at ${lead.contact.address} is active on MLS. Drip stopped."`);
               
               // If there's an SMS action, we trigger it:
               const formData = new FormData();

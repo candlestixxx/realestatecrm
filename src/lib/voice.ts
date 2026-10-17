@@ -4,7 +4,7 @@ export async function synthesizeSpeech(workspaceId: string, text: string): Promi
   const config = await getVoiceConfig(workspaceId);
 
   if (config.provider === 'SIMULATION') {
-    console.log(`[VoiceForge] [SIMULATION] Synthesizing speech: "${text.substring(0, 50)}..."`);
+    // console.log(`[VoiceForge] [SIMULATION] Synthesizing speech: "${text.substring(0, 50)}..."`);
     // Return a dummy buffer representing an audio file in simulation mode
     return Buffer.from('simulated-audio-data');
   }
@@ -75,7 +75,7 @@ export async function transcribeSpeech(workspaceId: string, audioBuffer: Buffer,
   const config = await getVoiceConfig(workspaceId);
 
   if (config.provider === 'SIMULATION') {
-    console.log(`[VoiceForge] [SIMULATION] Transcribing audio buffer...`);
+    // console.log(`[VoiceForge] [SIMULATION] Transcribing audio buffer...`);
     return "This is a simulated transcription of the audio.";
   }
 

@@ -28,7 +28,7 @@ export async function routeLeadAction(leadId: string) {
     });
 
     if (rules.length === 0) {
-      console.log(`[Lead Routing] No active routing rules found for workspace ${lead.workspaceId}.`);
+      // console.log(`[Lead Routing] No active routing rules found for workspace ${lead.workspaceId}.`);
       return { success: false, message: 'No active rules matching' };
     }
 
@@ -52,7 +52,7 @@ export async function routeLeadAction(leadId: string) {
     }
 
     if (!matchedRule) {
-      console.log(`[Lead Routing] Lead ${leadId} did not match any active routing rules.`);
+      // console.log(`[Lead Routing] Lead ${leadId} did not match any active routing rules.`);
       return { success: false, message: 'No matching rule criteria' };
     }
 
@@ -96,7 +96,7 @@ export async function routeLeadAction(leadId: string) {
       })
     ]);
 
-    console.log(`[Lead Routing] Lead ${leadId} successfully assigned to agent ${assignedAgentId} via rule "${matchedRule.name}".`);
+    // console.log(`[Lead Routing] Lead ${leadId} successfully assigned to agent ${assignedAgentId} via rule "${matchedRule.name}".`);
     return { success: true, assignedAgentId };
   } catch (err: any) {
     console.error('[Lead Routing] Error routing lead:', err);

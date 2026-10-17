@@ -22,7 +22,7 @@ export function startSyncScheduler() {
   if (schedulerStarted) return;
   schedulerStarted = true;
 
-  console.log('[MyPlus Scheduler] Started — morning drops synced (4-7 AM) and stragglers synced hourly');
+  // console.log('[MyPlus Scheduler] Started — morning drops synced (4-7 AM) and stragglers synced hourly');
 
   const tick = async () => {
     try {
@@ -35,7 +35,7 @@ export function startSyncScheduler() {
 
       // Run sync every 15 minutes all day long to deliver leads as soon as they are posted
       if (timeSinceLastSync >= fifteenMinsMs) {
-        console.log(`[MyPlus Scheduler] Triggering sync (lastSync: ${lastSyncTimeMs > 0 ? new Date(lastSyncTimeMs).toLocaleTimeString() : 'never'})...`);
+        // console.log(`[MyPlus Scheduler] Triggering sync (lastSync: ${lastSyncTimeMs > 0 ? new Date(lastSyncTimeMs).toLocaleTimeString() : 'never'})...`);
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const cronSecret = process.env.CRON_SECRET;
@@ -51,7 +51,7 @@ export function startSyncScheduler() {
         });
 
         const data = await res.json();
-        console.log(`[MyPlus Scheduler] Sync result: ${data.message || JSON.stringify(data)}`);
+        // console.log(`[MyPlus Scheduler] Sync result: ${data.message || JSON.stringify(data)}`);
         lastSyncTimeMs = nowMs;
       }
     } catch (err: any) {

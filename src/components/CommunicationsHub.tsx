@@ -151,7 +151,7 @@ export default function CommunicationsHub({
               <button
                 type="button"
                 onClick={() => {
-                  console.log("[Video API] Launching simulated WebRTC session...");
+                  // console.log("[Video API] Launching simulated WebRTC session...");
                   window.open("https://meet.google.com", "_blank");
                 }}
                 className="px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold rounded-lg hover:bg-secondary/90 transition-all shadow-md cursor-pointer"

@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized agent signature.' }, { status: 401 });
     }
 
-    console.log(`[Agent Handshake] Connected agent: ${agentName || 'Unknown'} executing action: ${action}`);
+    // console.log(`[Agent Handshake] Connected agent: ${agentName || 'Unknown'} executing action: ${action}`);
 
     // Process actions matching Hermes and OpenClaw protocol requirements
     switch (action) {
