@@ -8,7 +8,7 @@
  * for deep-links) plus a description of when to touch it.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import RoutingRulesWidget from '@/components/RoutingRulesWidget';
 import {

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import crypto from 'crypto';
 
@@ -51,35 +53,62 @@ export async function POST(request: NextRequest) {
     } catch {
       return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
-    const { template, workspaceId, action } = body as {
-      template: ContractTemplate;
-      workspaceId: string;
+    const { template, parties, workspaceId, action } = body as {
+      template: ContractTemplate | { type: string };
+      parties?: Array<{ role: string; name: string; email: string }>;
+      workspaceId?: string;
       action: 'deploy' | 'execute' | 'dispute';
     };
 
-    if (!template || !workspaceId) {
-      return NextResponse.json({ error: 'template and workspaceId required' }, { status: 400 });
+    if (!template?.type) {
+      return NextResponse.json({ error: 'template.type required' }, { status: 400 });
+    }
+
+    // Normalize template shape — UI may send { type } only, with parties at top level
+    const fullTemplate: ContractTemplate = {
+      type: (template as ContractTemplate).type || (template as { type: string }).type as ContractTemplate['type'],
+      parties: (template as ContractTemplate).parties || parties || [],
+      terms: (template as ContractTemplate).terms || {},
+      amount: (template as ContractTemplate).amount,
+      currency: (template as ContractTemplate).currency,
+    };
+
+    // Resolve workspaceId — from body, or from session user's primary workspace
+    let wsId = workspaceId;
+    if (!wsId) {
+      try {
+        const session = await getServerSession(authOptions);
+        const uid = (session?.user as { id?: string })?.id;
+        if (uid) {
+          const ws = await prisma.workspace.findFirst({ where: { members: { some: { userId: uid } } } });
+          wsId = ws?.id || 'default';
+        } else {
+          wsId = 'default';
+        }
+      } catch {
+        wsId = 'default';
+      }
     }
 
     switch (action) {
       case 'deploy': {
-        const contractHash = generateContractHash(template);
-        const deployed = simulateDeploy(template);
+        const contractHash = generateContractHash(fullTemplate);
+        const deployed = simulateDeploy(fullTemplate);
 
         const activity = await prisma.activity.create({
           data: {
             type: 'BLOCKCHAIN_CONTRACT_DEPLOYED',
-            workspaceId,
+            workspaceId: wsId!,
             content: JSON.stringify({
-              contractType: template.type,
+              contractType: fullTemplate.type,
               contractId: deployed.contractId,
               txHash: deployed.txHash,
               blockNumber: deployed.blockNumber,
               contractHash,
-              parties: template.parties,
-              terms: template.terms,
-              amount: template.amount,
-              currency: template.currency || 'USD',
+              parties: fullTemplate.parties,
+              terms: fullTemplate.terms,
+              amount: fullTemplate.amount,
+              currency: fullTemplate.currency || 'USD',
               status: deployed.status,
               deployedAt: deployed.deployedAt
             })
@@ -107,7 +136,7 @@ export async function POST(request: NextRequest) {
         await prisma.activity.create({
           data: {
             type: 'BLOCKCHAIN_CONTRACT_EXECUTED',
-            workspaceId,
+            workspaceId: wsId!,
             content: JSON.stringify({
               contractId,
               txHash,
@@ -135,7 +164,7 @@ export async function POST(request: NextRequest) {
         await prisma.activity.create({
           data: {
             type: 'BLOCKCHAIN_CONTRACT_DISPUTED',
-            workspaceId,
+            workspaceId: wsId!,
             content: JSON.stringify({
               contractId,
               reason,
@@ -163,12 +192,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const workspaceId = searchParams.get('workspaceId');
+    const workspaceId = searchParams.get('workspaceId') || 'default';
     const contractType = searchParams.get('type');
-
-    if (!workspaceId) {
-      return NextResponse.json({ error: 'workspaceId required' }, { status: 400 });
-    }
 
     const where: any = {
       workspaceId,
