@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 
 /**
  * Voice Command Panel — wires /api/agentcore/voice-command for mobile-style
