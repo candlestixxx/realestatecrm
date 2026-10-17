@@ -7,10 +7,20 @@
 - **`/api/chat/rooms` 500**: added try/catch graceful degradation + created missing ChatRoom/ChatParticipant/ChatMessage tables in production SQLite
 - **DATABASE_URL mismatch on prod**: `.env` had `file:./dev.db` resolving to wrong path — fixed to `file:/var/www/excellegacyrealtygroup/prisma/dev.db`
 - **Domain rebrand**: all references updated to `excellegacyrealtygroup.site` with SSL cert deployed
+- **16 buttons missing `type="button"`** inside forms across 13 files — prevents unintended form submission
+- **Unguarded `.map()`** in reporting/page.tsx — added null guard + empty state
+- **`react-hot-toast` vs `sonner`**: VoiceCommandPanel used `sonner` (not installed) — switched to `react-hot-toast`
 
-### Deployment
-- Production at `https://excellegacyrealtygroup.site` via PM2 + nginx + Let's Encrypt SSL
-- Standalone Next.js build on port 3210, proxied through nginx
+### Added
+- **`VoiceCommandPanel`**: new UI component wiring `/api/agentcore/voice-command` on AgentCore page — natural language command input with parsed action + confidence display
+- **`/api/leads/[id]/read`**: View Detail button on lead alerts now marks lead as read
+- **`audit-ui.py`**: consolidated nav coverage + API wiring + tooltip coverage audit script
+- **`code-quality-scan.py`**: scans for missing hook imports, template literal bugs, unguarded `.map()`, missing `type=button`
+- **`package-v3.py`**: production deploy packaging script (83 MB tarball)
+
+### Documentation
+- DEPLOY.md: added full Hetzner production deployment section (server details, DNS, deploy process, critical notes)
+- TODO.md: added production deploy checklist + remaining gaps
 
 ## v0.58.49 (2026-10-09)
 
