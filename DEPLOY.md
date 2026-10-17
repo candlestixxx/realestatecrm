@@ -214,3 +214,52 @@ npm run tray
 - Service-specific: `apps/*/server*.log` and `apps/*/*.err*.log` 
 - System tray logs: same service directories
 
+
+## Production Deployment (Hetzner)
+
+### Server Details
+- **Domain**: `excellegacyrealtygroup.site`
+- **IP**: `5.161.250.43`
+- **SSH**: `ssh hetzner` (as `root`)
+- **Deploy path**: `/var/www/excellegacyrealtygroup/`
+- **PM2 process**: `excellegacyrealtygroup` (port 3210)
+- **SSL**: Let's Encrypt via certbot (auto-renewing, expires 2027-01-14)
+- **Nginx**: `/etc/nginx/sites-available/excellegacyrealtygroup.site`
+
+### DNS Configuration
+| Type | Name | Value |
+|------|------|-------|
+| A | @ | 5.161.250.43 |
+| CNAME | www | excellegacyrealtygroup.site |
+
+### Deploy Process
+```bash
+# 1. Build locally (900s timeout required)
+cmd /c "npm run build > build-out.txt 2>&1"
+
+# 2. Package (use deploy/package-v3.py)
+python deploy/package-v3.py
+
+# 3. Upload
+scp deploy-v3.tar.gz hetzner:/tmp/deploy-v3.tar.gz
+
+# 4. Extract and restart
+ssh hetzner "cd /var/www/excellegacyrealtygroup && rm -rf .next standalone server.js middleware.ts && tar xzf /tmp/deploy-v3.tar.gz && ln -sfn client node_modules/@prisma/client-2c3a283f134fdcb6 && pm2 restart excellegacyrealtygroup"
+
+# 5. Test
+ssh hetzner "bash /tmp/test-fixes.sh"
+```
+
+### Critical Deployment Notes
+- **Prisma Turbopack symlink**: After every deploy, recreate:
+  `ln -sfn client node_modules/@prisma/client-2c3a283f134fdcb6`
+- **DATABASE_URL**: Must be `file:./prisma/dev.db` (NOT `file:./dev.db`)
+- **Auth credentials**: `admin@excellegacyrealtygroup.site` / `admin123` (hardcoded in `src/lib/auth.ts`)
+- **Build timeout**: Always use 900s for `npm run build` (600s not enough)
+
+### Health Checks
+```bash
+curl -sk https://excellegacyrealtygroup.site/           # ? 200/307
+curl -sk https://excellegacyrealtygroup.site/api/auth/session  # ? 200
+ssh hetzner "pm2 logs excellegacyrealtygroup --lines 10 --nostream"
+```
