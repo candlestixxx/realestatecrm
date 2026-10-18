@@ -38,7 +38,8 @@ type SectionId =
   | 'properties'
   | 'intelligence'
   | 'automation'
-  | 'platform';
+  | 'platform'
+  | 'subprojects';
 
 interface FeatureCard {
   label: string;
@@ -592,6 +593,53 @@ const SECTIONS: Section[] = [
       },
     ],
   },
+  {
+    id: 'subprojects',
+    title: 'Sub-Projects',
+    tagline: 'Independent services that power the Excel Legacy Realty platform',
+    features: [
+      {
+        label: 'LeadG — Voice & Lead Engine',
+        description: 'AI voice campaigns, lead generation, and outbound calling with accent morphing.',
+        href: '/leadg/',
+        icon: '📞',
+        tooltip: 'VoiceForge AI-powered outbound calling, lead scoring, and campaign management. Runs as an independent Next.js app on port 3211.',
+        badge: 'LIVE',
+      },
+      {
+        label: 'Foreclosure Workflow',
+        description: 'Automated foreclosure notice monitoring, legal intake, and distressed-property pipelines.',
+        href: '/foreclosure/',
+        icon: '⚖️',
+        tooltip: 'Macomb/Bay County foreclosure monitoring with tax-assessor prefill. Parses legal notices into CRM leads. Runs as an independent Next.js app on port 3212.',
+        badge: 'LIVE',
+      },
+      {
+        label: 'Content Planner',
+        description: 'Social media content creation, scheduling, brand kits, and campaign analytics.',
+        href: '/contentplanner/',
+        icon: '📝',
+        tooltip: 'Turbo monorepo with web UI + API. Create posts, manage campaigns, configure brand voice. Runs as an independent Next.js app on port 3213.',
+        badge: 'LIVE',
+      },
+      {
+        label: 'Media Workflow',
+        description: 'Photo import, storyboard generation, AI promo videos, and FFmpeg export pipeline.',
+        href: '/media-workflow/health',
+        icon: '🎬',
+        tooltip: 'Property photo → storyboard → rendered promo video pipeline with brand overlay. Express API service on port 3214 (API-only, no web UI).',
+        badge: 'LIVE',
+      },
+      {
+        label: 'LegacyLeads',
+        description: 'Property data, skip tracing, compliance checks, and lead enrichment.',
+        href: '/legacyleads/',
+        icon: '🔍',
+        tooltip: 'Lead generation and skip-tracing service for property data, TCPA compliance, and credit management. Frontend + backend on port 3215.',
+        badge: 'LIVE',
+      },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -767,6 +815,25 @@ export default function CommandCenter() {
           >
             ↻ Refresh stats
           </button>
+        </div>
+
+        {/* Mission statement */}
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl leading-none mt-0.5" aria-hidden>🏢</span>
+            <div>
+              <h2 className="text-sm font-bold text-foreground">Excel Legacy Realty Group — Unified Platform</h2>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                This dashboard is the central command center for the Excel Legacy Realty Group real-estate operations platform.
+                It integrates <strong className="text-foreground">5 independent sub-services</strong> — LeadG (voice &amp; lead engine),
+                Foreclosure Workflow (legal intake &amp; monitoring), Content Planner (social media &amp; campaigns),
+                Media Workflow (photo/video pipeline), and LegacyLeads (property data &amp; skip tracing) — into a single
+                operator experience. Use the <strong className="text-foreground">Sub-Projects</strong> section below to
+                access each service directly, or work within the CRM tools organized by business value.
+              </p>
+            </div>
+            <InfoBadge text="Each sub-service runs as an independent application but is linked here for unified access. The CRM (this dashboard) is the primary interface; sub-projects handle specialized workflows." />
+          </div>
         </div>
 
         {/* Body: section rail + cards */}
