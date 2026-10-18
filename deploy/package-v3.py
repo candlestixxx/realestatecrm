@@ -35,11 +35,11 @@ if os.path.isdir(nm_dir):
             tf.add(full, arcname=arc)
             count += 1
 
-# 3. Static client assets
+# 3. Static client assets — must go to .next/static/ for standalone server to serve them
 for root, dirs, files in os.walk('.next/static'):
     for f in files:
         full = os.path.join(root, f)
-        arc = os.path.join('static', os.path.relpath(full, '.next/static'))
+        arc = os.path.join('.next', 'static', os.path.relpath(full, '.next/static'))
         tf.add(full, arcname=arc)
         count += 1
 
