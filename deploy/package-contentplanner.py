@@ -38,7 +38,7 @@ if os.path.isdir(static_dir):
     for root, dirs, files in os.walk(static_dir):
         for f in files:
             full = os.path.join(root, f)
-            tf.add(full, arcname=os.path.join('static', os.path.relpath(full, static_dir)))
+            tf.add(full, arcname=os.path.join('.next', 'static', os.path.relpath(full, static_dir)))
             count += 1
 
 pub_dir = os.path.join(base, 'public')
