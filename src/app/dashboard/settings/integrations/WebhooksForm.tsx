@@ -10,7 +10,7 @@ export function WebhooksForm() {
   const [homesProfile, setHomesProfile] = useState('');
 
   // Webhook Urls
-  const [webhookBase, setWebhookBase] = useState('http://localhost:3000');
+  const [webhookBase, setWebhookBase] = useState(typeof window !== 'undefined' ? window.location.origin : '');
 
   useEffect(() => {
     // Determine host on client side

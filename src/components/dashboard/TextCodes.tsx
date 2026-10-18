@@ -27,7 +27,7 @@ const INITIAL_CODES: TextCode[] = [
     keyword: '8485SHERMAN',
     phoneNumber: '(586) 555-0190',
     listingAddress: '8485 Sherman Ave, Warren, MI 48089',
-    responseMessage: 'Thanks for inquiring about 8485 Sherman Ave! View full photos, video walk-throughs & price history here: http://localhost:3000/portal/site/8485-sherman-ave',
+    responseMessage: 'Thanks for inquiring about 8485 Sherman Ave! View full photos, video walk-throughs & price history here: /portal/site/8485-sherman-ave',
     status: 'ACTIVE',
     leadsCaptured: 14,
     createdAt: '2026-07-08',
@@ -37,7 +37,7 @@ const INITIAL_CODES: TextCode[] = [
     keyword: '615WILLARD',
     phoneNumber: '(586) 555-0190',
     listingAddress: '615 Willard Ave, Warren, MI 48089',
-    responseMessage: 'Welcome to 615 Willard! This beautiful property is back on the market. View listing: http://localhost:3000/portal/site/615-willard-ave-copy-122',
+    responseMessage: 'Welcome to 615 Willard! This beautiful property is back on the market. View listing: /portal/site/615-willard-ave-copy-122',
     status: 'ACTIVE',
     leadsCaptured: 8,
     createdAt: '2026-07-08',
@@ -47,7 +47,7 @@ const INITIAL_CODES: TextCode[] = [
     keyword: 'VIPBUYER',
     phoneNumber: '(586) 555-0122',
     listingAddress: 'General Buyer Capture Pool',
-    responseMessage: 'Want access to hot pocket listings in Macomb and Wayne county? Get our daily MLS sheet: http://localhost:3000/portal/site/vip-buyer-list',
+    responseMessage: 'Want access to hot pocket listings in Macomb and Wayne county? Get our daily MLS sheet: /portal/site/vip-buyer-list',
     status: 'PAUSED',
     leadsCaptured: 29,
     createdAt: '2026-07-05',
@@ -300,7 +300,7 @@ export default function TextCodes() {
                   required
                   value={responseMessage}
                   onChange={(e) => setResponseMessage(e.target.value)}
-                  placeholder="Thanks for inquiring! View list price & photos instantly: http://localhost:3000/portal/site/8485-sherman"
+                  placeholder="Thanks for inquiring! View list price & photos instantly: /portal/site/8485-sherman"
                   rows={4}
                   className="w-full bg-background border border-border/60 rounded-xl p-3 text-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                 />

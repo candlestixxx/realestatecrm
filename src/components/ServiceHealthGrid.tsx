@@ -15,15 +15,15 @@ interface ServiceStatus {
 }
 
 const SERVICES: Omit<ServiceStatus, 'status' | 'code'>[] = [
-  { name: 'Main CRM', port: 3000, url: 'http://localhost:3000' },
-  { name: 'LeadG', port: 3001, url: 'http://localhost:3001' },
-  { name: 'Foreclosure', port: 3002, url: 'http://localhost:3002' },
-  { name: 'ContentPlanner', port: 3003, url: 'http://localhost:3003' },
-  { name: 'ContentPlanner API', port: 3031, url: 'http://localhost:3031/posts' },
-  { name: 'MediaWorkflow', port: 3004, url: 'http://localhost:3004' },
-  { name: 'LegacyLeads Web', port: 3005, url: 'http://localhost:3005' },
-  { name: 'LegacyLeads API', port: 3006, url: 'http://localhost:3006/health' },
-  { name: 'Live Audio', port: 8090, url: 'http://localhost:8090' },
+  { name: 'Main CRM', port: 3210, url: '/api/health' },
+  { name: 'LeadG', port: 3211, url: process.env.NEXT_PUBLIC_LEADG_URL || 'http://localhost:3000' },
+  { name: 'Foreclosure', port: 3212, url: process.env.NEXT_PUBLIC_FORECLOSURE_URL || 'http://localhost:3007' },
+  { name: 'ContentPlanner', port: 3003, url: process.env.NEXT_PUBLIC_CONTENT_PLANNER_URL || 'http://localhost:3003' },
+  { name: 'ContentPlanner API', port: 3031, url: process.env.NEXT_PUBLIC_CONTENT_PLANNER_API_URL || 'http://localhost:3031' },
+  { name: 'MediaWorkflow', port: 3004, url: process.env.NEXT_PUBLIC_MEDIA_WORKFLOW_URL || 'http://localhost:3004' },
+  { name: 'LegacyLeads Web', port: 3005, url: process.env.NEXT_PUBLIC_LEGACY_LEADS_URL || 'http://localhost:3005' },
+  { name: 'LegacyLeads API', port: 3006, url: process.env.NEXT_PUBLIC_LEGACY_LEADS_API_URL || 'http://localhost:3006' },
+  { name: 'Live Audio', port: 8090, url: process.env.NEXT_PUBLIC_LIVE_AUDIO_URL || 'http://localhost:8090' },
 ];
 
 export default function ServiceHealthGrid() {

@@ -276,7 +276,7 @@ function RecentPostsSection() {
         </div>
       ) : posts.length === 0 ? (
         <div className="text-sm text-muted-foreground border border-border rounded-xl p-4">
-          No posts yet. Create content in the <a href="http://localhost:3003" target="_blank" rel="noopener noreferrer" className="text-secondary underline">Content Planner</a>.
+          No posts yet. Create content in the <a href={process.env.NEXT_PUBLIC_CONTENT_PLANNER_URL || "#"} target="_blank" rel="noopener noreferrer" className="text-secondary underline">Content Planner</a>.
         </div>
       ) : (
         <div className="space-y-2">

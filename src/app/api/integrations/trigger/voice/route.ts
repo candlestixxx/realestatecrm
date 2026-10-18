@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       workspaceId: lead.workspaceId,
     };
 
-    const voiceServiceUrl = process.env.VOICE_SERVICE_URL || 'http://localhost:3001';
+    const voiceServiceUrl = process.env.VOICE_SERVICE_URL || process.env.NEXT_PUBLIC_LEADG_URL || 'http://localhost:3000';
     try {
       const resp = await fetch(`${voiceServiceUrl}/api/campaigns/trigger`, {
         method: 'POST',

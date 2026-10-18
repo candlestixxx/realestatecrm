@@ -66,7 +66,7 @@ const VIDEOS: VideoTopic[] = [
       '✨ [AI] Processing prompt: "Generate page for 8485 Sherman Ave with valuation widget"',
       '🎨 [Canvas] Assembled block: Header Layout',
       '📸 [Media] Simulated photo upload: Added premium home showcase graphic',
-      '🔗 [Publish] Public page generated: http://localhost:3000/portal/site/8485-sherman-ave',
+      '🔗 [Publish] Public page generated: /portal/site/8485-sherman-ave',
       '📢 [Social] Shared post simulated on Google Business Profile & YouTube.'
     ]
   },
@@ -84,7 +84,7 @@ const VIDEOS: VideoTopic[] = [
     simulationLogs: [
       '💬 [SMS Engine] Incoming text message to (586) 555-0190: "8485SHERMAN"',
       '👤 [Lead Capture] Creating new Lead: "Owner of 8485 Sherman Ave" (Phone: +1 586-555-0199)',
-      '✉️ [Reply] Sending reply: "Thanks for inquiring! View list price & photos: http://localhost:3000/portal/site/8485-sherman"',
+      '✉️ [Reply] Sending reply: "Thanks for inquiring! View list price & photos: /portal/site/8485-sherman"',
       '📈 [Analytics] SMS Code "8485SHERMAN" total hits updated to 15.'
     ]
   },

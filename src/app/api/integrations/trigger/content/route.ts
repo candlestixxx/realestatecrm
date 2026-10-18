@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       workspaceId: context.workspaceId,
     };
 
-    const contentServiceUrl = process.env.CONTENT_SERVICE_URL || 'http://localhost:3002';
+    const contentServiceUrl = process.env.CONTENT_SERVICE_URL || process.env.NEXT_PUBLIC_CONTENT_PLANNER_URL || 'http://localhost:3008';
     try {
       const resp = await fetch(`${contentServiceUrl}/api/generate`, {
         method: 'POST',
