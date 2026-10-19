@@ -302,10 +302,10 @@ export default function MarketingStudioPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { title: 'Posts', desc: 'Create and schedule social media posts.', icon: '📝', href: 'http://localhost:3003/posts' },
-            { title: 'Campaigns', desc: 'Manage content marketing campaigns.', icon: '🚀', href: 'http://localhost:3003/campaigns' },
-            { title: 'Brand Kits', desc: 'Configure brand voice and style guides.', icon: '🎨', href: 'http://localhost:3003/brand-kits' },
-            { title: 'Analytics', desc: 'Track content performance metrics.', icon: '📊', href: 'http://localhost:3003/analytics' },
+            { title: 'Posts', desc: 'Create and schedule social media posts.', icon: '📝', href: '/contentplanner/posts' },
+            { title: 'Campaigns', desc: 'Manage content marketing campaigns.', icon: '🚀', href: '/contentplanner/campaigns' },
+            { title: 'Brand Kits', desc: 'Configure brand voice and style guides.', icon: '🎨', href: '/contentplanner/brand-kits' },
+            { title: 'Analytics', desc: 'Track content performance metrics.', icon: '📊', href: '/contentplanner/analytics' },
           ].map(item => (
             <a
               key={item.title}
@@ -336,9 +336,9 @@ export default function MarketingStudioPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { title: 'Property Search', desc: 'Search MLS listings with advanced filters.', icon: '🏠', href: 'http://localhost:3005' },
-            { title: 'Skip Trace', desc: 'Find contact info for property owners.', icon: '🔍', href: 'http://localhost:3005' },
-            { title: 'Compliance', desc: 'TCPA compliance and DNC checks.', icon: '🛡️', href: 'http://localhost:3005' },
+            { title: 'Property Search', desc: 'Search MLS listings with advanced filters.', icon: '🏠', href: '/legacyleads' },
+            { title: 'Skip Trace', desc: 'Find contact info for property owners.', icon: '🔍', href: '/legacyleads' },
+            { title: 'Compliance', desc: 'TCPA compliance and DNC checks.', icon: '🛡️', href: '/legacyleads' },
           ].map(item => (
             <a
               key={item.title}
