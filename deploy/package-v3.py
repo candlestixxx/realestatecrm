@@ -60,14 +60,18 @@ for root, dirs, files in os.walk('prisma'):
         count += 1
 
 # 6. Post-deploy script for Prisma symlink + DATABASE_URL fix
-post_deploy = '''#!/bin/bash
+import io
+post_deploy = b'''#!/bin/bash
 # Post-deploy: fix Prisma Turbopack symlink + DATABASE_URL
 cd /var/www/excellegacyrealtygroup
 ln -sfn client node_modules/@prisma/client-2c3a283f134fdcb6
 sed -i 's|file:./dev.db|file:/var/www/excellegacyrealtygroup/prisma/dev.db|g' .env 2>/dev/null
 echo "Prisma symlink + DATABASE_URL fixed"
 '''
-tf.add(post_deploy.encode(), arcname='post-deploy.sh')
+import tarfile as _tf
+ti = _tf.TarInfo(name='post-deploy.sh')
+ti.size = len(post_deploy)
+tf.addfile(ti, io.BytesIO(post_deploy))
 count += 1
 
 tf.close()

@@ -625,9 +625,9 @@ const SECTIONS: Section[] = [
       {
         label: 'Media Workflow',
         description: 'Photo import, storyboard generation, AI promo videos, and FFmpeg export pipeline.',
-        href: '/media-workflow/health',
+        href: '/media-workflow/',
         icon: '🎬',
-        tooltip: 'Property photo → storyboard → rendered promo video pipeline with brand overlay. Express API service on port 3214 (API-only, no web UI).',
+        tooltip: 'Property photo → storyboard → rendered promo video pipeline with brand overlay. Web UI + Express API on port 3214.',
         badge: 'LIVE',
       },
       {
