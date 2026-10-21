@@ -231,3 +231,17 @@
 - [ ] Delete 10 redundant remote feature branches (manual: `git push origin --delete <branch>`)
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
 - [ ] Deploy 8 sub-services to Hetzner
+
+### Codebase Analysis (2026-10-21) — verified findings
+- [x] Test suites repaired: media-workflow 0→60 passing (TS5107 fix + spec-aligned error messages), contentplanner 24→35 (jest Haste collision), leadg 9, legacyleads 11 — **115 tests passing across 4 submodules**
+- [x] Untracked 470MB deploy tarballs + build logs (gitignored)
+- [x] Prisma model audit: 40 models, only `VerificationToken` unreferenced (NextAuth artifact — expected)
+
+#### Real gaps found (ordered by impact)
+- [ ] **5 API routes still return mock data**: `skip-trace` (whitepages/public-records mocks), `property-data` (source='mock'), `avatar`, `agents/handshake`, `cron/mls-scrub` — these need real provider keys or honest "demo mode" labeling in UI
+- [ ] **Root e2e tests need a running server** (node:test against localhost:3000) — not wired into CI; add a CI job with a service container or convert to Playwright
+- [ ] **foreclosureworkflow has 0 tests** — the only subproject with none; parser logic (LLMNoticeParser) is the riskiest untested code
+- [ ] **legacyleads `/listings` mock data** → real MLS/property-data
+- [ ] **main CRM `tsconfig.json` has `ignoreBuildErrors: true`** — type errors ship silently; tighten gradually
+- [ ] **API keys still unwired**: Twilio, SendGrid/Resend, Stripe, Google Maps, HubSpot OAuth, BS&A, Magnific, OpenAI (embeddings/voice)
+- [ ] 10 redundant remote feature branches safe to delete (`git push origin --delete <branch>`)
