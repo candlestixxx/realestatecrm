@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import { createProviderClient } from '@/lib/ai/llm-providers';
+import { deepSeekCompletion } from '@/lib/ai/deepseek';
 
 /**
  * AI Lead Qualification Engine
@@ -64,25 +65,40 @@ Respond with ONLY a JSON object:
 {"score": <0-100>, "grade": "HOT|WARM|COLD", "reasoning": "<2-3 sentence explanation>", "factors": {"contact_completeness": <0-15>, "engagement": <0-20>, "interaction_depth": <0-15>, "status_quality": <0-20>, "follow_up": <0-10>, "freshness": <0-10>, "source_quality": <0-10>}}`;
 
   try {
-    // Try LLM-based scoring
-    const apiKeyRecord = await prisma.apiKey.findFirst({ where: { provider: 'openai' } });
-    if (apiKeyRecord) {
-      const { decrypt } = await import('@/lib/encryption');
-      const key = decrypt(apiKeyRecord.key);
-      const client = createProviderClient('openai', 'gpt-4o-mini', key);
-      const result = await client.complete({
+    // Try LLM-based scoring — prefer DeepSeek (single platform LLM), then vault key.
+    let resultText: string | null = null;
+    let modelUsed = 'deepseek-chat';
+    if (process.env.DEEPSEEK_API_KEY) {
+      resultText = await deepSeekCompletion({
         prompt,
         system: 'You are a real estate lead scoring AI. Respond only with valid JSON.',
       });
+    } else {
+      const apiKeyRecord =
+        (await prisma.apiKey.findFirst({ where: { provider: 'deepseek' } })) ??
+        (await prisma.apiKey.findFirst({ where: { provider: 'openai' } }));
+      if (apiKeyRecord) {
+        const { decrypt } = await import('@/lib/encryption');
+        const key = decrypt(apiKeyRecord.key);
+        const provider = apiKeyRecord.provider === 'deepseek' ? 'deepseek' : 'openai';
+        modelUsed = apiKeyRecord.provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o-mini';
+        const client = createProviderClient(provider, modelUsed, key);
+        resultText = (await client.complete({
+          prompt,
+          system: 'You are a real estate lead scoring AI. Respond only with valid JSON.',
+        })).text;
+      }
+    }
 
-      const parsed = JSON.parse(result.text);
+    if (resultText) {
+      const parsed = JSON.parse(resultText);
       const qualification = {
         leadId,
         score: Math.min(100, Math.max(0, parsed.score || 0)),
         grade: parsed.grade || (parsed.score >= 70 ? 'HOT' : parsed.score >= 40 ? 'WARM' : 'COLD'),
         reasoning: parsed.reasoning || '',
         factors: JSON.stringify(parsed.factors || {}),
-        model: 'gpt-4o-mini',
+        model: modelUsed,
       };
 
       await prisma.leadQualification.create({ data: qualification });

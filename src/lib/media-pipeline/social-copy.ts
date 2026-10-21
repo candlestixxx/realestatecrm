@@ -17,7 +17,7 @@ export class SocialCopyService {
     highlights: string[]
   ): Promise<string> {
     const prompt = this.buildPrompt(address, stage, highlights);
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY;
 
     // Fallback template when no API keys are present (CI/CD / local mock mode)
     if (!apiKey) {
@@ -25,14 +25,21 @@ export class SocialCopyService {
       return `Check out this amazing property at ${address}! Status: ${stage}. ${highlightsText} #RealEstate #ExcelLegacyTeam`;
     }
 
+    // DeepSeek (default) or OpenAI — both are OpenAI-compatible.
+    const baseUrl = process.env.DEEPSEEK_API_KEY
+      ? 'https://api.deepseek.com/v1'
+      : 'https://api.openai.com/v1';
+    const model = process.env.DEEPSEEK_API_KEY ? (process.env.DEEPSEEK_MODEL || 'deepseek-chat') : 'gpt-4';
+    const providerLabel = process.env.DEEPSEEK_API_KEY ? 'DeepSeek' : 'OpenAI';
+
     try {
       // Execute live API request
       const response = await fetch(
-        'https://api.openai.com/v1/chat/completions',
+        `${baseUrl}/chat/completions`,
         {
           method: 'POST',
           body: JSON.stringify({
-            model: 'gpt-4',
+            model,
             messages: [
               {
                 role: 'system',
@@ -59,9 +66,9 @@ export class SocialCopyService {
         }
       }
 
-      return `[API_ERROR] Unexpected payload format from OpenAI`;
+      return `[API_ERROR] Unexpected payload format from ${providerLabel}`;
     } catch (error) {
-      return `[API_ERROR] Failed to fetch live completion from OpenAI`;
+      return `[API_ERROR] Failed to fetch live completion from ${providerLabel}`;
     }
   }
 

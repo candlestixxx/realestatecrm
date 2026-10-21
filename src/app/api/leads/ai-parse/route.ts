@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
-import { google } from '@ai-sdk/google';
 import { generateObject } from 'ai';
 import { z } from 'zod';
+import { getDeepSeekModel } from '@/lib/ai/deepseek';
 
 export const runtime = 'nodejs';
 
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { object: parsedData } = await generateObject({
-      model: google('gemini-2.0-flash-001'),
+      model: getDeepSeekModel(),
       system: 'You are an expert real estate AI data extraction agent. Extract structured lead details from the given text message or email.',
       prompt: `Analyze the following text and extract details as JSON matching the schema.\nText:\n"""\n${text}\n"""`,
       schema: leadSchema,
