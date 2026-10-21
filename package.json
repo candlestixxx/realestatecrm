@@ -9,6 +9,7 @@
     "prestart": "node scripts/kill-port.js 3000",
     "start": "next start -p 3000",
     "lint": "eslint",
+    "test": "node --test --test-concurrency=1 tests/*.test.mts",
     "format": "prettier --write \".\"",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
