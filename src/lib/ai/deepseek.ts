@@ -67,7 +67,9 @@ export async function deepSeekCompletion(opts: {
       model: DEEPSEEK_MODEL,
       messages,
       temperature: opts.temperature ?? 0.7,
-      max_tokens: opts.maxTokens ?? 1024,
+      // V4 reasoning models spend part of this budget on reasoning_content —
+      // keep the floor generous so the visible answer is never truncated.
+      max_tokens: opts.maxTokens ?? 4096,
     }),
   });
 
@@ -79,3 +81,17 @@ export async function deepSeekCompletion(opts: {
   const data = await res.json();
   return data.choices?.[0]?.message?.content ?? '';
 }
+
+/**
+ * NOTE on V4 reasoning models: both `deepseek-flash` (aka deepseek-v4-flash)
+ * and `deepseek-v4-pro` emit `reasoning_content` before `content`, and those
+ * reasoning tokens count against `max_tokens`. Budgets must be generous
+ * (default raised to 4096) or `content` comes back empty with
+ * `finish_reason: "length"`. Verified live 2026-10-21.
+ *
+ * Verified DeepSeek V4 API capabilities (live tests):
+ * - response_format json_object: SUPPORTED
+ * - response_format json_schema: REJECTED ("This response_format type is
+ *   unavailable now") — always pass mode:'json' to generateObject.
+ * - Tool calling: SUPPORTED (incl. parallel tool calls)
+ */

@@ -43,6 +43,9 @@ export async function POST(req: NextRequest) {
 
     const { object: parsedData } = await generateObject({
       model: getDeepSeekModel(),
+      // DeepSeek V4 rejects response_format json_schema ("unavailable now");
+      // mode:'json' uses json_object which is supported. Verified live.
+      mode: 'json',
       system: 'You are an expert real estate AI data extraction agent. Extract structured lead details from the given text message or email.',
       prompt: `Analyze the following text and extract details as JSON matching the schema.\nText:\n"""\n${text}\n"""`,
       schema: leadSchema,
