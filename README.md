@@ -4,7 +4,8 @@ An AI-powered CRM and business operating system for **Excel Legacy Realty Group*
 
 ## Architecture
 
-This is the **main dashboard** (ealestatecrm) that hosts the unified UI and serves as the single entry point. Five sub-projects live as git submodules under pps/ and appear as subpages in the dashboard:
+This is the **main dashboard** (
+ealestatecrm) that hosts the unified UI and serves as the single entry point. Five sub-projects live as git submodules under pps/ and appear as subpages in the dashboard:
 
 | Submodule | Repo | Purpose |
 |-----------|------|---------|
@@ -29,12 +30,12 @@ The orchestration layer inside this CRM (formerly codenamed "HyperNexus") provid
 
 ## Tech Stack
 
-- **Frontend:** Next.js 15 (App Router) + Tailwind CSS + shadcn/ui
-- **Backend:** Next.js API routes + tRPC
+- **Frontend:** Next.js 16 (App Router) + Tailwind CSS + shadcn/ui
+- **Backend:** Next.js API routes
 - **Database:** SQLite via Prisma ORM
 - **Auth:** NextAuth.js
-- **AI:** OpenAI GPT-4o-mini, ElevenLabs voice
-- **Queues:** BullMQ (Redis)
+- **AI:** DeepSeek V4 (flash/pro) — all chat & completion calls; OpenAI retained for embeddings (RAG) + TTS/STT voice
+- **Queues:** BullMQ (Redis) — legacyleads/media-workflow
 - **Vector Search:** Pinecone / LanceDB
 
 ## Getting Started
@@ -92,7 +93,7 @@ realestatecrm/
 │   ├── components/       # React components
 │   └── lib/              # Utilities, Prisma client, RAG, AI helpers
 ├── prisma/
-│   ├── schema.prisma     # Database schema (29 models)
+│   ├── schema.prisma     # Database schema (40 models)
 │   └── seed.mjs          # Demo data seeder
 ├── apps/                 # Git submodules (sub-projects)
 │   ├── leadg/
@@ -109,8 +110,7 @@ realestatecrm/
 | Document | Description |
 |----------|-------------|
 | [VISION.md](VISION.md) | Product vision & goals |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Development roadmap |
-| [docs/PRD.md](docs/PRD.md) | Product requirements |
+| [ROADMAP.md](ROADMAP.md) | Development roadmap |
 | [IDEAS_PRESERVATION.md](IDEAS_PRESERVATION.md) | All features across all repos |
 | [DEPLOY.md](DEPLOY.md) | Deployment guide |
 | [HANDOFF.md](HANDOFF.md) | Agent handoff notes |
