@@ -1,3 +1,16 @@
+## v0.58.55 (2026-10-21)
+
+### Removed — all mock/placeholder data (production live-data readiness)
+- **Main CRM**: skip-trace now uses real Twilio Lookup + Whitepages Pro cascade; property-data returns 503 when BS&A/Realcomp unconfigured (was fabricating a fake parcel record); avatar returns 503 (was fake `wss://` stream URL); mls-scrub suppresses only on real listings (`?simulate=true` = dry run; was fabricating MLS numbers/prices); agents/handshake requires AGENT_SECRET (was accepting any token) and enrolls campaigns for real (was fake success); workflow forms default empty instead of pre-filled fake buyers/sellers; demo record seeding opt-in via `DEMO_SEED=true`.
+- **contentplanner**: AI providers throw explicit config errors (was returning "Mocked ... generation"); real Tavily/NewsAPI/RSS research providers; notifications/video/podcast routes persist to real Prisma tables (were in-memory stores with fabricated data); social OAuth does real code→token exchange (was MOCK_*_CLIENT_ID + fake connected accounts); **auth middleware now validates HS256 JWTs** (was attaching a mock OWNER user to every request — security fix); WebSocket broadcasts real queue counts (was random numbers).
+- **leadg**: adapters fail explicitly when unconfigured (were silently returning fake success via Mock*Providers); Vapi phone number ID + server URL from env (were placeholder strings); warm transfer executes for real; appointment dates extracted via LLM (was hardcoded "tomorrow"); call summaries report "Not provided" for missing fields (was fabricated motivation/timeline).
+- **legacyleads**: `/listings` real PostGIS query (was MOCK-123); skip-trace cascade uses Twilio/Whitepages/PeopleDataLabs (was 3 mock providers with 555-xxxx phones); AI Sync queue pulls real geofence leads (was hardcoded address).
+- **media-workflow**: Canva/Magnific integrations throw when unconfigured (were returning fake export paths/URLs); social publishing marks posts Failed without tokens (was marking Published with fake URLs); JustSold pipeline wires the real Canva export.
+- **foreclosureworkflow**: real BS&A tax-assessor scraping (was hardcoded "123 Resolved Main St").
+
+### Tests
+- 116 passing across 4 submodules (contentplanner 35, media-workflow 60, leadg 9, legacyleads 12) — rewritten against the live-provider contracts with network/SDK mocked at the boundary.
+
 ## v0.58.54 (2026-10-21)
 
 ### Fixed

@@ -1,3 +1,40 @@
+## v0.58.55 — Mock/Placeholder Data Purge (2026-10-21)
+
+**Task:** Remove all placeholder/mock data across main CRM + 5 submodules; wire everything for production live data.
+
+### What was found and fixed (13 clusters)
+
+**Fabricated data returned as real:**
+1. main `property-data` — invented full parcel records (assessed values, owner "Smith, John & Jane") when keys missing → now 503 with explicit config error
+2. main `skip-trace` — 2 fake providers → real Twilio Lookup + Whitepages Pro
+3. main `avatar` — fake `wss://mock-avatar-stream.example.com` → 503
+4. main `mls-scrub` — invented MLS numbers/prices into activity log → real listings only, dry-run mode
+5. legacyleads `/listings` + `/augmentpropertyrecord` — MOCK-123/John Doe/555-0100 → real PostGIS + live skip-trace (Twilio/Whitepages/PDL)
+6. legacyleads skiptrace — 3 mock providers → live providers with credit tiers preserved
+7. media-workflow — fake `mock_canva_export_*.jpg`/`mock_magnific_buffer_*` paths treated as real assets downstream → throw when unconfigured
+8. media-workflow SocialPublishing — posts marked **Published** with `mock_facebook_url_*` (fake engagement) → marks Failed without tokens
+9. contentplanner notifications/videos/podcasts — in-memory stores with fabricated "campaign ends in 2 days" data → real Prisma tables
+10. contentplanner research — MockSearchProvider etc. returned fake articles → real Tavily/NewsAPI/RSS/URL providers (mocks kept as TEST-ONLY)
+11. contentplanner social — `MOCK_TW_CLIENT_ID` + fake connected accounts → real OAuth code→token exchange + SocialAccount persistence
+12. leadg adapters — ALL providers (Vapi/SendGrid/Twilio/Lob/GCal) silently fell back to Mock*Provider returning `true` (fake success) → explicit failures
+13. main `crm-records`/`crm-view-model` — workflow forms pre-filled "Jordan Smith"/"412 Lakeview Dr"/$385,000 → empty fields; demo seed opt-in `DEMO_SEED=true`
+
+**Security fixes (same purge):**
+- contentplanner `requireAuth` attached `{ id: 'mock_user_id', role: 'OWNER' }` to EVERY request (any caller had owner access) → real HS256 JWT verification via node:crypto (dependency-free)
+- main `agents/handshake` accepted any token when AGENT_SECRET unset → now required
+- contentplanner WebSocket broadcast random fake queue numbers every 5s → real Prisma counts
+
+**LLM-powered replacements:** leadg appointment dates extracted via `extractAppointmentDate()` (was hardcoded "tomorrow"); video scripts get real structured generation (was hardcoded hook/cta wrapper).
+
+### Verified
+- Tests: **116 passing** (contentplanner 35, media-workflow 60, leadg 9, legacyleads 12) — rewritten against live-provider contracts with network mocked at SDK boundary
+- Root build green; media-workflow build green
+
+### Env keys now required for full function (documented per service)
+`DEEPSEEK_API_KEY` (done), `SKIP_TRACE_TWILIO_ACCOUNT_SID/AUTH_TOKEN` or `SKIP_TRACE_WHITEPAGES_API_KEY` or `SKIP_TRACE_PDL_API_KEY`, `BSA_API_KEY` or `REALCOMP_API_KEY`, `HEYGEN_API_KEY`/`DID_API_KEY`, `AGENT_SECRET`, `CANVA_API_KEY`, `MAGNIFIC_API_KEY`, `TAVILY_API_KEY`, `NEWSAPI_KEY`, `TWITTER/LINKEDIN/META_CLIENT_ID+SECRET`, `BROWSERLESS_WS_ENDPOINT`, Vapi/Twilio/SendGrid/Lob/Google Calendar per-user integration settings.
+
+---
+
 ## v0.58.54 — Full DeepSeek V4 rollout + prod fixes (2026-10-21)
 
 **Task:** Deploy DeepSeek everywhere, fix login redirect, probe DeepSeek endpoints.
