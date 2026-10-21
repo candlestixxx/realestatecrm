@@ -1,3 +1,14 @@
+## v0.58.52 (2026-10-17)
+
+### Fixed
+- **LeadG NextAuth Configuration error**: LeadG uses JWT sessions which require `NEXTAUTH_SECRET`, but its standalone server command didn't set it, so `/api/auth/signin` redirected to `/api/auth/error?error=Configuration`. Added `NEXTAUTH_SECRET`/`NEXTAUTH_URL` to all three launchers (`system-tray.ps1`, `start-all.bat`, `start-all.ps1`).
+
+### Changed
+- Archived 8 one-off diagnostic/fix scripts (`add-tooltips.py`, `audit-ui.py`, `code-quality-scan.py`, `extended-scan.py`, `fix-buttons.py`, `fix-console-logs.py`, `fix-localhost-refs.py`, `fix-localhost-refs2.py`) from `scripts/` root into `scripts/archive/` — root now holds only reusable utilities.
+
+### Notes (full-service smoke test)
+- All 9 services start and bind their ports. Two non-fatal warnings: (1) `next start` emits an advisory "output: standalone" warning for the 4 Next.js web apps — they still serve correctly; (2) `media-workflow` and `legacyleads-api` log Redis `ECONNREFUSED` (graceful degradation, already documented).
+
 ## v0.58.51 (2026-10-17)
 
 ### Changed

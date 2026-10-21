@@ -1,3 +1,25 @@
+## v0.58.52 — Continuous Execution: service smoke test + fixes (2026-10-17)
+
+**Task:** Run every component, watch logs, clean up scripts, fix issues, report gaps.
+
+### Completed
+- **Full-service smoke test**: started all 9 services and verified port binding + HTTP responses:
+  - ✅ main-crm (3000) HTTP 200, live-audio (8090), leadg (3001), foreclosure (3002), contentplanner web (3003) + API (3031), media-workflow (3004), legacyleads frontend (3005) + API (3006).
+- **Fixed — LeadG auth bug**: standalone server command lacked `NEXTAUTH_SECRET`, causing `/api/auth/error?error=Configuration`. Added `NEXTAUTH_SECRET` + `NEXTAUTH_URL` to `system-tray.ps1`, `start-all.bat`, `start-all.ps1`. Verified redirect now goes to `/login?callbackUrl=%2F`.
+- **Script cleanup (nondestructive)**: archived 8 one-off diagnostic `.py` scripts into `scripts/archive/`; `scripts/` root now holds only reusable utilities.
+- Version bump **0.58.51 → 0.58.52** + CHANGELOG.
+
+### Known non-fatal warnings (documented, not blockers)
+1. `next start` emits `⚠ "next start" does not work with "output: standalone"` for main-crm, contentplanner, foreclosure, legacyleads-frontend. They still serve correctly (`next start` auto-loads `.env`; the standalone output is used by Hetzner `deploy.sh` which copies static assets into `.next/standalone/`).
+2. `media-workflow` + `legacyleads-api` log Redis `ECONNREFUSED` on 6379 — graceful degradation (no Redis/Memurai installed).
+
+### Recommendations for next session
+- Install Redis/Memurai (or Wire Redis) to activate the media-workflow message broker + legacyleads queue.
+- `legacyleads-api` tray command uses `npx tsx src/index.ts`; `tsx` is not in `backend/package.json` (declared `ts-node --esm`). Consider adding `tsx` to devDependencies or switching the command.
+- Consider switching the 4 standalone-configured web apps to `node .next/standalone/server.js` in the local launchers for parity with the Hetzner deploy path (requires copying `.next/static` into `.next/standalone/` first, as `deploy.sh` already does).
+
+---
+
 ## v0.58.51 — Repository Synchronization & Intelligent Merge (2026-10-17)
 
 **Task:** EXECUTIVE PROTOCOL — comprehensive local/remote repo refresh, recursive submodule sync, dual-direction branch reconciliation, version bump, docs, push, build.
