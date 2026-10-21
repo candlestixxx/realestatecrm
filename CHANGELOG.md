@@ -1,3 +1,14 @@
+## v0.58.54 (2026-10-21)
+
+### Fixed
+- **Post-login redirect bug**: middleware used `req.url` (internal upstream URL `0.0.0.0:3210`) for `callbackUrl`. Now relative (`url.pathname + url.search`) — verified on prod: `callbackUrl=%2Fdashboard`.
+- **Deploy scripts wiped DEEPSEEK_API_KEY**: all 5 `deploy-*.sh` rewrote `.env` with hardcoded values on every deploy. They now preserve `DEEPSEEK*` lines and move old builds to timestamped backups instead of deleting.
+
+### Changed
+- **All 5 sub-services (LeadG, Foreclosure, ContentPlanner, MediaWorkflow, LegacyLeads) rebuilt + redeployed** with DeepSeek V4 LLM code. Live-verified from the server (`SUBSERVICE LIVE` via `deepseek-v4-flash`).
+- Probed DeepSeek V4 endpoints: **no embeddings (404) and no audio (404)** — RAG embeddings + voice TTS/STT confirmed to stay on OpenAI.
+- PM2 error scan post-deploy: 0 new errors on fresh traffic (historical "Failed to find Server Action" lines are stale-browser artifacts from the redeploy).
+
 ## v0.58.53 (2026-10-21)
 
 ### Changed

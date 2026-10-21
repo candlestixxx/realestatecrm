@@ -1,3 +1,24 @@
+## v0.58.54 — Full DeepSeek V4 rollout + prod fixes (2026-10-21)
+
+**Task:** Deploy DeepSeek everywhere, fix login redirect, probe DeepSeek endpoints.
+
+### Completed
+- **All 5 sub-services rebuilt + redeployed** on Hetzner with DeepSeek code (LeadG 3211, Foreclosure 3212, ContentPlanner 3213, MediaWorkflow 3214, LegacyLeads 3215). Live test from server: `SUBSERVICE LIVE` via `deepseek-v4-flash`.
+- **Login redirect bug FIXED**: middleware `callbackUrl` was `req.url` = internal `http://0.0.0.0:3210/...` behind nginx. Now relative path. Prod-verified: `callbackUrl=%2Fdashboard`.
+- **Deploy scripts bug FIXED**: `deploy-*.sh` heredocs wiped `DEEPSEEK_API_KEY` on every deploy. Now preserve `DEEPSEEK*` lines; old builds moved to `/tmp/<svc>-backup-<ts>` (nondestructive).
+- **DeepSeek endpoint probe**: `/v1/embeddings` → 404, `/v1/audio/speech` → 404. RAG embeddings (`src/lib/rag.ts`) + voice (`src/lib/voice.ts`) stay on OpenAI — confirmed correct.
+- PM2 error scan: 0 new errors from fresh traffic. ("Failed to find Server Action" x14 + "InvariantError" x4 are stale-browser-tab artifacts from the redeploy; they don't accumulate.)
+
+### Production state (2026-10-21)
+All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. All LLM calls → DeepSeek V4 (flash default / pro via DEEPSEEK_MODEL).
+
+### Remaining
+- Old tabs show Server Action errors until refreshed (inherent to Next.js redeploys).
+- `deploy-v3.tar.gz` etc. are tracked build artifacts — candidate for .gitignore.
+- Real API keys still missing for: Twilio, SendGrid/Resend, Stripe, Mapbox, HubSpot OAuth, OpenAI (embeddings/voice fallback path).
+
+---
+
 ## v0.58.53 — DeepSeek V4 LLM integration (2026-10-21)
 
 **Task:** Consolidate all LLM calls onto DeepSeek V4 across main CRM + 4 submodules; deploy.
