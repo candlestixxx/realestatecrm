@@ -7,7 +7,7 @@
  * OpenAI-compatible provider (DeepSeek) driven by one env var:
  *
  *   DEEPSEEK_API_KEY  (required)
- *   DEEPSEEK_MODEL    (optional, default "deepseek-chat")
+ *   DEEPSEEK_MODEL    (optional, default "deepseek-v4-flash")
  *
  * DeepSeek is OpenAI-compatible, so we reuse `@ai-sdk/openai`'s
  * `createOpenAI` pointed at DeepSeek's base URL.
@@ -20,7 +20,9 @@
 import { createOpenAI } from '@ai-sdk/openai';
 
 export const DEEPSEEK_BASE_URL = 'https://api.deepseek.com/v1';
-export const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+// Default: deepseek-v4-flash (fast tier). Set DEEPSEEK_MODEL=deepseek-v4-pro
+// for the highest-quality tier where latency is acceptable.
+export const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash';
 
 /** Returns the DeepSeek API key from env, or undefined if unset. */
 export function getDeepSeekApiKey(): string | undefined {

@@ -1,17 +1,16 @@
 ## v0.58.53 (2026-10-21)
 
 ### Changed
-- **DeepSeek as the primary LLM** for all chat/completion calls across the main CRM and 4 submodules (LeadG, ContentPlanner, Foreclosure, MediaWorkflow). Driven by `DEEPSEEK_API_KEY` + `DEEPSEEK_MODEL` (default `deepseek-chat`).
+- **DeepSeek as the primary LLM** for all chat/completion calls across the main CRM and 4 submodules (LeadG, ContentPlanner, Foreclosure, MediaWorkflow). Driven by `DEEPSEEK_API_KEY` + `DEEPSEEK_MODEL` (default `deepseek-v4-flash`; set `deepseek-v4-pro` for the highest-quality tier).
   - Main CRM: AI chat, lead parsing, AgentCore, lead qualification, social copy.
   - LeadG: sentiment/email/score prediction, conversation + reflection engines, Twilio gather/status.
   - ContentPlanner `OpenAIProvider`, Foreclosure `LLMNoticeParser`, MediaWorkflow `SocialCopyService`.
 - All DeepSeek clients are OpenAI-compatible (base URL `https://api.deepseek.com/v1`); OpenAI remains the automatic fallback when `DEEPSEEK_API_KEY` is unset.
 
-### Notes / Limitations (DeepSeek)
-- **No embeddings endpoint** → RAG vector sync stays on OpenAI (`OPENAI_API_KEY`).
-- **No TTS/STT** → voice (`src/lib/voice.ts`) stays on OpenAI.
-- **No `json_schema` structured outputs** → LeadG structured prompts converted to `json_object` mode.
-- `generateObject` (lead parsing) + `streamText` tool-calling need runtime verification with a live key.
+### Notes / Runtime Verification (DeepSeek V4)
+- **Embeddings**: RAG vector sync remains on OpenAI (`OPENAI_API_KEY`) pending confirmation whether DeepSeek V4 exposes an embeddings endpoint — `fallbackEmbedding` covers the gap gracefully.
+- **Voice TTS/STT**: `src/lib/voice.ts` remains on OpenAI pending confirmation DeepSeek has an audio API.
+- **Structured outputs**: LeadG structured prompts use `json_object` mode (works across all DeepSeek generations). `generateObject` (lead parsing) + `streamText` tool-calling to be verified with a live key against `deepseek-v4-flash`.
 
 ## v0.58.52 (2026-10-17)
 

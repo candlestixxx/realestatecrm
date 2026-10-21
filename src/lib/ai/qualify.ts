@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import { createProviderClient } from '@/lib/ai/llm-providers';
-import { deepSeekCompletion } from '@/lib/ai/deepseek';
+import { deepSeekCompletion, DEEPSEEK_MODEL } from '@/lib/ai/deepseek';
 
 /**
  * AI Lead Qualification Engine
@@ -67,7 +67,7 @@ Respond with ONLY a JSON object:
   try {
     // Try LLM-based scoring — prefer DeepSeek (single platform LLM), then vault key.
     let resultText: string | null = null;
-    let modelUsed = 'deepseek-chat';
+    let modelUsed = DEEPSEEK_MODEL;
     if (process.env.DEEPSEEK_API_KEY) {
       resultText = await deepSeekCompletion({
         prompt,
@@ -81,7 +81,7 @@ Respond with ONLY a JSON object:
         const { decrypt } = await import('@/lib/encryption');
         const key = decrypt(apiKeyRecord.key);
         const provider = apiKeyRecord.provider === 'deepseek' ? 'deepseek' : 'openai';
-        modelUsed = apiKeyRecord.provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o-mini';
+        modelUsed = apiKeyRecord.provider === 'deepseek' ? DEEPSEEK_MODEL : 'gpt-4o-mini';
         const client = createProviderClient(provider, modelUsed, key);
         resultText = (await client.complete({
           prompt,

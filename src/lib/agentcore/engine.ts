@@ -8,7 +8,7 @@
 
 import prisma from '@/lib/prisma';
 import { createProviderClient } from '@/lib/ai/llm-providers';
-import { deepSeekCompletion } from '@/lib/ai/deepseek';
+import { deepSeekCompletion, DEEPSEEK_MODEL } from '@/lib/ai/deepseek';
 
 async function callLLM(prompt: string, system?: string): Promise<string | null> {
   // Prefer DeepSeek (single LLM provider for the platform).
@@ -28,7 +28,7 @@ async function callLLM(prompt: string, system?: string): Promise<string | null> 
     const { decrypt } = await import('@/lib/encryption');
     const key = decrypt(apiKeyRecord.key);
     const provider = apiKeyRecord.provider === 'deepseek' ? 'deepseek' : 'openai';
-    const model = apiKeyRecord.provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o-mini';
+    const model = apiKeyRecord.provider === 'deepseek' ? DEEPSEEK_MODEL : 'gpt-4o-mini';
     const client = createProviderClient(provider, model, key);
     const result = await client.complete({ prompt, system });
     return result.text;

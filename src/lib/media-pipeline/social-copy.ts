@@ -29,7 +29,7 @@ export class SocialCopyService {
     const baseUrl = process.env.DEEPSEEK_API_KEY
       ? 'https://api.deepseek.com/v1'
       : 'https://api.openai.com/v1';
-    const model = process.env.DEEPSEEK_API_KEY ? (process.env.DEEPSEEK_MODEL || 'deepseek-chat') : 'gpt-4';
+    const model = process.env.DEEPSEEK_API_KEY ? (process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash') : 'gpt-4';
     const providerLabel = process.env.DEEPSEEK_API_KEY ? 'DeepSeek' : 'OpenAI';
 
     try {
