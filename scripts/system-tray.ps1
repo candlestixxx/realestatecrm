@@ -62,7 +62,7 @@ $Services = [ordered]@{
     'leadg' = @{
         Label = 'LeadG'
         Port = 3001
-        Cmd = 'set PORT=3001 && node .next\standalone\server.js'
+        Cmd = 'set PORT=3001 && set NEXTAUTH_SECRET=dev_secret_change_me && set NEXTAUTH_URL=http://localhost:3001 && node .next\standalone\server.js'
         WorkDir = (Join-Path $Root 'apps\leadg')
         HealthPath = '/auth/signin'
         Log = 'server.log'

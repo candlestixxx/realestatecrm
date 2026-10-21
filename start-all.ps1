@@ -33,7 +33,7 @@ Start-Service "main-crm" 3000 "node node_modules\next\dist\bin\next start -p 300
 Start-Service "live-audio" 8090 "node scripts\live-audio-server.mjs" "."
 
 # Port 3001 — LeadG (standalone Next.js server)
-Start-Service "leadg" 3001 "set PORT=3001 && node .next\standalone\server.js" "apps\leadg"
+Start-Service "leadg" 3001 "set PORT=3001 && set NEXTAUTH_SECRET=dev_secret_change_me && set NEXTAUTH_URL=http://localhost:3001 && node .next\standalone\server.js" "apps\leadg"
 
 # Port 3002 — Foreclosure Workflow (needs NEXTAUTH_SECRET)
 Start-Service "foreclosure" 3002 "set NODE_ENV=production && set PORT=3002 && set NEXTAUTH_SECRET=dev_secret_change_me && set NEXTAUTH_URL=http://localhost:3002 && node start-3002.js" "apps\foreclosureworkflow"
