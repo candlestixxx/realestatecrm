@@ -217,3 +217,17 @@
 - [ ] HubSpot OAuth for `/api/lead-gen/social`
 - [ ] Legacyleads `/listings` mock data to real data
 - [ ] Redis/Memurai for media-workflow MessageBroker
+
+### Repository Sync (2026-10-17, v0.58.51)
+- [x] Fetch all remotes + tags (root + 5 submodules; no nested submodules)
+- [x] Upstream robertpelloni/realestatecrm == origin/main (6d6d1f3) — no merge needed
+- [x] All 5 submodules verified at origin/main with clean working trees
+- [x] All 10 feature branches re-verified fully merged (zero unique commits) — no cherry-pick needed
+- [x] Reconciled start-all.ps1 to canonical 9-service list (ContentPlanner API 3031 + standalone server paths)
+- [x] Version bump → 0.58.51 (fixed package.json/package-lock drift from 0.58.43)
+- [x] Regenerate docs/SUBMODULE_MAP.md + docs/LIBRARIES.md
+
+### Follow-ups for next session
+- [ ] Delete 10 redundant remote feature branches (manual: `git push origin --delete <branch>`)
+- [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
+- [ ] Deploy 8 sub-services to Hetzner

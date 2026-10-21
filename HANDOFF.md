@@ -1,3 +1,31 @@
+## v0.58.51 — Repository Synchronization & Intelligent Merge (2026-10-17)
+
+**Task:** EXECUTIVE PROTOCOL — comprehensive local/remote repo refresh, recursive submodule sync, dual-direction branch reconciliation, version bump, docs, push, build.
+
+### Completed
+
+**STEP 1 — Upstream tracking & submodule sanitization**
+- Fetched all remotes + tags on root and all 5 submodules (no nested submodules exist).
+- Upstream: `robertpelloni/realestatecrm` and `candlestixxx/realestatecrm` resolve to the **identical** `main` HEAD (`6d6d1f3`) — no divergent upstream to merge.
+- All 5 submodules already at `origin/main` with clean working trees — no fast-forward required this pass.
+
+**STEP 2 — Dual-direction intelligent merge engine**
+- Re-interrogated **all 10 feature branches** (local + remote) across submodules. **Result: zero unique commits** — every one is an ancestor of `main` (ahead=0). No forward-merge, cherry-pick, or reverse-merge necessary. Full table in `docs/SUBMODULE_MAP.md`.
+
+**STEP 3 — Cleanup, docs, version, push, build**
+- Reconciled `start-all.ps1` with the canonical 9-service definitions in `scripts/system-tray.ps1`/`start-all.bat`: added ContentPlanner API (3031), switched LeadG to standalone server (`node .next\standalone\server.js`), corrected contentplanner/legacyleads start paths.
+- Version bump **0.58.50 → 0.58.51** across `VERSION.md`, `package.json`, `package-lock.json` (fixed drift — package files were still at 0.58.43), + new CHANGELOG entry.
+- Regenerated `docs/SUBMODULE_MAP.md` + updated `docs/LIBRARIES.md`; added Phase 15 to `ROADMAP.md`; updated `TODO.md`.
+
+### NOT done / left for next agent (deliberately)
+- **10 redundant remote feature branches** NOT deleted (verified safe-to-delete; left intact to honor retention-first policy).
+- **Real API keys + Hetzner deployment** of the 8 sub-services remain outstanding (see `TODO.md`).
+
+### Push status
+- Root commit + push completed after this write (version bump named in commit). No submodule commits were required this pass (all already at `origin/main`).
+
+---
+
 ## v0.58.43 — Repository Synchronization & Intelligent Merge (2026-10-09)
 
 **Task:** EXECUTIVE PROTOCOL — comprehensive local/remote repo refresh, recursive submodule sync, dual-direction branch reconciliation, version bump, docs, push, build.

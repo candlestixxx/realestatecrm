@@ -1,7 +1,18 @@
+## v0.58.51 (2026-10-17)
+
+### Changed
+- Repository synchronization: all 5 submodules verified at `origin/main` (clean working trees, no nested submodules)
+- Upstream `robertpelloni/realestatecrm` confirmed identical to `origin/main` (no divergent upstream to merge)
+- `start-all.ps1` reconciled with canonical service definitions (9 services, standalone Next.js server paths) — added ContentPlanner API (3031), LeadG standalone server, corrected contentplanner/legacyleads start paths
+- Version string synchronized: `package.json`/`package-lock.json` 0.58.43 → 0.58.51 (VERSION.md/CHANGELOG already at 0.58.50)
+
+### Notes
+- All 10 feature branches across submodules re-verified as fully merged (ancestors of `main`, zero unique commits) — no forward/reverse merge required
+
 ## v0.58.50 (2026-10-17)
 
 ### Fixed
-- **Missing React hook imports**: added `useState`/`useEffect`/`useRef` imports to 5 files (marketing-studio, canva, LeadDetailLayoutClient, SettingsTabs) — fixes `ReferenceError: useState is not defined` in production
+- **Missing React hook imports**:** added `useState`/`useEffect`/`useRef` imports to 5 files (marketing-studio, canva, LeadDetailLayoutClient, SettingsTabs) — fixes `ReferenceError: useState is not defined` in production
 - **`/api/posts` 404**: created route for publishing calendar — reads from BlogPost model, maps to calendar's expected shape
 - **`/api/contracts` 400**: fixed payload shape mismatch — UI sends `{ template: { type }, parties, action }` but API expected `{ template, workspaceId, action }`. Now auto-resolves workspaceId from session and normalizes template shape
 - **`/api/chat/rooms` 500**: added try/catch graceful degradation + created missing ChatRoom/ChatParticipant/ChatMessage tables in production SQLite
