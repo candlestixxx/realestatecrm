@@ -263,3 +263,31 @@ curl -sk https://excellegacyrealtygroup.site/           # ? 200/307
 curl -sk https://excellegacyrealtygroup.site/api/auth/session  # ? 200
 ssh hetzner "pm2 logs excellegacyrealtygroup --lines 10 --nostream"
 ```
+
+### Current Production State (verified 2026-10-21, v0.58.52)
+
+| Service | PM2 process | Port | Public path |
+|---|---|---|---|
+| Main CRM | `excellegacyrealtygroup` | 3210 | `/` |
+| LeadG | `leadg` | 3211 | `/leadg/` |
+| Foreclosure | `foreclosure` | 3212 | `/foreclosure/` |
+| ContentPlanner | `contentplanner` | 3213 | `/contentplanner/` |
+| Media Workflow | `media-workflow` | 3214 | `/media-workflow/` |
+| LegacyLeads | `legacyleads` | 3215 | `/legacyleads/` |
+
+- **NEXTAUTH_URL** must be `https://excellegacyrealtygroup.site` (NOT `localhost:3000`).
+- **Redis** runs on `127.0.0.1:6379` (systemd `redis-server`, active). Required by:
+  - `media-workflow` — `src/utils/MessageBroker.ts` (Redis Pub/Sub for background pipeline jobs).
+  - `legacyleads` backend — `src/queue.ts` (BullMQ job queue for AI sync / skip-trace).
+  - (Main CRM rate-limiting is in-memory — no Redis needed.)
+
+### Deploy (main CRM, nondestructive backup-and-swap)
+```bash
+# local: rebuild + package
+npm run build
+python deploy/package-v3.py
+scp deploy-v3.tar.gz hetzner:/tmp/deploy-v3.tar.gz
+
+# server: move old build aside, extract, restart
+ssh hetzner 'cd /var/www/excellegacyrealtygroup && BK=/tmp/ercm-backup-$(date +%s) && mkdir -p $BK && mv .next node_modules server.js middleware.ts package.json static public post-deploy.sh $BK/ 2>/dev/null; tar xzf /tmp/deploy-v3.tar.gz && ln -sfn client node_modules/@prisma/client-2c3a283f134fdcb6 && pm2 restart excellegacyrealtygroup --update-env'
+```
