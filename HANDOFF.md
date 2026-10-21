@@ -1,3 +1,22 @@
+## v0.58.53 — DeepSeek V4 LLM integration (2026-10-21)
+
+**Task:** Consolidate all LLM calls onto DeepSeek V4 across main CRM + 4 submodules; deploy.
+
+### Key findings (verified LIVE against api.deepseek.com)
+- The DeepSeek key lives in **`C:\Users\hyper\.pi\agent\auth.json`** (pi agent config) — NOT on Hetzner. Now copied to local `.env` + all 6 Hetzner service `.env` files.
+- Model IDs: `/v1/models` lists `deepseek-flash` + `deepseek-v4-pro`. `deepseek-v4-flash` works as an alias and resolves server-side to `deepseek-flash`. Default in code: `deepseek-v4-flash`; override with `DEEPSEEK_MODEL=deepseek-v4-pro`.
+- **V4 models are REASONING models**: `reasoning_content` is emitted before `content` and counts against `max_tokens`. Small budgets (1024) returned EMPTY content with `finish_reason: "length"`. Default raised to 4096.
+- **`response_format: json_schema` is REJECTED** ("This response_format type is unavailable now") → `generateObject` must pass `mode: 'json'` (json_object). This was a real runtime bug caught by live testing.
+- `response_format: json_object` and **tool calling both work** on V4.
+
+### What changed
+- Main CRM: `src/lib/ai/deepseek.ts` (new central provider), chat route, ai-parse route (mode:'json'), agentcore, qualify, social-copy.
+- LeadG `llm.ts` + sentiment/conversation/reflection/twilio; ContentPlanner `OpenAIProvider`; Foreclosure `LLMNoticeParser`; MediaWorkflow `SocialCopyService`.
+- Deployed to Hetzner: main CRM v0.58.53 + all 6 services restarted with `DEEPSEEK_API_KEY` in env. Live test returned `DEEPSEEK LIVE`.
+- RAG embeddings + voice TTS/STT remain on OpenAI (DeepSeek V4 embeddings/audio endpoints unverified — probe later).
+
+---
+
 ## v0.58.52 — Continuous Execution: service smoke test + fixes (2026-10-17)
 
 **Task:** Run every component, watch logs, clean up scripts, fix issues, report gaps.
