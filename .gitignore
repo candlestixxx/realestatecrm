@@ -18,6 +18,11 @@ build-out.txt
 build-out2.txt
 build-ws*.txt
 mw-build*.txt
+build-prod*.txt
+build-standalone*.txt
+
+# Deploy artifacts (built tarballs — regenerate with deploy/package-*.py)
+deploy-*.tar.gz
 
 # Database & state files are tracked (retention policy)
 # (dev.db, prisma/dev.db, metamcp.db, *.sqlite are intentionally not ignored)
