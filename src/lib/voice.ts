@@ -4,8 +4,11 @@ export async function synthesizeSpeech(workspaceId: string, text: string): Promi
   const config = await getVoiceConfig(workspaceId);
 
   if (config.provider === 'SIMULATION') {
-    // console.log(`[VoiceForge] [SIMULATION] Synthesizing speech: "${text.substring(0, 50)}..."`);
-    // Return a dummy buffer representing an audio file in simulation mode
+    // Explicit opt-in simulation mode (voice provider set to SIMULATION in
+    // settings — used for demos/CI where no TTS key is configured). The
+    // returned buffer is NOT audible audio; callers must not present it as a
+    // real recording.
+    console.warn('[VoiceForge] SIMULATION provider active — returning non-audio placeholder buffer.');
     return Buffer.from('simulated-audio-data');
   }
 

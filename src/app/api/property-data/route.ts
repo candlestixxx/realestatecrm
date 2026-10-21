@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
   // Try BS&A first
   let propertyData: any = null;
-  let source = 'mock';
+  let source = 'unconfigured';
 
   if (BSA_API_KEY) {
     try {
@@ -60,30 +60,21 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Mock data fallback for development
+  // No provider returned data and no keys configured — return an explicit
+  // configuration error. Never fabricate a fake parcel record (a made-up
+  // tax/assessment record is worse than no data for a real estate CRM).
   if (!propertyData) {
-    propertyData = {
-      parcelId: parcel || 'MAC-26-12-345-678',
-      address: address || '123 Main St, Macomb, MI 48042',
-      city: 'Macomb',
-      state: 'MI',
-      zip: '48042',
-      county: county === 'macomb' ? 'Macomb' : 'Wayne',
-      assessedValue: 185000,
-      taxableValue: 152000,
-      marketValue: 225000,
-      propertyType: 'SINGLE_FAMILY',
-      yearBuilt: 1998,
-      squareFeet: 2100,
-      lotSize: 0.25,
-      bedrooms: 3,
-      bathrooms: 2.5,
-      lastSalePrice: 210000,
-      lastSaleDate: '2022-06-15',
-      owner: 'Smith, John & Jane',
-      taxYear: 2024,
-      homestead: true,
-    };
+    const noKeys = !BSA_API_KEY && !REALCOMP_API_KEY;
+    return NextResponse.json(
+      {
+        success: false,
+        source: 'unconfigured',
+        error: noKeys
+          ? 'Property data requires BSA_API_KEY (BS&A Online) or REALCOMP_API_KEY. Configure one for live tax/assessment lookups.'
+          : 'No property record found for this address/parcel in the configured providers.',
+      },
+      { status: noKeys ? 503 : 404 }
+    );
   }
 
   // Generate prefill payloads based on action

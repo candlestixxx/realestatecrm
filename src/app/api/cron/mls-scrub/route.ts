@@ -6,6 +6,8 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  // ?simulate=true is a DRY RUN: it reports what would be suppressed using
+  // real listing data, but performs no DB mutations and fabricates nothing.
   const simulate = searchParams.get('simulate') === 'true';
 
   try {
@@ -30,13 +32,9 @@ export async function GET(request: Request) {
     for (const lead of leads) {
       if (!lead.contact?.address) continue;
 
-      // 2. Check MLS listing status
-      // We check if there is an active property listing with a matching address in this workspace,
-      // or if "?simulate=true" is passed, we simulate it for testing.
-      let isRelistedActive = false;
-      let mockMlsNum = 'MLS-99482';
-      let mockPrice = 350000;
-
+      // 2. Check MLS listing status against real PropertyListing records.
+      // Only a genuine ACTIVE listing match suppresses a campaign — no
+      // fabricated MLS numbers or prices ever enter the activity log.
       const matchingActiveListing = await prisma.propertyListing.findFirst({
         where: {
           workspaceId: lead.workspaceId,
@@ -45,17 +43,24 @@ export async function GET(request: Request) {
         }
       });
 
-      if (matchingActiveListing) {
-        isRelistedActive = true;
-        mockMlsNum = matchingActiveListing.mlsNumber || 'MLS-LOCAL';
-        mockPrice = matchingActiveListing.price || 0;
-      } else if (simulate && Math.random() > 0.6) {
-        // Randomly simulate 40% matching rate for testing
-        isRelistedActive = true;
-        mockPrice = 385000;
-      }
+      const isRelistedActive = !!matchingActiveListing;
+      const mlsNum = matchingActiveListing?.mlsNumber || 'MLS-LOCAL';
+      const price = matchingActiveListing?.price || 0;
 
       if (isRelistedActive) {
+        if (simulate) {
+          // Dry-run: report only, no writes.
+          stoppedCount++;
+          results.push({
+            leadId: lead.id,
+            address: lead.contact.address,
+            status: 'would-suppress (dry run)',
+            mlsNumber: mlsNum,
+            price
+          });
+          continue;
+        }
+
         // 3. Pause Smart Plan / Campaign
         await prisma.lead.updateMany({
           where: { id: lead.id },
@@ -69,7 +74,7 @@ export async function GET(request: Request) {
         await prisma.activity.create({
           data: {
             type: 'STATUS_CHANGE',
-            content: `⚠️ Campaign auto-suppressed: Property detected as ACTIVE on MLS (${mockMlsNum}) listed at $${mockPrice.toLocaleString()}. Expired outreach stopped.`,
+            content: `⚠️ Campaign auto-suppressed: Property detected as ACTIVE on MLS (${mlsNum}) listed at $${price.toLocaleString()}. Expired outreach stopped.`,
             isPinned: true,
             workspaceId: lead.workspaceId,
             leadId: lead.id
@@ -80,7 +85,7 @@ export async function GET(request: Request) {
         await prisma.systemNotification.create({
           data: {
             title: '🚨 MLS Campaign Suppressed',
-            description: `Address ${lead.contact.address} relisted on MLS for $${mockPrice.toLocaleString()}. Drips paused.`,
+            description: `Address ${lead.contact.address} relisted on MLS for $${price.toLocaleString()}. Drips paused.`,
             type: 'MLS_ALERT',
             workspaceId: lead.workspaceId,
             userId: lead.userId || null
@@ -116,8 +121,8 @@ export async function GET(request: Request) {
           leadId: lead.id,
           address: lead.contact.address,
           status: 'suppressed',
-          mlsNumber: mockMlsNum,
-          price: mockPrice
+          mlsNumber: mlsNum,
+          price: price
         });
       }
     }

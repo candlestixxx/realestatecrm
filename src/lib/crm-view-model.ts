@@ -11,30 +11,33 @@ export type CrmRecordView = {
   workflowType?: string | null;
 };
 
+// Fallback defaults are EMPTY: when no CRM record supplies real data, the
+// form must be filled by the agent — never pre-populated with fabricated
+// names/addresses/prices that would then be saved as real records.
 const offerFallbackDefaults = {
-  buyerName: 'Jordan Smith',
-  propertyAddress: '412 Lakeview Dr',
-  offerPrice: '385000',
-  earnestMoney: '10000',
-  closingDate: '2026-06-30',
-  financingType: 'Conventional',
-  contingencies: 'Inspection, appraisal, financing',
-  inclusions: 'Refrigerator, range, washer, dryer',
-  agentNotes: 'Use recent comparable sales to support the price band.',
+  buyerName: '',
+  propertyAddress: '',
+  offerPrice: '',
+  earnestMoney: '',
+  closingDate: '',
+  financingType: '',
+  contingencies: '',
+  inclusions: '',
+  agentNotes: '',
 };
 
 const listingFallbackDefaults = {
-  sellerName: 'Taylor Johnson',
-  propertyAddress: '412 Lakeview Dr',
-  listingPrice: '399000',
-  beds: '4',
-  baths: '2.5',
-  squareFeet: '2410',
-  lotSize: '0.28',
-  propertyType: 'Single Family',
+  sellerName: '',
+  propertyAddress: '',
+  listingPrice: '',
+  beds: '',
+  baths: '',
+  squareFeet: '',
+  lotSize: '',
+  propertyType: '',
   status: 'Draft',
-  remarks: 'Bright kitchen, updated flooring, and a private backyard.',
-  showingInstructions: 'Lockbox on side door; schedule 24 hours ahead.',
+  remarks: '',
+  showingInstructions: '',
 };
 
 export function buildOfferDefaultsFromView(record: CrmRecordView | null): Record<string, string> {
@@ -72,13 +75,13 @@ export function buildListingDefaultsFromView(record: CrmRecordView | null): Reco
 export function buildOfferSummaryItemsFromView(record: CrmRecordView | null) {
   const payload = record?.payload ?? {};
   return [
-    { label: 'Buyer', value: payload.buyerName ?? offerFallbackDefaults.buyerName, source: 'CRM' },
-    { label: 'Property', value: payload.propertyAddress ?? offerFallbackDefaults.propertyAddress, source: 'CRM' },
+    { label: 'Buyer', value: payload.buyerName || 'Not provided', source: 'CRM' },
+    { label: 'Property', value: payload.propertyAddress || 'Not provided', source: 'CRM' },
     { label: 'Deal stage', value: record?.status ?? 'Offer drafting', source: 'Workflow' },
     {
       label: 'Source provenance',
-      value: record?.sourceSystem ?? 'MiRealSource + Realist',
-      source: record?.sourceRecordId ? 'Tracked' : 'Mock',
+      value: record?.sourceSystem ?? 'No source record linked',
+      source: record?.sourceRecordId ? 'Tracked' : 'Untracked',
       accent: true,
     },
   ];
@@ -87,13 +90,13 @@ export function buildOfferSummaryItemsFromView(record: CrmRecordView | null) {
 export function buildListingSummaryItemsFromView(record: CrmRecordView | null) {
   const payload = record?.payload ?? {};
   return [
-    { label: 'Seller', value: payload.sellerName ?? listingFallbackDefaults.sellerName, source: 'CRM' },
-    { label: 'Listing', value: payload.propertyAddress ?? listingFallbackDefaults.propertyAddress, source: 'CRM' },
+    { label: 'Seller', value: payload.sellerName || 'Not provided', source: 'CRM' },
+    { label: 'Listing', value: payload.propertyAddress || 'Not provided', source: 'CRM' },
     { label: 'Agreement', value: record?.status ?? 'Draft', source: 'Docs' },
     {
       label: 'Source provenance',
-      value: record?.sourceSystem ?? 'MLS + BS&A + Realcomp',
-      source: record?.sourceRecordId ? 'Tracked' : 'Mock',
+      value: record?.sourceSystem ?? 'No source record linked',
+      source: record?.sourceRecordId ? 'Tracked' : 'Untracked',
       accent: true,
     },
   ];
@@ -105,7 +108,7 @@ export function buildOfferActivitySeedFromView(record: CrmRecordView | null) {
       title: 'Loaded from live CRM record',
       detail: record
         ? `Offer workflow is opening from ${record.displayName}.`
-        : 'Open offer workflow loaded with mock CRM and source context.',
+        : 'Open offer workflow started without a linked CRM record — enter details manually.',
       timestamp: 'Now',
     },
     {
@@ -122,7 +125,7 @@ export function buildListingActivitySeedFromView(record: CrmRecordView | null) {
       title: 'Loaded from live CRM record',
       detail: record
         ? `Listing workflow is opening from ${record.displayName}.`
-        : 'Interactive listing workflow opened with mock property data and source provenance.',
+        : 'Listing workflow started without a linked CRM record — enter details manually.',
       timestamp: 'Now',
     },
     {

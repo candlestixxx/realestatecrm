@@ -200,8 +200,11 @@ export default function LeadMapPage() {
                         body: JSON.stringify({ address: selectedLead.address, leadId: selectedLead.id }),
                       });
                       const data = await res.json();
+                      const isMock = String(data?.match?.provider || '').includes('mock');
                       if (data.match?.found) {
-                        toast.success(`Skip trace found: ${data.match.name || 'contact info'}`);
+                        toast.success(
+                          `Skip trace found: ${data.match.name || 'contact info'}` + (isMock ? ' (demo data — wire a skip-trace key for live results)' : '')
+                        );
                       } else {
                         toast('No additional info found', { icon: 'ℹ️' });
                       }

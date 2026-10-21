@@ -5,10 +5,12 @@
 import { useState } from 'react';
 import { Video, Play, Loader2, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import SourceBadge from '@/components/SourceBadge';
 
 export default function AvatarPage() {
   const [action, setAction] = useState('create-session');
   const [result, setResult] = useState<string | null>(null);
+  const [resultProvider, setResultProvider] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleAction() {
@@ -21,6 +23,7 @@ export default function AvatarPage() {
       });
       const data = await res.json();
       setResult(data.message || data.error || JSON.stringify(data).substring(0, 200));
+      setResultProvider(data.provider || (data.error ? 'error' : null));
     } finally { setLoading(false); }
   }
 
@@ -43,7 +46,12 @@ export default function AvatarPage() {
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />} Run
           </button>
         </div>
-        {result && <p className="mt-4 text-sm text-muted-foreground">{result}</p>}
+        {result && (
+          <div className="mt-4 flex items-start gap-2">
+            {resultProvider && <SourceBadge source={resultProvider} />}
+            <p className="text-sm text-muted-foreground">{result}</p>
+          </div>
+        )}
       </div>
     </TooltipProvider>
   );

@@ -74,20 +74,29 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Mock response for development
-    return NextResponse.json({
-      provider: 'mock',
-      sessionId: 'mock-session-' + Date.now(),
-      streamUrl: 'wss://mock-avatar-stream.example.com/live',
-      status: 'created',
-      message: 'Configure HEYGEN_API_KEY or DID_API_KEY for live avatars',
-    });
+    // No provider key configured — return an explicit configuration error.
+    // Never fabricate a fake session/stream URL (a wss:// mock endpoint would
+    // silently fail in the UI and mislead operators about live capability).
+    return NextResponse.json(
+      {
+        provider: 'unconfigured',
+        status: 'unavailable',
+        error: 'Avatar streaming requires HEYGEN_API_KEY or DID_API_KEY. Set one in the environment to enable live avatars.',
+      },
+      { status: 503 }
+    );
   }
 
   if (action === 'speak') {
     // Validate text before using .length — undefined text crashes with 500
     if (!text || typeof text !== 'string') {
       return NextResponse.json({ error: 'text is required for speak action' }, { status: 400 });
+    }
+    if (!HEYGEN_API_KEY && !DID_API_KEY) {
+      return NextResponse.json(
+        { provider: 'unconfigured', error: 'Avatar streaming requires HEYGEN_API_KEY or DID_API_KEY.' },
+        { status: 503 }
+      );
     }
     // Send text to avatar for lip-sync
     return NextResponse.json({

@@ -11,9 +11,16 @@ export async function POST(request: Request) {
     }
     const { agentName, token, action, payload } = body;
 
-    // Simple authentication handshake (accepting a mock or sandbox token)
-    const isAuthorized = !process.env.AGENT_SECRET || token === process.env.AGENT_SECRET;
-    if (!isAuthorized) {
+    // Agent authentication. AGENT_SECRET is REQUIRED in production — when
+    // unset we reject instead of accepting arbitrary tokens (the previous
+    // "accept if unset" behavior was effectively mock auth).
+    if (!process.env.AGENT_SECRET) {
+      return NextResponse.json(
+        { error: 'Agent handshake unavailable: AGENT_SECRET is not configured.' },
+        { status: 503 }
+      );
+    }
+    if (token !== process.env.AGENT_SECRET) {
       return NextResponse.json({ error: 'Unauthorized agent signature.' }, { status: 401 });
     }
 
@@ -61,12 +68,27 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ success: true, leadId: newLead.id, contactId: contact.id });
 
-      case 'TRIGGER_SMART_PLAN':
+      case 'TRIGGER_SMART_PLAN': {
         if (!payload || !payload.leadId || !payload.campaignId) {
           return NextResponse.json({ error: 'Missing leadId or campaignId' }, { status: 400 });
         }
-        // Mock success for campaign enrollments triggered by external agents
-        return NextResponse.json({ success: true, message: `Lead ${payload.leadId} successfully enrolled in Campaign ${payload.campaignId}` });
+        // Real enrollment — validate the lead exists, then create the
+        // enrollment record. (This previously returned a fabricated success
+        // message without enrolling anything.)
+        const lead = await prisma.lead.findUnique({ where: { id: payload.leadId } });
+        if (!lead) {
+          return NextResponse.json({ error: `Lead ${payload.leadId} not found` }, { status: 404 });
+        }
+        const plan = await prisma.smartPlan.findUnique({ where: { id: payload.campaignId } });
+        if (!plan) {
+          return NextResponse.json({ error: `Campaign ${payload.campaignId} not found` }, { status: 404 });
+        }
+        await prisma.lead.update({
+          where: { id: payload.leadId },
+          data: { smartPlanId: payload.campaignId },
+        });
+        return NextResponse.json({ success: true, message: `Lead ${payload.leadId} enrolled in Campaign ${payload.campaignId}` });
+      }
 
       default:
         return NextResponse.json({ error: `Unsupported agent action: ${action}` }, { status: 400 });
