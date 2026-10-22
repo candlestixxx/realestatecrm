@@ -73,7 +73,9 @@ export async function POST(request: NextRequest) {
       workspaceId: context.workspaceId,
     };
 
-    const contentServiceUrl = process.env.CONTENT_SERVICE_URL || process.env.NEXT_PUBLIC_CONTENT_PLANNER_URL || 'http://localhost:3008';
+    // Server-side call to the ContentPlanner API. CONTENT_SERVICE_URL points
+    // at the API's internal origin (Express on 3031 locally / 3216 on Hetzner).
+    const contentServiceUrl = process.env.CONTENT_SERVICE_URL || 'http://127.0.0.1:3031';
     try {
       const resp = await fetch(`${contentServiceUrl}/api/generate`, {
         method: 'POST',

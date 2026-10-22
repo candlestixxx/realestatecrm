@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { contentPlannerApiUrl } from '@/lib/contentplanner-api';
 import Link from 'next/link';
 
 const TOOLS = [
@@ -83,9 +84,9 @@ function MarketingStats() {
 
   useEffect(() => {
     Promise.allSettled([
-      fetch('http://localhost:3031/posts').then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('http://localhost:3031/campaigns').then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('http://localhost:3031/analytics').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+      fetch(contentPlannerApiUrl('/posts')).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(contentPlannerApiUrl('/campaigns')).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(contentPlannerApiUrl('/analytics')).then(r => r.ok ? r.json() : {}).catch(() => ({})),
     ]).then(([postsRes, campaignsRes, analyticsRes]) => {
       const posts = postsRes.status === 'fulfilled' && Array.isArray(postsRes.value) ? postsRes.value : [];
       const campaigns = campaignsRes.status === 'fulfilled' && Array.isArray(campaignsRes.value) ? campaignsRes.value : [];
@@ -151,7 +152,7 @@ function ContentPlannerNotifications() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:3031/notifications')
+    fetch(contentPlannerApiUrl('/notifications'))
       .then(r => r.ok ? r.json() : [])
       .then((data: Array<{ id: string; message: string; read: boolean; createdAt: string }>) => setNotifs(Array.isArray(data) ? data : []))
       .catch(() => setNotifs([]))
@@ -199,8 +200,8 @@ function ContentPipeline() {
 
   useEffect(() => {
     Promise.allSettled([
-      fetch('http://localhost:3031/video-projects').then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('http://localhost:3031/podcasts').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(contentPlannerApiUrl('/video-projects')).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(contentPlannerApiUrl('/podcasts')).then(r => r.ok ? r.json() : []).catch(() => []),
     ]).then(([vidRes, podRes]) => {
       if (vidRes.status === 'fulfilled' && Array.isArray(vidRes.value)) setVideos(vidRes.value);
       if (podRes.status === 'fulfilled' && Array.isArray(podRes.value)) setPodcasts(podRes.value);

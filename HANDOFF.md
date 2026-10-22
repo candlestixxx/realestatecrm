@@ -1,3 +1,35 @@
+## v0.58.56 — Full deployment + Prisma engine + API discovery (2026-10-22)
+
+**Task:** Deploy all to Hetzner, commit/push all.
+
+### Deployed
+All 7 services green on https://excellegacyrealtygroup.site (PM2):
+| Service | Port | Public path |
+|---|---|---|
+| Main CRM | 3210 | `/` |
+| LeadG | 3211 | `/leadg/` |
+| Foreclosure | 3212 | `/foreclosure/` |
+| ContentPlanner web | 3213 | `/contentplanner/` |
+| MediaWorkflow | 3214 | `/media-workflow/` |
+| LegacyLeads | 3215 | `/legacyleads/` |
+| **ContentPlanner API** | **3216** | **`/contentplanner-api/`** (WebSocket proxied) |
+
+### Real bugs found during deployment
+1. **PrismaClientInitializationError on Hetzner** (contentplanner/leadg): Windows builds only packaged `query_engine-windows.dll`. Fix: `binaryTargets = [native, windows, debian-openssl-3.0.x]` in all 3 non-main schemas (main already had it). Verified: error log clean after redeploy.
+2. **ContentPlanner Express API was never deployed** — the dashboard's marketing-studio/social pages fetched `http://localhost:3031` (hardcoded — fails in every browser) from an API that didn't exist in production. Fixed BOTH sides: new PM2 service + nginx `/contentplanner-api/` proxy (WS support), and `contentPlannerApiUrl()` helper replacing 9 hardcoded URLs.
+3. **contentplanner schema/URL mismatch** — schema is postgresql but .env had `file:./prisma/dev.db`. Provisioned a real Postgres DB on Hetzner (`contentplanner` user + database; password in `/root/.contentplanner-pgpass`) and wired web + API to it. Tables created via `prisma db push`.
+4. **Undeclared deps** — `dotenv`/`tsx` worked locally only via hoisting; fresh server installs failed. `@next/swc-win32-x64-msvc` in dependencies caused EBADPLATFORM on Linux (moved to optionalDependencies).
+
+### New deploy artifacts
+- `deploy/package-contentplanner-api.py` — packages ALL workspace packages (api imports @contentcommand/billing etc.)
+- `deploy/deploy-contentplanner-api.sh` — source-based deploy (npm install on server fetches Linux engines; prisma generate + db push; preserves DeepSeek env)
+
+### Ops knowledge
+- Postgres on Hetzner: accessible via `su postgres -c "psql ..."` (switching from root is sufficient; no elevated rights needed). contentplanner password in `/root/.contentplanner-pgpass`.
+- pm2 logs accumulate across restarts — `pm2 flush <svc>` before verifying fixes.
+
+---
+
 ## v0.58.55 — Mock/Placeholder Data Purge (2026-10-21)
 
 **Task:** Remove all placeholder/mock data across main CRM + 5 submodules; wire everything for production live data.

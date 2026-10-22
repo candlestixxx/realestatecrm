@@ -1,3 +1,18 @@
+## v0.58.56 (2026-10-22)
+
+### Added
+- **ContentPlanner Express API deployed on Hetzner** (PM2 `contentplanner-api`, port 3216, public at `/contentplanner-api/` with WebSocket proxying). Previously undeployed — the dashboard's Content Pipeline, notifications, engagement, video/podcast panels silently fetched from a nonexistent service in production.
+- ContentPlanner Postgres database provisioned on Hetzner (was SQLite URL with a postgres-only schema — every DB call would fail).
+
+### Fixed
+- **Prisma Linux engines**: contentplanner/leadg/foreclosure schemas now declare `binaryTargets = [native, windows, debian-openssl-3.0.x]` — Windows builds only packaged `query_engine-windows.dll`, so every DB call on Hetzner threw `PrismaClientInitializationError`.
+- Dashboard hardcoded `http://localhost:3031` fetches (marketing-studio ×6, social ×3) → relative `/contentplanner-api/` via `contentPlannerApiUrl()` helper (works on any host; local dev via `NEXT_PUBLIC_CONTENT_PLANNER_API_URL`).
+- `trigger/content` route fallback URL fixed (stale port 3008 → `127.0.0.1:3031`).
+- contentplanner: `dotenv`/`tsx` declared (were hoisting-only deps — fresh installs failed); `@next/swc-win32-x64-msvc` moved to optionalDependencies (EBADPLATFORM on Linux).
+
+### Deployment
+All 7 services green on https://excellegacyrealtygroup.site: Main CRM (v0.58.56), LeadG, Foreclosure, ContentPlanner web + **API (new)**, MediaWorkflow, LegacyLeads.
+
 ## v0.58.55 (2026-10-21)
 
 ### Removed — all mock/placeholder data (production live-data readiness)

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { contentPlannerApiUrl } from '@/lib/contentplanner-api';
 import toast from 'react-hot-toast';
 
 interface SocialAccount {
@@ -45,7 +46,7 @@ export default function SocialConnectionsPage() {
     try {
       // Try ContentPlanner OAuth flow first (works when real API keys are configured).
       try {
-        const oauthRes = await fetch('http://localhost:3031/social/auth-url?provider=' + platform.toLowerCase());
+        const oauthRes = await fetch(contentPlannerApiUrl('/social/auth-url?provider=' + platform.toLowerCase()));
         if (oauthRes.ok) {
           const oauthData = await oauthRes.json();
           if (oauthData.authUrl && !oauthData.authUrl.includes('MOCK_')) {
@@ -187,7 +188,7 @@ function SocialAnalyticsSummary() {
   const [analytics, setAnalytics] = useState<{ totalViews: number; totalLikes: number; totalShares: number } | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:3031/analytics')
+    fetch(contentPlannerApiUrl('/analytics'))
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data && typeof data === 'object') {
@@ -245,7 +246,7 @@ function RecentPostsSection() {
   const [apiUp, setApiUp] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:3031/posts')
+    fetch(contentPlannerApiUrl('/posts'))
       .then(res => {
         if (!res.ok) throw new Error('API down');
         return res.json();
