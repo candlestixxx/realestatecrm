@@ -17,6 +17,8 @@ type PartnerProduct = {
   connected: boolean;
 };
 
+// Default to unconnected. A partner is only shown as connected after a live
+// credential check confirms it — the flags below are not claimed connection state.
 const INITIAL_PARTNERS: PartnerProduct[] = [
   {
     id: 'shilo',
@@ -32,7 +34,7 @@ const INITIAL_PARTNERS: PartnerProduct[] = [
     category: 'Lead Providers',
     logo: '🎯',
     description: 'Sync expired, FSBO, FRBO, and pre-foreclosure listings directly into your round-robin lead queues every morning automatically.',
-    connected: true
+    connected: false
   },
   {
     id: 'zapier',
@@ -56,7 +58,7 @@ const INITIAL_PARTNERS: PartnerProduct[] = [
     category: 'Data Services',
     logo: '🏢',
     description: 'Realcomp II Ltd. is Michigans largest Multiple Listing Service. Sync live MLS data directly to your listing feeds.',
-    connected: true
+    connected: false
   }
 ];
 

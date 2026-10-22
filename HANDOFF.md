@@ -1,3 +1,19 @@
+## v0.58.58 — Cross-service workspace mapping (2026-10-22)
+
+**Task:** Continue — close the workspace scoping gap found in the click-through.
+
+### Design & implementation
+- **Shared workspace ids** (no mapping table): the CRM proxy resolves the caller's active workspace via `resolveWorkspaceAccess(session)` and upserts it into ContentPlanner's Workspace table with the SAME id (`POST /workspace/sync` — idempotent).
+- **Service JWT workspace claim**: the proxy signs `workspaceId` into the HS256 service token (5-min exp). ContentPlanner's `requireAuth` reads the claim into `req.workspaceId`; notifications + social/accounts reads default their scope to it (explicit query param wins).
+- Panels now see only the caller's active workspace data — the cross-service gap is closed without duplicating workspace state.
+
+### Verified on Hetzner
+- `POST /workspace/sync` persists (`{id: crm-ws-demo-1, name: demo-workspace, businessType: real_estate}`)
+- Scoped reads filter by the JWT workspace claim
+- All 7 panel endpoints 200; 0 critical errors across services
+
+---
+
 ## v0.58.57 — UI panel click-through + cross-service auth (2026-10-22)
 
 **Task:** UI click-through of newly-wired panels; add/commit/push all.

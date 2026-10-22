@@ -34,27 +34,14 @@ export async function createLandingPageAction(formData: FormData) {
       return { error: 'URL slug is already in use by another landing page.' };
     }
 
+    // Start each landing page with an empty, editable structure. No fabricated
+    // property details, prices, or video links are seeded into new pages.
     const defaultBlocks = [
       {
         id: 'header',
         type: 'HEADER',
         title: title,
-        subtitle: 'Welcome to your real estate marketing portal. Let us find your dream property together.',
-      },
-      {
-        id: 'video',
-        type: 'VIDEO',
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-        title: 'Watch Our Featured Tour',
-      },
-      {
-        id: 'property',
-        type: 'PROPERTY',
-        address: '123 Excel Legacy Lane, Metro Detroit, MI',
-        price: 499000,
-        beds: 4,
-        baths: 3,
-        remarks: 'Beautiful custom single-family home with modern kitchen and sprawling lakefront views.',
+        subtitle: '',
       },
       {
         id: 'leadCapture',

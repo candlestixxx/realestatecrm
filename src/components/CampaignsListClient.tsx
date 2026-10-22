@@ -813,56 +813,58 @@ export default function CampaignsListClient({
                 </div>
                 <div className="p-4 bg-muted/10 border border-border rounded-xl text-center space-y-1">
                   <span className="text-[9px] font-black uppercase text-muted-foreground block">Email Open Rate</span>
-                  <span className="text-xl font-extrabold text-green-500">72.4%</span>
+                  <span className="text-xl font-extrabold text-green-500">—</span>
                 </div>
                 <div className="p-4 bg-muted/10 border border-border rounded-xl text-center space-y-1">
                   <span className="text-[9px] font-black uppercase text-muted-foreground block">SMS Reply Rate</span>
-                  <span className="text-xl font-extrabold text-primary">28.1%</span>
+                  <span className="text-xl font-extrabold text-primary">—</span>
                 </div>
                 <div className="p-4 bg-muted/10 border border-border rounded-xl text-center space-y-1">
                   <span className="text-[9px] font-black uppercase text-muted-foreground block">Conversion Rate</span>
-                  <span className="text-xl font-extrabold text-indigo-500">14.5%</span>
+                  <span className="text-xl font-extrabold text-indigo-500">—</span>
                 </div>
               </div>
 
-              {/* Delivery stats chart summary */}
+              {/* Delivery stats chart summary — figures come from real dispatch logs only.
+                  Until a provider webhook reports delivery, these show 0 rather than
+                  fabricated percentages. */}
               <div className="bg-muted/5 border border-border rounded-xl p-4 space-y-3">
                 <h4 className="font-bold text-sm text-foreground border-b border-border pb-1.5 flex justify-between items-center">
                   <span>📈 Delivery Statistics Breakdown</span>
-                  <span className="text-[10px] text-muted-foreground font-medium">Confidence Score: High</span>
+                  <span className="text-[10px] text-muted-foreground font-medium">{metricsCampaign._count?.leads ? 'Based on enrolled leads' : 'No delivery data yet'}</span>
                 </h4>
                 <div className="grid grid-cols-3 gap-6 py-2">
                   <div className="space-y-1">
                     <div className="flex justify-between font-bold">
                       <span className="text-muted-foreground">Emails Sent:</span>
-                      <span className="text-foreground">{(metricsCampaign._count?.leads || 0) * 4 || 128}</span>
+                      <span className="text-foreground">0</span>
                     </div>
                     <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-green-500 h-full w-[94%]" />
+                      <div className="bg-green-500 h-full w-[0%]" />
                     </div>
-                    <span className="text-[9.5px] text-muted-foreground block">94% delivery rate success</span>
+                    <span className="text-[9.5px] text-muted-foreground block">Connect an email provider to track delivery</span>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex justify-between font-bold">
                       <span className="text-muted-foreground">SMS Delivered:</span>
-                      <span className="text-foreground">{(metricsCampaign._count?.leads || 0) * 3 || 96}</span>
+                      <span className="text-foreground">0</span>
                     </div>
                     <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-primary h-full w-[98%]" />
+                      <div className="bg-primary h-full w-[0%]" />
                     </div>
-                    <span className="text-[9.5px] text-muted-foreground block">98% network delivery success</span>
+                    <span className="text-[9.5px] text-muted-foreground block">Connect Twilio to track delivery</span>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex justify-between font-bold">
                       <span className="text-muted-foreground">Tasks Triggered:</span>
-                      <span className="text-foreground">{(metricsCampaign._count?.leads || 0) * 2 || 64}</span>
+                      <span className="text-foreground">0</span>
                     </div>
                     <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-indigo-500 h-full w-[88%]" />
+                      <div className="bg-indigo-500 h-full w-[0%]" />
                     </div>
-                    <span className="text-[9.5px] text-muted-foreground block">88% agent execution completion</span>
+                    <span className="text-[9.5px] text-muted-foreground block">Tasks appear as the campaign runs</span>
                   </div>
                 </div>
               </div>
@@ -875,10 +877,9 @@ export default function CampaignsListClient({
                     <p className="p-6 text-center text-muted-foreground italic">No steps defined in this campaign.</p>
                   ) : (
                     metricsSteps.map((step: any, index: number) => {
-                      // Generate mock stats for each step type
-                      const sentMock = (metricsCampaign._count?.leads || 0) || 12;
-                      const openMock = Math.round(sentMock * 0.72);
-                      const replyMock = Math.round(sentMock * 0.28);
+                      // Per-step delivery counts come from real dispatch logs. Until a
+                      // provider reports delivery, show 0 instead of invented numbers.
+                      const sentCount = 0;
 
                       return (
                         <div key={index} className="p-3 flex items-center justify-between text-xs hover:bg-muted/5 transition-colors">
@@ -903,24 +904,24 @@ export default function CampaignsListClient({
                           <div className="flex gap-4 shrink-0 font-bold text-[11px] text-right">
                             <div>
                               <span className="text-muted-foreground text-[9.5px] uppercase block">Dispatched</span>
-                              <span className="text-foreground">{sentMock}</span>
+                              <span className="text-foreground">{sentCount}</span>
                             </div>
                             {step.type === 'EMAIL' && (
                               <div>
                                 <span className="text-muted-foreground text-[9.5px] uppercase block">Opened</span>
-                                <span className="text-green-500">{openMock} ({Math.round((openMock/sentMock)*100 || 72)}%)</span>
+                                <span className="text-green-500">—</span>
                               </div>
                             )}
                             {step.type === 'SMS' && (
                               <div>
                                 <span className="text-muted-foreground text-[9.5px] uppercase block">Replied</span>
-                                <span className="text-primary">{replyMock} ({Math.round((replyMock/sentMock)*100 || 28)}%)</span>
+                                <span className="text-primary">—</span>
                               </div>
                             )}
                             {(step.type === 'CALL' || step.type === 'TASK') && (
                               <div>
                                 <span className="text-muted-foreground text-[9.5px] uppercase block">Completed</span>
-                                <span className="text-indigo-500">{Math.round(sentMock * 0.85)} ({85}%)</span>
+                                <span className="text-indigo-500">—</span>
                               </div>
                             )}
                           </div>

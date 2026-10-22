@@ -13,42 +13,26 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
   const [keywords, setKeywords] = useState('');
   const [tone, setTone] = useState('Professional');
   
-  // Phase 2 outline structure
-  const [title, setTitle] = useState('Top Reasons to Move to Macomb County in 2026');
-  const [headings, setHeadings] = useState<string[]>([
-    'Introduction: The Growing Real Estate Hub of Metro Detroit',
-    '1. High-Performing School Districts & Safe Suburbs',
-    '2. Affordability & Diverse Listing Options',
-    '3. Parks, Lake St. Clair Access & Local Attractions',
-    'Conclusion: Finding Your Dream Property in Macomb County'
-  ]);
+  // Phase 2 outline structure — starts empty; the AI outline step populates these.
+  const [title, setTitle] = useState('');
+  const [headings, setHeadings] = useState<string[]>([]);
   const [includeCTA, setIncludeCTA] = useState(true);
 
-  // Phase 3 meta settings
-  const [seoTitle, setSeoTitle] = useState('Top Reasons to Move to Macomb County in 2026 | Excel Legacy Realty');
-  const [metaDesc, setMetaDesc] = useState('Looking to move to Macomb County, Michigan? Discover the best neighborhood listings, parks, schools, and real estate options with Excel Legacy.');
-  const [slug, setSlug] = useState('move-to-macomb-county-2026');
-  const [gmbVerification, setGmbVerification] = useState('GMB-VERIFY-8834920');
+  // Phase 3 meta settings — starts empty; filled in by the author.
+  const [seoTitle, setSeoTitle] = useState('');
+  const [metaDesc, setMetaDesc] = useState('');
+  const [slug, setSlug] = useState('');
+  const [gmbVerification, setGmbVerification] = useState('');
 
   const [isGenerating, setIsGenerating] = useState(false);
-  const [articles, setArticles] = useState([
-    {
-      id: 'art-1',
-      title: 'St. Clair Shores Lakefront Living Guide',
-      slug: 'st-clair-shores-lakefront-guide',
-      keywords: 'st clair shores, waterfront listings, macomb county',
-      status: 'PUBLISHED',
-      createdAt: '2026-07-12'
-    },
-    {
-      id: 'art-2',
-      title: 'Warren MI Seller Market Valuation Checklist',
-      slug: 'warren-seller-market-valuation',
-      keywords: 'home valuation warren, house prices, sell home mi',
-      status: 'DRAFT',
-      createdAt: '2026-07-10'
-    }
-  ]);
+  const [articles, setArticles] = useState<Array<{
+    id: string;
+    title: string;
+    slug: string;
+    keywords: string;
+    status: string;
+    createdAt: string;
+  }>>([]);
 
   const handleGenerateOutline = (e: React.FormEvent) => {
     e.preventDefault();

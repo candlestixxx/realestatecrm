@@ -44,33 +44,10 @@ export async function createCampaignAction(formData: FormData) {
             autoApplyCriteria,
             autoPauseOn,
           },
-          items: [
-            {
-              id: '1',
-              type: 'EMAIL',
-              delayValue: 0,
-              delayUnit: 'DAY',
-              title: 'Welcome to our Agency!',
-              subject: 'Welcome to our Agency!',
-              content: 'Hi! Thanks for reaching out. Let us know how we can help you find your dream home.',
-            },
-            {
-              id: '2',
-              type: 'SMS',
-              delayValue: 1,
-              delayUnit: 'DAY',
-              title: 'Welcome SMS follow up',
-              content: 'Hi, just following up to see if you received our email yesterday? Let us know if you want to chat!',
-            },
-            {
-              id: '3',
-              type: 'CALL',
-              delayValue: 3,
-              delayUnit: 'DAY',
-              title: 'Schedule intro call',
-              content: 'Schedule follow up introduction call.',
-            }
-          ]
+          // Campaigns start with no steps. Step content is written by the agent
+          // and saved to the actual leads enrolled — no placeholder copy is seeded
+          // that could accidentally dispatch to real contacts.
+          items: []
         }),
       },
     });

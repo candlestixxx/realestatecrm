@@ -36,8 +36,10 @@ export default function WebsiteBuilder() {
   const [dataLoading, setDataLoading] = useState(true);
   const [sites, setSites] = useState<Site[]>([]);
   const [blocks, setBlocks] = useState<Block[]>([]);
-  const [title, setTitle] = useState('My Agent Site');
-  const [slug, setSlug] = useState('my-site');
+  // Title and slug start empty — the author names each site. No default name is
+  // saved into real site records.
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
   const [preview, setPreview] = useState(false);
   const [templates, setTemplates] = useState<{ id: string; name: string; category: string | null }[]>([]);
 

@@ -1,3 +1,10 @@
+## v0.58.58 (2026-10-22)
+
+### Added — cross-service workspace mapping
+- The CRM proxy now resolves the caller's active workspace (`resolveWorkspaceAccess`) and mirrors it into ContentPlanner via `POST /workspace/sync` (same id — idempotent upsert).
+- Service JWTs carry a `workspaceId` claim; ContentPlanner API routes default their read scope to it (explicit query params still win). Dashboard panels now see only their active workspace's data instead of recent-across-workspace.
+- Verified on Hetzner: workspace sync persists, scoped reads return workspace-filtered results, all 7 panel endpoints 200.
+
 ## v0.58.57 (2026-10-22)
 
 ### Fixed — UI panel click-through findings

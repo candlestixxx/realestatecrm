@@ -176,13 +176,9 @@ export default function DealDetailLayoutClient({
       };
     });
 
-    const defaultMsgs = [
-      { id: 'msg-1', text: 'Hi Darrell! I just set up the shared portal. You can upload the inspection report directly to the vault here once received.', senderName: 'Excel Legacy Realty Group', senderRole: 'AGENT', createdAt: '2023-01-01T10:00:00.000Z' },
-      { id: 'msg-2', text: 'Got it! The inspector is scheduled for tomorrow at 2 PM. I will upload it as soon as I get it.', senderName: deal.contact.firstName, senderRole: 'CLIENT', createdAt: '2023-01-01T11:00:00.000Z' },
-      { id: 'msg-3', text: 'Pre-approval verified. Appraisal order has been placed on our end.', senderName: 'Sarah Jenkins (Lender)', senderRole: 'LENDER', createdAt: '2023-01-01T11:30:00.000Z' },
-    ];
-
-    return [...customMsgs, ...defaultMsgs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    // Only real activity records are shown. No fabricated sample messages are
+    // appended — an empty conversation means no messages have been exchanged yet.
+    return customMsgs.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   })();
 
   // Calculations

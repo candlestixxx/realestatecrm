@@ -19,54 +19,11 @@ type SocialPost = {
   leads: number;
 };
 
-const INITIAL_POSTS: SocialPost[] = [
-  {
-    id: 'post-1',
-    date: 'Sunday, Jul 12',
-    platforms: ['facebook', 'instagram', 'linkedin', 'gmb'],
-    image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=350&q=80',
-    text: '🚨 Just Listed in St. Clair Shores! 🚨 Welcome to 22513 Avon St – a charming brick ranch in Macomb County with all the right updates. ✨ Updated kitchen perfect for cooking + entertaining. Full basement guest suite for visitors or office space!',
-    status: 'Published',
-    time: '04:13 PM',
-    views: 142,
-    comments: 18,
-    leads: 6,
-  },
-  {
-    id: 'post-2',
-    date: 'Monday, Jul 6',
-    platforms: ['facebook', 'instagram', 'linkedin', 'gmb'],
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=350&q=80',
-    text: 'Big dreams need big yards! 🌲 Welcome to 22513 Avon St – a stunning 3-bedroom home with room for everyone. Host friends in your modern kitchen, treat guests to their own suite downstairs, and unwind or play in your enormous yard!',
-    status: 'Published',
-    time: '02:58 PM',
-    views: 189,
-    comments: 24,
-    leads: 9,
-  },
-  {
-    id: 'post-3',
-    date: 'Friday, Jun 26',
-    platforms: ['facebook', 'instagram', 'linkedin', 'gmb'],
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=350&q=80',
-    text: '🏡 New on the Market! 🏡 Discover the charm of this move-in-ready 3-bedroom bungalow at 3547 Alvina Ave, Warren MI! Spacious yard, fresh updates, and the perfect spot to start your next chapter. Ready to make it yours? Schedule a private walkthrough today.',
-    status: 'Published',
-    time: '10:27 AM',
-    views: 95,
-    comments: 12,
-    leads: 3,
-  }
-];
+// No seeded posts — posts load from the connected social accounts. The list
+// starts empty so no demo posts appear as if they were actually published.
+const INITIAL_POSTS: SocialPost[] = [];
 
-const ENGAGEMENTS = [
-  { name: 'Lauren Lee', action: 'clicked post link', time: 'Jun 26 at 9:45 PM', avatar: 'L' },
-  { name: 'Testing Jossman', action: 'clicked post link', time: 'May 22 at 12:49 AM', avatar: 'T' },
-  { name: 'Paul', action: 'registered via post', time: 'Apr 22 at 9:10 AM', avatar: 'P' },
-  { name: 'Hannah', action: 'registered via post', time: 'Apr 19 at 10:14 AM', avatar: 'H' },
-  { name: 'Frank', action: 'registered via post', time: 'Apr 1 at 3:25 PM', avatar: 'F' },
-  { name: 'Katie', action: 'registered via post', time: 'Mar 25 at 2:00 AM', avatar: 'K' },
-  { name: 'Alisha Moulton', action: 'registered via post', time: 'Mar 20 at 11:10 AM', avatar: 'A' },
-];
+const ENGAGEMENTS: { name: string; action: string; time: string; avatar: string }[] = [];
 
 export default function SocialAgentTab({ workspaceId }: { workspaceId: string }) {
   const [subTab, setSubTab] = useState<'posts' | 'planner' | 'listing-feed'>('posts');
