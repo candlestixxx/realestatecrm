@@ -8,9 +8,10 @@ DEPLOY_DIR=/var/www/legacyleads
 mkdir -p "$DEPLOY_DIR"
 cd "$DEPLOY_DIR"
 
+# Preserve all integration env vars (API key continuity across redeploys)
 DEEPSEEK_ENV=""
 if [ -f .env ]; then
-  DEEPSEEK_ENV=$(grep '^DEEPSEEK' .env || true)
+  DEEPSEEK_ENV=$(grep -E '^(DEEPSEEK|VAPI|TWILIO|SENDGRID|LOB|SKIP_TRACE|BSA|REALCOMP|HEYGEN|DID|MAGNIFIC|CANVA|BROWSERLESS|TAVILY|NEWSAPI)' .env || true)
 fi
 
 BK=/tmp/legacyleads-backup-$(date +%Y%m%d-%H%M%S)

@@ -9,10 +9,12 @@ DEPLOY_DIR=/var/www/leadg
 mkdir -p "$DEPLOY_DIR"
 cd "$DEPLOY_DIR"
 
-# Preserve DeepSeek env vars from the previous .env (API key continuity)
-DEEPSEEK_ENV=""
+# Preserve integration env vars from the previous .env (API key continuity).
+# Covers VAPI/DEEPSEEK/TWILIO/SENDGRID/LOB — rewriting .env would otherwise
+# silently drop voice + messaging credentials on every deploy.
+PRESERVED=""
 if [ -f .env ]; then
-  DEEPSEEK_ENV=$(grep '^DEEPSEEK' .env || true)
+  PRESERVED=$(grep -E '^(DEEPSEEK|VAPI|TWILIO|SENDGRID|LOB|SKIP_TRACE)' .env || true)
 fi
 
 # Move old build aside (backup, never delete)
@@ -32,7 +34,7 @@ NEXTAUTH_SECRET="excel-legacy-leadg-secret-2026"
 NEXTAUTH_URL="https://excellegacyrealtygroup.site/leadg"
 PORT=3211
 NODE_ENV=production
-$DEEPSEEK_ENV
+$PRESERVED
 ENVEOF
 
 # Ensure prisma dir exists
