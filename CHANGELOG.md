@@ -1,3 +1,10 @@
+## v0.58.62 (2026-10-22)
+
+### Added — Vapi Web SDK (client-side key now live)
+- **"Talk to Riley (Browser)"** in LeadG's NativeDialer: live in-browser voice conversation with the assistant via `@vapi-ai/web` — the Vapi PUBLIC key's actual purpose (was stored but unused).
+- `GET /api/vapi/config` (LeadG) serves public SDK values dynamically — key rotation needs no rebuild.
+- NativeDialer now has 3 calling modes: **Talk to Riley (Browser)** · **AI Call (Riley)** (server-side outbound, private key) · **Live Call (Twilio WebRTC)**.
+
 ## v0.58.61 (2026-10-22)
 
 ### Fixed — systemic sub-app fetch routing (production-only bug)
