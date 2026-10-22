@@ -1,3 +1,15 @@
+## v0.58.60 (2026-10-22)
+
+### Fixed (from live console errors)
+- **`GET /api/leads` 404**: the route never existed — the Lead Map fetched it on load and crashed. New `GET/POST /api/leads` (workspace-scoped listing with limit/status/type/q + lead creation).
+- **Lead Map had no coordinate data model**: added `latitude`/`longitude` to Contact (migrated on prod SQLite) + Nominatim geocoding (`src/lib/geocode.ts`, keyless) on lead creation — leads now plot on the map.
+- **`Cannot read properties of undefined (reading 'avg')`** in Reporting: MarketTrendsSection read `trends.deals.*` but `/api/syndication` returns `dataPoints.*`. Rewrote to the real shape; privacy-suppressed values ('suppressed'/'insufficient_data') render as '—' instead of crashing.
+
+### Verified on prod
+- `/api/leads?limit=200` → 401 (route exists, auth required — was 404)
+- `/api/syndication` shape matches the component
+- 7/7 services green
+
 ## v0.58.59 (2026-10-22)
 
 ### Connected — Vapi voice AI + Twilio
