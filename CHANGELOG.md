@@ -1,3 +1,15 @@
+## v0.58.59 (2026-10-22)
+
+### Connected — Vapi voice AI + Twilio
+- **Vapi wired live**: private/public keys + assistant "Riley" (`915f9d01-...`) + phone number `+1 (586) 737-3387` (`7f1c7bc5-...`). Assistant bound to the phone number so inbound calls also reach Riley. LeadG adapters fall back to `VAPI_API_KEY`/`VAPI_ASSISTANT_ID`/`VAPI_PHONE_NUMBER_ID` env when per-user settings are absent.
+- **Twilio wired live**: account active; **Twilio Lookup (skip-trace provider A) verified live** — the skip-trace cascade in the main CRM + LegacyLeads now hits real carrier data. LeadG Twilio SMS env fallback added (`TWILIO_SID`/`TWILIO_TOKEN`/`TWILIO_FROM_NUMBER`).
+- **SendGrid + Lob env fallback** added to LeadG adapters (keys work the moment they're provided).
+- **Deploy scripts preserve ALL integration env vars** (VAPI/TWILIO/SENDGRID/LOB/DEEPSEEK/enrichment) — previously only DEEPSEEK survived redeploys.
+- `apps/leadg/.env.example` documents all integration variables.
+
+### Pending
+- Twilio phone number purchase (account has 0 numbers) — required for SMS/WhatsApp dispatch + Twilio voice fallback.
+
 ## v0.58.58 (2026-10-22)
 
 ### Added — cross-service workspace mapping

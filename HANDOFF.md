@@ -1,3 +1,19 @@
+## v0.58.59 — Vapi + Twilio live (2026-10-22)
+
+**Task:** Wire user-provided voice/telephony keys; continue.
+
+### Live integrations
+- **Vapi**: private key `4d5f2a03-...` + public `0abbaebf-...`; assistant "Riley" `915f9d01-8385-44c1-883d-a43755ef11c5`; phone `+1 (586) 737-3387` id `7f1c7bc5-8471-4862-8fe7-580f4d490d90`. Assistant bound to the number (inbound works). LeadG adapters: env fallback added (`VAPI_API_KEY`/`VAPI_ASSISTANT_ID`/`VAPI_PHONE_NUMBER_ID`).
+- **Twilio**: SID `AC63ab4a...` + auth token — account ACTIVE. **Twilio Lookup (skip-trace provider A) verified live** (HTTP 200, number normalized) in the main CRM + LegacyLeads. LeadG SMS env fallback (`TWILIO_SID`/`TWILIO_TOKEN`/`TWILIO_FROM_NUMBER`).
+- SendGrid + Lob env fallback added to LeadG (same pattern).
+- **Deploy scripts now preserve ALL integration env vars** — the four deploy-*.sh scripts only carried DEEPSEEK before; voice/messaging keys would have been wiped on redeploy.
+
+### Pending from user
+- **Twilio phone number purchase** — account has 0 numbers; SMS/WhatsApp dispatch + fallback messaging need one. (Vapi's +1 586 number is Vapi-managed and can't be the Twilio "from".)
+- SendGrid key + from-email, Lob key, Whitepages/PDL, BS&A, Tavily, NewsAPI, Canva/Magnific, HeyGen/D-ID, Browserless.
+
+---
+
 ## v0.58.58 — Cross-service workspace mapping (2026-10-22)
 
 **Task:** Continue — close the workspace scoping gap found in the click-through.
