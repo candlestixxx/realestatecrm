@@ -49,17 +49,25 @@ function InfoBadge({ text }: { text: string }) {
 }
 
 function MarketTrendsSection() {
+  // Shape matches GET /api/syndication's response: values live under
+  // dataPoints.*, and the API suppresses small samples (privacy threshold of
+  // 5) by returning the strings 'suppressed' / 'insufficient_data'.
   const [trends, setTrends] = useState<{
-    leadTrends: { status: string; count: number }[];
-    dealStats: { avg: number | null; sum: number | null; count: number };
-    listingStats: { avgPrice: number | null; count: number };
+    dataPoints: {
+      totalLeads: number | 'insufficient_data';
+      avgDealValue: number | null;
+      totalDealVolume: number | 'suppressed';
+      avgListPrice: number | null;
+      activeListings: number | 'suppressed';
+    };
+    indicators?: { marketHeat?: string; conversionRate?: number; demandIndex?: number };
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/syndication?timeframe=30d')
       .then(r => r.json())
-      .then(d => setTrends(d))
+      .then(d => setTrends(d?.dataPoints ? d : null))
       .catch(() => setTrends(null))
       .finally(() => setLoading(false));
   }, []);
@@ -67,29 +75,37 @@ function MarketTrendsSection() {
   if (loading) return <p className="text-sm text-muted-foreground">Loading market trends...</p>;
   if (!trends) return <p className="text-sm text-muted-foreground">Market trends unavailable.</p>;
 
+  // Privacy-suppressed counts arrive as strings — show '—' for those.
+  const fmtMoney = (v: number | null) =>
+    typeof v === 'number' ? '$' + v.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '--';
+  const fmtCount = (v: number | 'suppressed' | 'insufficient_data') =>
+    typeof v === 'number' ? v.toLocaleString() : '--';
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div className="bg-muted/30 rounded-lg p-4">
         <div className="text-xs text-muted-foreground mb-1">Avg Deal Value (30d)</div>
         <div className="text-xl font-bold text-foreground">
-          {trends.deals.avg ? '$' + trends.deals.avg.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '--'}
+          {fmtMoney(trends.dataPoints.avgDealValue)}
         </div>
       </div>
       <div className="bg-muted/30 rounded-lg p-4">
-        <div className="text-xs text-muted-foreground mb-1">Total Deal Volume (30d)</div>
+        <div className="text-xs text-muted-foreground mb-1">Deals Closed (30d)</div>
         <div className="text-xl font-bold text-foreground">
-          {trends.deals.sum ? '$' + trends.deals.sum.toLocaleString() : '--'}
+          {fmtCount(trends.dataPoints.totalDealVolume)}
         </div>
       </div>
       <div className="bg-muted/30 rounded-lg p-4">
         <div className="text-xs text-muted-foreground mb-1">Avg List Price (30d)</div>
         <div className="text-xl font-bold text-foreground">
-          {trends.listingStats.avgPrice ? '$' + trends.listingStats.avgPrice.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '--'}
+          {fmtMoney(trends.dataPoints.avgListPrice)}
         </div>
       </div>
       <div className="bg-muted/30 rounded-lg p-4">
-        <div className="text-xs text-muted-foreground mb-1">Deals Closed (30d)</div>
-        <div className="text-xl font-bold text-foreground">{trends.deals.count}</div>
+        <div className="text-xs text-muted-foreground mb-1">Active Listings (30d)</div>
+        <div className="text-xl font-bold text-foreground">
+          {fmtCount(trends.dataPoints.activeListings)}
+        </div>
       </div>
     </div>
   );

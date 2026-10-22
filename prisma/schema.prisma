@@ -90,6 +90,8 @@ model Contact {
   email            String?
   phone            String?
   address          String?
+  latitude         Float?
+  longitude        Float?
   workspaceId      String
   userId           String?
   additionalPhones String?   // JSON array of additional phones
