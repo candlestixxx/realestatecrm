@@ -1,3 +1,12 @@
+## v0.58.61 (2026-10-22)
+
+### Fixed — systemic sub-app fetch routing (production-only bug)
+- **Every sub-app client fetch('/api/...') hit the MAIN CRM instead of its own API** (root-absolute paths under the nginx /leadg//contentplanner/ mounts → 404s; LeadG pages could not load ANY data in production). Added prefix-aware `apiUrl()` helpers (`src/lib/api-base.ts`) in LeadG + ContentPlanner web; all 24 client fetches converted. Verified: `/leadg/api/*` → 401/200 (own routes) vs root `/api/*` → 404 (main CRM).
+
+### Added — Vapi AI call trigger
+- `POST /api/vapi/call` (LeadG): server-side Vapi outbound call — assistant Riley dials the lead through the Vapi line; private key never reaches the browser.
+- NativeDialer: **"AI Call (Riley)"** button alongside the Twilio WebRTC call (works today without a Twilio number).
+
 ## v0.58.60 (2026-10-22)
 
 ### Fixed (from live console errors)
