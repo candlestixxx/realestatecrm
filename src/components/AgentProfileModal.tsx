@@ -11,25 +11,27 @@ export default function AgentProfileModal({
   onClose: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<'profile' | 'company' | 'billing'>('profile');
+  // Starts empty — real values are loaded from the server profile. No seeded
+  // placeholder data is pre-filled into these form fields.
   const [profile, setProfile] = useState({
-    name: 'Excel Legacy Realty Team',
-    email: 'hankrealtyexec@gmail.com',
-    phone: '586-555-0210',
-    title: 'Principal Broker / Owner',
-    license: 'MI-650201099',
+    name: '',
+    email: '',
+    phone: '',
+    title: '',
+    license: '',
   });
   const [company, setCompany] = useState({
-    companyName: 'Excel Legacy Realty',
-    address: '123 Cyberdyne Way, Sterling Heights, MI 48310',
-    website: 'https://excellegacyrealtygroup.site',
-    taxId: 'XX-XXXXXXX',
+    companyName: '',
+    address: '',
+    website: '',
+    taxId: '',
   });
   const [billing, setBilling] = useState({
-    plan: 'Premium Growth Seat',
-    price: '$299/mo',
-    cardNumber: '•••• •••• •••• 4242',
-    expiry: '12/28',
-    status: 'Active',
+    plan: '',
+    price: '',
+    cardNumber: '',
+    expiry: '',
+    status: '',
   });
 
   useEffect(() => {

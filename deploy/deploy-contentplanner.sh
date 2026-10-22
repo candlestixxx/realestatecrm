@@ -8,9 +8,11 @@ DEPLOY_DIR=/var/www/contentplanner
 mkdir -p "$DEPLOY_DIR"
 cd "$DEPLOY_DIR"
 
-DEEPSEEK_ENV=""
+# Preserve DATABASE_URL + DeepSeek config across redeploys (the web app uses
+# the shared Postgres DB — rewriting .env would revert it to a SQLite URL).
+PRESERVED=""
 if [ -f .env ]; then
-  DEEPSEEK_ENV=$(grep '^DEEPSEEK' .env || true)
+  PRESERVED=$(grep -E '^(DATABASE_URL|DEEPSEEK)' .env || true)
 fi
 
 BK=/tmp/contentplanner-backup-$(date +%Y%m%d-%H%M%S)
@@ -22,12 +24,11 @@ done
 tar xzf /tmp/deploy-contentplanner.tar.gz
 
 cat > .env << ENVEOF
-DATABASE_URL="file:./prisma/dev.db"
 NEXTAUTH_SECRET="excel-legacy-contentplanner-secret-2026"
 NEXTAUTH_URL="https://excellegacyrealtygroup.site/contentplanner"
 PORT=3213
 NODE_ENV=production
-$DEEPSEEK_ENV
+$PRESERVED
 ENVEOF
 
 mkdir -p prisma

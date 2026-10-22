@@ -245,3 +245,8 @@
 - [ ] **main CRM `tsconfig.json` has `ignoreBuildErrors: true`** — type errors ship silently; tighten gradually
 - [ ] **API keys still unwired**: Twilio, SendGrid/Resend, Stripe, Google Maps, HubSpot OAuth, BS&A, Magnific, OpenAI (embeddings/voice)
 - [ ] 10 redundant remote feature branches safe to delete (`git push origin --delete <branch>`)
+
+### Cross-Service Integration Gap (2026-10-22, found during UI click-through)
+- [ ] **Workspace mapping between main CRM and ContentPlanner** — the services have separate workspace models/DBs. Panels currently read recent data across workspaces (workspaceId optional on GET /notifications + /social/accounts). Implement a workspace mapping table or shared workspace IDs so dashboard panels scope to the caller's active workspace.
+- [ ] OAuth client keys for social publishing: TWITTER_CLIENT_ID/SECRET, LINKEDIN_CLIENT_ID/SECRET, META_CLIENT_ID/SECRET (auth-url currently returns an honest 503)
+- [ ] Wire remaining provider keys per HANDOFF v0.58.55 list (Twilio lookup, Whitepages/PDL, BS&A, Canva, Magnific, Tavily, NewsAPI, HeyGen/D-ID, AGENT_SECRET, BROWSERLESS_WS_ENDPOINT)

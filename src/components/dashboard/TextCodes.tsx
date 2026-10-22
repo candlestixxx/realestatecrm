@@ -21,38 +21,9 @@ type TextCode = {
   createdAt: string;
 };
 
-const INITIAL_CODES: TextCode[] = [
-  {
-    id: '1',
-    keyword: '8485SHERMAN',
-    phoneNumber: '(586) 555-0190',
-    listingAddress: '8485 Sherman Ave, Warren, MI 48089',
-    responseMessage: 'Thanks for inquiring about 8485 Sherman Ave! View full photos, video walk-throughs & price history here: /portal/site/8485-sherman-ave',
-    status: 'ACTIVE',
-    leadsCaptured: 14,
-    createdAt: '2026-07-08',
-  },
-  {
-    id: '2',
-    keyword: '615WILLARD',
-    phoneNumber: '(586) 555-0190',
-    listingAddress: '615 Willard Ave, Warren, MI 48089',
-    responseMessage: 'Welcome to 615 Willard! This beautiful property is back on the market. View listing: /portal/site/615-willard-ave-copy-122',
-    status: 'ACTIVE',
-    leadsCaptured: 8,
-    createdAt: '2026-07-08',
-  },
-  {
-    id: '3',
-    keyword: 'VIPBUYER',
-    phoneNumber: '(586) 555-0122',
-    listingAddress: 'General Buyer Capture Pool',
-    responseMessage: 'Want access to hot pocket listings in Macomb and Wayne county? Get our daily MLS sheet: /portal/site/vip-buyer-list',
-    status: 'PAUSED',
-    leadsCaptured: 29,
-    createdAt: '2026-07-05',
-  }
-];
+// No seeded rows — codes are loaded from the API. Keeping an empty list here
+// ensures no demo/placeholder text codes are presented as real data.
+const INITIAL_CODES: TextCode[] = [];
 
 export default function TextCodes() {
   const [codes, setCodes] = useState<TextCode[]>(INITIAL_CODES);
@@ -62,7 +33,7 @@ export default function TextCodes() {
 
   // New Code Form State
   const [keyword, setKeyword] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('(586) 555-0190');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [listingAddress, setListingAddress] = useState('');
   const [responseMessage, setResponseMessage] = useState('');
 
@@ -277,6 +248,7 @@ export default function TextCodes() {
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     className="w-full bg-background border border-border/60 rounded-xl px-3 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   >
+                    <option value="" disabled>Select a rider number…</option>
                     <option value="(586) 555-0190">(586) 555-0190 (Broker Office)</option>
                     <option value="(586) 555-0122">(586) 555-0122 (Direct Line)</option>
                   </select>

@@ -32,7 +32,7 @@ export function PipelineTriggerPanel({ deals, activeListingId }: PipelineTrigger
 
     if (selectedDealId && selectedDealId !== 'custom') {
       const deal = deals.find(d => d.id === selectedDealId);
-      address = deal ? deal.title : '123 Main St';
+      address = deal ? deal.title : '';
     } else {
       listingId = `custom-${Date.now()}`;
       if (!address.trim()) {

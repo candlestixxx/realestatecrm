@@ -1,3 +1,26 @@
+## v0.58.57 — UI panel click-through + cross-service auth (2026-10-22)
+
+**Task:** UI click-through of newly-wired panels; add/commit/push all.
+
+### Click-through findings & fixes
+1. **All 7 panel endpoints 401'd in the browser** — the ContentPlanner API requires a Bearer JWT the browser can't hold. Added `/api/contentplanner/[...path]` proxy in the main CRM: session-auth (NextAuth) → signs a short-lived service JWT (`CONTENTPLANNER_SERVICE_SECRET`, 5-min exp) → forwards to the internal API (`CONTENT_SERVICE_URL=http://127.0.0.1:3216`). `contentPlannerApiUrl()` now points at the proxy.
+2. **OAuth endpoints were behind the API auth** — provider redirects carry no token. Split `social.ts` into `socialOAuthRouter` (auth-url + callback, public, PKCE-secured) + protected accounts router.
+3. **Deploy scripts kept wiping runtime config** — `deploy-contentplanner.sh` reverted DATABASE_URL to SQLite; `deploy-contentplanner-api.sh` dropped AUTH_JWT_SECRET. Both now preserve DATABASE_URL/DEEPSEEK/AUTH_JWT_SECRET.
+4. Notifications + social accounts GETs tolerate missing workspaceId (cross-service workspace mapping between CRM ↔ ContentPlanner workspace models is a real gap — noted in TODO.md).
+
+### Verified on Hetzner
+- 7/7 panel endpoints 200 with service JWTs (real empty data, no mocks)
+- `/api/contentplanner/*` returns 401 without a session (proxy correctly gated)
+- OAuth auth-url returns honest 503 ("TWITTER_CLIENT_ID not configured")
+- Deployed bundle: proxy path present, 0 stale localhost:3031 refs
+- Tests: 116 passing (35+60+9+12)
+
+### Secrets on server
+- `/root/.contentplanner-svc-secret` — service JWT secret (main CRM signs, API verifies)
+- `/root/.contentplanner-pgpass` — Postgres password for contentplanner DB
+
+---
+
 ## v0.58.56 — Full deployment + Prisma engine + API discovery (2026-10-22)
 
 **Task:** Deploy all to Hetzner, commit/push all.

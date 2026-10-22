@@ -1,3 +1,16 @@
+## v0.58.57 (2026-10-22)
+
+### Fixed — UI panel click-through findings
+- **All ContentPlanner panel endpoints returned 401 in the browser** (posts/campaigns/analytics/notifications/video/podcast/social): the API requires a Bearer JWT the browser cannot hold. New session-authenticated proxy `/api/contentplanner/[...path]` signs a short-lived service JWT server-side (`CONTENTPLANNER_SERVICE_SECRET` ↔ API `AUTH_JWT_SECRET`) and forwards — verified all 7 panel endpoints return 200.
+- **OAuth flow broken**: `/social/auth-url` + `/social/callback` were behind the API's auth (the provider's browser redirect carries no token). Now mounted as public PKCE-secured endpoints; account listing stays protected.
+- **Deploy scripts wiped runtime config**: `deploy-contentplanner.sh` reverted the Postgres DATABASE_URL to a SQLite path; `deploy-contentplanner-api.sh` dropped `AUTH_JWT_SECRET`. Both now preserve DATABASE_URL/DEEPSEEK/AUTH_JWT_SECRET across redeploys.
+- Notifications + social accounts GET endpoints tolerate missing workspaceId (returns recent) — cross-service workspace mapping pending (noted in TODO).
+- Dashboard bundle verified: proxy path present, 0 stale `localhost:3031` refs.
+
+### Verified
+- Tests: 116 passing (contentplanner 35, media-workflow 60, leadg 9, legacyleads 12)
+- Click-through: 7/7 panel endpoints 200 on Hetzner; OAuth auth-url returns honest 503 (Twitter/LinkedIn/Meta client keys pending)
+
 ## v0.58.56 (2026-10-22)
 
 ### Added

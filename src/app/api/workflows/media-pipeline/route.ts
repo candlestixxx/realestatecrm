@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const result = await AutomationTriggerService.triggerPipeline({
       event: body.event || 'manual',
       listingId: body.listingId || `listing-${Date.now()}`,
-      address: body.address || '123 Main St',
+      address: body.address, // required upstream — no placeholder address is substituted
       agentId: agentId,
       statusUpdate: body.statusUpdate
     });

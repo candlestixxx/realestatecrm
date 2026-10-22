@@ -12,7 +12,9 @@ cd "$DEPLOY_DIR"
 
 DEEPSEEK_ENV=""
 if [ -f .env ]; then
-  DEEPSEEK_ENV=$(grep '^DEEPSEEK' .env || true)
+  # Preserve auth + DeepSeek config across redeploys (rewriting .env would
+  # silently drop AUTH_JWT_SECRET and break service-token verification).
+  DEEPSEEK_ENV=$(grep -E '^(DEEPSEEK|AUTH_JWT_SECRET)' .env || true)
 fi
 
 BK=/tmp/contentplanner-api-backup-$(date +%Y%m%d-%H%M%S)
