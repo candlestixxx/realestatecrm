@@ -1,3 +1,14 @@
+## v0.58.63 (2026-10-22)
+
+### Fixed — Lead Detail "Properties" tab (found via 'Simulated:' toast report)
+The tab was fabricated UI: 5 buttons fired fake toasts (incl. 'Simulated: Added secondary property fields!'), two hardcoded duplicate cards showed invented stats ('3 beds | 2 baths | 1386 sqft') and a fake fallback address ('45409 North Ave...').
+
+- **New `OwnedProperty` model** (contact-scoped, workspace-tenant-safe) + prod migration
+- **`/api/owned-properties`** GET/POST/DELETE (cross-workspace writes rejected)
+- **Real Add Property form** (address/type/label/beds/baths/sqft/value), persisted list, real delete
+- **Live valuation** button → `/api/property-data` (BS&A/Realcomp; honest config error without a key)
+- Mailing-address card renders real contact data only; honest empty state
+
 ## v0.58.62 (2026-10-22)
 
 ### Added — Vapi Web SDK (client-side key now live)

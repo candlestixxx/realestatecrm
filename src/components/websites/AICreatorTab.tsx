@@ -208,13 +208,21 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
     } else if (opt === 'BRAND') {
       handleSendPrompt(undefined, 'Create a Company Brand page for Excel Legacy Realty');
     } else if (opt === 'IMAGE') {
-      const url = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=350&q=80';
+      // Real media entry — previously attached a hardcoded stock photo URL
+      // that silently became part of the user's published website content.
+      const url = window.prompt('Image URL to attach (direct link to .jpg/.png):')?.trim();
+      if (!url) return;
       setUploadedMedia([...uploadedMedia, url]);
-      toast.success('Simulated photo attached! Type prompt to finalize.');
+      toast.success('Image attached. Type a prompt to finalize.');
     } else if (opt === 'VIDEO') {
-      const url = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+      // Real media entry — previously attached a hardcoded YouTube video.
+      const raw = window.prompt('Video URL (YouTube/Vimeo/direct link):')?.trim();
+      if (!raw) return;
+      // Normalize YouTube watch URLs to embeddable form.
+      const yt = raw.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/);
+      const url = yt ? `https://www.youtube.com/embed/${yt[1]}` : raw;
       setUploadedMedia([...uploadedMedia, url]);
-      toast.success('Simulated video link attached! Type prompt to finalize.');
+      toast.success('Video attached. Type a prompt to finalize.');
     }
   };
 
