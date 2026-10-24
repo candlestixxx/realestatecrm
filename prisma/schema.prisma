@@ -70,6 +70,7 @@ model Workspace {
   agentSites     AgentSite[]
   voiceSettings  VoiceSettings?
   notifications  SystemNotification[]
+  ownedProperties OwnedProperty[]
 }
 
 model WorkspaceMember {
@@ -109,6 +110,7 @@ model Contact {
   leads            Lead[]
   stakeholderIn    DealStakeholder[]
   messages         Message[]
+  ownedProperties  OwnedProperty[]
     referrals        Referral[]       @relation("ReferralContact")
     buyerOffers      Offer[]          @relation("OfferBuyer")
     clientPortals    ClientPortal[]   @relation("ClientPortalContact")
@@ -146,6 +148,25 @@ model Lead {
   qualifications  LeadQualification[]
   messages        Message[]
   }
+
+model OwnedProperty {
+  id           String   @id @default(cuid())
+  workspaceId  String
+  contactId    String
+  address      String
+  propertyType String   @default("Single Family")
+  label        String   @default("Home") // Home | Rental | Vacation | Land
+  beds         Int?
+  baths        Float?
+  squareFeet   Int?
+  estValue     Int?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
 
 model SmartPlan {
   id          String    @id @default(cuid())

@@ -108,6 +108,75 @@ export default function LeadDetailLayoutClient({
   const [isPending, startTransition] = useTransition();
 
   // Tab State
+  // Owned Properties tab state (real persistence via /api/owned-properties)
+  const [ownedProps, setOwnedProps] = useState<any[]>([]);
+  const [loadingProps, setLoadingProps] = useState(false);
+  const [showAddProp, setShowAddProp] = useState(false);
+  const [newProp, setNewProp] = useState({ address: '', propertyType: 'Single Family', label: 'Home', beds: '', baths: '', squareFeet: '', estValue: '' });
+
+  const loadOwnedProps = async () => {
+    if (!lead?.contact?.id) return;
+    setLoadingProps(true);
+    try {
+      const res = await fetch('/api/owned-properties?contactId=' + encodeURIComponent(lead.contact.id));
+      const data = await res.json();
+      setOwnedProps(res.ok ? (data.properties || []) : []);
+    } catch {
+      setOwnedProps([]);
+    } finally {
+      setLoadingProps(false);
+    }
+  };
+
+  useEffect(() => { loadOwnedProps(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [lead?.contact?.id]);
+
+  const handleAddProperty = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/owned-properties', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId: lead.contact.id, ...newProp }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to add property');
+      toast.success('Property added');
+      setShowAddProp(false);
+      setNewProp({ address: '', propertyType: 'Single Family', label: 'Home', beds: '', baths: '', squareFeet: '', estValue: '' });
+      loadOwnedProps();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleDeleteProperty = async (id: string) => {
+    if (!window.confirm('Remove this property?')) return;
+    try {
+      const res = await fetch('/api/owned-properties?id=' + encodeURIComponent(id), { method: 'DELETE' });
+      if (!res.ok) throw new Error((await res.json()).error || 'Delete failed');
+      toast.success('Property removed');
+      loadOwnedProps();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  // Live valuation via /api/property-data (BS&A / Realcomp). Honest error when
+  // no data provider key is configured instead of a fake estimate.
+  const handleLookupValue = async (address: string) => {
+    try {
+      const res = await fetch('/api/property-data?address=' + encodeURIComponent(address));
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lookup failed');
+      const assessed = data.raw?.assessedValue ?? data.property?.assessedValue;
+      toast.success(assessed
+        ? `Assessed value: $${Number(assessed).toLocaleString()} (source: ${data.source})`
+        : `Lookup complete (source: ${data.source}) — no assessment returned`);
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
   const [activeTab, setActiveTab] = useState<'overview' | 'properties' | 'searches' | 'transactions' | 'documents' | 'automations' | 'communications'>('overview');
 
   // Inline Note Logging State
@@ -1716,106 +1785,123 @@ export default function LeadDetailLayoutClient({
             {/* PROPERTIES TAB */}
             {activeTab === 'properties' && (
               <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm space-y-6">
-                
-                {/* Title and Add Property button */}
+
                 <div className="flex items-center justify-between border-b border-border/40 pb-3">
                   <div>
                     <h3 className="font-extrabold text-base text-foreground">Owned Properties</h3>
-                    <p className="text-xs text-muted-foreground">Known real estate assets and mailing addresses verified for {lead.contact.firstName}.</p>
+                    <p className="text-xs text-muted-foreground">Real estate assets on file for {lead.contact.firstName}.</p>
                   </div>
-                  <button type="button" 
-                    onClick={() => {
-                      toast.success('Simulated: Added secondary property fields!');
-                    }}
+                  <button type="button"
+                    onClick={() => setShowAddProp((v: boolean) => !v)}
                     className="px-3.5 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1"
                   >
                     <Plus className="w-3.5 h-3.5" /> Add Property
                   </button>
                 </div>
 
-                {/* Lofty alert banner card */}
-                <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/15">
-                      <Sparkles className="w-4 h-4 text-indigo-400" />
-                    </div>
-                    <span className="text-xs font-bold text-foreground">
-                      These <strong className="text-indigo-400 font-extrabold">2 properties</strong> could be your next listings — start nurturing them today
-                    </span>
-                  </div>
-                  <button type="button" 
-                    onClick={() => toast.success('Smart plans activated for nurturing owned properties!')} 
-                    className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black rounded-lg uppercase tracking-wider cursor-pointer"
+                {showAddProp && (
+                  <form
+                    onSubmit={handleAddProperty}
+                    className="p-4 bg-muted/30 border border-border/60 rounded-xl space-y-3 max-w-lg"
                   >
-                    Start Nurturing
-                  </button>
-                </div>
-
-                {/* Sub cards grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-3.5 bg-muted/20 border border-border/40 rounded-xl space-y-1.5 text-left">
-                    <span className="text-lg">🏠</span>
-                    <h5 className="font-extrabold text-[11px] text-foreground leading-snug">Know their equity & home value</h5>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Auto-fill est. value, loan balance & interest rate — no research needed.</p>
-                  </div>
-                  <div className="p-3.5 bg-muted/20 border border-border/40 rounded-xl space-y-1.5 text-left">
-                    <span className="text-lg">📊</span>
-                    <h5 className="font-extrabold text-[11px] text-foreground leading-snug">Stay top of mind, automatically</h5>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Home reports go out in your name every month — zero effort on your end.</p>
-                  </div>
-                  <div className="p-3.5 bg-muted/20 border border-border/40 rounded-xl space-y-1.5 text-left">
-                    <span className="text-lg">💡</span>
-                    <h5 className="font-extrabold text-[11px] text-foreground leading-snug">Catch sellers before they move</h5>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Instant alerts when a homeowner shows any seller signal or engagement.</p>
-                  </div>
-                </div>
-
-                {/* Properties List */}
-                <div className="space-y-4 pt-1">
-                  
-                  {/* Property 1 (Mailing Address) */}
-                  <div className="p-4 bg-muted/30 border border-border/60 rounded-xl flex items-center justify-between gap-4">
-                    <div className="space-y-2 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.5 rounded font-black uppercase">Mailing Address</span>
-                        <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded font-black uppercase">Home</span>
+                    <h4 className="font-bold text-xs text-foreground uppercase">Add Owned Property</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="col-span-2">
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Address *</label>
+                        <input type="text" required value={newProp.address}
+                          onChange={(e) => setNewProp({ ...newProp, address: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none" />
                       </div>
-                      <h4 className="font-extrabold text-sm text-foreground truncate">{lead.contact.address || '45409 North Ave, Macomb, MI 48042'}</h4>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
-                        <span>EST. <strong className="text-foreground">--</strong></span>
-                        <button type="button" onClick={() => toast.success('Valuation criteria updated')} className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer">
-                          Unlock equity, loan & interest rate &rsaquo;
-                        </button>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Type</label>
+                        <select value={newProp.propertyType} onChange={(e) => setNewProp({ ...newProp, propertyType: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground">
+                          <option>Single Family</option><option>Condo</option><option>Townhouse</option><option>Multi Family</option><option>Land</option>
+                        </select>
                       </div>
-                    </div>
-                    <button type="button" onClick={() => toast.success('Options drawer opened')} className="text-muted-foreground hover:text-foreground font-extrabold text-sm p-1.5 bg-muted hover:bg-muted/80 border border-border/80 rounded-lg cursor-pointer">
-                      •••
-                    </button>
-                  </div>
-
-                  {/* Property 2 (Single Family Home) */}
-                  <div className="p-4 bg-muted/30 border border-border/60 rounded-xl flex items-center justify-between gap-4">
-                    <div className="space-y-2 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[9px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded font-black uppercase">Single Family</span>
-                        <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded font-black uppercase">Home</span>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Label</label>
+                        <select value={newProp.label} onChange={(e) => setNewProp({ ...newProp, label: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground">
+                          <option>Home</option><option>Rental</option><option>Vacation</option><option>Land</option>
+                        </select>
                       </div>
-                      <h4 className="font-extrabold text-sm text-foreground truncate">{lead.contact.address || '45409 North Ave, Macomb, MI 48042'}</h4>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
-                        <span>EST. <strong className="text-foreground">--</strong></span>
-                        <span>3 beds | 2 baths | 1386 sqft</span>
-                        <span className="text-muted-foreground/45">&bull;</span>
-                        <button type="button" onClick={() => toast.success('Equity metrics loaded')} className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer">
-                          Unlock equity, loan & interest rate &rsaquo;
-                        </button>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Beds</label>
+                        <input type="number" min="0" value={newProp.beds} onChange={(e) => setNewProp({ ...newProp, beds: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Baths</label>
+                        <input type="number" min="0" step="0.5" value={newProp.baths} onChange={(e) => setNewProp({ ...newProp, baths: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Sq Ft</label>
+                        <input type="number" min="0" value={newProp.squareFeet} onChange={(e) => setNewProp({ ...newProp, squareFeet: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Est. Value ($)</label>
+                        <input type="number" min="0" value={newProp.estValue} onChange={(e) => setNewProp({ ...newProp, estValue: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground" />
                       </div>
                     </div>
-                    <button type="button" onClick={() => toast.success('Options drawer opened')} className="text-muted-foreground hover:text-foreground font-extrabold text-sm p-1.5 bg-muted hover:bg-muted/80 border border-border/80 rounded-lg cursor-pointer">
-                      •••
-                    </button>
-                  </div>
+                    <div className="flex gap-2 pt-1">
+                      <button type="submit" className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg">Save Property</button>
+                      <button type="button" onClick={() => setShowAddProp(false)} className="px-3 py-1.5 border border-border text-xs font-bold rounded-lg">Cancel</button>
+                    </div>
+                  </form>
+                )}
 
-                </div>
+                {lead.contact.address && (
+                  <div className="p-4 bg-muted/30 border border-border/60 rounded-xl">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.5 rounded font-black uppercase">Mailing Address</span>
+                    </div>
+                    <h4 className="font-extrabold text-sm text-foreground truncate mt-2">{lead.contact.address}</h4>
+                  </div>
+                )}
+
+                {loadingProps ? (
+                  <p className="text-sm text-muted-foreground">Loading properties...</p>
+                ) : ownedProps.length === 0 ? (
+                  <div className="p-8 text-center border border-dashed border-border/60 rounded-xl">
+                    <p className="text-sm text-muted-foreground">No owned properties recorded yet.</p>
+                    <p className="text-xs text-muted-foreground/70 mt-1">Use <strong>Add Property</strong> to record real estate assets for this contact.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 pt-1">
+                    {ownedProps.map((p: any) => (
+                      <div key={p.id} className="p-4 bg-muted/30 border border-border/60 rounded-xl flex items-center justify-between gap-4">
+                        <div className="space-y-2 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[9px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded font-black uppercase">{p.propertyType}</span>
+                            <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded font-black uppercase">{p.label}</span>
+                          </div>
+                          <h4 className="font-extrabold text-sm text-foreground truncate">{p.address}</h4>
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1 flex-wrap">
+                            <span>EST. <strong className="text-foreground">{p.estValue ? '$' + Number(p.estValue).toLocaleString() : '--'}</strong></span>
+                            {(p.beds || p.baths || p.squareFeet) ? (
+                              <span>{p.beds ?? '--'} beds | {p.baths ?? '--'} baths | {p.squareFeet ? Number(p.squareFeet).toLocaleString() : '--'} sqft</span>
+                            ) : null}
+                            <button type="button"
+                              onClick={() => handleLookupValue(p.address)}
+                              className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer">
+                              Look up value &amp; equity &rsaquo;
+                            </button>
+                          </div>
+                        </div>
+                        <button type="button"
+                          onClick={() => handleDeleteProperty(p.id)}
+                          title="Remove property"
+                          className="text-muted-foreground hover:text-red-500 font-extrabold text-sm p-1.5 bg-muted hover:bg-muted/80 border border-border/80 rounded-lg cursor-pointer">
+                          &bull;&bull;&bull;
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
               </div>
             )}
