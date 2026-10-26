@@ -71,6 +71,7 @@ model Workspace {
   voiceSettings  VoiceSettings?
   notifications  SystemNotification[]
   ownedProperties OwnedProperty[]
+  contracts       Contract[]
 }
 
 model WorkspaceMember {
@@ -168,6 +169,44 @@ model OwnedProperty {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
+model Contract {
+  id            String   @id @default(cuid())
+  workspaceId   String
+  dealId        String?
+  title         String
+  contractType  String   @default("PURCHASE_AGREEMENT") // PURCHASE_AGREEMENT | LISTING_AGREEMENT | LEASE | EARNEST_MONEY | ADDENDUM
+  status        String   @default("DRAFT") // DRAFT | SENT | PARTIALLY_SIGNED | COMPLETED | VOID
+  terms         String?  // JSON body: property, price, contingencies, dates
+  documentHash  String?  // SHA-256 of content at send-time (integrity anchor for the audit trail)
+  createdBy     String?
+  sentAt        DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workspace   Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deal        Deal?              @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  signatures  ContractSignature[]
+}
+
+model ContractSignature {
+  id            String   @id @default(cuid())
+  contractId    String
+  partyName     String
+  partyEmail    String
+  role          String   @default("BUYER") // BUYER | SELLER | AGENT | CO_AGENT | WITNESS
+  status        String   @default("PENDING") // PENDING | SIGNED | DECLINED
+  signatureText String?  // typed signature, e.g. "/s/ Jane Doe"
+  ipAddress     String?
+  userAgent     String?
+  declinedReason String?
+  signedAt      DateTime?
+  inviteToken   String   @unique @default(cuid())
+  createdAt     DateTime @default(now())
+
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+}
+
 model SmartPlan {
   id          String    @id @default(cuid())
   name        String
@@ -204,6 +243,7 @@ model Deal {
   stakeholders    DealStakeholder[]
   requirements    DealRequirement[]
     referrals       Referral[]       @relation("ReferralDeal")
+    contracts       Contract[]
   }
 
 model DealStakeholder {
