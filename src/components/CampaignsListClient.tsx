@@ -144,7 +144,15 @@ export default function CampaignsListClient({
   const [planSearch, setPlanSearch] = useState('');
   
   // Folders layout state
-  const [myFolders, setMyFolders] = useState<string[]>(['Follow-up Folder', 'Lead Gen Sequence']);
+  const [myFolders, setMyFolders] = useState<string[]>([]);
+  const [previewTemplate, setPreviewTemplate] = useState<typeof REAL_ESTATE_TEMPLATES[number] | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('campaign-folders');
+      if (saved) setMyFolders(JSON.parse(saved));
+    } catch { /* ignore */ }
+  }, []);
   const [companyFolders, setCompanyFolders] = useState<string[]>(['Preforeclosure Folder', 'Expireds List Folder']);
   const [selectedFolder, setSelectedFolder] = useState<string>('all');
   const [newFolderName, setNewFolderName] = useState('');
@@ -244,10 +252,14 @@ export default function CampaignsListClient({
 
   const handleAddFolder = () => {
     if (newFolderName.trim()) {
-      setMyFolders([...myFolders, newFolderName.trim()]);
+      const next = [...myFolders, newFolderName.trim()];
+      setMyFolders(next);
+      // Persist locally so folders survive refresh (they were lost on every
+      // reload while toasting 'created successfully!').
+      try { localStorage.setItem('campaign-folders', JSON.stringify(next)); } catch { /* private mode */ }
       setNewFolderName('');
       setShowAddFolder(false);
-      toast.success('Folder created successfully!');
+      toast.success('Folder saved to this browser.');
     }
   };
 
@@ -671,10 +683,7 @@ export default function CampaignsListClient({
                       Use Template
                     </button>
                     <button type="button"
-                      onClick={() => {
-                        // Mock details preview
-                        toast.success(`Opening preview for: ${tmpl.name}`);
-                      }}
+                      onClick={() => setPreviewTemplate(tmpl)}
                       className="p-2 border border-border rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all"
                       title="Preview Steps"
                     >
@@ -939,6 +948,53 @@ export default function CampaignsListClient({
                 className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95 transition-all shadow-md"
               >
                 Close Metrics Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Template step preview (real data — was a 'Opening preview...' toast) */}
+      {previewTemplate && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setPreviewTemplate(null)}>
+          <div className="bg-card border border-border/60 rounded-2xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5 border-b border-border/40">
+              <h3 className="text-lg font-extrabold text-foreground">{previewTemplate.name}</h3>
+              <p className="text-xs text-muted-foreground mt-1">{previewTemplate.description}</p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <span className="text-[9px] bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded font-black uppercase">{previewTemplate.leadType}</span>
+                <span className="text-[9px] bg-muted text-muted-foreground border border-border px-1.5 py-0.5 rounded font-black uppercase">{previewTemplate.duration} Days</span>
+                <span className="text-[9px] bg-muted text-muted-foreground border border-border px-1.5 py-0.5 rounded font-black uppercase">{previewTemplate.scope}</span>
+                <span className="text-[9px] bg-muted text-muted-foreground border border-border px-1.5 py-0.5 rounded font-black uppercase">{previewTemplate.steps.length} Steps</span>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-5 space-y-3">
+              {previewTemplate.steps.map((s, i) => (
+                <div key={s.id} className="p-3 bg-muted/20 border border-border/40 rounded-xl">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-black uppercase border ${
+                      s.type === 'EMAIL' ? 'bg-blue-500/10 text-blue-400 border-blue-500/25' :
+                      s.type === 'SMS' ? 'bg-green-500/10 text-green-400 border-green-500/25' :
+                      s.type === 'CALL' ? 'bg-amber-500/10 text-amber-400 border-amber-500/25' :
+                      'bg-muted text-muted-foreground border-border'
+                    }`}>{s.type}</span>
+                    <span className="text-[10px] text-muted-foreground font-bold">
+                      Step {i + 1} · waits {s.delayValue} {s.delayUnit.toLowerCase()}{s.delayValue === 1 ? '' : 's'}
+                    </span>
+                  </div>
+                  {(s as any).subject && <p className="text-xs font-bold text-foreground mt-2">{(s as any).subject}</p>}
+                  <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line">{s.content}</p>
+                </div>
+              ))}
+            </div>
+            <div className="p-4 border-t border-border/40 flex justify-end gap-2 shrink-0">
+              <button type="button" onClick={() => handleImportTemplate(previewTemplate)}
+                className="px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold rounded-lg hover:bg-secondary/90">
+                Use Template
+              </button>
+              <button type="button" onClick={() => setPreviewTemplate(null)}
+                className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95">
+                Close
               </button>
             </div>
           </div>

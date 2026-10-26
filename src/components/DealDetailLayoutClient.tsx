@@ -4,6 +4,7 @@ import { useState, useEffect, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { DEAL_STAGES } from '@/lib/deal-stages';
 import { 
   ArrowLeft, CheckCircle2, Circle, DollarSign, Calculator, Briefcase, Plus,
   Trash2, FileText, Send, User, ShieldAlert, Sparkles, Building, Key, MapPin, Check
@@ -83,14 +84,8 @@ export default function DealDetailLayoutClient({
       .catch(() => {}).finally(() => setDataLoading(false));
   }, [deal.id]);
 
-  // Interactive stages list
-  const stages = [
-    { id: 'QUALIFICATION', label: 'Qualification' },
-    { id: 'PROPOSAL', label: 'Proposal/Showing' },
-    { id: 'NEGOTIATION', label: 'Negotiation' },
-    { id: 'UNDER_CONTRACT', label: 'Under Contract' },
-    { id: 'CLOSED_WON', label: 'Closed Won' },
-  ];
+  // Interactive stages list (canonical — from lib/deal-stages)
+  const stages = DEAL_STAGES.map(s => ({ id: s.id, label: s.label }));
 
   // Financial Ledger State
   const [purchasePrice, setPurchasePrice] = useState(deal.value || 0);

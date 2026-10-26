@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { 
   Search, ShieldAlert, Sparkles, Code2, Database, HelpCircle, MailCheck, UserPlus, Sliders, Globe2, CreditCard, ToggleRight, ToggleLeft
@@ -86,9 +87,10 @@ export default function IntegrationCenterClient({
   initialData: any;
   workspaceId: string;
 }) {
+  const router = useRouter();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [partners, setPartners] = useState<PartnerProduct[]>(INITIAL_PARTNERS);
+  const [partners] = useState<PartnerProduct[]>(INITIAL_PARTNERS);
   
   // MyPlusLeads Configuration modal state
   const [activePartnerConfig, setActivePartnerConfig] = useState<string | null>(null);
@@ -122,20 +124,20 @@ export default function IntegrationCenterClient({
     }
   };
 
-  const toggleConnection = (id: string) => {
+  const toggleConnection = (id: string, name: string) => {
     if (id === 'myplus') {
+      // MyPlusLeads has a real, working integration (credentials + hourly sync).
       setActivePartnerConfig('myplus');
       return;
     }
-    
-    setPartners(partners.map(p => {
-      if (p.id === id) {
-        const nextState = !p.connected;
-        toast.success(`${p.name} integration ${nextState ? 'enabled' : 'disabled'}.`);
-        return { ...p, connected: nextState };
-      }
-      return p;
-    }));
+    if (id === 'realcomp') {
+      // Realcomp is wired into the valuation API but needs a server key.
+      toast('Realcomp MLS requires a REALCOMP_API_KEY on the server — add it to .env to enable MLS and valuation lookups.', { icon: '🔑', duration: 6000 });
+      return;
+    }
+    // Not yet integrated: say so plainly instead of flipping a fake toggle
+    // that claimed 'integration enabled' with no connection behind it.
+    toast(`${name} is a planned integration — vendor API setup is not yet available in-app. Contact your administrator.`, { icon: '🔧', duration: 5000 });
   };
 
   const filteredPartners = partners.filter(p => {
@@ -158,7 +160,7 @@ export default function IntegrationCenterClient({
           </span>
         </div>
         <button type="button" 
-          onClick={() => toast.success('Redirecting to domain configuration setup...')}
+          onClick={() => router.push('/dashboard/settings/email')}
           className="bg-amber-500 hover:bg-amber-600 text-white font-black uppercase text-[10px] tracking-wider px-4 py-2.5 rounded-xl transition-colors cursor-pointer w-fit shrink-0"
         >
           Configure Domain
@@ -224,7 +226,7 @@ export default function IntegrationCenterClient({
                     </div>
 
                     <button type="button"
-                      onClick={() => toggleConnection(p.id)}
+                      onClick={() => toggleConnection(p.id, p.name)}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-black uppercase border cursor-pointer transition-colors ${
                         p.connected
                           ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'

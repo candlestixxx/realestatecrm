@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { authOptions } from '@/lib/auth';
 import { dealSchema } from '@/lib/validations/deal';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
+import { DEAL_STAGES } from '@/lib/deal-stages';
 import { syncDealToVectorStore } from '@/lib/rag';
 
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
@@ -91,13 +92,7 @@ export default async function DealsPage() {
     orderBy: { firstName: 'asc' },
   });
 
-  const stages = [
-    { id: 'QUALIFICATION', label: 'Qualification' },
-    { id: 'PROPOSAL', label: 'Proposal/Showing' },
-    { id: 'NEGOTIATION', label: 'Negotiation' },
-    { id: 'UNDER_CONTRACT', label: 'Under Contract' },
-    { id: 'CLOSED_WON', label: 'Closed Won' },
-  ];
+  const stages = DEAL_STAGES.map(s => ({ id: s.id, label: s.label, open: s.open }));
 
   return (
     <div className="space-y-6 h-[calc(100vh-6rem)] flex flex-col">

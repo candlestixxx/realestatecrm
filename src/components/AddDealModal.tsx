@@ -117,7 +117,8 @@ export default function AddDealModal({
                 <button
                   type="button"
                   onClick={() => {
-                    toast.success('Success!');
+                    // Cancel discards the form — no success toast (this used
+                    // to claim 'Success!' while closing without doing anything).
                     setIsOpen(false);
                     setError(null);
                   }}

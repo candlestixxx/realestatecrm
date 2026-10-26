@@ -48,7 +48,8 @@ export default function AgentProfileModal({
     localStorage.setItem('agent_profile', JSON.stringify(profile));
     localStorage.setItem('agent_company', JSON.stringify(company));
     localStorage.setItem('agent_billing', JSON.stringify(billing));
-    toast.success('Agent setup saved successfully!');
+    // Honest label: this wizard persists to the browser only (no server sync).
+    toast.success('Setup saved to this browser.');
     onClose();
   };
 
