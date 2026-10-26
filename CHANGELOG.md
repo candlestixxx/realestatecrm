@@ -1,3 +1,17 @@
+## v0.59.0 (2026-10-26)
+
+### Security — CRITICAL auth bypass (found while building team invites)
+`CredentialsProvider.authorize()` returned any DB user found by email with **no password verification** — anyone knowing an agent's email could sign in as them (prod has 4 real users incl. a BROKER). `User.passwordHash` (scrypt) is now enforced; passwordless accounts cannot password-sign in until set via team admin flow or magic link. Verified live: wrong-password login as the broker now returns 401 with an empty session.
+
+### Added — Team Management (white-label team phase 2)
+- `/api/team` GET/POST/PATCH/DELETE — RBAC via existing permission matrix, hierarchy guards (cannot assign above own rank), last-OWNER protection
+- Invites create accounts with one-time temp passwords (shown once, never stored plaintext)
+- Admin password reset + self-service change (current password required)
+- Settings -> Team page: members table, role dropdowns, invite, reset, remove
+
+### Added — v0.58.63 recap
+- Real e-sign contracts replacing the fabricated "blockchain" contracts API (deleted)
+
 ## v0.58.63 (2026-10-22)
 
 ### Fixed — Lead Detail "Properties" tab (found via 'Simulated:' toast report)
