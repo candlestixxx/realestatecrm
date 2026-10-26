@@ -26,7 +26,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const signature = await prisma.contractSignature.findUnique({
       where: { inviteToken: token },
-      include: { contract: { include: { signatures: true } } },
+      include: { contract: { include: { signatures: true, workspace: {
+        select: { name: true, logoUrl: true, primaryColor: true, accentColor: true, brokeragePhone: true, brokerageAddress: true, emailFooter: true },
+      } } } },
     });
     if (!signature) return NextResponse.json({ error: 'Invalid signing link' }, { status: 404 });
 
@@ -34,6 +36,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (c.status === 'VOID') return NextResponse.json({ error: 'This contract has been voided' }, { status: 410 });
 
     return NextResponse.json({
+      branding: c.workspace ? {
+        name: c.workspace.name,
+        logoUrl: c.workspace.logoUrl,
+        primaryColor: c.workspace.primaryColor,
+        accentColor: c.workspace.accentColor,
+        brokeragePhone: c.workspace.brokeragePhone,
+        brokerageAddress: c.workspace.brokerageAddress,
+        emailFooter: c.workspace.emailFooter,
+      } : null,
       contract: {
         id: c.id,
         title: c.title,

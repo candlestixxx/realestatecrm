@@ -12,6 +12,10 @@ import { FileSignature, CheckCircle2, Clock, PenLine, ShieldCheck, XCircle } fro
  */
 
 interface PartyView { name: string; role: string; status: string; signedAt?: string | null; isYou: boolean }
+interface BrandingView {
+  name: string; logoUrl: string | null; primaryColor: string; accentColor: string;
+  brokeragePhone: string | null; brokerageAddress: string | null; emailFooter: string | null;
+}
 interface ContractView {
   id: string; title: string; contractType: string; status: string;
   terms: any; sentAt: string | null; parties: PartyView[];
@@ -21,6 +25,7 @@ interface YourParty { name: string; email: string; role: string; status: string 
 export default function SignClient({ token }: { token: string }) {
   const [contract, setContract] = useState<ContractView | null>(null);
   const [yourParty, setYourParty] = useState<YourParty | null>(null);
+  const [branding, setBranding] = useState<BrandingView | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [signatureText, setSignatureText] = useState('');
@@ -35,6 +40,7 @@ export default function SignClient({ token }: { token: string }) {
         if (!res.ok) throw new Error(data.error || 'Failed to load');
         setContract(data.contract);
         setYourParty(data.yourParty);
+        if (data.branding) setBranding(data.branding);
         if (data.yourParty?.name) setSignatureText(data.yourParty.name);
       } catch (err: any) {
         setError(err.message);
@@ -86,9 +92,22 @@ export default function SignClient({ token }: { token: string }) {
     <div className="min-h-screen bg-muted/20 p-6 lg:p-10">
       <div className="max-w-2xl mx-auto space-y-5">
         <div className="text-center">
-          <FileSignature className="w-10 h-10 text-primary mx-auto" />
+          {branding?.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={branding.logoUrl} alt={branding.name} className="w-14 h-14 rounded-xl object-contain mx-auto bg-white/90 border border-border/40" />
+          ) : (
+            <FileSignature className="w-10 h-10 mx-auto" style={{ color: branding?.primaryColor || undefined }} />
+          )}
           <h1 className="text-xl font-extrabold text-foreground mt-2">{contract.title}</h1>
-          <p className="text-sm text-muted-foreground">{contract.contractType.replace(/_/g, ' ')} · Sent for electronic signature</p>
+          <p className="text-sm text-muted-foreground">
+            {contract.contractType.replace(/_/g, ' ')} · Sent for electronic signature
+            {branding?.name && <span> on behalf of <strong>{branding.name}</strong></span>}
+          </p>
+          {(branding?.brokerageAddress || branding?.brokeragePhone) && (
+            <p className="text-xs text-muted-foreground/70 mt-1">
+              {branding.brokerageAddress}{branding.brokeragePhone && <> · {branding.brokeragePhone}</>}
+            </p>
+          )}
         </div>
 
         <div className="bg-card border border-border/60 rounded-2xl p-6 space-y-5">
@@ -147,7 +166,8 @@ export default function SignClient({ token }: { token: string }) {
 
               <div className="flex gap-2">
                 <button type="button" onClick={() => submit('sign')} disabled={submitting || !consent || signatureText.trim().length < 3}
-                  className="flex-1 px-4 py-3 bg-primary text-primary-foreground font-bold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2">
+                  className="flex-1 px-4 py-3 text-white font-bold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{ backgroundColor: branding?.primaryColor || undefined }}>
                   <ShieldCheck className="w-4 h-4" /> Sign Document
                 </button>
                 <button type="button" onClick={() => { if (window.confirm('Decline this contract? This voids the agreement.')) submit('decline'); }}
@@ -163,6 +183,7 @@ export default function SignClient({ token }: { token: string }) {
         <p className="text-[10px] text-muted-foreground/70 text-center max-w-md mx-auto">
           Your signature is recorded with a timestamp and network address for attribution. The document content is fingerprinted
           (SHA-256) when sent; any alteration after sending blocks signing. Retain a copy for your records.
+          {branding?.emailFooter && <><br /><br />{branding.emailFooter}</>}
         </p>
       </div>
     </div>

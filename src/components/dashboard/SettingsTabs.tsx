@@ -29,6 +29,15 @@ interface SettingsTab {
 
 const TABS: SettingsTab[] = [
   {
+    id: 'branding',
+    label: 'Branding',
+    description: 'Brokerage name, logo, colors, and client portal identity.',
+    tooltip:
+      'White-label branding shown on the client portal, e-signing pages, and outbound emails. Each workspace carries its own identity.',
+    href: '/dashboard/settings/branding',
+    icon: '🎨',
+  },
+  {
     id: 'team',
     label: 'Team',
     description: 'Invite agents, assign brokerage roles, and manage access.',

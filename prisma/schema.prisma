@@ -41,6 +41,14 @@ model Workspace {
   chatRooms    ChatRoom[]
   id             String            @id @default(cuid())
   name           String
+  // White-label branding (rendered on client portal, signing pages, emails)
+  logoUrl        String?
+  primaryColor   String    @default("#2563eb")
+  accentColor    String    @default("#d4af37")
+  portalSlug     String?   @unique
+  emailFooter    String?
+  brokeragePhone String?
+  brokerageAddress String?
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
   Activity       Activity[]
