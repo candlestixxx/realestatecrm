@@ -1,3 +1,12 @@
+## v0.60.0 (2026-10-26)
+
+### Added — White-label Branding (B phase 3)
+- Per-workspace identity: logo, primary/accent colors, portal slug (globally unique), email footer, brokerage phone/address
+- `/api/branding` GET/PUT (manage:workspace RBAC, hex-color and slug validation, uniqueness checks)
+- Settings -> Branding page with color pickers and live client-portal preview
+- Client portal renders brokerage branding; e-signing pages show the inviting brokerage via the signing token
+- Portal fixes: Sign Out was a dead button (now real), Support number is a tel: link, branded footer added
+
 ## v0.59.0 (2026-10-26)
 
 ### Security — CRITICAL auth bypass (found while building team invites)
