@@ -61,3 +61,9 @@ apps/*/.env.local
 apps/*/.env.production
 apps/*/.env.production.local
 _staging/
+
+# agent temp files
+.tmp-*.js
+.tmp-*.py
+.tmp-*.txt
+.tmp-*.sql
