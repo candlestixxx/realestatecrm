@@ -29,6 +29,15 @@ interface SettingsTab {
 
 const TABS: SettingsTab[] = [
   {
+    id: 'team',
+    label: 'Team',
+    description: 'Invite agents, assign brokerage roles, and manage access.',
+    tooltip:
+      'Team management for the workspace. Roles follow the brokerage hierarchy: Owner, Broker, Associate Broker, Realtor Agent, Agent, Office Manager.',
+    href: '/dashboard/settings/team',
+    icon: '👥',
+  },
+  {
     id: 'integrations',
     label: 'Lead Integrations',
     description: 'MyPlusLeads, HubSpot, Salesforce, Lofty, and webhook endpoints.',

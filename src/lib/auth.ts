@@ -4,6 +4,7 @@ import type { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import EmailProvider from 'next-auth/providers/email';
 import prisma from './prisma';
+import { verifyPassword } from './password';
 import { DEFAULT_WORKSPACE_SLUG } from './workspace-context';
 
 process.env.NEXTAUTH_SECRET ??= 'realestatecrm-dev-secret';
@@ -107,10 +108,19 @@ export const authOptions: NextAuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: { email: identifier },
-          select: { id: true, name: true, email: true, role: true },
+          select: { id: true, name: true, email: true, role: true, passwordHash: true },
         });
 
         if (!user) {
+          return null;
+        }
+
+        // SECURITY: DB users must present the matching password. This path
+        // previously returned the user for ANY password once the email
+        // matched — full account takeover for every registered account.
+        // Accounts without a passwordHash are not password-signable; their
+        // password is set via the team invite/reset flow or email magic link.
+        if (!user.passwordHash || !verifyPassword(password, user.passwordHash)) {
           return null;
         }
 

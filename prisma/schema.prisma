@@ -15,6 +15,7 @@ model User {
   emailVerified DateTime?
   image         String?
   role          String            @default("AGENT")
+  passwordHash  String?           // scrypt hash (salt:hex) — null until password set via invite/reset
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
   activities    Activity[]
