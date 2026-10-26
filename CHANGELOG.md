@@ -1,3 +1,19 @@
+## v0.61.0 (2026-10-26)
+
+### Fixed — fake-UI sweep (full-page pattern audit, 5 fakes killed)
+- AddDealModal 'Cancel' fired a success toast while discarding the form
+- CampaignsListClient folders: claimed 'created' but never persisted (now saved, honest label)
+- CampaignsListClient template preview: 'Mock details preview' did nothing -> real step-preview modal
+- IntegrationCenter: fake 'integration enabled' toggles with no connection behind them -> honest per-vendor status; fake 'Redirecting...' -> real navigation to email settings
+- AgentProfileModal: browser-only storage no longer claims server success
+
+### Fixed — deal pipeline stage drift
+- Canonical `lib/deal-stages.ts` (LEAD -> ... -> CLOSED_WON | CLOSED_LOST): LEAD deals were invisible on both kanbans and no CLOSED_LOST existed anywhere
+- Stage strings validated in dealSchema and updateDealStageAction (previously any string persisted silently)
+
+### Added — money-path test suite (tests/money-paths.test.mts, 6/6 passing)
+- Auth regression (wrong password -> no session), e-sign lifecycle with consent/integrity/attribution assertions, team RBAC, branding validation, deal stage whitelist
+
 ## v0.60.0 (2026-10-26)
 
 ### Added — White-label Branding (B phase 3)
