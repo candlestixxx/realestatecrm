@@ -46,6 +46,9 @@ async function main() {
     if (!tab) { console.error('Muse chat tab not found'); process.exit(1); }
     console.log('Target: ' + tab.title + ' | ' + tab.url);
     await cdp(tab.webSocketDebuggerUrl, async send => {
+      // New Muse UI keeps the composer hidden until the tab is frontmost.
+      try { await send('Page.bringToFront', {}); } catch (e) { /* non-fatal */ }
+      await new Promise(r => setTimeout(r, 800));
       if (message === '--inspect') {
         // Find the composer: input/textarea/contenteditable near the bottom
         const r = await send('Runtime.evaluate', {
