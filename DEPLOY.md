@@ -37,10 +37,13 @@ DATABASE_URL="file:./dev.db"
 NEXTAUTH_SECRET="your-secret-here"
 NEXTAUTH_URL="http://localhost:3000"
 
-# OpenAI (for AI features)
+# DeepSeek (PRIMARY LLM — all chat/parse/qualify/copy calls default to deepseek-v4-flash; override with DEEPSEEK_MODEL=deepseek-v4-pro)
+DEEPSEEK_API_KEY="sk-..."
+
+# OpenAI (embeddings for src/lib/rag.ts + voice STT/TTS fallback — DeepSeek has no embeddings/audio endpoints)
 OPENAI_API_KEY="sk-..."
 
-# ElevenLabs (for voice features)
+# ElevenLabs (legacy voice provider — superseded by OpenAI TTS fallback)
 ELEVENLABS_API_KEY="..."
 
 # Pinecone (optional, for vector search)
@@ -274,6 +277,11 @@ ssh hetzner "pm2 logs excellegacyrealtygroup --lines 10 --nostream"
 | ContentPlanner | `contentplanner` | 3213 | `/contentplanner/` |
 | Media Workflow | `media-workflow` | 3214 | `/media-workflow/` |
 | LegacyLeads | `legacyleads` | 3215 | `/legacyleads/` |
+| ContentPlanner API | `contentplanner-api` | 3216 | `/contentplanner-api/` (WebSocket proxied) |
+
+- **ContentPlanner DB**: Postgres (`contentplanner` user+DB; password in `/root/.contentplanner-pgpass`) — schema is postgresql, NOT SQLite.
+- **ContentPlanner service JWT**: main CRM proxies `/api/contentplanner/*` with a short-lived HS256 token; secret in `/root/.contentplanner-svc-secret`. Deploy scripts must preserve it alongside `DATABASE_URL`/`DEEPSEEK*`/`AUTH_JWT_SECRET`.
+- **Deploy scripts preserve integration keys**: all `deploy-*.sh` preserve `DEEPSEEK*` lines (and voice/messaging keys) — never redeploy with a script that wipes env.
 
 - **NEXTAUTH_URL** must be `https://excellegacyrealtygroup.site` (NOT `localhost:3000`).
 - **Redis** runs on `127.0.0.1:6379` (systemd `redis-server`, active). Required by:

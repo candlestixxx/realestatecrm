@@ -1,3 +1,14 @@
+## v0.61.0 — Auth bypass fix, team/branding, fake-UI purge, CDP lane (2026-10-26 → 2026-10-31)
+
+**v0.59.0 — CRITICAL auth bypass fixed**: `CredentialsProvider.authorize()` verified email only, no password check — anyone with an agent's email could sign in as them. Now scrypt `passwordHash` enforced. Plus team management (`/api/team`, RBAC, invites, last-OWNER guard) and real e-sign contracts (fabricated "blockchain" API deleted).
+**v0.60.0 — White-label branding**: per-workspace logo/colors/portal slug/email footer; Settings → Branding with live preview; client portal + e-sign pages render brokerage identity.
+**v0.61.0 — Fake-UI sweep**: 5 fabricated patterns killed (AddDealModal fake success toast, Campaigns folders/templates, IntegrationCenter fake toggles, AgentProfileModal browser-storage-as-server). Deal stage whitelist (`lib/deal-stages.ts`) + money-path tests 6/6.
+**CDP send lane (2026-10-31)**: `scripts/muse-cdp.js` hardened — stale hardcoded TAB_ID removed (URL-match pick), 8s list / 10s ws-open / 15s per-send / 30s overall timeouts (was: hang forever). Verified live against Edge 156: chat tab + visible composer found, lane-check delivered (`TYPE: TYPED`, Enter dispatched). Committed as d3e4faa via protocol loop.
+
+**Still key-blocked (unchanged)**: Twilio number purchase, SendGrid/Lob keys, Whitepages/PDL/BS&A/Tavily/NewsAPI/Canva/HeyGen/Browserless, SQLite→Turso/Postgres, Pinecone/OpenAI hosted.
+
+---
+
 ## v0.58.59 — Vapi + Twilio live (2026-10-22)
 
 **Task:** Wire user-provided voice/telephony keys; continue.

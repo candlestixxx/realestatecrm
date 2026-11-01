@@ -108,7 +108,7 @@ const SECTIONS: Section[] = [
         href: '/dashboard/agentcore',
         icon: '🤖',
         tooltip:
-          'Gemini-powered co-pilot that can execute CRM actions directly. Ask it to "create a task" or "segment leads from last week" and it will do it.',
+          'DeepSeek-powered co-pilot that can execute CRM actions directly. Ask it to "create a task" or "segment leads from last week" and it will do it.',
         priority: 3,
         badge: 'AI',
       },
@@ -205,7 +205,7 @@ const SECTIONS: Section[] = [
       {
         label: 'SMS Text Codes',
         description: 'Keyword-based auto-responses and lead capture via short codes.',
-        href: '/dashboard/marketing/text-codes',
+        href: '/dashboard/marketing',
         icon: '💬',
         tooltip:
           'Prospects text a keyword to your number; the system auto-creates a lead and enrolls them in a campaign.',
@@ -255,6 +255,14 @@ const SECTIONS: Section[] = [
     title: 'Marketing & Content Studio',
     tagline: 'Generate, brand, schedule, and publish across every channel',
     features: [
+      {
+        label: 'Marketing Hub',
+        description: 'Campaigns, text codes, and channel tools in one tabbed surface.',
+        href: '/dashboard/marketing',
+        icon: '📣',
+        tooltip:
+          'Canonical marketing home. Houses the TextCodes component plus links to campaigns and the studio.',
+      },
       {
         label: 'Marketing Studio',
         description: 'Hub for 10 marketing channels — email, social, print, video, ads.',
@@ -482,7 +490,7 @@ const SECTIONS: Section[] = [
       {
         label: 'Website Builder',
         description: 'Drag-and-drop WYSIWYG for pages, templates, and landing funnels.',
-        href: '/dashboard/websites/builder',
+        href: '/dashboard/websites',
         icon: '🧱',
         tooltip: 'Visual builder replicating Lofty.com parity. Pre-built templates for agents, properties, neighborhoods.',
       },
@@ -519,7 +527,7 @@ const SECTIONS: Section[] = [
         description: 'Provider API keys for Gemini, OpenAI, and other model endpoints.',
         href: '/dashboard/settings/ai-models',
         icon: '🔑',
-        tooltip: 'Keys for the AI layer. The co-pilot defaults to Gemini 2.0 Flash; override per-agent if needed.',
+        tooltip: 'Keys for the AI layer. The co-pilot defaults to DeepSeek V4 (flash); override per-agent if needed.',
       },
       {
         label: 'MCP Server',
@@ -527,6 +535,34 @@ const SECTIONS: Section[] = [
         href: '/dashboard/settings/mcp',
         icon: '🧩',
         tooltip: 'Expose CRM tools to external MCP-compatible agents (Claude, Cursor, etc.).',
+      },
+      {
+        label: 'Settings Hub',
+        description: 'All configuration in one tabbed surface — AI, brand, team, voice, email.',
+        href: '/dashboard/settings',
+        icon: '⚙️',
+        tooltip: 'Canonical settings home. Every settings subpage lives here as a tab.',
+      },
+      {
+        label: 'AI Memory',
+        description: 'Long-term memory controls and learning preferences for the co-pilot.',
+        href: '/dashboard/settings/ai-memory',
+        icon: '🧠',
+        tooltip: 'What the co-pilot remembers across sessions. Review and prune stored facts.',
+      },
+      {
+        label: 'Branding',
+        description: 'Workspace identity — logo, colors, portal slug, email footer.',
+        href: '/dashboard/settings/branding',
+        icon: '🎨',
+        tooltip: 'White-label identity. Live client-portal preview as you edit colors and logo.',
+      },
+      {
+        label: 'Team',
+        description: 'Members, roles, invites, and password resets.',
+        href: '/dashboard/settings/team',
+        icon: '👥',
+        tooltip: 'RBAC via the permission matrix. Invites use one-time temp passwords; last-OWNER is protected.',
       },
       {
         label: 'Sync Queue Log',

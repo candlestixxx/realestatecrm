@@ -6,7 +6,7 @@
 $services = @(
   @{ Name = 'Main CRM';        Port = 3000;  WorkDir = 'C:\Users\hyper\workspace\realestatecrm';                        Cmd = 'node node_modules\next\dist\bin\next start -p 3000' },
   @{ Name = 'Live Audio';      Port = 8090;  WorkDir = 'C:\Users\hyper\workspace\realestatecrm';                        Cmd = 'node scripts\live-audio-server.mjs' },
-  @{ Name = 'LeadG';           Port = 3001;  WorkDir = 'C:\Users\hyper\workspace\realestatecrm\apps\leadg';              Cmd = 'node node_modules\next\dist\bin\next start -p 3001' },
+  @{ Name = 'LeadG';           Port = 3001;  WorkDir = 'C:\Users\hyper\workspace\realestatecrm\apps\leadg';              Cmd = 'node .next\standalone\server.js' },
   @{ Name = 'Foreclosure';     Port = 3002;  WorkDir = 'C:\Users\hyper\workspace\realestatecrm\apps\foreclosureworkflow'; Cmd = 'set NODE_ENV=production && set PORT=3002 && set NEXTAUTH_SECRET=dev_secret_change_me && set NEXTAUTH_URL=http://localhost:3002 && node start-3002.js' },
   @{ Name = 'CP Web';          Port = 3003;  WorkDir = 'C:\Users\hyper\workspace\realestatecrm\apps\contentplanner\apps\web'; Cmd = 'node ..\..\node_modules\next\dist\bin\next start -p 3003' },
   @{ Name = 'CP API';          Port = 3031;  WorkDir = 'C:\Users\hyper\workspace\realestatecrm\apps\contentplanner\packages\api'; Cmd = 'cmd /c start-api.bat' },

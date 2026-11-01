@@ -86,6 +86,11 @@ const GROUPS: NavGroup[] = [
     tooltip: 'Everything that touches a prospect or publishes content.',
     links: [
       {
+        label: 'Marketing Hub',
+        href: '/dashboard/marketing',
+        tooltip: 'Campaigns, text codes, and channel tools in one tabbed surface.',
+      },
+      {
         label: 'Drip Campaigns',
         href: '/dashboard/campaigns',
         tooltip: 'AI-led SMS/Email sequences with weighted A/B variants.',
@@ -118,7 +123,7 @@ const GROUPS: NavGroup[] = [
       },
       {
         label: 'SMS Text Codes',
-        href: '/dashboard/marketing/text-codes',
+        href: '/dashboard/marketing',
         tooltip: 'Keyword auto-responses that capture leads from inbound texts.',
       },
       {
@@ -258,7 +263,7 @@ const GROUPS: NavGroup[] = [
       },
       {
         label: 'Website Builder',
-        href: '/dashboard/websites/builder',
+        href: '/dashboard/websites',
         tooltip: 'Drag-and-drop WYSIWYG for pages, templates, and landing funnels.',
       },
       {

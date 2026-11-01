@@ -4,7 +4,7 @@ import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 import AddTaskModal from '@/components/AddTaskModal';
-import { addTaskAction } from '@/lib/actions/task';
+import { addTaskAction, toggleTaskStatusAction } from '@/lib/actions/task';
 import Link from 'next/link';
 import {} from '@/lib/permissions';
 
@@ -91,8 +91,7 @@ export default async function TasksPage(props: {
             <option value="DONE">Done</option>
           </select>
           <input type="hidden" name="page" value={currentPage} />
-          <button type="button"
-            type="submit"
+          <button type="submit"
             className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/90 transition-colors"
           >
             Search
@@ -141,12 +140,12 @@ export default async function TasksPage(props: {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right flex justify-end gap-3">
-                    <button type="button" className="text-muted-foreground hover:text-foreground transition-colors">
-                      Complete
-                    </button>
-                    <button type="button" className="text-primary hover:underline text-sm font-medium">
-                      Edit
-                    </button>
+                    <form action={toggleTaskStatusAction} className="inline">
+                      <input type="hidden" name="taskId" value={task.id} />
+                      <button type="submit" className="text-muted-foreground hover:text-foreground transition-colors">
+                      {task.status === 'DONE' ? 'Reopen' : 'Complete'}
+                      </button>
+                    </form>
                   </td>
                 </tr>
               ))}

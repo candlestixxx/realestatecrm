@@ -1,3 +1,26 @@
+## v0.61.1 (2026-10-31)
+
+### Added — UI consolidation (nav gaps closed)
+- CommandCenter: new Marketing Hub, Settings Hub, AI Memory, Branding, Team cards (all with tooltips)
+- SidebarNav: new Marketing Hub link in Outreach & Marketing
+- SMS Text Codes + Website Builder cards/links repointed to canonical parents (`/dashboard/marketing`, `/dashboard/websites`)
+- Stale Gemini references corrected to DeepSeek V4 (AI Co-Pilot + AI Model Keys tooltips)
+
+### Fixed — tasks page dead controls
+- "Complete" button was dead (no handler) → now a real Complete/Reopen toggle via existing `toggleTaskStatusAction`
+- Removed dead "Edit" button with no handler (fake-UI class)
+- Fixed duplicate `type="button"` + `type="submit"` on Search button
+
+### Fixed — scripts/probes
+- `check-status.ps1` now probes 9/9 services (added ContentPlanner API :3031)
+- `scripts/e2e-smoke.js` now covers ContentPlanner API `/health`
+- `scripts/watch-services.ps1` LeadG command aligned to canonical `.next/standalone/server.js`
+- Archived tracked root `build-*.txt` logs to `scripts/archive/root-logs-2026-10/` (history-preserving renames)
+
+### Docs
+- `DEPLOY.md`: DeepSeek as primary LLM, OpenAI embeddings/voice fallback note, ContentPlanner API :3216 + Postgres + service-JWT secret notes
+- `HANDOFF.md`: v0.61.0 entry covering v0.59–v0.61 + CDP lane
+
 ## v0.61.0 (2026-10-26)
 
 ### Fixed — fake-UI sweep (full-page pattern audit, 5 fakes killed)
