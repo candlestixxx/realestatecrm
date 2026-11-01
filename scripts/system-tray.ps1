@@ -98,7 +98,7 @@ $Services = [ordered]@{
     'media-workflow' = @{
         Label = 'Media Workflow API'
         Port = 3004
-        Cmd = 'node dist\src\index.js'
+        Cmd = 'set PORT=3004 && node dist\src\index.js'
         WorkDir = (Join-Path $Root 'apps\media-workflow')
         HealthPath = $null
         Log = 'server.log'

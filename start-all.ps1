@@ -45,7 +45,7 @@ Start-Service "contentplanner" 3003 "node ..\..\node_modules\next\dist\bin\next 
 Start-Service "contentplanner-api" 3031 "cmd /c start-api.bat" "apps\contentplanner\packages\api"
 
 # Port 3004 — Media Workflow API
-Start-Service "media-workflow" 3004 "node dist\src\index.js" "apps\media-workflow"
+Start-Service "media-workflow" 3004 "set PORT=3004 && node dist\src\index.js" "apps\media-workflow"
 
 # Port 3005 — LegacyLeads Frontend
 Start-Service "legacyleads" 3005 "set NEXTAUTH_SECRET=dev_secret_change_me && set NEXTAUTH_URL=http://localhost:3005 && node node_modules\next\dist\bin\next start -p 3005" "apps\legacyleads\frontend"

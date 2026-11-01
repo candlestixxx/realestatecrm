@@ -63,7 +63,7 @@
 - [x] Audit improvements (audit trail)
 - [x] Accessibility refinement
 - [x] UI polish
-- [ ] Load testing and bug fixing
+- [x] Load testing and bug fixing (2026-10-31: scripts/load-test.js ALL PASS 350/350; e2e-smoke 21/22, sole fail = legacyleads /listings 500 with no local Postgres — backend returns honest error + code, covered by new regression test)
 
 ## Phase 8 — MLS / MiRealSource parity [COMPLETE]
 - [x] Listing search parity (MLS search)

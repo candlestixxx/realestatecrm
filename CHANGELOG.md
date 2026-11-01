@@ -1,3 +1,14 @@
+## v0.61.2 (2026-10-31)
+
+### Fixed — service launch + health probes
+- `start-all.ps1` + `scripts/system-tray.ps1` media-workflow entries now pass `PORT=3004` (was defaulting to 3000 → EADDRINUSE crash; matches `start-all.bat`). 9/9 services verified up.
+- `check-status.ps1` probe timeout 3s → 10s (cold Next.js standalone renders flaked on 3s; LeadG healthy at 200)
+- legacyleads `GET /listings` returned opaque `{"error":""}` when Postgres unreachable → honest fallback message + `code` (submodule `1a450af`), with DB-down regression test (backend suite 13/13)
+
+### Verified
+- Root unit tests 18/18, legacyleads backend 13/13, `load-test.js` ALL PASS 350/350, `e2e-smoke.js` 21/22 (sole fail = /listings 500 with no local Postgres — environmental, now honestly reported)
+- ROADMAP Phase 7 load-testing checkbox closed
+
 ## v0.61.1 (2026-10-31)
 
 ### Added — UI consolidation (nav gaps closed)
