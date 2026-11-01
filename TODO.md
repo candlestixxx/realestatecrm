@@ -215,7 +215,7 @@
 - [ ] Deploy 8 sub-services to Hetzner
 - [ ] Google Maps API key (`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`)
 - [ ] HubSpot OAuth for `/api/lead-gen/social`
-- [ ] Legacyleads `/listings` mock data to real data
+- [ ] Legacyleads `/listings` to real data: no local Postgres on 5432 (no binaries/docker); `migrations/01_initial_schema.sql` creates `properties` but the route queries a `listings` table ("StandardStatus"/"ListPrice"/"PostalCode"/geom) that no migration defines — needs a `listings` table migration + MLS ingestion gateway before this can go green (endpoint now fails honestly with message + code, covered by DB-down regression test)
 - [ ] Redis/Memurai for media-workflow MessageBroker
 
 ### Repository Sync (2026-10-17, v0.58.51)
