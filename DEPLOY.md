@@ -290,6 +290,11 @@ ssh hetzner "pm2 logs excellegacyrealtygroup --lines 10 --nostream"
   - (Main CRM rate-limiting is in-memory — no Redis needed.)
 
 ### Deploy (main CRM, nondestructive backup-and-swap)
+
+> PowerShell quoting trap: invoking the ssh command in double quotes lets
+> PowerShell expand `$(date +%s)` LOCALLY (Get-Date error) and sends an empty
+> `BK=` to the server — the old build is then NOT backed up. Always
+> single-quote the remote command, or compute the timestamp before ssh.
 ```bash
 # local: rebuild + package
 npm run build
