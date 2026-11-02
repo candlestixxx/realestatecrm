@@ -40,11 +40,17 @@ else
 fi
 export PGPASSWORD="$PGPASS"
 
-su postgres -c "psql -v ON_ERROR_STOP=1 -c \"DO \\\$\\\$ BEGIN IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'legacyleads') THEN CREATE ROLE legacyleads LOGIN PASSWORD '$PGPASS'; END IF; END \\\$\\\$;\""
+if ! su postgres -c "psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='legacyleads'\"" | grep -q 1; then
+  su postgres -c "psql -v ON_ERROR_STOP=1 -c \"CREATE ROLE legacyleads LOGIN PASSWORD '$PGPASS'\""
+fi
 su postgres -c "psql -v ON_ERROR_STOP=1 -c \"SELECT 1 FROM pg_database WHERE datname = 'legacyleads'\" | grep -q 1 || createdb -O legacyleads legacyleads"
 su postgres -c "psql -d legacyleads -v ON_ERROR_STOP=1 -c 'CREATE EXTENSION IF NOT EXISTS postgis'"
 su postgres -c "psql -d legacyleads -v ON_ERROR_STOP=1 -f $DEPLOY_DIR/migrations/01_initial_schema.sql"
 su postgres -c "psql -d legacyleads -v ON_ERROR_STOP=1 -f $DEPLOY_DIR/migrations/02_listings_schema.sql"
+# Tables are created by the postgres superuser; grant the app role access
+# (fresh DBs would otherwise 500 with "permission denied").
+su postgres -c "psql -d legacyleads -v ON_ERROR_STOP=1 -c 'GRANT ALL ON ALL TABLES IN SCHEMA public TO legacyleads'"
+su postgres -c "psql -d legacyleads -v ON_ERROR_STOP=1 -c 'ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO legacyleads'"
 
 cat > .env << ENVEOF
 PORT=3217
@@ -57,7 +63,7 @@ $PRESERVED_ENV
 ENVEOF
 
 pm2 delete legacyleads-api 2>/dev/null || true
-PORT=3217 pm2 start node --name legacyleads-api --cwd "$DEPLOY_DIR" -- dist/src/index.js
+PORT=3217 pm2 start node --name legacyleads-api --cwd "$DEPLOY_DIR" -- dist/index.js
 pm2 save
 
 echo "LegacyLeads API deployed at port 3217 (old deploy in $BK)"

@@ -1,3 +1,11 @@
+## v0.61.4 (2026-11-02)
+
+### Live — legacyleads backend on Hetzner (:3217)
+- Fixed `tsc` output path (`dist/index.js`, not `dist/src/index.js`) in backend `start` + deploy script
+- `deploy-legacyleads-api.sh` now grants the app role table access post-migration (fresh DBs 500'd with 42501 otherwise) and keeps LF endings (CRLF breaks the remote run; never pipe scripts to ssh via PowerShell — scp + run)
+- Installed `postgresql-16-postgis-3` on the server; provisioned role/DB/migrations; nginx `/legacyleads-api/` live
+- Verified: `:3217/health` 200, `/listings` → `{data: [], count: 0}` locally and publicly; frontend rebuilt with prod API URL and redeployed
+
 ## v0.61.3 (2026-11-02)
 
 ### Added — legacyleads backend deploy pipeline (:3217)

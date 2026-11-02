@@ -289,6 +289,7 @@ The backend previously had no deploy path (prod ran no backend process).
 Pipeline (all committed): `deploy/package-legacyleads-api.py` (packs src + lockfile + tsconfig + `migrations/`, no node_modules) → `scp deploy-legacyleads-api.tar.gz hetzner:/tmp/` → `ssh hetzner 'bash /var/www/legacyleads-api/deploy-legacyleads-api.sh'` → `ssh hetzner 'bash add-legacyleads-api-nginx.sh'` (run from `deploy/`).
 The deploy script provisions idempotently: `legacyleads` Postgres role/DB (password in `/root/.legacyleads-pgpass`, chmod 600), PostGIS extension, migrations `01` + `02_listings`, `.env` (PORT=3217, local Redis), PM2 `legacyleads-api` from compiled `dist/`.
 Heads-up: the `listings` table starts EMPTY (no MLS ingestion gateway yet) — `/listings` returns `{data: [], count: 0}` until ingestion lands.
+Status 2026-11-02: backend LIVE on :3217 (PM2 `legacyleads-api`), nginx `/legacyleads-api/` Live, frontend rebuilt with `NEXT_PUBLIC_API_URL` and redeployed — end-to-end path verified to `{data: [], count: 0}`.
 Frontend wiring: rebuild `apps/legacyleads/frontend` with `NEXT_PUBLIC_API_URL=https://excellegacyrealtygroup.site/legacyleads-api` so the browser client hits the new route instead of `localhost:3006` (already supported by `src/app/lib/api.ts`; no code change needed).
 
 - **NEXTAUTH_URL** must be `https://excellegacyrealtygroup.site` (NOT `localhost:3000`).
@@ -303,6 +304,9 @@ Frontend wiring: rebuild `apps/legacyleads/frontend` with `NEXT_PUBLIC_API_URL=h
 > PowerShell expand `$(date +%s)` LOCALLY (Get-Date error) and sends an empty
 > `BK=` to the server — the old build is then NOT backed up. Always
 > single-quote the remote command, or compute the timestamp before ssh.
+> Never pipe script files to ssh via PowerShell (`Get-Content x.sh | ssh ...`):
+> the pipe reintroduces CRLF and bash chokes. `scp` the script up, then run
+> `ssh hetzner 'bash /tmp/script.sh'`.
 ```bash
 # local: rebuild + package
 npm run build
