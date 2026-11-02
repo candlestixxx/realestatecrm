@@ -278,10 +278,18 @@ ssh hetzner "pm2 logs excellegacyrealtygroup --lines 10 --nostream"
 | Media Workflow | `media-workflow` | 3214 | `/media-workflow/` |
 | LegacyLeads | `legacyleads` | 3215 | `/legacyleads/` |
 | ContentPlanner API | `contentplanner-api` | 3216 | `/contentplanner-api/` (WebSocket proxied) |
+| LegacyLeads API | `legacyleads-api` | 3217 | `/legacyleads-api/` (new; DB provisioned on first deploy) |
 
 - **ContentPlanner DB**: Postgres (`contentplanner` user+DB; password in `/root/.contentplanner-pgpass`) — schema is postgresql, NOT SQLite.
 - **ContentPlanner service JWT**: main CRM proxies `/api/contentplanner/*` with a short-lived HS256 token; secret in `/root/.contentplanner-svc-secret`. Deploy scripts must preserve it alongside `DATABASE_URL`/`DEEPSEEK*`/`AUTH_JWT_SECRET`.
 - **Deploy scripts preserve integration keys**: all `deploy-*.sh` preserve `DEEPSEEK*` lines (and voice/messaging keys) — never redeploy with a script that wipes env.
+
+### LegacyLeads API (:3217) first deploy
+The backend previously had no deploy path (prod ran no backend process).
+Pipeline (all committed): `deploy/package-legacyleads-api.py` (packs src + lockfile + tsconfig + `migrations/`, no node_modules) → `scp deploy-legacyleads-api.tar.gz hetzner:/tmp/` → `ssh hetzner 'bash /var/www/legacyleads-api/deploy-legacyleads-api.sh'` → `ssh hetzner 'bash add-legacyleads-api-nginx.sh'` (run from `deploy/`).
+The deploy script provisions idempotently: `legacyleads` Postgres role/DB (password in `/root/.legacyleads-pgpass`, chmod 600), PostGIS extension, migrations `01` + `02_listings`, `.env` (PORT=3217, local Redis), PM2 `legacyleads-api` from compiled `dist/`.
+Heads-up: the `listings` table starts EMPTY (no MLS ingestion gateway yet) — `/listings` returns `{data: [], count: 0}` until ingestion lands.
+Frontend wiring: rebuild `apps/legacyleads/frontend` with `NEXT_PUBLIC_API_URL=https://excellegacyrealtygroup.site/legacyleads-api` so the browser client hits the new route instead of `localhost:3006` (already supported by `src/app/lib/api.ts`; no code change needed).
 
 - **NEXTAUTH_URL** must be `https://excellegacyrealtygroup.site` (NOT `localhost:3000`).
 - **Redis** runs on `127.0.0.1:6379` (systemd `redis-server`, active). Required by:

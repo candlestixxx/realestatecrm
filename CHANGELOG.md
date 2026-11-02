@@ -1,3 +1,12 @@
+## v0.61.3 (2026-11-02)
+
+### Added — legacyleads backend deploy pipeline (:3217)
+- `migrations/02_listings_schema.sql`: the `listings` table (`StandardStatus`/`ListPrice`/`PostalCode`/geom + GIST) the API queries but no migration defined (table starts empty; ingestion gateway still pending)
+- Backend `build` (`tsc`) + `start` (`node dist/src/index.js`) scripts (tsc clean, backend suite 13/13)
+- `deploy/package-legacyleads-api.py` + `deploy/deploy-legacyleads-api.sh` + `deploy/add-legacyleads-api-nginx.sh`: idempotent Postgres role/DB/PostGIS/migrations, pm2 `legacyleads-api`
+- Frontend `fetchListings` now reads backend `{data}` shape (was `json.listings`, always empty on success)
+- DEPLOY.md: :3217 service row + first-deploy section (build frontend with `NEXT_PUBLIC_API_URL=https://excellegacyrealtygroup.site/legacyleads-api`)
+
 ## v0.61.2 (2026-10-31)
 
 ### Fixed — service launch + health probes
