@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useTransition, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -253,12 +254,39 @@ export default function LeadDetailLayoutClient({
   // 3-dots dropdown state
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const dropdownPanelRef = React.useRef<HTMLDivElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 288, maxHeight: 450 });
+
+  React.useLayoutEffect(() => {
+    if (!showMoreDropdown) return;
+    const positionDropdown = () => {
+      const anchor = dropdownRef.current?.getBoundingClientRect();
+      if (!anchor) return;
+      const width = Math.min(288, window.innerWidth - 16);
+      const maxHeight = Math.min(450, window.innerHeight - 16);
+      const below = window.innerHeight - anchor.bottom - 8;
+      const above = anchor.top - 8;
+      const top = below >= maxHeight || below >= above ? anchor.bottom + 8 : anchor.top - maxHeight - 8;
+      setDropdownPosition({
+        left: Math.max(8, Math.min(anchor.right - width, window.innerWidth - width - 8)),
+        top: Math.max(8, Math.min(top, window.innerHeight - maxHeight - 8)),
+        width, maxHeight,
+      });
+    };
+    positionDropdown();
+    window.addEventListener('resize', positionDropdown);
+    window.addEventListener('scroll', positionDropdown, true);
+    return () => {
+      window.removeEventListener('resize', positionDropdown);
+      window.removeEventListener('scroll', positionDropdown, true);
+    };
+  }, [showMoreDropdown]);
 
   // Close dropdown on outside click
   React.useEffect(() => {
     if (!showMoreDropdown) return;
     const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (!dropdownRef.current?.contains(e.target as Node) && !dropdownPanelRef.current?.contains(e.target as Node)) {
         setShowMoreDropdown(false);
       }
     };
@@ -270,7 +298,10 @@ export default function LeadDetailLayoutClient({
   React.useEffect(() => {
     if (!showMoreDropdown) return;
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setShowMoreDropdown(false);
+      if (e.key === 'Escape') {
+        setShowMoreDropdown(false);
+        dropdownRef.current?.querySelector('button')?.focus();
+      }
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
@@ -930,12 +961,17 @@ export default function LeadDetailLayoutClient({
                     onClick={() => setShowMoreDropdown(!showMoreDropdown)}
                     className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors cursor-pointer font-black text-sm leading-none"
                     title="More options"
+                    aria-expanded={showMoreDropdown}
+                    aria-haspopup="dialog"
+                    aria-controls={`lead-options-${lead.id}`}
                   >
                     •••
                   </button>
                   
-                  {showMoreDropdown && (
-                    <div className="absolute right-0 mt-2 w-72 bg-background border-2 border-border rounded-2xl shadow-2xl z-[100] text-left p-4 space-y-4 text-xs font-semibold overflow-y-auto max-h-[450px]" style={{ backgroundColor: 'var(--background)', backdropFilter: 'none', opacity: 1 }}>
+                  {showMoreDropdown && createPortal(
+                    // Escape the lead column's overflow and stacking context so the
+                    // panel can overlap the dashboard sidebar at narrow widths.
+                    <div ref={dropdownPanelRef} id={`lead-options-${lead.id}`} role="dialog" aria-label="Lead options" className="fixed bg-background border-2 border-border rounded-2xl shadow-2xl z-[100] text-left p-4 space-y-4 text-xs font-semibold overflow-y-auto" style={{ ...dropdownPosition, backgroundColor: 'var(--background)', backdropFilter: 'none', opacity: 1 }}>
                       
                       <div>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider mb-1.5 border-b border-border/40 pb-1">Lead Nurturing</p>
@@ -1013,7 +1049,8 @@ export default function LeadDetailLayoutClient({
                         </div>
                       </div>
 
-                    </div>
+                    </div>,
+                    document.body
                   )}
                 </div>
 

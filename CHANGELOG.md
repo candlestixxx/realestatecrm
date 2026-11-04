@@ -1105,3 +1105,6 @@ submodules match.
 
 ## 0.61.7 — Campaign list verification fix (2026-11-04)
 - Restored the missing useEffect import found by the Hetzner campaign type check. Expanded regression checks to cover all four default templates.
+
+## 0.61.8 — Lead options menu layering (2026-11-04)
+- Render the lead detail three-dot options panel in a body portal, positioned against its trigger and above the sidebar. Clamp to the viewport, track scrolling/resizing, preserve outside-click dismissal, and restore trigger focus on Escape.
