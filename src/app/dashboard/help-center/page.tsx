@@ -66,7 +66,7 @@ const VIDEOS: VideoTopic[] = [
       '✨ [AI] Processing prompt: "Generate page for 8485 Sherman Ave with valuation widget"',
       '🎨 [Canvas] Assembled block: Header Layout',
       '📸 [Media] Simulated photo upload: Added premium home showcase graphic',
-      '🔗 [Publish] Public page generated: http://localhost:3000/portal/site/8485-sherman-ave',
+      '🔗 [Publish] Public page generated: /portal/site/8485-sherman-ave',
       '📢 [Social] Shared post simulated on Google Business Profile & YouTube.'
     ]
   },
@@ -84,11 +84,237 @@ const VIDEOS: VideoTopic[] = [
     simulationLogs: [
       '💬 [SMS Engine] Incoming text message to (586) 555-0190: "8485SHERMAN"',
       '👤 [Lead Capture] Creating new Lead: "Owner of 8485 Sherman Ave" (Phone: +1 586-555-0199)',
-      '✉️ [Reply] Sending reply: "Thanks for inquiring! View list price & photos: http://localhost:3000/portal/site/8485-sherman"',
+      '✉️ [Reply] Sending reply: "Thanks for inquiring! View list price & photos: /portal/site/8485-sherman"',
       '📈 [Analytics] SMS Code "8485SHERMAN" total hits updated to 15.'
+    ]
+  },
+  {
+    id: 'deals',
+    title: 'Deal Pipeline & Transaction Management',
+    category: 'Sales Pipeline',
+    description: 'Track deals from lead to close with stage-based pipeline, offer management, and timeline activity logging.',
+    steps: [
+      'Navigate to Deals to see your pipeline board with stage columns.',
+      'Click any deal to open the detail view with full timeline and activity history.',
+      'Use the Offer Draft workflow to generate purchase agreements from deal data.',
+      'Move deals between stages by dragging or using the stage selector.'
+    ],
+    simulationLogs: [
+      '📋 [Pipeline] Deal "8485 Sherman Ave" moved from "Active" to "Under Contract".',
+      '📝 [Activity] Logged Note: "Buyer accepted counter-offer at $285,000".',
+      '📄 [Document] Generated Purchase Agreement draft for review.',
+      '✅ [Task] Created closing checklist task: "Order title search" (Due: Fri).'
+    ]
+  },
+  {
+    id: 'workflows',
+    title: 'Guided Workflows & Wizards',
+    category: 'Automation',
+    description: 'Step-by-step wizards for listing entry, offer drafting, foreclosure intake, and marketing media creation.',
+    steps: [
+      'Go to Workflows and select a wizard (Listing Entry, Offer Draft, Foreclosure Intake).',
+      'Follow the guided steps with validation at each stage.',
+      'Save progress at any step — wizards persist state across sessions.',
+      'Complete the wizard to auto-create CRM records and trigger follow-up actions.'
+    ],
+    simulationLogs: [
+      '🧙 [Wizard] Started "Listing Entry" workflow for 8485 Sherman Ave.',
+      '✅ [Validation] Property details validated: 3bd/2ba, 1,450 sqft.',
+      '📸 [Media] Upload slot ready for property photos (drag & drop).',
+      '🔄 [CRM Sync] Listing record created and synced to pipeline.'
+    ]
+  },
+  {
+    id: 'reporting',
+    title: 'Reporting & Analytics Studio',
+    category: 'Intelligence',
+    description: 'Real-time dashboards for pipeline health, campaign ROI, team performance, and custom report builder.',
+    steps: [
+      'Open Reporting to see the unified analytics dashboard.',
+      'Use date range filters to analyze trends over specific periods.',
+      'Export reports as CSV/PDF for stakeholder presentations.',
+      'Set up automated weekly report delivery via email.'
+    ],
+    simulationLogs: [
+      '📊 [Analytics] Computing metrics for period: Last 30 days.',
+      '📈 [Report] Pipeline value: $2.4M across 18 active deals.',
+      '💰 [ROI] Campaign "Expired Outreach" generated 12 leads at $8.33/lead.',
+      '📧 [Delivery] Scheduled weekly report to team@excellegacyrealtygroup.site.'
+    ]
+  },
+  {
+    id: 'voice',
+    title: 'AI Voice Agent & Live Calls',
+    category: 'AI & Automation',
+    description: 'AI-powered voice agent for inbound/outbound calls, lead qualification, appointment setting, and live audio monitoring.',
+    steps: [
+      'Configure voice agent scripts and qualification criteria in Settings > Voice.',
+      'Assign the agent to inbound lead phone numbers for auto-answering.',
+      'Monitor live calls in real-time with the Live Audio dashboard.',
+      'Review call transcripts and AI qualification scores on lead timelines.'
+    ],
+    simulationLogs: [
+      '📞 [Voice] Incoming call from +1 (586) 555-0142 — AI agent answering.',
+      '🤖 [Qualify] "Are you still looking to sell your property?" — Yes.',
+      '📅 [Appointment] Scheduled showing for Saturday 2pm.',
+      '📝 [CRM] Lead qualified (Score: 85/100) and routed to agent Harry Lum.'
+    ]
+  },
+  {
+    id: 'social',
+    title: 'Social Media & Content Studio',
+    category: 'Marketing',
+    description: 'AI content generation, social scheduling, brand voice management, multi-platform publishing, video/podcast pipeline, and engagement analytics.',
+    steps: [
+      'Open Marketing Studio to access the AI Content Creator.',
+      'Set up your Brand Voice profile for consistent messaging.',
+      'Generate posts with AI using property data and market trends.',
+      'Schedule posts across Facebook, Instagram, LinkedIn, and Google Business.',
+      'View the Content Pipeline for video projects and podcast episodes.',
+      'Check Social Analytics on the Social page for engagement metrics (views, likes, shares).'
+    ],
+    simulationLogs: [
+      '✨ [AI] Generating post for "8485 Sherman Ave" using brand voice "Luxury Metro".',
+      '📝 [Content] Created: "Just listed! Stunning 3bd in prime location..." (247 chars).',
+      '📅 [Schedule] Queued for Facebook + Instagram — Tomorrow 9:00 AM.',
+      '📊 [Analytics] Previous post reach: 1,247 impressions, 23 engagements.',
+      '🎬 [Pipeline] Video project "Top 5 SaaS Tools" — script ready for rendering.',
+      '🎙️ [Pipeline] Podcast "The Future of AI" — outline generated, ready to record.'
+    ]
+  },
+  {
+    id: 'foreclosure',
+    title: 'Foreclosure Monitoring & Legal Intake',
+    category: 'Properties & Data',
+    description: 'Automated foreclosure notice monitoring, legal document parsing, and distressed property lead generation.',
+    steps: [
+      'Access the Foreclosure dashboard to see newly detected notices.',
+      'Use the Foreclosure Intake wizard to parse legal notices into CRM records.',
+      'Set up monitoring alerts for specific counties or zip codes.',
+      'Track auction dates and redemption periods on the property timeline.'
+    ],
+    simulationLogs: [
+      '🔍 [Monitor] Scanning Macomb County legal notices... Found 3 new filings.',
+      '📄 [Parser] Extracted: "8485 Sherman Ave, Warren MI 48089" — Case #2024-CV-1234.',
+      '⚠️ [Alert] Auction date: 2025-03-15 | Redemption period: 6 months.',
+      '👤 [Lead] Created distressed property lead and assigned to investor pipeline.'
+    ]
+  },
+  {
+    id: 'shortcuts',
+    title: 'Keyboard Shortcuts & Quick Navigation',
+    category: 'Platform',
+    description: 'Power-user keyboard shortcuts for navigating the CRM, searching records, and running commands.',
+    steps: [
+      'Press Cmd+K (or Ctrl+K) anywhere to open the Command Palette.',
+      'When the palette is empty, see quick navigation links to top pages.',
+      'Type at least 2 characters to search leads, contacts, deals, and tasks.',
+      'Use arrow keys to navigate results and Enter to open the selected record.'
+    ],
+    simulationLogs: [
+      '⌥ [Palette] Opened command palette with Cmd+K.',
+      '🔍 [Search] Query "8485 Sherman" — found 1 matching lead.',
+      '⏎ [Navigate] Opening lead detail page for "8485 Sherman Ave".',
+      '✅ [Done] Command palette used in 1.2 seconds.'
+    ]
+  },
+  {
+    id: 'collaboration',
+    title: 'Team Chat & Internal Collaboration',
+    category: 'Communications',
+    description: 'Private direct messages and group chat channels for your team. Keep deal discussions in context.',
+    steps: [
+      'Open Team Chat from the sidebar or the Unified Inbox page.',
+      'Create a private DM with any team member or start a group channel.',
+      'Chat messages are persisted per workspace for compliance.',
+      'Reference deals and leads directly in chat messages.'
+    ],
+    simulationLogs: [
+      '💬 [Chat] Opened Team Chat — 3 active conversations.',
+      '👤 [DM] Started private chat with "Hank Mendez".',
+      '📢 [Group] Created group "Deal #45 — Closing Team" with 4 members.',
+      '✅ [Sync] Chat history synced and saved to workspace.'
+    ]
+  },
+  {
+    id: 'ai-qualification',
+    title: 'AI Lead Qualification & Scoring',
+    category: 'AI Features',
+    description: 'Let AI score and grade your leads automatically based on engagement, fit, and behavior signals.',
+    steps: [
+      'Open any lead and go to the Searches tab.',
+      'Click "Qualify Lead" in the AI Qualification panel to run AI analysis.',
+      'Review the letter grade (A-F), score out of 100, and factor breakdown.',
+      'Use the Lead Score widget alongside for predictive conversion probability.',
+      'Follow the recommendations list to improve lead conversion.'
+    ],
+    simulationLogs: [
+      '🤖 [AI] Running lead qualification for "Sarah Johnson"...',
+      '📊 [Score] Score: 82/100 — Grade: A',
+      '💡 [Factors] High engagement (3 website visits), matches buyer profile.',
+      '✅ [Recommend] Schedule showing within 48 hours for best conversion.'
+    ]
+  },
+  {
+    id: 'routing',
+    title: 'Lead Routing Rules',
+    category: 'Automation',
+    description: 'Automatically assign incoming leads to agents based on rules like source, location, or price range.',
+    steps: [
+      'Go to Settings and open the "Lead Routing" tab.',
+      'Click "Create Rule" and name your routing rule.',
+      'Set the source filter (e.g., Zillow, Realtor.com, website).',
+      'Enter agent IDs to receive matching leads (comma-separated).',
+      'Toggle the rule active — new leads will auto-assign immediately.'
+    ],
+    simulationLogs: [
+      '⚙️ [Rule] Created routing rule "Zillow Westside".',
+      '🎯 [Match] New lead from Zillow matched rule — assigning to Agent #4.',
+      '📧 [Notify] Agent #4 notified of new lead assignment.',
+      '✅ [Done] Lead auto-assigned in 0.3s.'
+    ]
+  },
+  {
+    id: 'export-and-trends',
+    title: 'Data Export & Market Trends',
+    category: 'Reporting',
+    description: 'Export your reporting data as CSV and view aggregated market trends across brokerages.',
+    steps: [
+      'Go to Reports & Analytics in the dashboard.',
+      'Click "Export CSV" in the top-right to download your current report data.',
+      'Scroll down to the "Market Trends" section for aggregated industry metrics.',
+      'View average deal value, total volume, average list price, and deals closed.',
+      'Use these benchmarks to compare your performance against the market.'
+    ],
+    simulationLogs: [
+      '📊 [Report] Loaded reporting dashboard with 5 summary cards.',
+      '📥 [Export] Generated CSV with 45 rows — downloaded as reporting-export.csv.',
+      '📈 [Trends] Market avg deal value: $312,000 — your avg: $345,000 (10% above).',
+      '✅ [Done] Export and trends loaded in 1.2s.'
+    ]
+  },
+  {
+    id: 'folders-and-comps',
+    title: 'Folder Monitoring & Comparable Sales',
+    category: 'Automation',
+    description: 'Auto-import property files from watched folders and view comparable sales for any listing.',
+    steps: [
+      'Go to Settings and open the "Folder Monitoring" tab.',
+      'View active watch folders (Network Share, MLS Downloads, Downloads, Desktop).',
+      'Matching files are auto-imported into the CRM.',
+      'Open any listing to see its Comparable Sales panel.',
+      'Comps show sold price, date, beds/baths, and square footage for nearby properties.'
+    ],
+    simulationLogs: [
+      '📁 [Watch] Folder monitoring active — 4 sources scanned.',
+      '📷 [Import] Found 3 new property photos in MLS Downloads — auto-imported.',
+      '🏘️ [Comps] Loaded 5 comparable sales for 123 Main St.',
+      '✅ [Done] Folder scan and comps loaded in 0.8s.'
     ]
   }
 ];
+
+
 
 export default function HelpCenterPage() {
   const [activeTopic, setActiveTopic] = useState<VideoTopic>(VIDEOS[0]);
@@ -117,7 +343,7 @@ export default function HelpCenterPage() {
       <div className="border-b border-border/40 pb-5">
         <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-2">
           📖 CRM Help Center & Training Portal
-        </h1>
+         <span title="Searchable help articles, video tutorials, and interactive training simulations for all CRM features." aria-label="About this section: Searchable help articles, video tutorials, and interactive training simulations for all CRM features." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
         <p className="text-sm text-muted-foreground font-semibold mt-1">
           Interactive simulation videos and master operator manuals for the Excel Legacy CRM features.
         </p>
@@ -129,7 +355,7 @@ export default function HelpCenterPage() {
         <div className="lg:col-span-1 space-y-3">
           <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider px-2 block mb-1">Select Help Topic</span>
           {VIDEOS.map(video => (
-            <button
+            <button type="button"
               key={video.id}
               onClick={() => {
                 setActiveTopic(video);
@@ -174,17 +400,17 @@ export default function HelpCenterPage() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Main Visualizer */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col aspect-video relative group">
+          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-2xl flex flex-col aspect-video relative group">
             
             {/* Overlay simulation */}
             {isPlaying ? (
-              <div className="flex-1 flex flex-col justify-end p-6 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent">
+              <div className="flex-1 flex flex-col justify-end p-6 bg-gradient-to-t from-muted via-muted/60 to-transparent">
                 <div className="space-y-2 max-w-lg">
                   <span className="text-[9px] font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded uppercase tracking-wider w-fit">
                     ⚡ Live CRM Operations Log Simulation
                   </span>
                   
-                  <div className="space-y-1.5 font-mono text-[11px] text-slate-300 min-h-[120px] transition-all">
+                  <div className="space-y-1.5 font-mono text-[11px] text-muted-foreground min-h-[120px] transition-all">
                     {activeTopic.simulationLogs.slice(0, currentStep + 1).map((log, index) => (
                       <div key={index} className="animate-fadeIn truncate">
                         {log}
@@ -194,17 +420,17 @@ export default function HelpCenterPage() {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-slate-900 space-y-4">
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-card space-y-4">
                 <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0 group-hover:scale-110 transition-transform">
                   <Play className="w-6 h-6 fill-primary" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-extrabold text-sm text-slate-200">Interactive Walk-Through Player</h4>
-                  <p className="text-[11px] text-slate-400 max-w-sm">
+                  <h4 className="font-extrabold text-sm text-muted-foreground">Interactive Walk-Through Player</h4>
+                  <p className="text-[11px] text-muted-foreground max-w-sm">
                     Click play to run a live visual console simulation showing this feature in action.
                   </p>
                 </div>
-                <button
+                <button type="button"
                   onClick={startSimulation}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer shadow"
                 >
@@ -214,7 +440,7 @@ export default function HelpCenterPage() {
             )}
 
             {/* Video Progress Bar */}
-            <div className="h-1 bg-slate-800 w-full relative">
+            <div className="h-1 bg-card w-full relative">
               <div 
                 className="h-full bg-primary transition-all duration-500" 
                 style={{ width: `${((currentStep + (isPlaying ? 1 : 0)) / activeTopic.simulationLogs.length) * 100}%` }}

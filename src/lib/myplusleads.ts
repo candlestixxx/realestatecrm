@@ -98,7 +98,27 @@ export async function fetchListings(token: string, startID?: string | null): Pro
   });
 
   if (!res.ok) {
-    throw new Error(`Failed to fetch MyPlusLeads listings: ${res.statusText}`);
+    if (res.status === 400) {
+      try {
+        const errData = await res.clone().json();
+        if (errData && errData.code === 811) {
+          return {
+            result: {
+              success: 'true',
+              minID: '',
+              maxID: '',
+              lastID: startID || ''
+            },
+            listings: []
+          };
+        }
+      } catch (e) {}
+    }
+    let bodyText = '';
+    try {
+      bodyText = await res.clone().text();
+    } catch (_) {}
+    throw new Error(`Failed to fetch MyPlusLeads listings: HTTP ${res.status} ${res.statusText} - Body: ${bodyText}`);
   }
 
   return await res.json();

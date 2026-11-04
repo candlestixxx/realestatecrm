@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { 
   Search, ShieldAlert, Sparkles, Code2, Database, HelpCircle, MailCheck, UserPlus, Sliders, Globe2, CreditCard, ToggleRight, ToggleLeft
 } from 'lucide-react';
 import { MyPlusLeadsSettingsForm } from '@/components/MyPlusLeadsSettingsForm';
+import { getNotificationPreferencesAction, updateNotificationPreferencesAction } from '@/lib/actions/notification';
 
 type PartnerProduct = {
   id: string;
@@ -16,6 +18,8 @@ type PartnerProduct = {
   connected: boolean;
 };
 
+// Default to unconnected. A partner is only shown as connected after a live
+// credential check confirms it — the flags below are not claimed connection state.
 const INITIAL_PARTNERS: PartnerProduct[] = [
   {
     id: 'shilo',
@@ -31,7 +35,7 @@ const INITIAL_PARTNERS: PartnerProduct[] = [
     category: 'Lead Providers',
     logo: '🎯',
     description: 'Sync expired, FSBO, FRBO, and pre-foreclosure listings directly into your round-robin lead queues every morning automatically.',
-    connected: true
+    connected: false
   },
   {
     id: 'zapier',
@@ -55,7 +59,7 @@ const INITIAL_PARTNERS: PartnerProduct[] = [
     category: 'Data Services',
     logo: '🏢',
     description: 'Realcomp II Ltd. is Michigans largest Multiple Listing Service. Sync live MLS data directly to your listing feeds.',
-    connected: true
+    connected: false
   }
 ];
 
@@ -83,27 +87,57 @@ export default function IntegrationCenterClient({
   initialData: any;
   workspaceId: string;
 }) {
+  const router = useRouter();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [partners, setPartners] = useState<PartnerProduct[]>(INITIAL_PARTNERS);
+  const [partners] = useState<PartnerProduct[]>(INITIAL_PARTNERS);
   
   // MyPlusLeads Configuration modal state
   const [activePartnerConfig, setActivePartnerConfig] = useState<string | null>(null);
 
-  const toggleConnection = (id: string) => {
+  // MLS Relisting Alerts preferences state
+  const [smsAlerts, setSmsAlerts] = useState(false);
+  const [emailAlerts, setEmailAlerts] = useState(true);
+  const [isUpdatingPrefs, setIsUpdatingPrefs] = useState(false);
+
+  useEffect(() => {
+    async function loadPrefs() {
+      const res = await getNotificationPreferencesAction();
+      if (res.success && res.preferences) {
+        setSmsAlerts(res.preferences.smsAlertsMlsRelist);
+        setEmailAlerts(res.preferences.emailAlertsMlsRelist);
+      }
+    }
+    loadPrefs();
+  }, []);
+
+  const handleUpdatePrefs = async (sms: boolean, email: boolean) => {
+    setSmsAlerts(sms);
+    setEmailAlerts(email);
+    setIsUpdatingPrefs(true);
+    const res = await updateNotificationPreferencesAction(sms, email);
+    setIsUpdatingPrefs(false);
+    if (res.success) {
+      toast.success('Notification preferences updated!');
+    } else {
+      toast.error(res.error || 'Failed to save preferences.');
+    }
+  };
+
+  const toggleConnection = (id: string, name: string) => {
     if (id === 'myplus') {
+      // MyPlusLeads has a real, working integration (credentials + hourly sync).
       setActivePartnerConfig('myplus');
       return;
     }
-    
-    setPartners(partners.map(p => {
-      if (p.id === id) {
-        const nextState = !p.connected;
-        toast.success(`${p.name} integration ${nextState ? 'enabled' : 'disabled'}.`);
-        return { ...p, connected: nextState };
-      }
-      return p;
-    }));
+    if (id === 'realcomp') {
+      // Realcomp is wired into the valuation API but needs a server key.
+      toast('Realcomp MLS requires a REALCOMP_API_KEY on the server — add it to .env to enable MLS and valuation lookups.', { icon: '🔑', duration: 6000 });
+      return;
+    }
+    // Not yet integrated: say so plainly instead of flipping a fake toggle
+    // that claimed 'integration enabled' with no connection behind it.
+    toast(`${name} is a planned integration — vendor API setup is not yet available in-app. Contact your administrator.`, { icon: '🔧', duration: 5000 });
   };
 
   const filteredPartners = partners.filter(p => {
@@ -115,6 +149,7 @@ export default function IntegrationCenterClient({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto text-foreground p-6">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Integration Center</h1> <span title="Connect third-party services including CRM systems, marketing tools, and communication platforms. Manage API keys and sync settings." aria-label="About this section: Connect third-party services including CRM systems, marketing tools, and communication platforms. Manage API keys and sync settings." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       
       {/* Banner Notice Alert */}
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -124,8 +159,8 @@ export default function IntegrationCenterClient({
             We strongly advise that you select a unique email sending domain for improved deliverability and SPF settings.
           </span>
         </div>
-        <button 
-          onClick={() => toast.success('Redirecting to domain configuration setup...')}
+        <button type="button" 
+          onClick={() => router.push('/dashboard/settings/email')}
           className="bg-amber-500 hover:bg-amber-600 text-white font-black uppercase text-[10px] tracking-wider px-4 py-2.5 rounded-xl transition-colors cursor-pointer w-fit shrink-0"
         >
           Configure Domain
@@ -144,7 +179,7 @@ export default function IntegrationCenterClient({
         <div className="lg:col-span-3 space-y-1">
           <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider px-3 block mb-2">App Categories</span>
           {CATEGORIES.map(cat => (
-            <button
+            <button type="button"
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
@@ -176,7 +211,7 @@ export default function IntegrationCenterClient({
           <h3 className="text-sm font-black uppercase tracking-wider text-muted-foreground">Partner Products</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredPartners.map(p => (
+            {filteredPartners.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No integrations match your filter. Try a different category.</div> : (filteredPartners.map(p => (
               <div key={p.id} className="bg-card border border-border/60 rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4 hover:border-border transition-colors">
                 <div className="space-y-3.5">
                   <div className="flex justify-between items-center">
@@ -190,8 +225,8 @@ export default function IntegrationCenterClient({
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => toggleConnection(p.id)}
+                    <button type="button"
+                      onClick={() => toggleConnection(p.id, p.name)}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-black uppercase border cursor-pointer transition-colors ${
                         p.connected
                           ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
@@ -207,7 +242,7 @@ export default function IntegrationCenterClient({
                 </div>
 
                 <div className="pt-3 border-t border-border/40 flex justify-between items-center text-[10px] font-black uppercase tracking-wider">
-                  <button 
+                  <button type="button" 
                     onClick={() => toggleConnection(p.id)}
                     className="text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer"
                   >
@@ -215,9 +250,59 @@ export default function IntegrationCenterClient({
                   </button>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
 
+        </div>
+
+        {/* Notification Alerts Preferences Card */}
+        <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-sm mt-6">
+          <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+            <ShieldAlert className="w-5 h-5 text-indigo-500" />
+            <h3 className="text-sm font-black text-foreground uppercase tracking-wider">
+              MLS Relist Notification Preferences
+            </h3>
+          </div>
+          <p className="text-xs text-muted-foreground font-semibold leading-relaxed">
+            When a lead's property is detected as back on the market (ACTIVE on MLS), configure how you want to be notified. Drip campaigns will always be paused automatically.
+          </p>
+          <div className="grid md:grid-cols-2 gap-4 pt-2">
+            <div className="flex items-center justify-between p-3 bg-muted/20 border border-border/60 rounded-xl">
+              <div className="flex flex-col min-w-0 pr-2">
+                <span className="text-xs font-bold text-foreground">Email Notifications</span>
+                <span className="text-[10px] text-muted-foreground font-semibold leading-normal">Send email alerts to assigned agent</span>
+              </div>
+              <button type="button"
+                onClick={() => handleUpdatePrefs(smsAlerts, !emailAlerts)}
+                disabled={isUpdatingPrefs}
+                className="cursor-pointer shrink-0"
+              >
+                {emailAlerts ? (
+                  <ToggleRight className="w-9 h-9 text-indigo-500" />
+                ) : (
+                  <ToggleLeft className="w-9 h-9 text-muted-foreground" />
+                )}
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-muted/20 border border-border/60 rounded-xl">
+              <div className="flex flex-col min-w-0 pr-2">
+                <span className="text-xs font-bold text-foreground">SMS Notifications (Charges Apply)</span>
+                <span className="text-[10px] text-muted-foreground font-semibold leading-normal">Send text alerts to agent's cell phone</span>
+              </div>
+              <button type="button"
+                onClick={() => handleUpdatePrefs(!smsAlerts, emailAlerts)}
+                disabled={isUpdatingPrefs}
+                className="cursor-pointer shrink-0"
+              >
+                {smsAlerts ? (
+                  <ToggleRight className="w-9 h-9 text-indigo-500" />
+                ) : (
+                  <ToggleLeft className="w-9 h-9 text-muted-foreground" />
+                )}
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -230,7 +315,7 @@ export default function IntegrationCenterClient({
               <h3 className="text-base font-black text-foreground uppercase tracking-wider">
                 🎯 Configure MyPlusLeads Integration
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setActivePartnerConfig(null)}
                 className="text-muted-foreground hover:text-foreground text-sm cursor-pointer"
               >

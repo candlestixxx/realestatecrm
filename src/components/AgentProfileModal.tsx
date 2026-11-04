@@ -11,25 +11,27 @@ export default function AgentProfileModal({
   onClose: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<'profile' | 'company' | 'billing'>('profile');
+  // Starts empty — real values are loaded from the server profile. No seeded
+  // placeholder data is pre-filled into these form fields.
   const [profile, setProfile] = useState({
-    name: 'Excel Legacy Realty Team',
-    email: 'hankrealtyexec@gmail.com',
-    phone: '586-555-0210',
-    title: 'Principal Broker / Owner',
-    license: 'MI-650201099',
+    name: '',
+    email: '',
+    phone: '',
+    title: '',
+    license: '',
   });
   const [company, setCompany] = useState({
-    companyName: 'Excel Legacy Realty',
-    address: '123 Cyberdyne Way, Sterling Heights, MI 48310',
-    website: 'https://excellegacyrealty.com',
-    taxId: 'XX-XXXXXXX',
+    companyName: '',
+    address: '',
+    website: '',
+    taxId: '',
   });
   const [billing, setBilling] = useState({
-    plan: 'Premium Growth Seat',
-    price: '$299/mo',
-    cardNumber: '•••• •••• •••• 4242',
-    expiry: '12/28',
-    status: 'Active',
+    plan: '',
+    price: '',
+    cardNumber: '',
+    expiry: '',
+    status: '',
   });
 
   useEffect(() => {
@@ -46,7 +48,8 @@ export default function AgentProfileModal({
     localStorage.setItem('agent_profile', JSON.stringify(profile));
     localStorage.setItem('agent_company', JSON.stringify(company));
     localStorage.setItem('agent_billing', JSON.stringify(billing));
-    toast.success('Agent setup saved successfully!');
+    // Honest label: this wizard persists to the browser only (no server sync).
+    toast.success('Setup saved to this browser.');
     onClose();
   };
 
@@ -61,7 +64,8 @@ export default function AgentProfileModal({
             <h3 className="text-lg font-bold text-foreground">Lofty Agent & Company Setup</h3>
             <p className="text-xs text-muted-foreground">Manage your credentials, branding, and billing center info.</p>
           </div>
-          <button
+          <button type="button"
+            aria-label="Close agent profile"
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted"
           >
@@ -73,7 +77,7 @@ export default function AgentProfileModal({
 
         {/* Navigation Tabs */}
         <div className="flex border-b border-border bg-muted/10 px-4">
-          <button
+          <button type="button"
             onClick={() => setActiveTab('profile')}
             className={`px-4 py-3 text-sm font-semibold border-b-2 transition-all ${
               activeTab === 'profile'
@@ -83,7 +87,7 @@ export default function AgentProfileModal({
           >
             👤 Agent Profile
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab('company')}
             className={`px-4 py-3 text-sm font-semibold border-b-2 transition-all ${
               activeTab === 'company'
@@ -93,7 +97,7 @@ export default function AgentProfileModal({
           >
             🏢 Company Profile
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab('billing')}
             className={`px-4 py-3 text-sm font-semibold border-b-2 transition-all ${
               activeTab === 'billing'
@@ -263,13 +267,13 @@ export default function AgentProfileModal({
 
         {/* Footer */}
         <div className="p-6 border-t border-border flex justify-end gap-3 bg-muted/10">
-          <button
+          <button type="button"
             onClick={onClose}
             className="px-4 py-2 border border-border hover:bg-muted text-sm font-semibold rounded-lg transition-colors"
           >
             Cancel
           </button>
-          <button
+          <button type="button"
             onClick={handleSave}
             className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold rounded-lg transition-colors"
           >

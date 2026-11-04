@@ -1,0 +1,34 @@
+﻿src/app/calendar/page.tsx(4,52): error TS6133: 'CardDescription' is declared but its value is never read.
+src/app/calendar/page.tsx(82,21): error TS2322: Type '"ghost"' is not assignable to type '"default" | "outline" | "secondary" | "destructive" | null | undefined'.
+src/app/calendar/page.tsx(83,21): error TS2322: Type '"ghost"' is not assignable to type '"default" | "outline" | "secondary" | "destructive" | null | undefined'.
+src/app/campaigns/page.tsx(25,31): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+src/app/campaigns/page.tsx(26,21): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+src/app/content/page.tsx(4,52): error TS6133: 'CardDescription' is declared but its value is never read.
+src/app/landing-pages/page.tsx(10,10): error TS6133: 'pages' is declared but its value is never read.
+src/app/learning-center/page.tsx(11,3): error TS6133: 'TrendingUp' is declared but its value is never read.
+src/app/learning-center/page.tsx(125,66): error TS2345: Argument of type 'Tutorial | undefined' is not assignable to parameter of type 'Tutorial | (() => Tutorial)'.
+  Type 'undefined' is not assignable to type 'Tutorial | (() => Tutorial)'.
+src/app/notifications/page.tsx(4,1): error TS6133: 'apiClient' is declared but its value is never read.
+src/app/notifications/page.tsx(24,46): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+src/app/notifications/page.tsx(35,34): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+src/app/notifications/page.tsx(44,34): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+src/app/settings/billing/page.tsx(4,1): error TS6133: 'apiClient' is declared but its value is never read.
+src/app/settings/billing/page.tsx(7,1): error TS6133: 'Input' is declared but its value is never read.
+src/app/settings/billing/page.tsx(34,49): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+src/app/settings/billing/page.tsx(37,48): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+src/app/settings/billing/page.tsx(46,46): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+src/app/settings/billing/page.tsx(62,46): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+src/components/calendar-reference.tsx(4,36): error TS2307: Cannot find module '../App' or its corresponding type declarations.
+src/components/content-library-reference.tsx(4,36): error TS2307: Cannot find module '../App' or its corresponding type declarations.
+src/components/legacy-settings-reference.tsx(5,78): error TS2307: Cannot find module '../services/oauth' or its corresponding type declarations.
+src/components/legacy-settings-reference.tsx(6,21): error TS2307: Cannot find module '../services/api' or its corresponding type declarations.
+src/components/legacy-settings-reference.tsx(53,24): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/components/legacy-settings-reference.tsx(57,24): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/lib/ai-persona-prompt.ts(1,69): error TS2307: Cannot find module '../../types/api' or its corresponding type declarations.
+src/lib/api.ts(1,41): error TS4111: Property 'NEXT_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['NEXT_PUBLIC_API_URL'].
+src/lib/auth.ts(24,29): error TS4111: Property 'GITHUB_ID' comes from an index signature, so it must be accessed with ['GITHUB_ID'].
+src/lib/auth.ts(25,33): error TS4111: Property 'GITHUB_SECRET' comes from an index signature, so it must be accessed with ['GITHUB_SECRET'].
+src/store/legacy-app-provider.tsx(3,28): error TS2307: Cannot find module './context' or its corresponding type declarations.
+src/store/legacy-app-provider.tsx(4,30): error TS2307: Cannot find module './types' or its corresponding type declarations.
+src/store/legacy-app-provider.tsx(5,28): error TS2307: Cannot find module './reducer' or its corresponding type declarations.
+src/store/legacy-reducer.ts(1,44): error TS2307: Cannot find module './types' or its corresponding type declarations.

@@ -8,11 +8,11 @@ import AICreatorTab from './AICreatorTab';
 import AnalyticsTab from './AnalyticsTab';
 import SEOBlogTab from './SEOBlogTab';
 import SocialAgentTab from './SocialAgentTab';
-import { Plus, Search, ChevronRight, LayoutGrid, Sparkles, BarChart3, Settings, Globe, FileText, ArrowLeft, Trash, Copy, BookOpen, Share2 } from 'lucide-react';
+import { Plus, Search, ChevronRight, LayoutGrid, Sparkles, BarChart3, Globe, Trash, Copy, BookOpen, Share2 } from 'lucide-react';
 
 type LandingPageBlock = {
   id: string;
-  type: 'HEADER' | 'VIDEO' | 'PROPERTY' | 'LEAD_CAPTURE' | 'LINKS';
+  type: 'HEADER' | 'VIDEO' | 'PROPERTY' | 'LEAD_CAPTURE' | 'LINKS' | 'CALCULATOR';
   title?: string;
   subtitle?: string;
   videoUrl?: string;
@@ -123,6 +123,9 @@ export default function WebsitesClient({
       newBlock.remarks = 'Bright open floor plan with custom lighting, updated deck, and spacious rooms.';
     } else if (type === 'LEAD_CAPTURE') {
       newBlock.ctaText = 'Claim Free Market Assessment Report';
+    } else if (type === 'CALCULATOR') {
+      newBlock.title = 'Is this a good investment?';
+      newBlock.subtitle = 'Buyer and seller numbers, plain-English verdict for clients.';
     } else if (type === 'LINKS') {
       newBlock.title = 'Useful Marketing Links';
       newBlock.links = [{ label: 'View Virtual Tour Brochure', href: '#' }];
@@ -212,13 +215,14 @@ export default function WebsitesClient({
 
   return (
     <div className="flex bg-background rounded-3xl border border-border/60 overflow-hidden min-h-[700px] text-foreground">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Agent Websites</h1> <span title="Build and manage your real estate websites with drag-and-drop blocks. Configure IDX search, landing pages, and SEO settings." aria-label="About this section: Build and manage your real estate websites with drag-and-drop blocks. Configure IDX search, landing pages, and SEO settings." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       
       {/* Left Sidebar - Google Gemini Style */}
       <aside className="w-64 bg-muted/30 border-r border-border/60 flex flex-col shrink-0">
         
         {/* New Page Header Option */}
         <div className="p-4 border-b border-border/40">
-          <button
+          <button type="button"
             onClick={() => setIsCreating(true)}
             className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
           >
@@ -242,7 +246,7 @@ export default function WebsitesClient({
         <div className="flex-1 overflow-y-auto px-2 space-y-1 py-2">
           <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider px-3 block mb-2">History & Recents</span>
           {filteredPages.map(page => (
-            <button
+            <button type="button"
               key={page.id}
               onClick={() => handleEditPage(page)}
               className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
@@ -257,14 +261,14 @@ export default function WebsitesClient({
               </div>
 
               <div className="flex items-center gap-1 shrink-0">
-                <button
+                <button type="button"
                   onClick={(e) => handleCopyPage(page, e)}
                   className="p-1 hover:bg-muted text-muted-foreground hover:text-indigo-500 rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                   title="Duplicate Landing Page"
                 >
                   <Copy className="w-3 h-3" />
                 </button>
-                <button
+                <button type="button"
                   onClick={(e) => handleDeletePage(page.id, e)}
                   className="p-1 hover:bg-muted text-muted-foreground hover:text-rose-500 rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                   title="Delete Landing Page"
@@ -295,7 +299,7 @@ export default function WebsitesClient({
 
           {/* Switcher Tab Buttons */}
           <div className="flex bg-muted/60 border border-border/60 rounded-xl p-1 gap-1 text-[11px] font-black uppercase tracking-wider">
-            <button
+            <button type="button"
               onClick={() => { setEditingPageId(null); setActiveTab('ai-creator'); }}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 activeTab === 'ai-creator' && !editingPageId
@@ -305,7 +309,7 @@ export default function WebsitesClient({
             >
               <Sparkles className="w-3.5 h-3.5" /> INSTA GEN "NEW"
             </button>
-            <button
+            <button type="button"
               onClick={() => {
                 if (!editingPageId && landingPages.length > 0) {
                   handleEditPage(landingPages[0]);
@@ -321,7 +325,7 @@ export default function WebsitesClient({
             >
               <LayoutGrid className="w-3.5 h-3.5" /> Traditional Builder
             </button>
-            <button
+            <button type="button"
               onClick={() => { setEditingPageId(null); setActiveTab('seo-blog'); }}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 activeTab === 'seo-blog'
@@ -331,7 +335,7 @@ export default function WebsitesClient({
             >
               <BookOpen className="w-3.5 h-3.5" /> SEO & Blog Creator
             </button>
-            <button
+            <button type="button"
               onClick={() => { setEditingPageId(null); setActiveTab('social-agent'); }}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 activeTab === 'social-agent'
@@ -341,7 +345,7 @@ export default function WebsitesClient({
             >
               <Share2 className="w-3.5 h-3.5" /> Social Studio
             </button>
-            <button
+            <button type="button"
               onClick={() => { setEditingPageId(null); setActiveTab('analytics'); }}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 activeTab === 'analytics'
@@ -387,7 +391,7 @@ export default function WebsitesClient({
                   <div className="lg:col-span-4 bg-card border border-border/60 rounded-2xl p-6 shadow-sm space-y-5">
                     <div className="flex justify-between items-center pb-2 border-b border-border/40">
                       <h3 className="font-extrabold text-xs uppercase text-muted-foreground tracking-wider">Lofty Canvas Blocks</h3>
-                      <button
+                      <button type="button"
                         onClick={() => { setEditingPageId(null); setActiveTab('ai-creator'); }}
                         className="text-[10px] bg-muted hover:bg-muted/80 px-2 py-1 rounded border border-border font-bold uppercase transition-colors"
                       >
@@ -400,22 +404,25 @@ export default function WebsitesClient({
                     </p>
 
                     <div className="grid grid-cols-2 gap-2 pt-1">
-                      <button onClick={() => handleAddBlock('HEADER')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+                      <button type="button" onClick={() => handleAddBlock('HEADER')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
                         <span>📢</span> Header Block
                       </button>
-                      <button onClick={() => handleAddBlock('VIDEO')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+                      <button type="button" onClick={() => handleAddBlock('VIDEO')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
                         <span>🎥</span> Video Tour
                       </button>
-                      <button onClick={() => handleAddBlock('PROPERTY')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+                      <button type="button" onClick={() => handleAddBlock('PROPERTY')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
                         <span>🏠</span> MLS Listings
                       </button>
-                      <button onClick={() => handleAddBlock('LEAD_CAPTURE')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+                      <button type="button" onClick={() => handleAddBlock('LEAD_CAPTURE')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
                         <span>📥</span> Lead capture
+                      </button>
+                      <button type="button" onClick={() => handleAddBlock('CALCULATOR')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+                        <span>🧮</span> Calculator
                       </button>
                     </div>
 
                     <div className="pt-4 border-t border-border/40 flex flex-col gap-2 shrink-0">
-                      <button
+                      <button type="button"
                         disabled={isSaving}
                         onClick={handleSaveBlocks}
                         className="w-full py-2 bg-indigo-600 text-white text-xs font-black uppercase rounded-lg hover:bg-indigo-500 transition-colors shadow shadow-indigo-500/20 cursor-pointer"
@@ -435,13 +442,16 @@ export default function WebsitesClient({
                     </div>
 
                     <div className="space-y-4 min-h-[400px]">
-                      {blocks.map((block, idx) => (
+                      {blocks.length === 0 ? (
+                        <div className="text-sm text-muted-foreground py-2">No content blocks yet.</div>
+                      ) : (
+                        blocks.map((block, idx) => (
                         <div key={block.id} className="p-4.5 border border-border/60 rounded-xl bg-muted/15 relative space-y-4 group">
                           <div className="flex justify-between items-center pb-2 border-b border-border/30">
                             <span className="text-[10px] font-black uppercase tracking-widest text-primary">
                               Block {idx + 1}: {block.type}
                             </span>
-                            <button
+                            <button type="button"
                               onClick={() => handleRemoveBlock(idx)}
                               className="text-[10px] text-rose-500 hover:text-rose-600 font-bold opacity-30 group-hover:opacity-100 transition-opacity cursor-pointer"
                             >
@@ -525,8 +535,28 @@ export default function WebsitesClient({
                               className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
                             />
                           )}
+
+                          {block.type === 'CALCULATOR' && (
+                            <div className="grid grid-cols-1 gap-3">
+                              <input
+                                type="text"
+                                value={block.title || ''}
+                                onChange={(e) => handleBlockChange(idx, 'title', e.target.value)}
+                                placeholder="Calculator headline"
+                                className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                              />
+                              <input
+                                type="text"
+                                value={block.subtitle || ''}
+                                onChange={(e) => handleBlockChange(idx, 'subtitle', e.target.value)}
+                                placeholder="Calculator subtext"
+                                className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                              />
+                            </div>
+                          )}
                         </div>
-                      ))}
+                      ))
+                      )}
                       {blocks.length === 0 && (
                         <div className="py-24 text-center border border-dashed border-border/60 rounded-xl text-muted-foreground italic text-xs">
                           Canvas layout is empty. Click elements on the left side to compile blocks.
@@ -540,7 +570,7 @@ export default function WebsitesClient({
                 <div className="py-16 text-center border border-dashed border-border/60 rounded-2xl text-muted-foreground text-xs font-semibold space-y-4">
                   <span>No landing page currently loaded in editor.</span>
                   <div>
-                    <button
+                    <button type="button"
                       onClick={() => setIsCreating(true)}
                       className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg uppercase tracking-wider font-black cursor-pointer shadow text-[10px]"
                     >
@@ -575,11 +605,11 @@ export default function WebsitesClient({
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Custom Subdomain mapping (Optional)</label>
-                <input name="subdomain" placeholder="e.g. valuation.excellegacy.com" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
+                <input name="subdomain" placeholder="e.g. valuation.excellegacyrealtygroup.site" className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none" />
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
-                <button
+                <button type="button"
                   type="button"
                   onClick={() => setIsCreating(false)}
                   className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-md transition-colors"
@@ -600,3 +630,4 @@ export default function WebsitesClient({
     </div>
   );
 }
+

@@ -1,0 +1,15 @@
+[submodule "apps/foreclosureworkflow"]
+	path = apps/foreclosureworkflow
+	url = https://github.com/candlestixxx/forclosureworkflow.git
+[submodule "apps/leadg"]
+	path = apps/leadg
+	url = https://github.com/candlestixxx/leadG.git
+[submodule "apps/contentplanner"]
+	path = apps/contentplanner
+	url = https://github.com/candlestixxx/socialmediacontentplanner.git
+[submodule "apps/media-workflow"]
+	path = apps/media-workflow
+	url = https://github.com/candlestixxx/re-agent-workflow-media-1.git
+[submodule "apps/legacyleads"]
+	path = apps/legacyleads
+	url = https://github.com/candlestixxx/LegacyLeads.git

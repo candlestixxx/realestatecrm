@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
-import { google } from '@ai-sdk/google';
 import { generateObject } from 'ai';
 import { z } from 'zod';
+import { getDeepSeekModel } from '@/lib/ai/deepseek';
 
 export const runtime = 'nodejs';
 
@@ -29,14 +29,23 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { text } = await req.json();
+    let parsed;
+    try {
+      parsed = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+    const { text } = parsed;
 
     if (!text || !text.trim()) {
       return NextResponse.json({ error: 'Text content is required for AI intake.' }, { status: 400 });
     }
 
     const { object: parsedData } = await generateObject({
-      model: google('gemini-2.0-flash-001'),
+      model: getDeepSeekModel(),
+      // DeepSeek V4 rejects response_format json_schema ("unavailable now");
+      // mode:'json' uses json_object which is supported. Verified live.
+      mode: 'json',
       system: 'You are an expert real estate AI data extraction agent. Extract structured lead details from the given text message or email.',
       prompt: `Analyze the following text and extract details as JSON matching the schema.\nText:\n"""\n${text}\n"""`,
       schema: leadSchema,

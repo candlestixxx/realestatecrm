@@ -4,9 +4,9 @@ import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 import AddTaskModal from '@/components/AddTaskModal';
-import { addTaskAction } from '@/lib/actions/task';
+import { addTaskAction, toggleTaskStatusAction } from '@/lib/actions/task';
 import Link from 'next/link';
-import { AppRole, isAtLeastRole } from '@/lib/permissions';
+import {} from '@/lib/permissions';
 
 export default async function TasksPage(props: {
   searchParams?: Promise<{ status?: string; q?: string; page?: string }>;
@@ -63,7 +63,7 @@ export default async function TasksPage(props: {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Tasks <span title="Create, assign, and track tasks across your team. Set due dates, priorities, and link tasks to leads, deals, or contacts." aria-label="About this section: Create, assign, and track tasks across your team. Set due dates, priorities, and link tasks to leads, deals, or contacts." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-muted-foreground">Manage your daily to-dos and action items.</p>
         </div>
         <div className="flex gap-2">
@@ -91,8 +91,7 @@ export default async function TasksPage(props: {
             <option value="DONE">Done</option>
           </select>
           <input type="hidden" name="page" value={currentPage} />
-          <button
-            type="submit"
+          <button type="submit"
             className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary/90 transition-colors"
           >
             Search
@@ -141,12 +140,12 @@ export default async function TasksPage(props: {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right flex justify-end gap-3">
-                    <button className="text-muted-foreground hover:text-foreground transition-colors">
-                      Complete
-                    </button>
-                    <button className="text-primary hover:underline text-sm font-medium">
-                      Edit
-                    </button>
+                    <form action={toggleTaskStatusAction} className="inline">
+                      <input type="hidden" name="taskId" value={task.id} />
+                      <button type="submit" className="text-muted-foreground hover:text-foreground transition-colors">
+                      {task.status === 'DONE' ? 'Reopen' : 'Complete'}
+                      </button>
+                    </form>
                   </td>
                 </tr>
               ))}

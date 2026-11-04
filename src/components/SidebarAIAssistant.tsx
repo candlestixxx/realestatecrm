@@ -64,7 +64,7 @@ export default function SidebarAIAssistant() {
   return (
     <div className="flex h-full border-l border-border relative z-30">
       {/* Trigger Rail (Collapsable Strip) */}
-      <button
+      <button type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-10 bg-muted/50 hover:bg-muted border-r border-border h-full flex flex-col items-center py-6 gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
       >
@@ -89,7 +89,7 @@ export default function SidebarAIAssistant() {
                 </p>
               </div>
             </div>
-            <button
+            <button type="button"
               onClick={() => setIsOpen(false)}
               className="text-muted-foreground hover:text-foreground text-xs"
             >
@@ -99,7 +99,7 @@ export default function SidebarAIAssistant() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((m) => (
+            {messages.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No messages yet. Ask the AI assistant for help.</div> : (messages.map((m) => (
               <div
                 key={m.id}
                 className={`flex flex-col max-w-[85%] ${
@@ -119,7 +119,7 @@ export default function SidebarAIAssistant() {
                   {m.text}
                 </div>
               </div>
-            ))}
+            )))}
             {isTyping && (
               <div className="flex gap-1 items-center pl-2">
                 <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce"></span>
@@ -131,19 +131,19 @@ export default function SidebarAIAssistant() {
 
           {/* Quick Prompts */}
           <div className="p-3 bg-muted/10 border-t border-border/50 flex flex-wrap gap-1">
-            <button
+            <button type="button"
               onClick={() => handleSend('Draft follow up SMS')}
               className="px-2 py-1 bg-background hover:bg-muted border border-border text-[9px] font-bold uppercase rounded-lg text-muted-foreground hover:text-foreground"
             >
               💬 Draft SMS
             </button>
-            <button
+            <button type="button"
               onClick={() => handleSend('Draft follow up email')}
               className="px-2 py-1 bg-background hover:bg-muted border border-border text-[9px] font-bold uppercase rounded-lg text-muted-foreground hover:text-foreground"
             >
               ✉️ Draft Email
             </button>
-            <button
+            <button type="button"
               onClick={() => handleSend('Summarize lead notes')}
               className="px-2 py-1 bg-background hover:bg-muted border border-border text-[9px] font-bold uppercase rounded-lg text-muted-foreground hover:text-foreground"
             >
@@ -166,7 +166,7 @@ export default function SidebarAIAssistant() {
               placeholder="Ask anything..."
               className="flex-1 bg-muted/30 border border-border rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
             />
-            <button
+            <button type="button"
               type="submit"
               className="px-3 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg text-xs hover:bg-primary/90 transition-colors"
             >

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { DEAL_STAGES } from '@/lib/deal-stages';
 import { 
   ArrowLeft, CheckCircle2, Circle, DollarSign, Calculator, Briefcase, Plus,
   Trash2, FileText, Send, User, ShieldAlert, Sparkles, Building, Key, MapPin, Check
@@ -64,19 +65,27 @@ export default function DealDetailLayoutClient({
   addActivityAction: (formData: FormData) => Promise<any>;
 }) {
   const router = useRouter();
+  const [dataLoading, setDataLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'roadmap' | 'vault' | 'messages' | 'tasks'>('roadmap');
+  const [activeTab, setActiveTab] = useState<'roadmap' | 'vault' | 'messages' | 'tasks' | 'requirements' | 'stakeholders'>('roadmap');
+  const [requirements, setRequirements] = useState<any[]>([]);
+  const [stakeholders, setStakeholders] = useState<any[]>([]);
 
-  // Interactive stages list
-  const stages = [
-    { id: 'QUALIFICATION', label: 'Qualification' },
-    { id: 'PROPOSAL', label: 'Proposal/Showing' },
-    { id: 'NEGOTIATION', label: 'Negotiation' },
-    { id: 'UNDER_CONTRACT', label: 'Under Contract' },
-    { id: 'CLOSED_WON', label: 'Closed Won' },
-  ];
+  useEffect(() => {
+    fetch('/api/deal-requirements?dealId=' + deal.id)
+      .then(r => r.json())
+      .then(d => setRequirements(d.requirements || []))
+      .catch(() => {}).finally(() => setDataLoading(false));
+    fetch('/api/deal-stakeholders?dealId=' + deal.id)
+      .then(r => r.json())
+      .then(d => setStakeholders(d.stakeholders || []))
+      .catch(() => {}).finally(() => setDataLoading(false));
+  }, [deal.id]);
+
+  // Interactive stages list (canonical — from lib/deal-stages)
+  const stages = DEAL_STAGES.map(s => ({ id: s.id, label: s.label }));
 
   // Financial Ledger State
   const [purchasePrice, setPurchasePrice] = useState(deal.value || 0);
@@ -162,13 +171,9 @@ export default function DealDetailLayoutClient({
       };
     });
 
-    const defaultMsgs = [
-      { id: 'msg-1', text: 'Hi Darrell! I just set up the shared portal. You can upload the inspection report directly to the vault here once received.', senderName: 'Excel Legacy Realty Group', senderRole: 'AGENT', createdAt: '2023-01-01T10:00:00.000Z' },
-      { id: 'msg-2', text: 'Got it! The inspector is scheduled for tomorrow at 2 PM. I will upload it as soon as I get it.', senderName: deal.contact.firstName, senderRole: 'CLIENT', createdAt: '2023-01-01T11:00:00.000Z' },
-      { id: 'msg-3', text: 'Pre-approval verified. Appraisal order has been placed on our end.', senderName: 'Sarah Jenkins (Lender)', senderRole: 'LENDER', createdAt: '2023-01-01T11:30:00.000Z' },
-    ];
-
-    return [...customMsgs, ...defaultMsgs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    // Only real activity records are shown. No fabricated sample messages are
+    // appended — an empty conversation means no messages have been exchanged yet.
+    return customMsgs.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   })();
 
   // Calculations
@@ -333,6 +338,7 @@ export default function DealDetailLayoutClient({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 select-none">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Deal Detail</h1> <span title="Full deal management with stage tracker, task list, requirements checklist, stakeholders, documents, and financial details." aria-label="About this section: Full deal management with stage tracker, task list, requirements checklist, stakeholders, documents, and financial details." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       
       {/* Top Header: back to pipeline link */}
       <div className="flex items-center justify-between gap-4 py-2 px-4 bg-card/60 border border-border/60 rounded-xl">
@@ -365,7 +371,7 @@ export default function DealDetailLayoutClient({
               const isPassed = stages.findIndex(s => s.id === deal.stage) >= idx;
 
               return (
-                <button
+                <button type="button"
                   key={stg.id}
                   onClick={() => handleStageChange(stg.id)}
                   className={`w-full text-center py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
@@ -462,7 +468,7 @@ export default function DealDetailLayoutClient({
                       onChange={(e) => setExpenseAmount(e.target.value)}
                       className="w-full bg-muted/40 border border-border/80 rounded px-2 py-1 text-xs focus:outline-none"
                     />
-                    <button
+                    <button type="button"
                       type="submit"
                       disabled={isAddingExpense}
                       className="px-3 bg-primary text-primary-foreground text-xs font-bold rounded hover:opacity-90 shrink-0 cursor-pointer"
@@ -474,12 +480,12 @@ export default function DealDetailLayoutClient({
 
                 {/* Expenses list */}
                 <div className="space-y-1.5 max-h-[150px] overflow-y-auto pr-1">
-                  {expensesList.map(exp => (
+                  {expensesList.length === 0 ? <p className="text-sm text-muted-foreground py-4">No expenses recorded.</p> : expensesList.map(exp => (
                     <div key={exp.id} className="flex justify-between items-center p-2 bg-muted/20 border border-border/40 rounded text-[11px] font-semibold text-foreground">
                       <span className="truncate pr-1">{exp.label}</span>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <span className="font-bold text-red-400">-${exp.amount}</span>
-                        <button 
+                        <button type="button" 
                           onClick={() => handleDeleteExpense(exp.id)}
                           className="text-muted-foreground hover:text-red-400 transition-colors"
                           title="Delete expense"
@@ -509,8 +515,10 @@ export default function DealDetailLayoutClient({
               { id: 'vault', label: 'Documents Vault' },
               { id: 'messages', label: 'Co-Op Communication' },
               { id: 'tasks', label: 'Task List' },
+              { id: 'requirements', label: 'Requirements' },
+              { id: 'stakeholders', label: 'Stakeholders' },
             ].map(tab => (
-              <button
+              <button type="button"
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
@@ -637,7 +645,7 @@ export default function DealDetailLayoutClient({
                       onChange={(e) => setNewDocTitle(e.target.value)}
                       className="bg-muted/40 border border-border/80 rounded px-2.5 py-1.5 text-xs text-foreground focus:outline-none"
                     />
-                    <button 
+                    <button type="button" 
                       type="submit"
                       disabled={isRequestingDoc}
                       className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded transition-colors cursor-pointer"
@@ -649,7 +657,7 @@ export default function DealDetailLayoutClient({
 
                 {/* Vault elements list */}
                 <div className="space-y-3.5">
-                  {requestedDocs.map(doc => (
+                  {requestedDocs.length === 0 ? <p className="text-sm text-muted-foreground py-4">No documents requested.</p> : requestedDocs.map(doc => (
                     <div 
                       key={doc.id} 
                       className="p-4 border border-border/60 rounded-xl bg-muted/10 hover:border-border transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
@@ -662,7 +670,7 @@ export default function DealDetailLayoutClient({
                           <h4 className="font-extrabold text-xs text-foreground">{doc.title}</h4>
                           <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1">
                             <span>Status:</span>
-                            <button 
+                            <button type="button" 
                               onClick={() => handleToggleDocStatus(doc.id, doc.status, doc.signed)}
                               className={`px-1.5 py-0.5 rounded font-black uppercase text-[8px] border transition-all ${
                                 doc.status === 'COMPLETED' 
@@ -684,16 +692,24 @@ export default function DealDetailLayoutClient({
                             <Check className="w-3.5 h-3.5 text-emerald-400" /> Signed
                           </span>
                         ) : (
-                          <button 
+                          <button type="button" 
                             onClick={() => handleSignDoc(doc.id, doc.title, doc.status)}
                             className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg shadow cursor-pointer"
                           >
                             Sign Document
                           </button>
                         )}
-                        <button 
-                          onClick={() => {
-                            toast.success(`Mock Upload: Document "${doc.title}" uploaded!`);
+                        <button type="button"
+                          onClick={async () => {
+                            try {
+                              const res = await fetch('/api/uploads', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ filename: doc.title, contentType: 'application/pdf', dealId: deal.id }),
+                              });
+                              if (res.ok) toast.success(`Document "${doc.title}" upload initialized`);
+                              else toast.error('Upload failed — check AWS S3 configuration');
+                            } catch { toast.error('Network error'); }
                             handleToggleDocStatus(doc.id, 'IN_PROGRESS', doc.signed);
                           }}
                           className="px-3 py-1.5 bg-muted border border-border rounded-lg text-xs font-bold hover:text-foreground cursor-pointer"
@@ -717,7 +733,7 @@ export default function DealDetailLayoutClient({
 
                 {/* Messages feed list */}
                 <div className="border border-border/60 rounded-2xl p-4 bg-muted/10 h-[280px] overflow-y-auto space-y-4 pr-2.5">
-                  {messageLogs.map(msg => {
+                  {messageLogs.length === 0 ? <p className="text-sm text-muted-foreground py-4">No messages logged.</p> : messageLogs.map(msg => {
                     const isAgent = msg.senderRole === 'AGENT';
                     return (
                       <div key={msg.id} className={`flex flex-col max-w-[85%] ${isAgent ? 'ml-auto items-end' : 'items-start'}`}>
@@ -792,7 +808,7 @@ export default function DealDetailLayoutClient({
                   {deal.tasks.length === 0 ? (
                     <p className="text-xs text-muted-foreground italic text-center py-6">No general tasks found. Use the roadmap tab to follow guide milestones.</p>
                   ) : (
-                    deal.tasks.map(task => (
+                    (deal.tasks || []).length === 0 ? <p className="text-sm text-muted-foreground py-4">No tasks yet.</p> : deal.tasks.map(task => (
                       <div key={task.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-start gap-2.5">
                         <input type="checkbox" className="mt-0.5 w-4 h-4 rounded border-border" defaultChecked={task.status === 'DONE'} />
                         <div>
@@ -803,6 +819,58 @@ export default function DealDetailLayoutClient({
                     ))
                   )}
                 </div>
+              </div>
+            )}
+            {/* REQUIREMENTS TAB */}
+            {activeTab === 'requirements' && (
+              <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm space-y-4">
+                <div>
+                  <h3 className="font-extrabold text-base text-foreground">Deal Requirements</h3>
+                  <p className="text-xs text-muted-foreground">Track closing requirements like title, inspection, appraisal, and financing.</p>
+                </div>
+                {requirements.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic text-center py-6">No requirements yet. Add requirements via the API or ask your coordinator.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {requirements.length === 0 ? <p className="text-sm text-muted-foreground py-4">No requirements listed.</p> : requirements.map((req: any) => (
+                      <div key={req.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-center gap-3">
+                        <span className={'w-2.5 h-2.5 rounded-full flex-shrink-0 ' + (req.status === 'COMPLETED' ? 'bg-green-500' : req.status === 'IN_PROGRESS' ? 'bg-yellow-500' : 'bg-red-500')} />
+                        <div className="flex-1">
+                          <p className="font-bold text-xs text-foreground">{req.title}</p>
+                          {req.description && <p className="text-[10px] text-muted-foreground mt-0.5">{req.description}</p>}
+                        </div>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted/40 text-muted-foreground">{req.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* STAKEHOLDERS TAB */}
+            {activeTab === 'stakeholders' && (
+              <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm space-y-4">
+                <div>
+                  <h3 className="font-extrabold text-base text-foreground">Deal Stakeholders</h3>
+                  <p className="text-xs text-muted-foreground">People involved: title company, lender, inspector, appraiser, client.</p>
+                </div>
+                {stakeholders.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic text-center py-6">No stakeholders assigned yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {stakeholders.length === 0 ? <p className="text-sm text-muted-foreground py-4">No stakeholders added.</p> : stakeholders.map((s: any) => (
+                      <div key={s.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                          {s.role.charAt(0)}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-bold text-xs text-foreground">{s.contact ? s.contact.firstName + ' ' + s.contact.lastName : s.user?.name || 'Unassigned'}</p>
+                          <p className="text-[10px] text-muted-foreground">{s.role} · {s.permissions}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

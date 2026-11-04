@@ -206,7 +206,10 @@ function FieldEditor({
 function ActivityFeed({ activity }: { activity: WorkflowActivityEntry[] }) {
   return (
     <div className="space-y-3">
-      {activity.map((entry) => (
+      {activity.length === 0 ? (
+        <div className="text-sm text-muted-foreground py-2">No recent activity.</div>
+      ) : (
+        activity.map((entry) => (
         <div
           key={`${entry.timestamp}-${entry.title}`}
           className="rounded-xl border border-border bg-muted/20 p-3"
@@ -221,7 +224,8 @@ function ActivityFeed({ activity }: { activity: WorkflowActivityEntry[] }) {
             </span>
           </div>
         </div>
-      ))}
+      ))
+      )}
     </div>
   );
 }
@@ -262,6 +266,7 @@ export function WorkflowStudio({
   defaultValues,
   activitySeed,
 }: WorkflowStudioProps) {
+  const [dataLoading, setDataLoading] = useState(true);
   const [draft, setDraft] = useState<Record<string, string>>(defaultValues);
   const [activity, setActivity] = useState<WorkflowActivityEntry[]>(activitySeed);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
@@ -597,7 +602,7 @@ export function WorkflowStudio({
               </div>
               <div className="space-y-2">
                 <p className="text-sm font-medium text-muted-foreground">{routeLabel}</p>
-                <h1 className="text-3xl font-bold tracking-tight md:text-5xl">{title}</h1>
+                <h1 className="text-3xl font-bold tracking-tight md:text-5xl">{title} <span title={subtitle || title} aria-label={'About this section: ' + (subtitle || title)} className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-border text-[10px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
                 <p className="max-w-3xl text-sm leading-6 text-muted-foreground md:text-base">
                   {subtitle}
                 </p>

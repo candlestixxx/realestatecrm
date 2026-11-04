@@ -12,7 +12,7 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
     if (typeof args[0] === 'string' && args[0].includes('Encountered a script tag')) {
       return;
     }
-    if (typeof args[0] === 'string' && args[0].includes('DialogContent requires a DialogTitle')) {
+    if (typeof args[0] === 'string' && args[0].includes('DialogContent') && args[0].includes('DialogTitle')) {
       return;
     }
     if (typeof args[0] === 'string' && (args[0].includes('decryption operation failed') || args[0].includes('JWT_SESSION_ERROR'))) {

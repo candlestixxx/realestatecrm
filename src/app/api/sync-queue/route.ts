@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 
 import { authOptions } from '@/lib/auth';
-import { requireWorkspaceAccess } from '@/lib/workspace-access';
+import { requireWorkspaceAccess, workspaceErrorResponse } from '@/lib/workspace-access';
 import {
   getSyncQueue,
   getQueueStats,
@@ -66,8 +66,15 @@ export const dynamic = 'force-dynamic';
  * GET /api/sync-queue — List all items in the sync queue + stats + readiness
  */
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  await requireWorkspaceAccess(session);
+  try {
+    const session = await getServerSession(authOptions);
+    await requireWorkspaceAccess(session);
+  } catch (err) {
+    const resp = workspaceErrorResponse(err);
+    if (resp) return resp;
+    console.error('sync-queue GET failed:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 
   const [items, stats] = await Promise.all([getSyncQueue(), getQueueStats()]);
 
@@ -94,9 +101,15 @@ export async function GET() {
  *   { action: "skip", id: "" }               — skip this lead
  */
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  const access = await requireWorkspaceAccess(session);
-  const body = await req.json();
+  try {
+    const session = await getServerSession(authOptions);
+    const access = await requireWorkspaceAccess(session);
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
   const { action } = body;
 
   switch (action) {
@@ -342,5 +355,11 @@ export async function POST(req: NextRequest) {
 
     default:
       return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
+    }
+  } catch (err) {
+    const resp = workspaceErrorResponse(err);
+    if (resp) return resp;
+    console.error('sync-queue POST failed:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

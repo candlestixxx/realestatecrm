@@ -1,0 +1,495 @@
+﻿
+> real-estate-crm@0.54.0 prebuild
+> node scripts/kill-port.js 3000
+
+
+> real-estate-crm@0.54.0 build
+> next build
+
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+node.exe : Turbopack build encountered 1 warnings:
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\hyper\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Turbopack build encountered 1 warnings::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+./next.config.ts
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace 
+below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Import trace:
+  App Route:
+    ./next.config.ts
+    ./src/app/api/folder-detection/route.ts
+
+
+✓ Compiled successfully in 18.9s
+  Skipping validation of types
+  Finished TypeScript config validation in 51ms ...
+  Collecting page data using 31 workers ...
+  Generating static pages using 31 workers (0/90) ...
+Session decryption failed: Error: Dynamic server usage: Route /dashboard couldn't be rendered statically because it 
+used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard couldn't be rendered statically because it used `headers`. See more info here: 
+https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed on dashboard page: Error: Dynamic server usage: Route /dashboard couldn't be rendered 
+statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at k (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0-2wwe5._.js:1:3505)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard couldn't be rendered statically because it used `headers`. See more info here: 
+https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/agent-studio couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/agent-studio couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/partners couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/partners couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/reporting/analytics couldn't be rendered 
+statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/reporting/analytics couldn't be rendered statically because it used `headers`. See 
+more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+  Generating static pages using 31 workers (22/90) 
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/settings/ai-models couldn't be rendered 
+statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/settings/ai-models couldn't be rendered statically because it used `headers`. See 
+more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/agent-websites couldn't be rendered 
+statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/agent-websites couldn't be rendered statically because it used `headers`. See more 
+info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed on page: Error: Dynamic server usage: Route /dashboard/agent-websites couldn't be rendered 
+statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at l (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__047b9yt._.js:1:2245)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/agent-websites couldn't be rendered statically because it used `headers`. See more 
+info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/agentcore couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/agentcore couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/reporting couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/reporting couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/segments couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/segments couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/settings/integrations couldn't be rendered 
+statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/settings/integrations couldn't be rendered statically because it used `headers`. See 
+more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/approvals couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/approvals couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/audit couldn't be rendered statically because 
+it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/audit couldn't be rendered statically because it used `headers`. See more info here: 
+https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/calendar couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/calendar couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/settings/mcp couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/settings/mcp couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+  Generating static pages using 31 workers (44/90) 
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/campaigns couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/campaigns couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/settings/voice couldn't be rendered 
+statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/settings/voice couldn't be rendered statically because it used `headers`. See more 
+info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/sync-queue couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/sync-queue couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/settings couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/settings couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/deals couldn't be rendered statically because 
+it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/deals couldn't be rendered statically because it used `headers`. See more info here: 
+https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/data-quality couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/data-quality couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/social couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/social couldn't be rendered statically because it used `headers`. See more info here: 
+https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+  Generating static pages using 31 workers (67/90) 
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/tasks couldn't be rendered statically because 
+it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/tasks couldn't be rendered statically because it used `headers`. See more info here: 
+https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/help-center couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/help-center couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/inbox couldn't be rendered statically because 
+it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/inbox couldn't be rendered statically because it used `headers`. See more info here: 
+https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/leaderboard couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/leaderboard couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/websites/builder couldn't be rendered 
+statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/websites/builder couldn't be rendered statically because it used `headers`. See more 
+info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/listings couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/listings couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/workflows couldn't be rendered statically 
+because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/workflows couldn't be rendered statically because it used `headers`. See more info 
+here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/map couldn't be rendered statically because 
+it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/map couldn't be rendered statically because it used `headers`. See more info here: 
+https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/marketing-studio couldn't be rendered 
+statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/marketing-studio couldn't be rendered statically because it used `headers`. See more 
+info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+Session decryption failed: Error: Dynamic server usage: Route /dashboard/marketing/text-codes couldn't be rendered 
+statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at m (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0wp-l5i._.js:1:15902)
+    at h (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\_0ar5rf7._.js:34:24883)
+    at z (C:\Users\hyper\workspace\realestatecrm\.next\server\chunks\ssr\[root-of-the-server]__0k_atkk._.js:8:14384)
+    at stringify (<anonymous>) {
+  description: "Route /dashboard/marketing/text-codes couldn't be rendered statically because it used `headers`. See 
+more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+✓ Generating static pages using 31 workers (90/90) in 1347ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /[domain]
+├ ƒ /[domain]/blog
+├ ƒ /[domain]/blog/[slug]
+├ ƒ /api/agentcore
+├ ƒ /api/agentcore/voice-command
+├ ƒ /api/agentcore/workflows
+├ ƒ /api/agentcore/workflows/[id]
+├ ƒ /api/agents/handshake
+├ ƒ /api/approvals
+├ ƒ /api/audit
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/avatar
+├ ƒ /api/canva
+├ ƒ /api/chat
+├ ƒ /api/chat/voice
+├ ƒ /api/client-portal
+├ ƒ /api/contracts
+├ ƒ /api/crm-records
+├ ƒ /api/crm-records/[recordId]
+├ ƒ /api/cron/mls-scrub
+├ ƒ /api/cron/myplusleads
+├ ƒ /api/data-quality
+├ ƒ /api/export
+├ ƒ /api/folder-detection
+├ ƒ /api/gamification
+├ ƒ /api/idx
+├ ƒ /api/idx/search
+├ ƒ /api/imports
+├ ƒ /api/inbox
+├ ƒ /api/integrations/content
+├ ƒ /api/integrations/foreclosure
+├ ƒ /api/integrations/leads
+├ ƒ /api/integrations/media
+├ ƒ /api/integrations/trigger/content
+├ ƒ /api/integrations/trigger/voice
+├ ƒ /api/lead-gen/social
+├ ƒ /api/leads/[id]/qualify
+├ ƒ /api/leads/ai-parse
+├ ƒ /api/leads/external
+├ ƒ /api/leads/webhooks/[provider]
+├ ƒ /api/listings
+├ ƒ /api/mcp
+├ ƒ /api/mls/historical
+├ ƒ /api/objections
+├ ƒ /api/offers
+├ ƒ /api/partners
+├ ƒ /api/property-data
+├ ƒ /api/referrals
+├ ƒ /api/reporting
+├ ƒ /api/routing
+├ ƒ /api/scoring
+├ ƒ /api/search
+├ ƒ /api/skip-trace
+├ ƒ /api/social
+├ ƒ /api/sync-history
+├ ƒ /api/sync-queue
+├ ƒ /api/syndication
+├ ƒ /api/uploads
+├ ƒ /api/vault
+├ ƒ /api/voice/accent-morphing
+├ ƒ /api/webhooks/voice
+├ ƒ /api/websites
+├ ƒ /api/websites/templates
+├ ƒ /api/workflows/[workflowId]
+├ ƒ /api/workflows/media-pipeline
+├ ƒ /auth/signin
+├ ƒ /dashboard
+├ ƒ /dashboard/agent-studio
+├ ƒ /dashboard/agent-websites
+├ ƒ /dashboard/agentcore
+├ ƒ /dashboard/approvals
+├ ƒ /dashboard/audit
+├ ƒ /dashboard/calendar
+├ ƒ /dashboard/campaigns
+├ ƒ /dashboard/data-quality
+├ ƒ /dashboard/deals
+├ ƒ /dashboard/deals/[id]
+├ ƒ /dashboard/help-center
+├ ƒ /dashboard/inbox
+├ ƒ /dashboard/leaderboard
+├ ƒ /dashboard/leads
+├ ƒ /dashboard/leads/[id]
+├ ƒ /dashboard/listings
+├ ƒ /dashboard/map
+├ ƒ /dashboard/marketing-studio
+├ ƒ /dashboard/marketing/text-codes
+├ ƒ /dashboard/partners
+├ ƒ /dashboard/reporting
+├ ƒ /dashboard/reporting/analytics
+├ ƒ /dashboard/segments
+├ ƒ /dashboard/settings
+├ ƒ /dashboard/settings/ai-models
+├ ƒ /dashboard/settings/email
+├ ƒ /dashboard/settings/integrations
+├ ƒ /dashboard/settings/mcp
+├ ƒ /dashboard/settings/voice
+├ ƒ /dashboard/social
+├ ƒ /dashboard/sync-queue
+├ ƒ /dashboard/tasks
+├ ƒ /dashboard/websites/builder
+├ ƒ /dashboard/workflows
+├ ƒ /portal
+├ ƒ /site/[slug]
+├ ƒ /workflows/foreclosure-intake
+├ ƒ /workflows/listing-entry
+├ ƒ /workflows/marketing-media
+└ ƒ /workflows/offer-draft
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

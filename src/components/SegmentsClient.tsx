@@ -213,6 +213,7 @@ export default function SegmentsClient({
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Segments</h1> <span title="Create and manage lead segments for targeted campaigns. Filter by status, source, location, and behavior." aria-label="About this section: Create and manage lead segments for targeted campaigns. Filter by status, source, location, and behavior." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       {/* 1. SECTOR VIEW: SEGMENTS DASHBOARD (No active segment selected) */}
       {!selectedSegmentId && (
         <>
@@ -264,7 +265,7 @@ export default function SegmentsClient({
                   </div>
                   <div className="flex flex-col items-end text-[11px] text-muted-foreground">
                     <span className="font-semibold text-green-500">Unlimited Leads</span>
-                    <button
+                    <button type="button"
                       onClick={() => setSelectedSegmentId(seg.id)}
                       className="mt-2 text-xs font-bold text-primary flex items-center gap-1 hover:underline"
                     >
@@ -328,20 +329,20 @@ export default function SegmentsClient({
                       <td className="px-6 py-4 text-muted-foreground text-xs">N/A</td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-3 opacity-90 group-hover:opacity-100 transition-opacity">
-                          <button
+                          <button type="button"
                             onClick={() => handleTogglePin(seg.id)}
                             className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-amber-500 transition-colors"
                             title={seg.isPinned ? 'Unpin from Top' : 'Pin to Top (Up to 5)'}
                           >
                             {seg.isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
                           </button>
-                          <button
+                          <button type="button"
                             onClick={() => setSelectedSegmentId(seg.id)}
                             className="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
                           >
                             Open List <ChevronRight className="w-3.5 h-3.5" />
                           </button>
-                          <button
+                          <button type="button"
                             onClick={() => handleDeleteSegment(seg.id)}
                             className="p-1 hover:bg-red-500/10 rounded text-muted-foreground hover:text-red-500 transition-colors"
                           >
@@ -369,7 +370,7 @@ export default function SegmentsClient({
       {selectedSegmentId && activeSegment && (
         <div className="space-y-6">
           <div className="flex flex-col gap-4">
-            <button
+            <button type="button"
               onClick={() => {
                 setSelectedSegmentId(null);
                 setLeadSearchTerm('');
@@ -394,7 +395,7 @@ export default function SegmentsClient({
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <button
+                <button type="button"
                   onClick={() => setIsAddingLead(!isAddingLead)}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors"
                 >
@@ -410,7 +411,7 @@ export default function SegmentsClient({
             <div className="bg-muted/30 border border-border rounded-xl p-4 max-w-md animate-in slide-in-from-top-2">
               <div className="flex justify-between items-center mb-2">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-wide">Enroll Lead in Segment</h4>
-                <button onClick={() => setIsAddingLead(false)}>
+                <button type="button" aria-label="Close add lead form" onClick={() => setIsAddingLead(false)}>
                   <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                 </button>
               </div>
@@ -443,14 +444,14 @@ export default function SegmentsClient({
                 segmentName={activeSegment.name}
                 sendMassEmailToSegmentAction={sendMassEmailToSegmentAction}
               />
-              <button
+              <button type="button"
                 onClick={() => setIsSmsOpen(true)}
                 className="font-bold text-primary flex items-center gap-1 hover:underline"
               >
                 <MessageSquare className="w-3.5 h-3.5" />
                 Mass SMS
               </button>
-              <button
+              <button type="button"
                 onClick={() => setIsSmartPlanOpen(true)}
                 className="font-bold text-primary flex items-center gap-1 hover:underline"
               >
@@ -533,7 +534,7 @@ export default function SegmentsClient({
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button
+                        <button type="button"
                           onClick={() => handleRemoveLead(l.id)}
                           className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1 justify-end ml-auto"
                         >
@@ -563,7 +564,7 @@ export default function SegmentsClient({
           <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-lg overflow-hidden flex flex-col">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
               <h3 className="font-bold text-md text-foreground">Mass SMS Broadcast</h3>
-              <button onClick={() => setIsSmsOpen(false)}>
+              <button type="button" aria-label="Close SMS dialog" onClick={() => setIsSmsOpen(false)}>
                 <X className="w-5 h-5 text-muted-foreground hover:text-foreground" />
               </button>
             </div>
@@ -583,7 +584,7 @@ export default function SegmentsClient({
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button
+                <button type="button"
                   type="button"
                   onClick={() => setIsSmsOpen(false)}
                   className="px-4 py-2 border border-border rounded-lg text-xs font-bold text-muted-foreground hover:bg-muted/20 transition-colors"
@@ -608,7 +609,7 @@ export default function SegmentsClient({
           <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-lg overflow-hidden flex flex-col">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
               <h3 className="font-bold text-md text-foreground">Bulk Smart Plan Campaign Enrollment</h3>
-              <button onClick={() => setIsSmartPlanOpen(false)}>
+              <button type="button" aria-label="Close smart plan dialog" onClick={() => setIsSmartPlanOpen(false)}>
                 <X className="w-5 h-5 text-muted-foreground hover:text-foreground" />
               </button>
             </div>

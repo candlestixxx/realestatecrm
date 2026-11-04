@@ -25,7 +25,7 @@ export async function sendSmsAction(formData: FormData) {
 
   if (accountSid && authToken && fromPhone) {
     try {
-      console.log(`[SMS API] Sending real Twilio message to ${phone}...`);
+      // console.log(`[SMS API] Sending real Twilio message to ${phone}...`);
       const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
       const basicAuth = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
       const bodyParams = new URLSearchParams({
@@ -48,14 +48,14 @@ export async function sendSmsAction(formData: FormData) {
         console.error('[SMS API] Twilio error response:', errorText);
         return { error: `Twilio failed: ${res.statusText}` };
       }
-      console.log(`[SMS API] Twilio message successfully sent to ${phone}`);
+      // console.log(`[SMS API] Twilio message successfully sent to ${phone}`);
     } catch (err) {
       console.error('[SMS API] Twilio connection error:', err);
       return { error: 'Failed to establish connection to Twilio API.' };
     }
   } else {
     // Fallback simulation for local dev without credentials
-    console.log(`[SMS API] [SIMULATION] Sending message to ${phone}: "${message}"`);
+    // console.log(`[SMS API] [SIMULATION] Sending message to ${phone}: "${message}"`);
     await new Promise((resolve) => setTimeout(resolve, 800));
   }
 

@@ -6,6 +6,10 @@ async function main() {
   console.log('Seeding database...');
 
   // Clear existing to prevent duplicates on multiple seed runs
+  await prisma.leadQualification.deleteMany().catch(() => {});
+  await prisma.leadRoutingRule.deleteMany().catch(() => {});
+  await prisma.agentWorkflow.deleteMany().catch(() => {});
+  await prisma.agentLog.deleteMany().catch(() => {});
   await prisma.workflowSession.deleteMany();
   await prisma.activity.deleteMany();
   await prisma.workspaceMember.deleteMany();
@@ -161,6 +165,125 @@ async function main() {
     },
   });
 
+
+  // Create additional Contacts + Leads for demo variety
+  const extraContacts = [
+    { firstName: 'Robert', lastName: 'Williams', email: 'rwilliams@example.com', phone: '555-4401', workspaceId: workspace.id },
+    { firstName: 'Lisa', lastName: 'Anderson', email: 'lisa.a@example.com', phone: '555-7723', workspaceId: workspace.id },
+    { firstName: 'James', lastName: 'Taylor', email: 'jtaylor@example.com', phone: '555-9910', workspaceId: workspace.id },
+    { firstName: 'Maria', lastName: 'Garcia', email: 'mgarcia@example.com', phone: '555-3345', workspaceId: workspace.id },
+    { firstName: 'David', lastName: 'Martinez', email: 'dmartinez@example.com', phone: '555-2211', workspaceId: workspace.id },
+    { firstName: 'Jennifer', lastName: 'Brown', email: 'jbrown@example.com', phone: '555-6678', workspaceId: workspace.id },
+    { firstName: 'Christopher', lastName: 'Lee', email: 'clee@example.com', phone: '555-8890', workspaceId: workspace.id },
+    { firstName: 'Amanda', lastName: 'Wilson', email: 'awilson@example.com', phone: '555-1122', workspaceId: workspace.id },
+  ];
+  const createdExtra = [];
+  for (const c of extraContacts) {
+    createdExtra.push(await prisma.contact.create({ data: c }));
+  }
+
+  const leadStatuses = ['NEW', 'CONTACTED', 'QUALIFIED', 'NURTURE', 'APPOINTMENT', 'PROPOSAL', 'CLOSED_WON', 'CLOSED_LOST'];
+  const leadSources = ['Zillow', 'Realtor.com', 'Referral', 'Facebook', 'Website', 'Open House', 'Cold Call', 'MyPlusLeads'];
+  const leadTypes = ['BUYER', 'SELLER'];
+  for (let i = 0; i < createdExtra.length; i++) {
+    await prisma.lead.create({
+      data: {
+        type: leadTypes[i % leadTypes.length],
+        source: leadSources[i % leadSources.length],
+        status: leadStatuses[i % leadStatuses.length],
+        score: 40 + ((i * 7) % 60),
+        workspaceId: workspace.id,
+        contactId: createdExtra[i].id,
+        userId: i % 2 === 0 ? harry.id : don.id,
+        isAiAssisted: i % 3 === 0,
+        tags: i % 2 === 0 ? '#firsttimebuyer' : '#investor',
+      },
+    });
+  }
+
+  // Seed Activities
+  const allLeads = await prisma.lead.findMany();
+  const activityTypes = ['NOTE', 'CALL', 'EMAIL', 'SMS', 'MEETING'];
+  for (let i = 0; i < 8; i++) {
+    const lead = allLeads[i % allLeads.length];
+    await prisma.activity.create({
+      data: {
+        type: activityTypes[i % activityTypes.length],
+        content: [
+          'Initial contact made. Buyer pre-approved up to \.',
+          'Called about listing at 456 Oak Ave. Left voicemail.',
+          'Sent follow-up email with 3 comparable properties.',
+          'SMS conversation: scheduling showing for Saturday 2pm.',
+          'Met at open house. Interested in 3-bed/2-bath in Warren.',
+          'Discussed short sale options. Seller is behind on payments.',
+          'Sent market analysis report for seller lead.',
+          'Called to check timeline. Still 6-12 months out.',
+        ][i],
+        workspaceId: workspace.id,
+        userId: harry.id,
+        leadId: lead.id,
+      },
+    });
+  }
+
+  // Seed AgentWorkflow
+  await prisma.agentWorkflow.create({
+    data: {
+      name: 'Auto-Qualify New Leads',
+      description: 'When a new lead arrives, score it with AI and route to the best available agent.',
+      trigger: 'NEW_LEAD',
+      actions: JSON.stringify([
+        { condition: 'always', actions: [
+          { type: 'AI_SCORE', model: 'gpt-4o-mini' },
+          { type: 'ROUTE', rule: 'round-robin' },
+          { type: 'NOTIFY', channel: 'in-app' },
+        ]},
+      ]),
+      isActive: true,
+      workspaceId: workspace.id,
+    },
+  });
+
+  await prisma.agentWorkflow.create({
+    data: {
+      name: 'Hot Lead Alert',
+      description: 'When a lead score exceeds 80, send an immediate alert to the assigned agent.',
+      trigger: 'SCORE_CHANGE',
+      actions: JSON.stringify([
+        { condition: 'score > 80', actions: [
+          { type: 'NOTIFY', channel: 'sms' },
+          { type: 'TASK', title: 'Call hot lead within 15 min' },
+        ]},
+      ]),
+      isActive: true,
+      workspaceId: workspace.id,
+    },
+  });
+
+  // Seed LeadRoutingRule
+  await prisma.leadRoutingRule.create({
+    data: {
+      name: 'Zillow Round-Robin',
+      description: 'Distribute Zillow leads evenly across Harry and Don.',
+      workspaceId: workspace.id,
+      isActive: true,
+      source: 'Zillow',
+      agentIds: [harry.id, don.id].join(','),
+      currentIndex: 0,
+    },
+  });
+
+  await prisma.leadRoutingRule.create({
+    data: {
+      name: 'Referral to Broker',
+      description: 'All referral leads go to Hank first.',
+      workspaceId: workspace.id,
+      isActive: true,
+      source: 'Referral',
+      agentIds: hank.id,
+      currentIndex: 0,
+    },
+  });
   // --- Seed Smart Plan Templates ---
   const smartPlanTemplates = [
     {

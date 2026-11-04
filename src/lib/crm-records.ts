@@ -166,46 +166,50 @@ export function getRecordDisplayLabel(record: CrmRecord) {
 
 export function buildOfferDefaults(record: CrmRecord | null): Record<string, string> {
   const payload = record?.payload ?? {};
+  // Form defaults come from the real CRM record only. Missing fields are
+  // left EMPTY for the agent to fill in — never pre-filled with fabricated
+  // names/prices that would then be saved as real offer data.
   return {
-    buyerName: payload.buyerName ?? 'Jordan Smith',
-    propertyAddress: payload.propertyAddress ?? '412 Lakeview Dr',
-    offerPrice: payload.offerPrice ?? '385000',
-    earnestMoney: payload.earnestMoney ?? '10000',
-    closingDate: payload.closingDate ?? '2026-06-30',
-    financingType: payload.financingType ?? 'Conventional',
-    contingencies: payload.contingencies ?? 'Inspection, appraisal, financing',
-    inclusions: payload.inclusions ?? 'Refrigerator, range, washer, dryer',
-    agentNotes: payload.agentNotes ?? 'Use recent comparable sales to support the price band.',
+    buyerName: payload.buyerName ?? '',
+    propertyAddress: payload.propertyAddress ?? '',
+    offerPrice: payload.offerPrice ?? '',
+    earnestMoney: payload.earnestMoney ?? '',
+    closingDate: payload.closingDate ?? '',
+    financingType: payload.financingType ?? '',
+    contingencies: payload.contingencies ?? '',
+    inclusions: payload.inclusions ?? '',
+    agentNotes: payload.agentNotes ?? '',
   };
 }
 
 export function buildListingDefaults(record: CrmRecord | null): Record<string, string> {
   const payload = record?.payload ?? {};
+  // Same principle as buildOfferDefaults: real data or empty.
   return {
-    sellerName: payload.sellerName ?? 'Taylor Johnson',
-    propertyAddress: payload.propertyAddress ?? '412 Lakeview Dr',
-    listingPrice: payload.listingPrice ?? '399000',
-    beds: payload.beds ?? '4',
-    baths: payload.baths ?? '2.5',
-    squareFeet: payload.squareFeet ?? '2410',
-    lotSize: payload.lotSize ?? '0.28',
-    propertyType: payload.propertyType ?? 'Single Family',
+    sellerName: payload.sellerName ?? '',
+    propertyAddress: payload.propertyAddress ?? '',
+    listingPrice: payload.listingPrice ?? '',
+    beds: payload.beds ?? '',
+    baths: payload.baths ?? '',
+    squareFeet: payload.squareFeet ?? '',
+    lotSize: payload.lotSize ?? '',
+    propertyType: payload.propertyType ?? '',
     status: payload.status ?? 'Draft',
-    remarks: payload.remarks ?? 'Bright kitchen, updated flooring, and a private backyard.',
-    showingInstructions: payload.showingInstructions ?? 'Lockbox on side door; schedule 24 hours ahead.',
+    remarks: payload.remarks ?? '',
+    showingInstructions: payload.showingInstructions ?? '',
   };
 }
 
 export function buildOfferSummaryItems(record: CrmRecord | null) {
   const payload = record?.payload ?? {};
   return [
-    { label: 'Buyer', value: payload.buyerName ?? 'Jordan Smith', source: 'CRM' },
-    { label: 'Property', value: payload.propertyAddress ?? '412 Lakeview Dr', source: 'CRM' },
+    { label: 'Buyer', value: payload.buyerName || 'Not provided', source: 'CRM' },
+    { label: 'Property', value: payload.propertyAddress || 'Not provided', source: 'CRM' },
     { label: 'Deal stage', value: record?.status ?? 'Offer drafting', source: 'Workflow' },
     {
       label: 'Source provenance',
-      value: record?.sourceSystem ?? 'MiRealSource + Realist',
-      source: record?.sourceRecordId ? 'Tracked' : 'Mock',
+      value: record?.sourceSystem ?? 'No source record linked',
+      source: record?.sourceRecordId ? 'Tracked' : 'Untracked',
       accent: true,
     },
   ];
@@ -214,13 +218,13 @@ export function buildOfferSummaryItems(record: CrmRecord | null) {
 export function buildListingSummaryItems(record: CrmRecord | null) {
   const payload = record?.payload ?? {};
   return [
-    { label: 'Seller', value: payload.sellerName ?? 'Taylor Johnson', source: 'CRM' },
-    { label: 'Listing', value: payload.propertyAddress ?? '412 Lakeview Dr', source: 'CRM' },
+    { label: 'Seller', value: payload.sellerName || 'Not provided', source: 'CRM' },
+    { label: 'Listing', value: payload.propertyAddress || 'Not provided', source: 'CRM' },
     { label: 'Agreement', value: record?.status ?? 'Draft', source: 'Docs' },
     {
       label: 'Source provenance',
-      value: record?.sourceSystem ?? 'MLS + BS&A + Realcomp',
-      source: record?.sourceRecordId ? 'Tracked' : 'Mock',
+      value: record?.sourceSystem ?? 'No source record linked',
+      source: record?.sourceRecordId ? 'Tracked' : 'Untracked',
       accent: true,
     },
   ];
@@ -232,7 +236,7 @@ export function buildOfferActivitySeed(record: CrmRecord | null) {
       title: 'Loaded from live CRM record',
       detail: record
         ? `Offer workflow is opening from ${record.displayName}.`
-        : 'Offer workflow loaded with mock CRM and source context.',
+        : 'Offer workflow started without a linked CRM record — enter details manually.',
       timestamp: 'Now',
     },
     {
@@ -249,7 +253,7 @@ export function buildListingActivitySeed(record: CrmRecord | null) {
       title: 'Loaded from live CRM record',
       detail: record
         ? `Listing workflow is opening from ${record.displayName}.`
-        : 'Interactive listing workflow opened with mock property data and source provenance.',
+        : 'Listing workflow started without a linked CRM record — enter details manually.',
       timestamp: 'Now',
     },
     {
@@ -272,7 +276,13 @@ export function buildDashboardCards(records: CrmRecord[]): CrmDashboardCard[] {
   }));
 }
 
+/**
+ * Seed demo CRM records when the store is empty — OPT-IN ONLY via
+ * DEMO_SEED=true. Production deployments must never grow demo deals/listings
+ * out of an empty store; records should come from real MLS/CRM ingestion.
+ */
 export async function seedCrmRecordsIfEmpty() {
+  if (process.env.DEMO_SEED !== 'true') return;
   const store = await readFileStore();
   if (store.records.length === 0) {
     await writeFileStore(seedRecords);

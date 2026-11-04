@@ -1,10 +1,34 @@
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import prisma from '@/lib/prisma';
 import LandingPagePortalClient from '@/components/websites/LandingPagePortalClient';
+import ShareWidget from '@/components/ShareWidget';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+// Dynamic OG metadata per landing page — shared links render with
+// the page title and a rich preview on Facebook/LinkedIn/X.
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const { slug } = await props.params;
+  const landingPage = await prisma.landingPage.findUnique({ where: { slug }, select: { title: true, blocks: true } });
+  if (!landingPage) return { title: 'Page Not Found' };
+  return {
+    title: landingPage.title,
+    description: 'Excel Legacy Realty Group - ' + landingPage.title,
+    openGraph: {
+      title: landingPage.title,
+      description: 'Excel Legacy Realty Group - ' + landingPage.title,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: landingPage.title,
+      description: 'Excel Legacy Realty Group - ' + landingPage.title,
+    },
+  };
+}
 
 export default async function PublicLandingPage(props: PageProps) {
   const resolvedParams = await props.params;
@@ -74,11 +98,31 @@ export default async function PublicLandingPage(props: PageProps) {
     const workspaceId = workspaces[0]?.id || 'default';
 
     return (
-      <LandingPagePortalClient
-        pageTitle={`${agent.name} Site`}
-        blocksJson={JSON.stringify(agentBlocks)}
-        workspaceId={workspaceId}
-      />
+      <>
+        {/* JSON-LD for agent pages */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'RealEstateAgent',
+              name: agent.name,
+              email: agent.email,
+              telephone: agent.phone,
+              jobTitle: agent.role,
+              worksFor: {
+                '@type': 'Organization',
+                name: 'Excel Legacy Realty Group',
+              },
+            }),
+          }}
+        />
+        <LandingPagePortalClient
+          pageTitle={`${agent.name} Site`}
+          blocksJson={JSON.stringify(agentBlocks)}
+          workspaceId={workspaceId}
+        />
+      </>
     );
   }
 
@@ -92,6 +136,23 @@ export default async function PublicLandingPage(props: PageProps) {
 
   return (
     <>
+      {/* JSON-LD structured data for search engines */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            name: landingPage.title,
+            description: 'Excel Legacy Realty Group - ' + landingPage.title,
+            url: (process.env.NEXT_PUBLIC_APP_URL || '') + '/site/' + slug,
+            publisher: {
+              '@type': 'Organization',
+              name: 'Excel Legacy Realty Group',
+            },
+          }),
+        }}
+      />
       {landingPage.fbPixelId && (
         <script
           dangerouslySetInnerHTML={{
@@ -115,6 +176,14 @@ export default async function PublicLandingPage(props: PageProps) {
         blocksJson={landingPage.blocks}
         workspaceId={landingPage.workspaceId}
       />
+      {/* Social share bar — drives organic traffic from shared links */}
+      <div className="max-w-4xl mx-auto px-4 py-4">
+        <ShareWidget
+          url={(process.env.NEXT_PUBLIC_APP_URL || '') + '/site/' + slug}
+          title={landingPage.title}
+          description={''}
+        />
+      </div>
     </>
   );
 }

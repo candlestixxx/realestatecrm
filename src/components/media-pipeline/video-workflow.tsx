@@ -21,7 +21,7 @@ export function VideoWorkflow({ listingId }: { listingId?: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-muted/10 border border-border rounded-xl p-6 flex flex-col items-center justify-center min-h-[300px] border-dashed">
           <div className="text-muted-foreground mb-4">No clips selected from source.</div>
-          <button className="bg-secondary/20 text-secondary border border-secondary/50 px-4 py-2 rounded-md text-sm font-semibold hover:bg-secondary/30 transition-colors">
+          <button type="button" className="bg-secondary/20 text-secondary border border-secondary/50 px-4 py-2 rounded-md text-sm font-semibold hover:bg-secondary/30 transition-colors">
             Scan Source Folder for Media
           </button>
         </div>
@@ -30,13 +30,13 @@ export function VideoWorkflow({ listingId }: { listingId?: string }) {
           <div>
             <h4 className="font-semibold mb-3">Format</h4>
             <div className="flex gap-2">
-              <button
+              <button type="button"
                 onClick={() => setSelectedFormat('9:16')}
                 className={`flex-1 py-2 rounded-md text-sm font-bold border transition-colors ${selectedFormat === '9:16' ? 'bg-primary text-primary-foreground border-primary' : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted/50'}`}
               >
                 9:16 Reel
               </button>
-              <button
+              <button type="button"
                 onClick={() => setSelectedFormat('16:9')}
                 className={`flex-1 py-2 rounded-md text-sm font-bold border transition-colors ${selectedFormat === '16:9' ? 'bg-primary text-primary-foreground border-primary' : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted/50'}`}
               >
@@ -63,7 +63,7 @@ export function VideoWorkflow({ listingId }: { listingId?: string }) {
             </div>
           </div>
 
-          <button className="w-full bg-primary text-primary-foreground py-3 rounded-md font-bold hover:bg-primary/90 transition-colors mt-auto opacity-50 cursor-not-allowed">
+          <button type="button" className="w-full bg-primary text-primary-foreground py-3 rounded-md font-bold hover:bg-primary/90 transition-colors mt-auto opacity-50 cursor-not-allowed">
             Render Preview
           </button>
         </div>

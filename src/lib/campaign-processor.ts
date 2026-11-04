@@ -234,7 +234,7 @@ export async function processDueCampaignTasks() {
             console.error('Twilio campaign dispatch error:', e);
           }
         } else {
-          console.log(`[Campaign SMS Simulation] Sent to ${phone}: ${message}`);
+          // console.log(`[Campaign SMS Simulation] Sent to ${phone}: ${message}`);
         }
 
         // Log Activity

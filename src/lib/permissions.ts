@@ -7,6 +7,7 @@ export enum AppRole {
   BROKER = 'BROKER',
   ASSOCIATE_BROKER = 'ASSOCIATE_BROKER',
   REALTOR_AGENT = 'REALTOR_AGENT',
+  AGENT = 'AGENT',
   OFFER_MANAGER = 'OFFICE_MANAGER',
   ADMIN = 'ADMIN',
 }
@@ -17,6 +18,7 @@ export const ROLE_HIERARCHY: Record<AppRole, number> = {
   [AppRole.BROKER]: 80,
   [AppRole.ASSOCIATE_BROKER]: 60,
   [AppRole.REALTOR_AGENT]: 40,
+  [AppRole.AGENT]: 40,
   [AppRole.OFFER_MANAGER]: 20,
   [AppRole.ADMIN]: 90, // Admin has high system power but may not have legal brokerage power
 };
@@ -72,6 +74,13 @@ export const PERMISSION_MATRIX: Record<AppRole, AppPermission[]> = {
     'approve:offers',
   ],
   [AppRole.REALTOR_AGENT]: [
+    'view:dashboard',
+    'view:leads',
+    'view:contacts',
+    'view:deals',
+    'view:tasks',
+  ],
+  [AppRole.AGENT]: [
     'view:dashboard',
     'view:leads',
     'view:contacts',

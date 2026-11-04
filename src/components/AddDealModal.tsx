@@ -31,7 +31,7 @@ export default function AddDealModal({
 
   return (
     <>
-      <button
+      <button type="button"
         onClick={() => setIsOpen(true)}
         className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors"
       >
@@ -117,7 +117,8 @@ export default function AddDealModal({
                 <button
                   type="button"
                   onClick={() => {
-                    toast.success('Success!');
+                    // Cancel discards the form — no success toast (this used
+                    // to claim 'Success!' while closing without doing anything).
                     setIsOpen(false);
                     setError(null);
                   }}

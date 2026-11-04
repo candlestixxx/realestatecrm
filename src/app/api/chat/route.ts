@@ -1,5 +1,5 @@
-import { google } from '@ai-sdk/google';
 import { streamText } from 'ai';
+import { getDeepSeekModel } from '@/lib/ai/deepseek';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
@@ -11,7 +11,16 @@ import { z } from 'zod';
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
+  const { messages } = body;
+  if (!Array.isArray(messages)) {
+    return new Response(JSON.stringify({ error: 'messages must be an array' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  }
   const session = await getServerSession(authOptions);
   
   let access;
@@ -25,9 +34,9 @@ export async function POST(req: Request) {
   const workspaceContext = await buildChatContext({ workspaceSlug: access.workspaceSlug, query: latestUserMessage as string });
 
   const result = streamText({
-    model: google('gemini-2.0-flash-001'),
+    model: getDeepSeekModel(),
     system:
-      'You are Gemini, the ultra-capable real estate AI assistant for Excel Legacy Realty. Your goal is to help agents dominate their local market. ' +
+      'You are the ultra-capable real estate AI assistant for Excel Legacy Realty. Your goal is to help agents dominate their local market. ' +
       'You have deep access to the CRM data and can perform actions on behalf of the user. ' +
       'Be proactive, professional, and efficient. Use the context below to inform your responses.\n\n' +
       workspaceContext,
@@ -79,6 +88,10 @@ export async function POST(req: Request) {
           leadId: z.string().optional().describe('Link to a specific lead ID.'),
         }),
         execute: async ({ title, description, dueDate, leadId }: { title: string; description?: string; dueDate?: string; leadId?: string }) => {
+          if (leadId) {
+            const lead = await prisma.lead.findUnique({ where: { id: leadId } });
+            if (!lead) return { error: 'Lead not found' };
+          }
           const task = await prisma.task.create({
             data: {
               title,
