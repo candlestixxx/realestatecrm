@@ -7,6 +7,7 @@ import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
 import { enrollLeadInCampaignSteps } from '@/lib/campaign-processor';
+import { validateCampaignSteps } from '@/lib/campaign-validation';
 
 export async function createCampaignAction(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -34,6 +35,8 @@ export async function createCampaignAction(formData: FormData) {
       data: {
         name,
         description: description || null,
+        scope,
+        leadType,
         workspaceId,
         isActive: true,
         steps: JSON.stringify({
@@ -61,6 +64,7 @@ export async function createCampaignAction(formData: FormData) {
 }
 
 export async function updateCampaignStepsAction(campaignId: string, stepsJson: string) {
+  if (!validateCampaignSteps(stepsJson)) return { error: 'Invalid steps. Use whole delays from 0 to 10000 and supported time units.' };
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
 
@@ -124,11 +128,10 @@ export async function enrollLeadInCampaignAction(leadId: string, campaignId: str
     let campaignName = 'None';
     if (campaignId) {
       const campaign = await prisma.smartPlan.findUnique({
-        where: { id: campaignId },
+        where: { id: campaignId, workspaceId: access.workspaceId },
       });
-      if (campaign) {
-        campaignName = campaign.name;
-      }
+      if (!campaign || !campaign.isActive) return { error: 'Choose an active campaign in your workspace.' };
+      campaignName = campaign.name;
     }
 
     await prisma.$transaction([
@@ -173,14 +176,15 @@ export async function bulkEnrollLeadsInCampaignAction(leadIds: string[], campaig
   }
 
   try {
+    const matchingLeads = await prisma.lead.count({ where: { id: { in: leadIds }, workspaceId: access.workspaceId } });
+    if (matchingLeads !== new Set(leadIds).size) return { error: 'Some selected leads are outside your workspace.' };
     let campaignName = 'None';
     if (campaignId) {
       const campaign = await prisma.smartPlan.findUnique({
-        where: { id: campaignId },
+        where: { id: campaignId, workspaceId: access.workspaceId },
       });
-      if (campaign) {
-        campaignName = campaign.name;
-      }
+      if (!campaign || !campaign.isActive) return { error: 'Choose an active campaign in your workspace.' };
+      campaignName = campaign.name;
     }
 
     await prisma.$transaction([
@@ -220,6 +224,7 @@ export async function bulkEnrollLeadsInCampaignAction(leadIds: string[], campaig
 }
 
 export async function importCampaignTemplateAction(name: string, description: string, stepsJson: string) {
+  if (!validateCampaignSteps(stepsJson)) return { error: 'Invalid campaign template steps.' };
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
 
@@ -254,6 +259,7 @@ export async function importCampaignTemplateAction(name: string, description: st
         name,
         description: description || null,
         steps: formattedSteps,
+        scope: 'COMPANY',
         workspaceId: access.workspaceId,
         isActive: true,
       },
@@ -278,11 +284,12 @@ export async function deleteCampaignAction(campaignId: string) {
   try {
     // Also delete any pending tasks associated with this campaign
     const campaign = await prisma.smartPlan.findUnique({
-      where: { id: campaignId },
+      where: { id: campaignId, workspaceId: access.workspaceId },
     });
     if (campaign) {
       await prisma.task.deleteMany({
         where: {
+          workspaceId: access.workspaceId,
           title: { startsWith: `[Drip: ${campaign.name}]` },
           status: 'TODO',
         },

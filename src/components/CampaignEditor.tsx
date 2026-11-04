@@ -235,7 +235,7 @@ export default function CampaignEditor({
                       onChange={(e) => setSettings({ ...settings, scope: e.target.value })}
                       className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
                     >
-                      <option value="COMPANY">Company Plan</option>
+                      <option value="COMPANY">Brokerage / Company • All agents</option>
                       <option value="PERSONAL">Personal Plan</option>
                     </select>
                   </div>
@@ -335,9 +335,12 @@ export default function CampaignEditor({
 
                     <div className="p-5 space-y-4 text-xs font-semibold text-muted-foreground">
                       <div className="flex items-center gap-2">
-                        <span>Delay:</span>
+                        <span title="Each delay starts after the preceding step. Months and years use calendar dates, clamped to the last valid day.">Delay after previous step:</span>
                         <input
                           type="number"
+                          min={0}
+                          max={10000}
+                          step={1}
                           value={step.delayValue}
                           onChange={(e) => handleStepChange(index, 'delayValue', Number(e.target.value))}
                           className="w-12 bg-background border border-border rounded text-center py-1 font-bold"
@@ -347,9 +350,13 @@ export default function CampaignEditor({
                           onChange={(e) => handleStepChange(index, 'delayUnit', e.target.value)}
                           className="bg-background border border-border rounded py-1 px-1.5"
                         >
+                          <option value="SECOND">Seconds</option>
                           <option value="MINUTE">Minutes</option>
                           <option value="HOUR">Hours</option>
                           <option value="DAY">Days</option>
+                          <option value="WEEK">Weeks</option>
+                          <option value="MONTH">Months</option>
+                          <option value="YEAR">Years</option>
                         </select>
                       </div>
 
@@ -401,6 +408,12 @@ export default function CampaignEditor({
                           />
                         </div>
                       )}
+                      {(step.type === 'TASK' || step.type === 'CALL') && (
+                        <label className="block space-y-1">
+                          <span>Agent instructions</span>
+                          <textarea value={step.content} onChange={(e) => handleStepChange(index, 'content', e.target.value)} rows={3} className="w-full bg-background border border-border rounded p-3 text-foreground" />
+                        </label>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -414,6 +427,8 @@ export default function CampaignEditor({
                 <button type="button" onClick={() => handleAddStep('SMS')} className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-[10px] font-black uppercase cursor-pointer">
                   + SMS Step
                 </button>
+                <button type="button" onClick={() => handleAddStep('CALL')} className="px-3.5 py-1.5 bg-muted border border-border rounded-lg text-xs">+ Call task</button>
+                <button type="button" onClick={() => handleAddStep('TASK')} className="px-3.5 py-1.5 bg-muted border border-border rounded-lg text-xs">+ Task</button>
               </div>
             </div>
 

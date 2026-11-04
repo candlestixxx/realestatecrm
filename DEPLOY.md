@@ -316,3 +316,6 @@ scp deploy-v3.tar.gz hetzner:/tmp/deploy-v3.tar.gz
 # server: move old build aside, extract, restart
 ssh hetzner 'cd /var/www/excellegacyrealtygroup && BK=/tmp/ercm-backup-$(date +%s) && mkdir -p $BK && mv .next node_modules server.js middleware.ts package.json static public post-deploy.sh $BK/ 2>/dev/null; tar xzf /tmp/deploy-v3.tar.gz && ln -sfn client node_modules/@prisma/client-2c3a283f134fdcb6 && pm2 restart excellegacyrealtygroup --update-env'
 ```
+
+### Campaign defaults (0.61.6)
+On Hetzner with Node 24+, run DATABASE_URL pointing to the production SQLite database and node scripts/load-default-campaigns.mjs from the source checkout. This adds four company plans to each workspace without enrolling contacts or overwriting edited defaults. Future workspaces initialize on Campaigns page access. Server instrumentation scans due email/SMS tasks every minute. Live email/SMS provider configuration is required. ERROR or stranded IN_PROGRESS sends require operator review before reopening to avoid duplicate sends.

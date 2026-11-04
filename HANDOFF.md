@@ -540,3 +540,6 @@ Comprehensive local/remote repository refresh executed under the Executive Proto
 - `main` @ `e07aa1d` + uncommitted-then-committed v0.48.0 bump (see git log for the `chore: bump version to 0.48.0` commit).
 - All local branches converged at the same tip; working tree clean after commit.
 - Next steps: restore push credentials + free disk, push all branches, then run `npm run build` to validate the `aa79bbf` sync payload end-to-end (VoiceForge v0.47.0 features + new website-builder tabs + sync-queue routes).
+
+## 2026-11-04 — 0.61.6 shared campaign defaults
+User requested buyer/seller default drip plans for brokerage/company/all agents. Interpreted as campaign templates, not fabricated contacts. Four plans seed idempotently per workspace, preserving edits. Defaults require manual enrollment. Calendar delays are sequential in UTC. New server instrumentation dispatches every minute independent of visits. Task status IN_PROGRESS claims avoid overlapping dispatch, ERROR requires review/reopen after provider fixes. No schema migration. Hetzner root@5.161.250.43 uses ~/.ssh/id_ed25519; hetzner_key failed to load. Production service excellegacyrealtygroup on port 3210, /var/www/excellegacyrealtygroup. Build/test only on Hetzner by user instruction. Merge preserved both local and upstream notes.

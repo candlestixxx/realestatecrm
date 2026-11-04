@@ -1098,3 +1098,7 @@ submodules match.
 
 
 
+
+## 0.61.6 — Shared buyer and seller campaigns (2026-11-04)
+- Added four original brokerage-wide default plans, editable delay units through years, calendar month-end handling, validated schedules, workspace enrollment checks, atomic pending task replacement, and a minute-based server dispatcher.
+- Automated sends require live providers. Call and general tasks remain open for agents. Failed sends are retained as ERROR for review.

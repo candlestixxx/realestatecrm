@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { DEFAULT_CAMPAIGNS } from '@/lib/default-campaigns';
 import CampaignEditor from './CampaignEditor';
 import {
   importCampaignTemplateAction,
@@ -36,6 +37,7 @@ type SegmentOption = {
 };
 
 const REAL_ESTATE_TEMPLATES = [
+  ...DEFAULT_CAMPAIGNS,
   {
     name: 'ELRT-Pre Foreclosure GPT',
     description: 'When a Seller lead is reassigned, this plan launches a paced outreach campaign designed to re-engage them and move them through the pipeline. It updates the pipeline, then sends an email and automated text.',
