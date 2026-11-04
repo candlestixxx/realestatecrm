@@ -549,3 +549,20 @@ Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPA
 0.61.7 deployed and verified authenticated Campaigns SSR for OWNER and REALTOR_AGENT. Four defaults visible, campaign-specific tsc diagnostics clear after excluding pre-existing broken archive. User follow-up 0.61.8 moves LeadDetailLayoutClient's three-dot menu to a fixed body portal to escape clipped/stacked left columns.
 
 0.61.8 LIVE on Hetzner, PM2 excellegacyrealtygroup healthy and public auth endpoint HTTP 200. Server-only Playwright passed body portal, sidebar overlap hit-testing, viewport bounds at 1280/900/768/640 widths, Escape focus restoration, Smart Plans navigation, and outside-click dismissal. No contact mutations during UI tests. Backup /opt/crm-releases/backups/runtime-before-0.61.8.tar. Source build directory remains /opt/crm-releases/0.61.6 with final package version 0.61.8. Existing unrelated duplicate type attribute in lead phone editor still appears in tsc, and archived ContactTableClient still has syntax errors. Production build and menu browser checks pass.
+=======
+## Session 2026-11-04 (v0.61.5 90ae412, pushed + live on Hetzner)
+
+### Completed
+- Buyer + seller investment calculators at /dashboard/calculators (affordability, DSCR, cap rate, cash-on-cash, net sheets, plain-English verdict; AZ defaults; print handouts)
+- Shared engine src/lib/calculators.ts; CALCULATOR block for agent tenant sites; linked in Command Center + sidebar
+- Fixed prior-session breaks: stray import inside tenant JSX, stray brace in SidebarNav (hard syntax error)
+- New tests/calculators.test.mts (6/6 pass); requested Arizona reference domain does not resolve (NXDOMAIN) so in-CRM version stands in
+
+### Verified
+- Build 126/126 pages; tarball MD5 matched; backup-and-swap deploy; excellegacyrealtygroup 0.61.5 online, main 200, calculators route live behind auth, no fresh error-log writes
+- Hetzner-only: no local servers started; legacyleads + legacyleads-api healthy (:3217/health 200)
+
+### Next
+- MLS ingestion to fill legacyleads listings (table empty)
+- Real API keys still key-blocked (Twilio, SendGrid, Whitepages/PDL, etc.)
+- Consider prettier --write pass (repo-wide style drift, untouched files warn too)
