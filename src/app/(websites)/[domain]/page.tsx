@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { AgentSiteChatWidget } from '@/components/websites/AgentSiteChatWidget';
 import { LeadCaptureModal } from '@/components/websites/LeadCaptureModal';
 import { PhotoGalleryWithIntent } from '@/components/websites/PhotoGalleryWithIntent';
+import InvestmentCalculators from '@/components/calculators/InvestmentCalculators';
 
 export default async function TenantWebsitePage({ params }: { params: Promise<{ domain: string }> }) {
   const { domain } = await params;
@@ -109,6 +110,16 @@ export default async function TenantWebsitePage({ params }: { params: Promise<{ 
           )
         }
 
+        if (block.type === 'CALCULATOR') {
+          return (
+            <section className="max-w-4xl mx-auto py-16 px-6">
+              <h3 className="text-3xl font-extrabold text-center">{block.title || 'Is this a good investment?'}</h3>
+              {block.subtitle ? <p className="text-muted-foreground text-center mt-2 mb-6">{block.subtitle}</p> : <div className="mb-6" />}
+              <InvestmentCalculators />
+              <p className="mt-4 text-center text-[11px] text-muted-foreground">Estimate only, not financial advice. Provided via the RealEstateCRM platform site.</p>
+            </section>
+          );
+        }
         return null;
       })}
 

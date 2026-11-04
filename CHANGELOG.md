@@ -1,3 +1,10 @@
+## v0.61.5 (2026-11-03)
+
+### Investment calculators for client presentations
+- Buyer + seller calculator at /dashboard/calculators (affordability, DSCR, cap rate, cash-on-cash, net sheets, plain-English verdict)
+- Shared engine in src/lib/calculators.ts, embeddable CALCULATOR block for agent tenant sites, linked in Command Center + sidebar
+- Fixed stray import in tenant page and stray brace in SidebarNav from prior session; new tests/calculators.test.mts (6 tests)
+
 ## v0.61.4 (2026-11-02)
 
 ### Live — legacyleads backend on Hetzner (:3217)

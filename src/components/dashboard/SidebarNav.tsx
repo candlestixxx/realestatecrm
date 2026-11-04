@@ -167,7 +167,12 @@ const GROUPS: NavGroup[] = [
         label: 'Property Data',
         href: '/dashboard/property-data',
         tooltip: 'MLS/RESO property lookup with tax records, comps, and enrichment.',
-      },
+        },
+        {
+          label: 'Investment Calculators',
+          href: '/dashboard/calculators',
+          tooltip: 'Buyer and seller investment verdicts to show clients live.',
+        },
       {
         label: 'Data Imports',
         href: '/dashboard/imports',
@@ -375,3 +380,5 @@ export default function SidebarNav() {
     </TooltipProvider>
   );
 }
+
+

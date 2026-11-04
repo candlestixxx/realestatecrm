@@ -12,7 +12,7 @@ import { Plus, Search, ChevronRight, LayoutGrid, Sparkles, BarChart3, Globe, Tra
 
 type LandingPageBlock = {
   id: string;
-  type: 'HEADER' | 'VIDEO' | 'PROPERTY' | 'LEAD_CAPTURE' | 'LINKS';
+  type: 'HEADER' | 'VIDEO' | 'PROPERTY' | 'LEAD_CAPTURE' | 'LINKS' | 'CALCULATOR';
   title?: string;
   subtitle?: string;
   videoUrl?: string;
@@ -123,6 +123,9 @@ export default function WebsitesClient({
       newBlock.remarks = 'Bright open floor plan with custom lighting, updated deck, and spacious rooms.';
     } else if (type === 'LEAD_CAPTURE') {
       newBlock.ctaText = 'Claim Free Market Assessment Report';
+    } else if (type === 'CALCULATOR') {
+      newBlock.title = 'Is this a good investment?';
+      newBlock.subtitle = 'Buyer and seller numbers, plain-English verdict for clients.';
     } else if (type === 'LINKS') {
       newBlock.title = 'Useful Marketing Links';
       newBlock.links = [{ label: 'View Virtual Tour Brochure', href: '#' }];
@@ -413,6 +416,9 @@ export default function WebsitesClient({
                       <button type="button" onClick={() => handleAddBlock('LEAD_CAPTURE')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
                         <span>📥</span> Lead capture
                       </button>
+                      <button type="button" onClick={() => handleAddBlock('CALCULATOR')} className="p-3.5 border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 rounded-xl text-center text-xs font-bold flex flex-col items-center gap-1.5 transition-all cursor-pointer">
+                        <span>🧮</span> Calculator
+                      </button>
                     </div>
 
                     <div className="pt-4 border-t border-border/40 flex flex-col gap-2 shrink-0">
@@ -529,6 +535,25 @@ export default function WebsitesClient({
                               className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
                             />
                           )}
+
+                          {block.type === 'CALCULATOR' && (
+                            <div className="grid grid-cols-1 gap-3">
+                              <input
+                                type="text"
+                                value={block.title || ''}
+                                onChange={(e) => handleBlockChange(idx, 'title', e.target.value)}
+                                placeholder="Calculator headline"
+                                className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                              />
+                              <input
+                                type="text"
+                                value={block.subtitle || ''}
+                                onChange={(e) => handleBlockChange(idx, 'subtitle', e.target.value)}
+                                placeholder="Calculator subtext"
+                                className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                              />
+                            </div>
+                          )}
                         </div>
                       ))
                       )}
@@ -605,3 +630,4 @@ export default function WebsitesClient({
     </div>
   );
 }
+

@@ -339,6 +339,13 @@ const SECTIONS: Section[] = [
         statKey: 'listings',
       },
       {
+        label: 'Investment Calculators',
+        description: 'Buyer affordability plus investor metrics and seller net sheets with client verdict.',
+        href: '/dashboard/calculators',
+        icon: "🧮",
+        tooltip: 'Buyer monthly cost, cash to close, DSCR cap-rate cash-on-cash verdict; seller net proceeds and ROI. Built for live client presentations.',
+      },
+      {
         label: 'IDX Search Widget',
         description: 'Embeddable RESO-powered search for agent websites.',
         href: '/dashboard/agent-websites',
