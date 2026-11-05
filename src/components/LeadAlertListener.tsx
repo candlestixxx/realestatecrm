@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { BellRing, BellOff, Volume2, VolumeX } from 'lucide-react';
+import { BellRing, Volume2, VolumeX } from 'lucide-react';
 
 export default function LeadAlertListener() {
   const lastCheckedRef = useRef<string>(new Date().toISOString());
@@ -158,13 +158,15 @@ export default function LeadAlertListener() {
                         onClick={(e) => {
                           e.preventDefault();
                           toast.dismiss(t.id);
+                          // Mark lead as read when user views it
+                          fetch(`/api/leads/${lead.id}/read`, { method: 'POST' }).catch(() => {});
                           window.location.href = `/dashboard/leads/${lead.id}`;
                         }}
                         className="flex-1 border border-transparent rounded-none rounded-tr-2xl px-4 py-2 flex items-center justify-center text-xs font-black text-indigo-500 hover:text-indigo-600 focus:outline-hidden hover:bg-muted/30 select-none uppercase tracking-wider text-center"
                       >
                         View Detail
                       </a>
-                      <button
+                      <button type="button"
                         onClick={() => dismissLeadAlert(lead.id, t.id)}
                         className="flex-1 border border-transparent rounded-none rounded-br-2xl px-4 py-2 flex items-center justify-center text-xs font-black text-rose-500 hover:text-rose-600 focus:outline-hidden hover:bg-muted/30 select-none uppercase tracking-wider cursor-pointer text-center"
                         title="Clear Alert & Mark Read"
@@ -174,7 +176,7 @@ export default function LeadAlertListener() {
                     </div>
                   </div>
                   
-                  <button
+                  <button type="button"
                     onClick={handleMuteUntilNewBatch}
                     className="w-full py-3 bg-gradient-to-r from-rose-500/10 via-indigo-500/5 to-rose-500/10 hover:from-rose-500/20 hover:to-indigo-500/15 border-t border-border/80 text-[10px] font-black text-rose-500 dark:text-rose-400 hover:text-indigo-600 dark:hover:text-indigo-400 uppercase tracking-widest text-center cursor-pointer transition-all duration-300 flex items-center justify-center gap-1.5 group hover:shadow-[inset_0_1px_12px_rgba(244,63,94,0.15)]"
                   >
@@ -217,7 +219,7 @@ export default function LeadAlertListener() {
         </span>
       </div>
       
-      <button
+      <button type="button"
         onClick={toggleKillSwitch}
         className={`p-1.5 rounded-lg transition-all flex items-center justify-center cursor-pointer ${
           alertsKilled 

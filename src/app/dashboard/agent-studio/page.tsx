@@ -49,7 +49,7 @@ export default async function AgentStudioPage() {
     <div className="space-y-8 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">AI Agent Studio <span title="Configure AI agents for lead qualification, follow-up sequences, and automated responses. Set agent personality, knowledge base, and escalation rules." aria-label="About this section: Configure AI agents for lead qualification, follow-up sequences, and automated responses. Set agent personality, knowledge base, and escalation rules." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight">AI Agent Studio <span title="Configure AI agents for lead qualification, follow-up sequences, and automated responses. Set agent personality, knowledge base, and escalation rules." aria-label="About this section: Configure AI agents for lead qualification, follow-up sequences, and automated responses. Set agent personality, knowledge base, and escalation rules." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-muted-foreground">Build, monitor, and control autonomous actions taken by your CRM AI Agents.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -68,7 +68,7 @@ export default async function AgentStudioPage() {
           
           {/* Active Workflows */}
           <div className="bg-background border border-border rounded-2xl p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-bold">Autonomous AI Workflows</h2>
+            <h2 className="text-lg font-bold">Autonomous AI Workflows <span title="AI-powered workflows that run automatically based on triggers like new leads, deal stage changes, or scheduled times." aria-label="About Autonomous AI Workflows: AI-powered workflows that run automatically based on triggers." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h2>
             <div className="divide-y divide-border/60">
               {workflows.map(wf => (
                 <div key={wf.id} className="py-4 flex items-start justify-between gap-4">
@@ -85,7 +85,7 @@ export default async function AgentStudioPage() {
                   <form action={handleToggle}>
                     <input type="hidden" name="id" value={wf.id} />
                     <input type="hidden" name="active" value={String(wf.isActive)} />
-                    <button
+                    <button type="button"
                       type="submit"
                       className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all uppercase tracking-wider cursor-pointer ${
                         wf.isActive

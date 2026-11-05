@@ -67,26 +67,26 @@ export default function IDXSearchWidget({ domain = '' }: { domain?: string }) {
           <option value="">Any Baths</option>
           {[1,1.5,2,2.5,3,3.5,4].map(n => <option key={n} value={n}>{n}+ baths</option>)}
         </select>
-        <button onClick={() => setPage(1)} className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700">Search</button>
+        <button type="button" onClick={() => setPage(1)} className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700">Search</button>
       </div>
 
       {/* Results */}
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Searching properties...</div>
+        <div className="text-center py-12 text-muted-foreground">Searching properties...</div>
       ) : listings.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">No properties found.</div>
+        <div className="text-center py-12 text-muted-foreground">No properties found.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {listings.map(l => (
             <div key={l.id} className="border rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="h-52 bg-gray-100 flex items-center justify-center text-gray-400">
+              <div className="h-52 bg-muted flex items-center justify-center text-muted-foreground">
                 {l.photos ? <img src={JSON.parse(l.photos)[0]} alt="" className="h-full w-full object-cover" /> : 'No Photo'}
               </div>
               <div className="p-5">
-                <div className="text-2xl font-bold text-gray-900">{l.listPrice ? '$' + l.listPrice.toLocaleString() : 'Call for Price'}</div>
-                <div className="text-gray-600 mt-1">{l.address}</div>
-                <div className="text-gray-500 text-sm">{l.city}, {l.state}</div>
-                <div className="flex gap-4 mt-3 text-sm text-gray-600">
+                <div className="text-2xl font-bold text-foreground">{l.listPrice ? '$' + l.listPrice.toLocaleString() : 'Call for Price'}</div>
+                <div className="text-muted-foreground mt-1">{l.address}</div>
+                <div className="text-muted-foreground text-sm">{l.city}, {l.state}</div>
+                <div className="flex gap-4 mt-3 text-sm text-muted-foreground">
                   <span>{l.bedrooms || '—'} beds</span>
                   <span>{l.bathrooms || '—'} baths</span>
                   <span>{l.squareFeet?.toLocaleString() || '—'} sqft</span>
@@ -100,9 +100,9 @@ export default function IDXSearchWidget({ domain = '' }: { domain?: string }) {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center gap-2">
-          <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-4 py-2 border rounded-lg disabled:opacity-50">Previous</button>
-          <span className="px-4 py-2 text-gray-600">Page {page} of {totalPages}</span>
-          <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="px-4 py-2 border rounded-lg disabled:opacity-50">Next</button>
+          <button type="button" disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-4 py-2 border rounded-lg disabled:opacity-50">Previous</button>
+          <span className="px-4 py-2 text-muted-foreground">Page {page} of {totalPages}</span>
+          <button type="button" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="px-4 py-2 border rounded-lg disabled:opacity-50">Next</button>
         </div>
       )}
     </div>

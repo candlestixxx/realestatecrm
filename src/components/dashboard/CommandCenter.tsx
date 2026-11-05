@@ -22,7 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
+import { getClientWorkspaceSlug } from '@/lib/workspace-client';
 import LiveAudioMonitor from '@/components/LiveAudioMonitor';
 import ServiceHealthGrid from '@/components/ServiceHealthGrid';
 
@@ -38,7 +38,8 @@ type SectionId =
   | 'properties'
   | 'intelligence'
   | 'automation'
-  | 'platform';
+  | 'platform'
+  | 'subprojects';
 
 interface FeatureCard {
   label: string;
@@ -107,7 +108,7 @@ const SECTIONS: Section[] = [
         href: '/dashboard/agentcore',
         icon: '🤖',
         tooltip:
-          'Gemini-powered co-pilot that can execute CRM actions directly. Ask it to "create a task" or "segment leads from last week" and it will do it.',
+          'DeepSeek-powered co-pilot that can execute CRM actions directly. Ask it to "create a task" or "segment leads from last week" and it will do it.',
         priority: 3,
         badge: 'AI',
       },
@@ -204,7 +205,7 @@ const SECTIONS: Section[] = [
       {
         label: 'SMS Text Codes',
         description: 'Keyword-based auto-responses and lead capture via short codes.',
-        href: '/dashboard/marketing/text-codes',
+        href: '/dashboard/marketing',
         icon: '💬',
         tooltip:
           'Prospects text a keyword to your number; the system auto-creates a lead and enrolls them in a campaign.',
@@ -254,6 +255,14 @@ const SECTIONS: Section[] = [
     title: 'Marketing & Content Studio',
     tagline: 'Generate, brand, schedule, and publish across every channel',
     features: [
+      {
+        label: 'Marketing Hub',
+        description: 'Campaigns, text codes, and channel tools in one tabbed surface.',
+        href: '/dashboard/marketing',
+        icon: '📣',
+        tooltip:
+          'Canonical marketing home. Houses the TextCodes component plus links to campaigns and the studio.',
+      },
       {
         label: 'Marketing Studio',
         description: 'Hub for 10 marketing channels — email, social, print, video, ads.',
@@ -328,6 +337,13 @@ const SECTIONS: Section[] = [
         icon: '🏠',
         tooltip: 'Listings synced from MLS/IDX. Each listing tracks offers and can generate marketing packages.',
         statKey: 'listings',
+      },
+      {
+        label: 'Investment Calculators',
+        description: 'Buyer affordability plus investor metrics and seller net sheets with client verdict.',
+        href: '/dashboard/calculators',
+        icon: "🧮",
+        tooltip: 'Buyer monthly cost, cash to close, DSCR cap-rate cash-on-cash verdict; seller net proceeds and ROI. Built for live client presentations.',
       },
       {
         label: 'IDX Search Widget',
@@ -481,7 +497,7 @@ const SECTIONS: Section[] = [
       {
         label: 'Website Builder',
         description: 'Drag-and-drop WYSIWYG for pages, templates, and landing funnels.',
-        href: '/dashboard/websites/builder',
+        href: '/dashboard/websites',
         icon: '🧱',
         tooltip: 'Visual builder replicating Lofty.com parity. Pre-built templates for agents, properties, neighborhoods.',
       },
@@ -518,7 +534,7 @@ const SECTIONS: Section[] = [
         description: 'Provider API keys for Gemini, OpenAI, and other model endpoints.',
         href: '/dashboard/settings/ai-models',
         icon: '🔑',
-        tooltip: 'Keys for the AI layer. The co-pilot defaults to Gemini 2.0 Flash; override per-agent if needed.',
+        tooltip: 'Keys for the AI layer. The co-pilot defaults to DeepSeek V4 (flash); override per-agent if needed.',
       },
       {
         label: 'MCP Server',
@@ -526,6 +542,34 @@ const SECTIONS: Section[] = [
         href: '/dashboard/settings/mcp',
         icon: '🧩',
         tooltip: 'Expose CRM tools to external MCP-compatible agents (Claude, Cursor, etc.).',
+      },
+      {
+        label: 'Settings Hub',
+        description: 'All configuration in one tabbed surface — AI, brand, team, voice, email.',
+        href: '/dashboard/settings',
+        icon: '⚙️',
+        tooltip: 'Canonical settings home. Every settings subpage lives here as a tab.',
+      },
+      {
+        label: 'AI Memory',
+        description: 'Long-term memory controls and learning preferences for the co-pilot.',
+        href: '/dashboard/settings/ai-memory',
+        icon: '🧠',
+        tooltip: 'What the co-pilot remembers across sessions. Review and prune stored facts.',
+      },
+      {
+        label: 'Branding',
+        description: 'Workspace identity — logo, colors, portal slug, email footer.',
+        href: '/dashboard/settings/branding',
+        icon: '🎨',
+        tooltip: 'White-label identity. Live client-portal preview as you edit colors and logo.',
+      },
+      {
+        label: 'Team',
+        description: 'Members, roles, invites, and password resets.',
+        href: '/dashboard/settings/team',
+        icon: '👥',
+        tooltip: 'RBAC via the permission matrix. Invites use one-time temp passwords; last-OWNER is protected.',
       },
       {
         label: 'Sync Queue Log',
@@ -589,6 +633,53 @@ const SECTIONS: Section[] = [
         href: '/dashboard/property-data',
         icon: '🏠',
         tooltip: 'Tax records, comps, and ownership history. RESO Web API integration for live MLS data.',
+      },
+    ],
+  },
+  {
+    id: 'subprojects',
+    title: 'Sub-Projects',
+    tagline: 'Independent services that power the Excel Legacy Realty platform',
+    features: [
+      {
+        label: 'LeadG — Voice & Lead Engine',
+        description: 'AI voice campaigns, lead generation, and outbound calling with accent morphing.',
+        href: '/leadg/',
+        icon: '📞',
+        tooltip: 'VoiceForge AI-powered outbound calling, lead scoring, and campaign management. Runs as an independent Next.js app on port 3211.',
+        badge: 'LIVE',
+      },
+      {
+        label: 'Foreclosure Workflow',
+        description: 'Automated foreclosure notice monitoring, legal intake, and distressed-property pipelines.',
+        href: '/foreclosure/',
+        icon: '⚖️',
+        tooltip: 'Macomb/Bay County foreclosure monitoring with tax-assessor prefill. Parses legal notices into CRM leads. Runs as an independent Next.js app on port 3212.',
+        badge: 'LIVE',
+      },
+      {
+        label: 'Content Planner',
+        description: 'Social media content creation, scheduling, brand kits, and campaign analytics.',
+        href: '/contentplanner/',
+        icon: '📝',
+        tooltip: 'Turbo monorepo with web UI + API. Create posts, manage campaigns, configure brand voice. Runs as an independent Next.js app on port 3213.',
+        badge: 'LIVE',
+      },
+      {
+        label: 'Media Workflow',
+        description: 'Photo import, storyboard generation, AI promo videos, and FFmpeg export pipeline.',
+        href: '/media-workflow/',
+        icon: '🎬',
+        tooltip: 'Property photo → storyboard → rendered promo video pipeline with brand overlay. Web UI + Express API on port 3214.',
+        badge: 'LIVE',
+      },
+      {
+        label: 'LegacyLeads',
+        description: 'Property data, skip tracing, compliance checks, and lead enrichment.',
+        href: '/legacyleads/',
+        icon: '🔍',
+        tooltip: 'Lead generation and skip-tracing service for property data, TCPA compliance, and credit management. Frontend + backend on port 3215.',
+        badge: 'LIVE',
       },
     ],
   },
@@ -767,6 +858,25 @@ export default function CommandCenter() {
           >
             ↻ Refresh stats
           </button>
+        </div>
+
+        {/* Mission statement */}
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl leading-none mt-0.5" aria-hidden>🏢</span>
+            <div>
+              <h2 className="text-sm font-bold text-foreground">Excel Legacy Realty Group — Unified Platform</h2>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                This dashboard is the central command center for the Excel Legacy Realty Group real-estate operations platform.
+                It integrates <strong className="text-foreground">5 independent sub-services</strong> — LeadG (voice &amp; lead engine),
+                Foreclosure Workflow (legal intake &amp; monitoring), Content Planner (social media &amp; campaigns),
+                Media Workflow (photo/video pipeline), and LegacyLeads (property data &amp; skip tracing) — into a single
+                operator experience. Use the <strong className="text-foreground">Sub-Projects</strong> section below to
+                access each service directly, or work within the CRM tools organized by business value.
+              </p>
+            </div>
+            <InfoBadge text="Each sub-service runs as an independent application but is linked here for unified access. The CRM (this dashboard) is the primary interface; sub-projects handle specialized workflows." />
+          </div>
         </div>
 
         {/* Body: section rail + cards */}

@@ -11,6 +11,7 @@ const CONTENT_URL = process.env.CONTENT_URL || 'http://localhost:3003';
 const MEDIA_URL = process.env.MEDIA_URL || 'http://localhost:3004';
 const LEGACY_WEB_URL = process.env.LEGACY_WEB_URL || 'http://localhost:3005';
 const LEGACY_API_URL = process.env.LEGACY_API_URL || 'http://localhost:3006';
+const CONTENT_API_URL = process.env.CONTENT_API_URL || 'http://localhost:3031';
 const AUDIO_URL = process.env.AUDIO_URL || 'http://localhost:8090';
 
 const results = [];
@@ -33,6 +34,7 @@ async function run() {
   await test('LeadG', LEADG_URL);
   await test('Foreclosure', FORECLOSURE_URL);
   await test('ContentPlanner', CONTENT_URL);
+  await test('ContentPlanner API', CONTENT_API_URL + '/health');
   await test('MediaWorkflow', MEDIA_URL);
   await test('LegacyLeads Web', LEGACY_WEB_URL);
   await test('LegacyLeads API', LEGACY_API_URL);

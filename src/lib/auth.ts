@@ -4,6 +4,7 @@ import type { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import EmailProvider from 'next-auth/providers/email';
 import prisma from './prisma';
+import { verifyPassword } from './password';
 import { DEFAULT_WORKSPACE_SLUG } from './workspace-context';
 
 process.env.NEXTAUTH_SECRET ??= 'realestatecrm-dev-secret';
@@ -71,7 +72,7 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'email', placeholder: 'lum@excellegacy.com' },
+        email: { label: 'Email', type: 'email', placeholder: 'lum@excellegacyrealtygroup.site' },
         username: { label: 'Username', type: 'text', placeholder: 'lum' },
         password: { label: 'Password', type: 'password' },
       },
@@ -83,11 +84,11 @@ export const authOptions: NextAuthOptions = {
         const demoPassword = process.env.AUTH_DEMO_PASSWORD?.trim() || process.env.MIREALSOURCE_PASSWORD?.trim() || '';
 
         // Universal Admin for Dev
-        if (identifier === 'admin@excellegacy.com' && password === 'admin123') {
+        if (identifier === 'admin@excellegacyrealtygroup.site' && password === 'admin123') {
           return {
             id: 'universal-admin',
             name: 'Universal Admin',
-            email: 'admin@excellegacy.com',
+            email: 'admin@excellegacyrealtygroup.site',
             role: 'OWNER',
             workspaceSlug: DEFAULT_WORKSPACE_SLUG,
             workspaceId: DEFAULT_WORKSPACE_SLUG,
@@ -107,10 +108,19 @@ export const authOptions: NextAuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: { email: identifier },
-          select: { id: true, name: true, email: true, role: true },
+          select: { id: true, name: true, email: true, role: true, passwordHash: true },
         });
 
         if (!user) {
+          return null;
+        }
+
+        // SECURITY: DB users must present the matching password. This path
+        // previously returned the user for ANY password once the email
+        // matched — full account takeover for every registered account.
+        // Accounts without a passwordHash are not password-signable; their
+        // password is set via the team invite/reset flow or email magic link.
+        if (!user.passwordHash || !verifyPassword(password, user.passwordHash)) {
           return null;
         }
 

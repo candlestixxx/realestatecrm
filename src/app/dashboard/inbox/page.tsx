@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import TeamChat from "@/components/TeamChat";
 import toast from 'react-hot-toast';
 
@@ -28,6 +29,8 @@ const CHANNELS = [
 ];
 
 export default function UnifiedInboxPage() {
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id || 'current-user';
   const [messages, setMessages] = useState<Message[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeChannel, setActiveChannel] = useState('all');
@@ -87,7 +90,7 @@ export default function UnifiedInboxPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Unified Inbox <span title="All customer communications in one place: email, SMS, voice calls, and team chat. Assign conversations and set response reminders." aria-label="About this section: All customer communications in one place: email, SMS, voice calls, and team chat. Assign conversations and set response reminders." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+          <h1 className="text-2xl font-bold text-foreground">Unified Inbox <span title="All customer communications in one place: email, SMS, voice calls, and team chat. Assign conversations and set response reminders." aria-label="About this section: All customer communications in one place: email, SMS, voice calls, and team chat. Assign conversations and set response reminders." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-sm text-muted-foreground mt-1">
             All conversations from email, SMS, and social media in one place.
           </p>
@@ -98,7 +101,7 @@ export default function UnifiedInboxPage() {
               {unreadCount} unread
             </span>
           )}
-          <button
+          <button type="button"
             onClick={markAllRead}
             className="px-4 py-2 text-sm text-secondary border border-border rounded-lg hover:bg-muted transition-colors"
           >
@@ -110,7 +113,7 @@ export default function UnifiedInboxPage() {
       {/* Channel Filters */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {CHANNELS.map(channel => (
-          <button
+          <button type="button"
             key={channel.id}
             onClick={() => setActiveChannel(channel.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-colors ${
@@ -186,7 +189,7 @@ export default function UnifiedInboxPage() {
         </div>
       )}
       {/* Internal team chat */}
-      <TeamChat currentUserId="current-user" />
+      <TeamChat currentUserId={currentUserId} />
     </div>
   );
 }

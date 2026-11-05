@@ -86,6 +86,11 @@ const GROUPS: NavGroup[] = [
     tooltip: 'Everything that touches a prospect or publishes content.',
     links: [
       {
+        label: 'Marketing Hub',
+        href: '/dashboard/marketing',
+        tooltip: 'Campaigns, text codes, and channel tools in one tabbed surface.',
+      },
+      {
         label: 'Drip Campaigns',
         href: '/dashboard/campaigns',
         tooltip: 'AI-led SMS/Email sequences with weighted A/B variants.',
@@ -118,8 +123,18 @@ const GROUPS: NavGroup[] = [
       },
       {
         label: 'SMS Text Codes',
-        href: '/dashboard/marketing/text-codes',
+        href: '/dashboard/marketing',
         tooltip: 'Keyword auto-responses that capture leads from inbound texts.',
+      },
+      {
+        label: 'Canva Designs',
+        href: '/dashboard/canva',
+        tooltip: 'Design marketing materials with Canva templates — flyers, social posts, listing sheets.',
+      },
+      {
+        label: 'Objection Handling',
+        href: '/dashboard/objections',
+        tooltip: 'AI-powered responses to common buyer/seller objections with pre-built scripts.',
       },
     ],
   },
@@ -147,6 +162,21 @@ const GROUPS: NavGroup[] = [
         label: 'Data Quality',
         href: '/dashboard/data-quality',
         tooltip: 'Contact completeness scoring with prioritized fix recommendations.',
+      },
+      {
+        label: 'Property Data',
+        href: '/dashboard/property-data',
+        tooltip: 'MLS/RESO property lookup with tax records, comps, and enrichment.',
+        },
+        {
+          label: 'Investment Calculators',
+          href: '/dashboard/calculators',
+          tooltip: 'Buyer and seller investment verdicts to show clients live.',
+        },
+      {
+        label: 'Data Imports',
+        href: '/dashboard/imports',
+        tooltip: 'Bulk import leads, contacts, and listings from CSV/Excel files.',
       },
     ],
   },
@@ -204,6 +234,12 @@ const GROUPS: NavGroup[] = [
         badge: 'AI',
       },
       {
+        label: 'AI Avatar Video',
+        href: '/dashboard/avatar',
+        tooltip: 'Generate AI presenter videos for listings with HeyGen integration.',
+        badge: 'AI',
+      },
+      {
         label: 'Approvals',
         href: '/dashboard/approvals',
         tooltip: 'Human review gates for offers, listings, and marketing content.',
@@ -226,8 +262,13 @@ const GROUPS: NavGroup[] = [
         tooltip: 'Multi-tenant site builder with IDX, chat widget, and lead capture.',
       },
       {
+        label: 'Client Portal',
+        href: '/dashboard/client-portal',
+        tooltip: 'External-facing dashboard for clients to view listings, documents, and messages.',
+      },
+      {
         label: 'Website Builder',
-        href: '/dashboard/websites/builder',
+        href: '/dashboard/websites',
         tooltip: 'Drag-and-drop WYSIWYG for pages, templates, and landing funnels.',
       },
       {
@@ -339,3 +380,5 @@ export default function SidebarNav() {
     </TooltipProvider>
   );
 }
+
+

@@ -2,7 +2,7 @@
 // Lead routing rules widget — manage automatic lead assignment rules via /api/routing.
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, RefreshCw, ArrowRight } from 'lucide-react';
+import { Plus, RefreshCw, ArrowRight } from 'lucide-react';
 
 interface RoutingRule {
   id: string;
@@ -77,14 +77,14 @@ export default function RoutingRulesWidget() {
   };
 
   return (
-    <div className="bg-white rounded-lg border p-4">
+    <div className="bg-card rounded-lg border p-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-sm text-gray-700">Lead Routing Rules</h3>
+        <h3 className="font-semibold text-sm text-foreground">Lead Routing Rules</h3>
         <div className="flex gap-2">
-          <button onClick={fetchRules} className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+          <button type="button" onClick={fetchRules} className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
             <RefreshCw className="w-3 h-3" /> Refresh
           </button>
-          <button
+          <button type="button"
             onClick={() => setShowForm(!showForm)}
             className="text-xs bg-indigo-600 text-white px-2 py-1 rounded hover:bg-indigo-700 flex items-center gap-1"
           >
@@ -94,7 +94,7 @@ export default function RoutingRulesWidget() {
       </div>
 
       {showForm && (
-        <div className="bg-gray-50 rounded p-3 mb-4 space-y-2">
+        <div className="bg-muted/30 rounded p-3 mb-4 space-y-2">
           <input
             type="text"
             placeholder="Rule name"
@@ -123,18 +123,18 @@ export default function RoutingRulesWidget() {
             onChange={e => setForm(f => ({ ...f, agentIds: e.target.value }))}
             className="w-full text-xs border rounded px-2 py-1.5"
           />
-          <button onClick={createRule} className="w-full bg-indigo-600 text-white text-xs py-1.5 rounded hover:bg-indigo-700">
+          <button type="button" onClick={createRule} className="w-full bg-indigo-600 text-white text-xs py-1.5 rounded hover:bg-indigo-700">
             Create Rule
           </button>
         </div>
       )}
 
       {loading ? (
-        <div className="flex items-center gap-2 text-gray-500 text-sm">
+        <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <RefreshCw className="w-4 h-4 animate-spin" /> Loading rules...
         </div>
       ) : rules.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 text-sm">
+        <div className="text-center py-8 text-muted-foreground text-sm">
           No routing rules configured. Create rules to automatically assign leads to agents.
         </div>
       ) : (
@@ -143,24 +143,24 @@ export default function RoutingRulesWidget() {
             <div key={rule.id} className="flex items-center justify-between border rounded p-2.5">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-800">{rule.name}</span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded ${rule.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                  <span className="text-sm font-medium text-foreground">{rule.name}</span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded ${rule.isActive ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}`}>
                     {rule.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
                 {rule.description && (
-                  <div className="text-xs text-gray-500 mt-0.5">{rule.description}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{rule.description}</div>
                 )}
-                <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
-                  {rule.source && <span className="bg-gray-100 rounded px-1.5 py-0.5">Source: {rule.source}</span>}
+                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                  {rule.source && <span className="bg-muted rounded px-1.5 py-0.5">Source: {rule.source}</span>}
                   <ArrowRight className="w-3 h-3" />
                   <span>Agents: {rule.agentIds}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button
+                <button type="button"
                   onClick={() => toggleRule(rule.id, !rule.isActive)}
-                  className="text-xs text-gray-500 hover:text-gray-700"
+                  className="text-xs text-muted-foreground hover:text-foreground"
                   title={rule.isActive ? 'Deactivate' : 'Activate'}
                 >
                   {rule.isActive ? 'Disable' : 'Enable'}

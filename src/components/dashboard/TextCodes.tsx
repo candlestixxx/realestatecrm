@@ -21,38 +21,9 @@ type TextCode = {
   createdAt: string;
 };
 
-const INITIAL_CODES: TextCode[] = [
-  {
-    id: '1',
-    keyword: '8485SHERMAN',
-    phoneNumber: '(586) 555-0190',
-    listingAddress: '8485 Sherman Ave, Warren, MI 48089',
-    responseMessage: 'Thanks for inquiring about 8485 Sherman Ave! View full photos, video walk-throughs & price history here: http://localhost:3000/portal/site/8485-sherman-ave',
-    status: 'ACTIVE',
-    leadsCaptured: 14,
-    createdAt: '2026-07-08',
-  },
-  {
-    id: '2',
-    keyword: '615WILLARD',
-    phoneNumber: '(586) 555-0190',
-    listingAddress: '615 Willard Ave, Warren, MI 48089',
-    responseMessage: 'Welcome to 615 Willard! This beautiful property is back on the market. View listing: http://localhost:3000/portal/site/615-willard-ave-copy-122',
-    status: 'ACTIVE',
-    leadsCaptured: 8,
-    createdAt: '2026-07-08',
-  },
-  {
-    id: '3',
-    keyword: 'VIPBUYER',
-    phoneNumber: '(586) 555-0122',
-    listingAddress: 'General Buyer Capture Pool',
-    responseMessage: 'Want access to hot pocket listings in Macomb and Wayne county? Get our daily MLS sheet: http://localhost:3000/portal/site/vip-buyer-list',
-    status: 'PAUSED',
-    leadsCaptured: 29,
-    createdAt: '2026-07-05',
-  }
-];
+// No seeded rows — codes are loaded from the API. Keeping an empty list here
+// ensures no demo/placeholder text codes are presented as real data.
+const INITIAL_CODES: TextCode[] = [];
 
 export default function TextCodes() {
   const [codes, setCodes] = useState<TextCode[]>(INITIAL_CODES);
@@ -62,7 +33,7 @@ export default function TextCodes() {
 
   // New Code Form State
   const [keyword, setKeyword] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('(586) 555-0190');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [listingAddress, setListingAddress] = useState('');
   const [responseMessage, setResponseMessage] = useState('');
 
@@ -127,7 +98,7 @@ export default function TextCodes() {
             Create high-converting sign rider keyword codes to capture mobile leads directly from physical listing signs.
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={() => setShowCreateModal(true)}
           className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs px-4.5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-1.5 cursor-pointer w-fit"
         >
@@ -197,7 +168,7 @@ export default function TextCodes() {
                     </span>
                   </td>
                   <td className="px-5 py-4.5 text-center">
-                    <button
+                    <button type="button"
                       onClick={() => toggleStatus(code.id)}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase border cursor-pointer transition-colors ${
                         code.status === 'ACTIVE'
@@ -211,14 +182,14 @@ export default function TextCodes() {
                   </td>
                   <td className="px-5 py-4.5 text-right">
                     <div className="flex items-center justify-end gap-1.5">
-                      <button
+                      <button type="button"
                         onClick={() => handleCopyLink(`Text "${code.keyword}" to ${code.phoneNumber}`, code.id)}
                         className="p-1.5 hover:bg-muted/80 rounded-lg text-muted-foreground hover:text-indigo-500 transition-colors cursor-pointer"
                         title="Copy Rider Instructions"
                       >
                         {copiedId === code.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
-                      <button
+                      <button type="button"
                         onClick={() => handleDelete(code.id)}
                         className="p-1.5 hover:bg-muted/80 rounded-lg text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer"
                         title="Delete Code"
@@ -249,7 +220,7 @@ export default function TextCodes() {
               <h3 className="text-base font-black text-foreground uppercase tracking-wider flex items-center gap-1.5">
                 💬 Create Sign Rider SMS Code
               </h3>
-              <button
+              <button type="button"
                 onClick={() => setShowCreateModal(false)}
                 className="text-muted-foreground hover:text-foreground text-sm cursor-pointer"
               >
@@ -277,6 +248,7 @@ export default function TextCodes() {
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     className="w-full bg-background border border-border/60 rounded-xl px-3 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   >
+                    <option value="" disabled>Select a rider number…</option>
                     <option value="(586) 555-0190">(586) 555-0190 (Broker Office)</option>
                     <option value="(586) 555-0122">(586) 555-0122 (Direct Line)</option>
                   </select>
@@ -300,7 +272,7 @@ export default function TextCodes() {
                   required
                   value={responseMessage}
                   onChange={(e) => setResponseMessage(e.target.value)}
-                  placeholder="Thanks for inquiring! View list price & photos instantly: http://localhost:3000/portal/site/8485-sherman"
+                  placeholder="Thanks for inquiring! View list price & photos instantly: /portal/site/8485-sherman"
                   rows={4}
                   className="w-full bg-background border border-border/60 rounded-xl p-3 text-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                 />

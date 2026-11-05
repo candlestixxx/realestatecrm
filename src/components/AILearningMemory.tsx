@@ -66,10 +66,10 @@ export default function AILearningMemory() {
       {loading && (
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600" />
-          <span className="ml-2 text-sm text-gray-500">Loading settings...</span>
+          <span className="ml-2 text-sm text-muted-foreground">Loading settings...</span>
         </div>
       )}
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">AI Memory</h1> <span title="Control what the AI remembers, learning preferences, and data retention. Export or delete your AI data." aria-label="About this section: Control what the AI remembers, learning preferences, and data retention. Export or delete your AI data." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">AI Memory</h1> <span title="Control what the AI remembers, learning preferences, and data retention. Export or delete your AI data." aria-label="About this section: Control what the AI remembers, learning preferences, and data retention. Export or delete your AI data." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       {/* Header */}
       <div className="border-b border-border/40 pb-4">
         <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
@@ -91,7 +91,7 @@ export default function AILearningMemory() {
             <label className="text-sm font-medium text-foreground">Remember conversations</label>
             <p className="text-xs text-muted-foreground">Store conversation history for context-aware responses</p>
           </div>
-          <button
+          <button type="button"
             onClick={() => setSettings({ ...settings, rememberConversations: !settings.rememberConversations })}
             className={
               'w-11 h-6 rounded-full transition-colors ' +
@@ -102,7 +102,7 @@ export default function AILearningMemory() {
           >
             <div
               className={
-                'w-5 h-5 rounded-full bg-white shadow transition-transform ' +
+                'w-5 h-5 rounded-full bg-card shadow transition-transform ' +
                 (settings.rememberConversations ? 'translate-x-5' : 'translate-x-0.5')
               }
             />
@@ -142,7 +142,7 @@ export default function AILearningMemory() {
             <label className="text-sm font-medium text-foreground">Enable learning</label>
             <p className="text-xs text-muted-foreground">AI adapts to your workflow patterns and preferences</p>
           </div>
-          <button
+          <button type="button"
             onClick={() => setSettings({ ...settings, learningEnabled: !settings.learningEnabled })}
             className={
               'w-11 h-6 rounded-full transition-colors ' +
@@ -153,7 +153,7 @@ export default function AILearningMemory() {
           >
             <div
               className={
-                'w-5 h-5 rounded-full bg-white shadow transition-transform ' +
+                'w-5 h-5 rounded-full bg-card shadow transition-transform ' +
                 (settings.learningEnabled ? 'translate-x-5' : 'translate-x-0.5')
               }
             />
@@ -165,7 +165,7 @@ export default function AILearningMemory() {
             <label className="text-sm font-medium text-foreground">Personalization</label>
             <p className="text-xs text-muted-foreground">AI tailors responses to your role, brand voice, and style</p>
           </div>
-          <button
+          <button type="button"
             onClick={() => setSettings({ ...settings, personalizationEnabled: !settings.personalizationEnabled })}
             className={
               'w-11 h-6 rounded-full transition-colors ' +
@@ -176,7 +176,7 @@ export default function AILearningMemory() {
           >
             <div
               className={
-                'w-5 h-5 rounded-full bg-white shadow transition-transform ' +
+                'w-5 h-5 rounded-full bg-card shadow transition-transform ' +
                 (settings.personalizationEnabled ? 'translate-x-5' : 'translate-x-0.5')
               }
             />
@@ -207,14 +207,17 @@ export default function AILearningMemory() {
             <label className="text-sm font-medium text-foreground">Export my AI data</label>
             <p className="text-xs text-muted-foreground">Download all AI conversation history and learned preferences</p>
           </div>
-          <button
+          <button type="button"
             onClick={async () => {
-              const res = await fetch('/api/ai/memory-settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...settings, dataExportRequested: true }),
-              });
-              if (res.ok) toast.success('Data export request submitted');
+              try {
+                const res = await fetch('/api/ai/memory-settings', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ ...settings, dataExportRequested: true }),
+                });
+                if (res.ok) toast.success('Data export request submitted');
+                else toast.error('Export request failed');
+              } catch { toast.error('Network error'); }
             }}
             className="px-4 py-2 border border-border text-xs font-bold rounded-lg hover:bg-muted"
           >
@@ -226,15 +229,18 @@ export default function AILearningMemory() {
             <label className="text-sm font-medium text-foreground">Delete my AI data</label>
             <p className="text-xs text-muted-foreground">Permanently delete all AI conversation history and learned data</p>
           </div>
-          <button
+          <button type="button"
             onClick={async () => {
               if (!confirm('This permanently deletes all AI data. Continue?')) return;
-              const res = await fetch('/api/ai/memory-settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...settings, dataDeletionRequested: true }),
-              });
-              if (res.ok) toast.success('Data deletion request submitted');
+              try {
+                const res = await fetch('/api/ai/memory-settings', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ ...settings, dataDeletionRequested: true }),
+                });
+                if (res.ok) toast.success('Data deletion request submitted');
+                else toast.error('Deletion request failed');
+              } catch { toast.error('Network error'); }
             }}
             className="px-4 py-2 border border-red-500/50 text-red-500 text-xs font-bold rounded-lg hover:bg-red-500/10"
           >
@@ -245,7 +251,7 @@ export default function AILearningMemory() {
 
       {/* Save button */}
       <div className="flex justify-end">
-        <button
+        <button type="button"
           onClick={save}
           disabled={saving}
           className="px-6 py-2.5 bg-secondary text-secondary-foreground text-sm font-bold rounded-lg hover:bg-secondary/90 disabled:opacity-50"

@@ -37,7 +37,7 @@ export default function AddTaskModal({
 
   return (
     <>
-      <button
+      <button type="button"
         onClick={() => setIsOpen(true)}
         className={triggerClassName}
       >

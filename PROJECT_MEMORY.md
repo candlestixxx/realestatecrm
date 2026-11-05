@@ -77,3 +77,5 @@ To build a real estate CRM that is **as technical and data-dense as Lofty, but s
 - **AI Drip Execution (Twilio/SendGrid):** Wire up the backend logic to the "Start AI Drip" button to allow Gemini to dispatch actual SMS and Email follow-ups.
 - **Workflow Automation:** Expand the Bulk Action bar to support automated data mapping between selected leads and transaction workflows.
 - **Tool Calling Refinement (AI):** The immediate priority is executing a clean dependency audit for `ai` and `@ai-sdk/react` to allow server-side function calling (e.g., `prisma.lead.count()`) directly inside the `/api/chat` router.
+
+Campaign defaults use stable default-workspace-template IDs; upsert updates are empty to preserve agent edits. COMPANY plans are workspace-wide, never cross-workspace. Production validation occurs on Hetzner only.

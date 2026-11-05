@@ -25,7 +25,7 @@ export async function scheduleShowingAction(formData: FormData) {
 
   // --- MLS INTEGRATION MOCK ---
   // In a real environment, you would hit the ShowingTime or MLS API here.
-  console.log(`[MLS API] Scheduling showing at ${propertyAddress} on ${showingDate.toLocaleString()}`);
+  // console.log(`[MLS API] Scheduling showing at ${propertyAddress} on ${showingDate.toLocaleString()}`);
 
   const content = `Scheduled showing for ${propertyAddress} on ${showingDate.toLocaleString()}`;
 

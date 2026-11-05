@@ -1,5 +1,6 @@
 import prisma from './prisma';
 import { sendMail } from './email-config';
+import { addCampaignDelay as addDelay } from './campaign-schedule';
 
 export type DelayUnit = 'SECOND' | 'MINUTE' | 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
 
@@ -25,34 +26,6 @@ export interface CampaignStepsData {
   items?: CampaignStep[];
 }
 
-function addDelay(date: Date, value: number, unit: DelayUnit): Date {
-  const newDate = new Date(date.getTime());
-  switch (unit) {
-    case 'SECOND':
-      newDate.setSeconds(newDate.getSeconds() + value);
-      break;
-    case 'MINUTE':
-      newDate.setMinutes(newDate.getMinutes() + value);
-      break;
-    case 'HOUR':
-      newDate.setHours(newDate.getHours() + value);
-      break;
-    case 'DAY':
-      newDate.setDate(newDate.getDate() + value);
-      break;
-    case 'WEEK':
-      newDate.setDate(newDate.getDate() + value * 7);
-      break;
-    case 'MONTH':
-      newDate.setMonth(newDate.getMonth() + value);
-      break;
-    case 'YEAR':
-      newDate.setFullYear(newDate.getFullYear() + value);
-      break;
-  }
-  return newDate;
-}
-
 /**
  * Enrolls a lead in a campaign: deletes existing pending drip tasks,
  * parses campaign steps, schedules future tasks.
@@ -63,24 +36,13 @@ export async function enrollLeadInCampaignSteps(
   workspaceId: string,
   userId?: string | null
 ) {
-  // 1. Delete all current TODO drip tasks for this lead
-  await prisma.task.deleteMany({
-    where: {
-      leadId,
-      status: 'TODO',
-      title: {
-        startsWith: '[Drip:',
-      },
-    },
-  });
-
   if (!campaignId) {
+    await prisma.task.deleteMany({ where: { leadId, workspaceId, status: 'TODO', title: { startsWith: '[Drip:' } } });
     return;
   }
-
   // 2. Fetch the campaign
   const campaign = await prisma.smartPlan.findUnique({
-    where: { id: campaignId },
+    where: { id: campaignId, workspaceId },
   });
 
   if (!campaign || !campaign.steps) {
@@ -106,18 +68,18 @@ export async function enrollLeadInCampaignSteps(
     return;
   }
 
-  // 3. Add tasks sequentially
+  // Build the full schedule before replacing pending tasks, so invalid dates cannot leave a partial schedule.
   let scheduledTime = new Date();
+  const scheduledTasks = [];
   for (let idx = 0; idx < stepsList.length; idx++) {
     const step = stepsList[idx];
-    scheduledTime = addDelay(scheduledTime, step.delayValue || 0, step.delayUnit || 'DAY');
+    scheduledTime = addDelay(scheduledTime, step.delayValue ?? (step as CampaignStep & { delayDays?: number }).delayDays ?? 0, step.delayUnit || 'DAY');
 
     const desc = step.type === 'EMAIL' 
       ? `Subject: ${step.subject || ''}\n\nContent:\n${step.content}`
       : step.content;
 
-    await prisma.task.create({
-      data: {
+    scheduledTasks.push({
         title: `[Drip: ${campaign.name}] Step ${idx + 1}: ${step.type}`,
         description: desc,
         status: 'TODO',
@@ -128,9 +90,13 @@ export async function enrollLeadInCampaignSteps(
         triggerEmail: step.type === 'EMAIL',
         triggerSMS: step.type === 'SMS',
         triggerCall: step.type === 'CALL',
-      },
     });
   }
+
+  await prisma.$transaction([
+    prisma.task.deleteMany({ where: { leadId, workspaceId, status: 'TODO', title: { startsWith: '[Drip:' } } }),
+    prisma.task.createMany({ data: scheduledTasks }),
+  ]);
 
   // Process immediate due tasks
   await processDueCampaignTasks();
@@ -149,6 +115,7 @@ export async function processDueCampaignTasks() {
       status: 'TODO',
       dueDate: { lte: now },
       title: { startsWith: '[Drip:' },
+      OR: [{ triggerEmail: true }, { triggerSMS: true }],
     },
     include: {
       lead: {
@@ -174,6 +141,14 @@ export async function processDueCampaignTasks() {
     }
 
     const lead = task.lead;
+    const campaign = lead.smartPlanId ? await prisma.smartPlan.findFirst({
+      where: { id: lead.smartPlanId, workspaceId: task.workspaceId, isActive: true },
+    }) : null;
+    if (!campaign || !task.title.startsWith(`[Drip: ${campaign.name}]`)) continue;
+    const claimed = await prisma.task.updateMany({
+      where: { id: task.id, status: 'TODO' }, data: { status: 'IN_PROGRESS' },
+    });
+    if (!claimed.count) continue;
     const campaignNameMatch = task.title.match(/\[Drip:\s*([^\]]+)\]/);
     const campaignName = campaignNameMatch ? campaignNameMatch[1] : 'Smart Plan';
 
@@ -190,11 +165,14 @@ export async function processDueCampaignTasks() {
           : task.description || '';
 
         // Execute send
-        await sendMail({
+        const delivery = await sendMail({
           to: lead.contact.email,
           subject: subject,
           message: message,
         });
+        if (!delivery.success || delivery.mode === 'SIMULATION') {
+          throw new Error('Campaign email requires a configured live email provider.');
+        }
 
         // Log Activity
         await prisma.activity.create({
@@ -218,7 +196,7 @@ export async function processDueCampaignTasks() {
           try {
             const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
             const basicAuth = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
-            await fetch(twilioUrl, {
+            const response = await fetch(twilioUrl, {
               method: 'POST',
               headers: {
                 Authorization: `Basic ${basicAuth}`,
@@ -230,11 +208,12 @@ export async function processDueCampaignTasks() {
                 Body: message,
               }).toString(),
             });
+            if (!response.ok) throw new Error(`SMS provider returned ${response.status}`);
           } catch (e) {
-            console.error('Twilio campaign dispatch error:', e);
+            throw e;
           }
         } else {
-          console.log(`[Campaign SMS Simulation] Sent to ${phone}: ${message}`);
+          throw new Error('Campaign SMS requires configured Twilio credentials and a sending number.');
         }
 
         // Log Activity
@@ -247,28 +226,8 @@ export async function processDueCampaignTasks() {
             leadId: lead.id,
           },
         });
-      } else if (task.triggerCall) {
-        // Log Call task notification
-        await prisma.activity.create({
-          data: {
-            type: 'SYSTEM',
-            content: `Campaign "${campaignName}" Call Task alert: Please call ${lead.contact.firstName} ${lead.contact.lastName || ''} (${lead.contact.phone || 'no phone'}) regarding: "${task.description}"`,
-            workspaceId: task.workspaceId,
-            userId: task.assignedToId,
-            leadId: lead.id,
-          },
-        });
       } else {
-        // General task alert
-        await prisma.activity.create({
-          data: {
-            type: 'SYSTEM',
-            content: `Campaign "${campaignName}" task due: "${task.title.split(':').slice(2).join(':').trim() || task.description}"`,
-            workspaceId: task.workspaceId,
-            userId: task.assignedToId,
-            leadId: lead.id,
-          },
-        });
+        throw new Error('Campaign recipient is missing the required email address or phone number.');
       }
 
       // Mark task as completed successfully
@@ -278,6 +237,9 @@ export async function processDueCampaignTasks() {
       });
     } catch (err) {
       console.error(`Failed to process drip task ${task.id}:`, err);
+      // Retain failed sends for operator review instead of silently recording delivery
+      // or automatically retrying an ambiguous provider response.
+      await prisma.task.update({ where: { id: task.id }, data: { status: 'ERROR' } });
     }
   }
 }

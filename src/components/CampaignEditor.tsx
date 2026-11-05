@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { updateCampaignStepsAction, toggleCampaignStatusAction } from '@/lib/actions/campaign';
 import toast from 'react-hot-toast';
-import { Eye, MessageSquare, UserCheck, BarChart3, List, Settings, Play, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Settings } from 'lucide-react';
 
 type DelayUnit = 'SECOND' | 'MINUTE' | 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
 
@@ -173,7 +173,7 @@ export default function CampaignEditor({
 
           {/* Sub-tab Switches */}
           <div className="flex bg-muted/65 border border-border/60 rounded-xl p-1 gap-1 text-[10px] font-black uppercase tracking-wider select-none">
-            <button
+            <button type="button"
               onClick={() => setEditorTab('builder')}
               className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
                 editorTab === 'builder' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -181,7 +181,7 @@ export default function CampaignEditor({
             >
               Builder
             </button>
-            <button
+            <button type="button"
               onClick={() => setEditorTab('performance')}
               className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
                 editorTab === 'performance' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -189,7 +189,7 @@ export default function CampaignEditor({
             >
               Performance
             </button>
-            <button
+            <button type="button"
               onClick={() => setEditorTab('enrollments')}
               className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
                 editorTab === 'enrollments' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -199,7 +199,7 @@ export default function CampaignEditor({
             </button>
           </div>
 
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground cursor-pointer">
+          <button type="button" aria-label="Close campaign editor" onClick={onClose} className="text-muted-foreground hover:text-foreground cursor-pointer">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
@@ -235,7 +235,7 @@ export default function CampaignEditor({
                       onChange={(e) => setSettings({ ...settings, scope: e.target.value })}
                       className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
                     >
-                      <option value="COMPANY">Company Plan</option>
+                      <option value="COMPANY">Brokerage / Company • All agents</option>
                       <option value="PERSONAL">Personal Plan</option>
                     </select>
                   </div>
@@ -313,7 +313,10 @@ export default function CampaignEditor({
                 </p>
               </div>
 
-              {steps.map((step, index) => (
+              {steps.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No steps yet. Add your first campaign step above.</div>
+              ) : (
+                steps.map((step, index) => (
                 <div key={step.id} className="w-full max-w-xl flex flex-col items-center">
                   <div className="w-0.5 h-6 bg-border"></div>
                   
@@ -322,7 +325,7 @@ export default function CampaignEditor({
                       <span className="font-extrabold text-xs text-foreground uppercase tracking-wide">
                         {step.type === 'EMAIL' ? '✉️ Email Step' : step.type === 'SMS' ? '💬 SMS Text Step' : '📋 Task Step'}
                       </span>
-                      <button 
+                      <button type="button" 
                         onClick={() => handleDeleteStep(index)}
                         className="text-xs font-black text-rose-500 uppercase cursor-pointer"
                       >
@@ -332,9 +335,12 @@ export default function CampaignEditor({
 
                     <div className="p-5 space-y-4 text-xs font-semibold text-muted-foreground">
                       <div className="flex items-center gap-2">
-                        <span>Delay:</span>
+                        <span title="Each delay starts after the preceding step. Months and years use calendar dates, clamped to the last valid day.">Delay after previous step:</span>
                         <input
                           type="number"
+                          min={0}
+                          max={10000}
+                          step={1}
                           value={step.delayValue}
                           onChange={(e) => handleStepChange(index, 'delayValue', Number(e.target.value))}
                           className="w-12 bg-background border border-border rounded text-center py-1 font-bold"
@@ -344,9 +350,13 @@ export default function CampaignEditor({
                           onChange={(e) => handleStepChange(index, 'delayUnit', e.target.value)}
                           className="bg-background border border-border rounded py-1 px-1.5"
                         >
+                          <option value="SECOND">Seconds</option>
                           <option value="MINUTE">Minutes</option>
                           <option value="HOUR">Hours</option>
                           <option value="DAY">Days</option>
+                          <option value="WEEK">Weeks</option>
+                          <option value="MONTH">Months</option>
+                          <option value="YEAR">Years</option>
                         </select>
                       </div>
 
@@ -398,18 +408,27 @@ export default function CampaignEditor({
                           />
                         </div>
                       )}
+                      {(step.type === 'TASK' || step.type === 'CALL') && (
+                        <label className="block space-y-1">
+                          <span>Agent instructions</span>
+                          <textarea value={step.content} onChange={(e) => handleStepChange(index, 'content', e.target.value)} rows={3} className="w-full bg-background border border-border rounded p-3 text-foreground" />
+                        </label>
+                      )}
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+              )}
 
               <div className="flex gap-2 mt-6">
-                <button onClick={() => handleAddStep('EMAIL')} className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-[10px] font-black uppercase cursor-pointer">
+                <button type="button" onClick={() => handleAddStep('EMAIL')} className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-[10px] font-black uppercase cursor-pointer">
                   + Email Step
                 </button>
-                <button onClick={() => handleAddStep('SMS')} className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-[10px] font-black uppercase cursor-pointer">
+                <button type="button" onClick={() => handleAddStep('SMS')} className="px-3.5 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-[10px] font-black uppercase cursor-pointer">
                   + SMS Step
                 </button>
+                <button type="button" onClick={() => handleAddStep('CALL')} className="px-3.5 py-1.5 bg-muted border border-border rounded-lg text-xs">+ Call task</button>
+                <button type="button" onClick={() => handleAddStep('TASK')} className="px-3.5 py-1.5 bg-muted border border-border rounded-lg text-xs">+ Task</button>
               </div>
             </div>
 
@@ -423,7 +442,7 @@ export default function CampaignEditor({
               <h4 className="text-sm font-black uppercase text-foreground">Email & SMS Performance</h4>
               <div className="flex gap-2 text-[10px] font-black uppercase tracking-wider">
                 {['Today', 'Yesterday', '7D', '30D', 'Default'].map(d => (
-                  <button key={d} className="px-3 py-1.5 bg-background border border-border/60 hover:border-border rounded-lg text-muted-foreground hover:text-foreground cursor-pointer">
+                  <button type="button" key={d} className="px-3 py-1.5 bg-background border border-border/60 hover:border-border rounded-lg text-muted-foreground hover:text-foreground cursor-pointer">
                     {d}
                   </button>
                 ))}
@@ -491,7 +510,7 @@ export default function CampaignEditor({
                 </thead>
                 <tbody className="divide-y divide-border/30">
                   {[
-                    { name: 'Lauren Lee', email: 'lauren@excellegacy.com', step: 'Step 2 of 4 (Email)', status: 'ACTIVE', date: '2026-07-12' },
+                    { name: 'Lauren Lee', email: 'lauren@excellegacyrealtygroup.site', step: 'Step 2 of 4 (Email)', status: 'ACTIVE', date: '2026-07-12' },
                     { name: 'Frank Ferguson', email: 'frank@legacyhomes.com', step: 'Step 4 of 4 (General Task)', status: 'COMPLETED', date: '2026-07-10' },
                     { name: 'Paul Peterson', email: 'paul@realcomp.com', step: 'Step 1 of 4 (SMS)', status: 'PAUSED', date: '2026-07-08' },
                   ].map((lead, i) => (
@@ -506,10 +525,10 @@ export default function CampaignEditor({
                       </td>
                       <td className="px-5 py-3.5">{lead.date}</td>
                       <td className="px-5 py-3.5 text-right font-black uppercase text-[9px]">
-                        <button className="text-indigo-500 hover:underline mr-3 cursor-pointer">
+                        <button type="button" className="text-indigo-500 hover:underline mr-3 cursor-pointer">
                           {lead.status === 'PAUSED' ? 'Resume' : 'Pause'}
                         </button>
-                        <button className="text-rose-500 hover:underline cursor-pointer">Unenroll</button>
+                        <button type="button" className="text-rose-500 hover:underline cursor-pointer">Unenroll</button>
                       </td>
                     </tr>
                   ))}
@@ -526,13 +545,13 @@ export default function CampaignEditor({
           </span>
           
           <div className="flex gap-2">
-            <button
+            <button type="button"
               onClick={onClose}
               className="px-4 py-2 border border-border hover:bg-muted rounded-lg text-xs font-medium transition-colors cursor-pointer"
             >
               Cancel
             </button>
-            <button
+            <button type="button"
               onClick={handleSave}
               disabled={isSaving}
               className="px-6 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95 transition-all shadow-md disabled:opacity-50 cursor-pointer"

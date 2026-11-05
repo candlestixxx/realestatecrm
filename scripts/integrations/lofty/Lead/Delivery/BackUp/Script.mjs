@@ -172,19 +172,51 @@ function collectEmails(listing) {
 
 function parseName(listing) {
   const owner = listing.owner || {};
+  const street = clean(listing.propertyAddress?.streetAddress);
+
+  // Prefer the already-split owner fields from MyPlus.
+  const fn = clean(owner.firstName);
+  const ln = clean(owner.lastName);
+  if (fn || ln) {
+    if (fn && ln) {
+      return { firstName: trunc(fn, MAX_NAME), lastName: trunc(ln, MAX_NAME) };
+    }
+    // Entity / single-name owner: keep the full value in lastName.
+    if (!fn && ln) {
+      return { firstName: 'Owner', lastName: trunc(ln, MAX_NAME) };
+    }
+    if (fn && !ln) {
+      return { firstName: trunc(fn, MAX_NAME), lastName: trunc(street || 'Unknown', MAX_NAME) };
+    }
+  }
+
+  // Fall back to the full owner name (split first token + rest).
   const full = clean(owner.name);
   if (full) {
     const tokens = full.split(/\s+/).filter(Boolean);
     return {
       firstName: trunc(tokens[0], MAX_NAME),
-      lastName: trunc(tokens.slice(1).join(' '), MAX_NAME),
+      lastName: trunc(tokens.slice(1).join(' '), MAX_NAME) || undefined,
     };
   }
-  const street = clean(listing.propertyAddress?.streetAddress);
-  if (owner.firstName || owner.lastName) {
-    return { firstName: trunc(owner.firstName || 'Owner', MAX_NAME), lastName: trunc(owner.lastName || street || '', MAX_NAME) };
-  }
+
+  // No name available — fall back to the street address.
   return { firstName: 'Owner', lastName: trunc(street || 'Unknown', MAX_NAME) };
+}
+
+/** Second owner (co-owner) → Lofty family member (spouse) placeholder. */
+function buildFamilyMembers(listing) {
+  const owner = listing.owner || {};
+  const name2 = clean(owner.name2);
+  if (!name2) return undefined;
+  const tokens = name2.split(/\s+/).filter(Boolean);
+  return [
+    {
+      firstName: trunc(tokens[0], MAX_NAME),
+      lastName: trunc(tokens.slice(1).join(' '), MAX_NAME) || undefined,
+      relationship: 'Spouse',
+    },
+  ];
 }
 
 const toInt = (v) => { const n = parseInt(clean(v).replace(/[^0-9.-]/g, ''), 10); return Number.isFinite(n) ? n : undefined; };
@@ -200,6 +232,7 @@ function buildNote(listing, name) {
   const o = listing.owner || {};
   const c1 = listing.contact1 || {};
   const c2 = listing.contact2 || {};
+  const agent = listing.agent || {};
   const stage = clean(p.normalizedStatus || p.status);
   const lines = [];
 
@@ -222,6 +255,15 @@ function buildNote(listing, name) {
   if (p.propertyType) lines.push(`Property Type: ${p.propertyType}`);
   if (o.apn) lines.push(`APN: ${o.apn}`);
   if (p.url) lines.push(`Source URL: ${p.url}`);
+
+  if (agent.agentName || agent.agentOffice || agent.agentEmail || agent.agentPhone) {
+    lines.push('');
+    lines.push('LISTING AGENT');
+    if (agent.agentName) lines.push(`Listing Agent: ${clean(agent.agentName)}`);
+    if (agent.agentOffice) lines.push(`Listing Office: ${clean(agent.agentOffice)}`);
+    if (agent.agentEmail) lines.push(`Agent Email: ${clean(agent.agentEmail)}`);
+    if (agent.agentPhone) lines.push(`Agent Phone: ${clean(agent.agentPhone)}`);
+  }
 
   lines.push('');
   lines.push('OWNER');
@@ -292,6 +334,7 @@ function buildLoftyPayload(listing) {
     state: addr.state || undefined,
     zipCode: addr.zip || undefined,
     county: addr.county || undefined,
+    mailAddress: true,
   };
   if (price) property.price = price;
   if (toInt(p.bedrooms)) property.bedrooms = toInt(p.bedrooms);
@@ -309,7 +352,13 @@ function buildLoftyPayload(listing) {
     source: 'my +plus leads',
     stage: stage || undefined,
     tags: ['MyPlus/Lofty', stage].filter(Boolean),
+    // Mailing address = property address (Lofty top-level address placeholders).
+    streetAddress: trunc(addr.streetAddress, 200) || undefined,
+    city: addr.city || undefined,
+    state: addr.state || undefined,
+    zipCode: addr.zip || undefined,
     property,
+    leadFamilyMemberList: buildFamilyMembers(listing),
     content: buildNote(listing, name),
   };
 

@@ -10,6 +10,7 @@ $services = @(
     @{ Name = "Media Workflow"; Port = 3004; Path = "/" },
     @{ Name = "LegacyLeads Web"; Port = 3005; Path = "/" },
     @{ Name = "LegacyLeads API"; Port = 3006; Path = "/health" },
+    @{ Name = "ContentPlanner API"; Port = 3031; Path = "/health" },
     @{ Name = "Live Audio WS"; Port = 8090; Path = "/health" }
 )
 
@@ -24,7 +25,7 @@ foreach ($svc in $services) {
     }
     
     try {
-        $r = Invoke-WebRequest -Uri "http://localhost:$($svc.Port)$($svc.Path)" -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop
+        $r = Invoke-WebRequest -Uri "http://127.0.0.1:$($svc.Port)$($svc.Path)" -TimeoutSec 10 -UseBasicParsing -ErrorAction Stop
         Write-Host ("  {0,-20} Port {1,-5} HTTP {2}" -f $svc.Name, $svc.Port, $r.StatusCode) -ForegroundColor Green
     } catch {
         $code = $_.Exception.Response.StatusCode.value__

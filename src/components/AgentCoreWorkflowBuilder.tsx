@@ -170,7 +170,7 @@ export default function AgentCoreWorkflowBuilder() {
           <h2 className="text-lg font-bold text-foreground">Workflow Automations</h2>
           <p className="text-xs text-muted-foreground">If-this-then-that rules for your CRM</p>
         </div>
-        <button
+        <button type="button"
           onClick={() => { resetForm(); setShowForm(true); }}
           className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-bold rounded-lg hover:bg-secondary/90 transition-colors"
         >
@@ -184,7 +184,7 @@ export default function AgentCoreWorkflowBuilder() {
           <div className="bg-background border border-border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <h3 className="text-base font-bold text-foreground">{editingId ? 'Edit Workflow' : 'Create Workflow'}</h3>
-              <button onClick={resetForm} className="text-muted-foreground hover:text-foreground text-xl leading-none">&times;</button>
+              <button type="button" onClick={resetForm} className="text-muted-foreground hover:text-foreground text-xl leading-none">&times;</button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
@@ -239,7 +239,7 @@ export default function AgentCoreWorkflowBuilder() {
                     className="text-xs text-secondary hover:underline font-bold">+ Add Action</button>
                 </div>
                 <div className="space-y-3">
-                  {actions.map((action, idx) => (
+                  {actions.length === 0 ? <p className="text-xs text-muted-foreground py-2">No actions configured.</p> : actions.map((action, idx) => (
                     <div key={idx} className="p-3 bg-muted/30 border border-border rounded-lg space-y-2">
                       <div className="flex items-center justify-between">
                         <select value={action.type} onChange={e => updateAction(idx, { type: e.target.value as WorkflowAction['type'] })}
@@ -318,7 +318,7 @@ export default function AgentCoreWorkflowBuilder() {
         </div>
       ) : (
         <div className="space-y-2">
-          {workflows.map(wf => {
+          {workflows.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No workflows yet. Create one above.</div> : workflows.map(wf => {
             const parsed = parseActions(wf.actions);
             const triggerLabel = TRIGGER_EVENTS.find(t => t.value === wf.trigger)?.label || wf.trigger;
             return (
@@ -339,13 +339,13 @@ export default function AgentCoreWorkflowBuilder() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => toggleActive(wf)} className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded border border-border">
+                  <button type="button" onClick={() => toggleActive(wf)} className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded border border-border">
                     {wf.isActive ? 'Pause' : 'Resume'}
                   </button>
-                  <button onClick={() => startEdit(wf)} className="text-xs text-secondary hover:underline px-2 py-1">
+                  <button type="button" onClick={() => startEdit(wf)} className="text-xs text-secondary hover:underline px-2 py-1">
                     Edit
                   </button>
-                  <button onClick={() => deleteWorkflow(wf.id)} className="text-xs text-red-500 hover:underline px-2 py-1">
+                  <button type="button" onClick={() => deleteWorkflow(wf.id)} className="text-xs text-red-500 hover:underline px-2 py-1">
                     Delete
                   </button>
                 </div>

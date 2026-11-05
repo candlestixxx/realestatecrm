@@ -79,8 +79,8 @@ export default function AIModelsSettingsClient() {
 
   return (
     <div className="space-y-6">
-      {loading && <div className="flex items-center justify-center py-8"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600" /><span className="ml-2 text-sm text-gray-500">Loading settings...</span></div>}
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">AI Model Keys</h1> <span title="Configure API keys for Gemini, OpenAI, and custom model endpoints. Set default models per agent." aria-label="About this section: Configure API keys for Gemini, OpenAI, and custom model endpoints. Set default models per agent." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      {loading && <div className="flex items-center justify-center py-8"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600" /><span className="ml-2 text-sm text-muted-foreground">Loading settings...</span></div>}
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">AI Model Keys</h1> <span title="Configure API keys for Gemini, OpenAI, and custom model endpoints. Set default models per agent." aria-label="About this section: Configure API keys for Gemini, OpenAI, and custom model endpoints. Set default models per agent." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       <div>
         <h1 className="text-2xl font-bold text-foreground">AI Model Keys</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -109,7 +109,7 @@ export default function AIModelsSettingsClient() {
                   <span className="text-[10px] px-2 py-1 rounded-full bg-green-500/15 text-green-500 font-bold uppercase">
                     Configured
                   </span>
-                  <button onClick={() => deleteKey(provider.id)}
+                  <button type="button" onClick={() => deleteKey(provider.id)}
                     className="text-xs text-red-500 hover:underline">
                     Remove
                   </button>
@@ -125,7 +125,7 @@ export default function AIModelsSettingsClient() {
                 placeholder={isConfigured(provider.id) ? '••••••••  (enter new key to replace)' : provider.placeholder}
                 className="flex-1 px-3 py-2 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary/50 text-foreground placeholder:text-muted-foreground"
               />
-              <button
+              <button type="button"
                 onClick={() => saveKey(provider.id)}
                 disabled={saving === provider.id || !keys[provider.id]?.trim()}
                 className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-bold rounded-lg hover:bg-secondary/90 disabled:opacity-50 transition-colors"

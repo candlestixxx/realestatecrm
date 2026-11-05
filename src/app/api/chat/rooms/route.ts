@@ -10,26 +10,31 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const rooms = await prisma.chatRoom.findMany({
-    where: {
-      participants: {
-        some: { userId: session.user.id },
+  try {
+    const rooms = await prisma.chatRoom.findMany({
+      where: {
+        participants: {
+          some: { userId: session.user.id },
+        },
       },
-    },
-    include: {
-      participants: {
-        include: { user: { select: { id: true, name: true, email: true, image: true } } },
+      include: {
+        participants: {
+          include: { user: { select: { id: true, name: true, email: true, image: true } } },
+        },
+        messages: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          include: { sender: { select: { id: true, name: true } } },
+        },
       },
-      messages: {
-        orderBy: { createdAt: 'desc' },
-        take: 1,
-        include: { sender: { select: { id: true, name: true } } },
-      },
-    },
-    orderBy: { updatedAt: 'desc' },
-  });
+      orderBy: { updatedAt: 'desc' },
+    });
 
-  return NextResponse.json({ rooms });
+    return NextResponse.json({ rooms });
+  } catch (error) {
+    console.error('Chat rooms fetch error:', error);
+    return NextResponse.json({ rooms: [] });
+  }
 }
 
 // POST /api/chat/rooms — create a DIRECT or GROUP room
@@ -50,21 +55,48 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'participantIds required' }, { status: 400 });
   }
 
-  // For DIRECT rooms, check if one already exists between these two users
-  if (type === 'DIRECT' && participantIds.length === 1) {
-    const otherId = participantIds[0];
-    const existing = await prisma.chatRoom.findFirst({
-      where: {
-        type: 'DIRECT',
-        participants: {
-          every: {
-            userId: { in: [session.user.id, otherId] },
+  try {
+    // For DIRECT rooms, check if one already exists between these two users
+    if (type === 'DIRECT' && participantIds.length === 1) {
+      const otherId = participantIds[0];
+      const existing = await prisma.chatRoom.findFirst({
+        where: {
+          type: 'DIRECT',
+          participants: {
+            every: {
+              userId: { in: [session.user.id, otherId] },
+            },
+          },
+          AND: [
+            { participants: { some: { userId: session.user.id } } },
+            { participants: { some: { userId: otherId } } },
+          ],
+        },
+        include: {
+          participants: {
+            include: { user: { select: { id: true, name: true, email: true, image: true } } },
           },
         },
-        AND: [
-          { participants: { some: { userId: session.user.id } } },
-          { participants: { some: { userId: otherId } } },
-        ],
+      });
+      if (existing) return NextResponse.json({ room: existing });
+    }
+
+    const workspace = await prisma.workspace.findFirst({
+      where: { members: { some: { userId: session.user.id } } },
+    });
+
+    const room = await prisma.chatRoom.create({
+      data: {
+        type,
+        name: type === 'GROUP' ? name || 'Group Chat' : null,
+        workspaceId: workspace?.id || 'default',
+        createdById: session.user.id,
+        participants: {
+          create: [
+            { userId: session.user.id, role: 'ADMIN' },
+            ...participantIds.map((id) => ({ userId: id, role: 'MEMBER' })),
+          ],
+        },
       },
       include: {
         participants: {
@@ -72,32 +104,10 @@ export async function POST(req: NextRequest) {
         },
       },
     });
-    if (existing) return NextResponse.json({ room: existing });
+
+    return NextResponse.json({ room }, { status: 201 });
+  } catch (error) {
+    console.error('Chat room create error:', error);
+    return NextResponse.json({ error: 'Failed to create room' }, { status: 500 });
   }
-
-  const workspace = await prisma.workspace.findFirst({
-    where: { members: { some: { userId: session.user.id } } },
-  });
-
-  const room = await prisma.chatRoom.create({
-    data: {
-      type,
-      name: type === 'GROUP' ? name || 'Group Chat' : null,
-      workspaceId: workspace!.id,
-      createdById: session.user.id,
-      participants: {
-        create: [
-          { userId: session.user.id, role: 'ADMIN' },
-          ...participantIds.map((id) => ({ userId: id, role: 'MEMBER' })),
-        ],
-      },
-    },
-    include: {
-      participants: {
-        include: { user: { select: { id: true, name: true, email: true, image: true } } },
-      },
-    },
-  });
-
-  return NextResponse.json({ room }, { status: 201 });
 }

@@ -19,54 +19,11 @@ type SocialPost = {
   leads: number;
 };
 
-const INITIAL_POSTS: SocialPost[] = [
-  {
-    id: 'post-1',
-    date: 'Sunday, Jul 12',
-    platforms: ['facebook', 'instagram', 'linkedin', 'gmb'],
-    image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=350&q=80',
-    text: '🚨 Just Listed in St. Clair Shores! 🚨 Welcome to 22513 Avon St – a charming brick ranch in Macomb County with all the right updates. ✨ Updated kitchen perfect for cooking + entertaining. Full basement guest suite for visitors or office space!',
-    status: 'Published',
-    time: '04:13 PM',
-    views: 142,
-    comments: 18,
-    leads: 6,
-  },
-  {
-    id: 'post-2',
-    date: 'Monday, Jul 6',
-    platforms: ['facebook', 'instagram', 'linkedin', 'gmb'],
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=350&q=80',
-    text: 'Big dreams need big yards! 🌲 Welcome to 22513 Avon St – a stunning 3-bedroom home with room for everyone. Host friends in your modern kitchen, treat guests to their own suite downstairs, and unwind or play in your enormous yard!',
-    status: 'Published',
-    time: '02:58 PM',
-    views: 189,
-    comments: 24,
-    leads: 9,
-  },
-  {
-    id: 'post-3',
-    date: 'Friday, Jun 26',
-    platforms: ['facebook', 'instagram', 'linkedin', 'gmb'],
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=350&q=80',
-    text: '🏡 New on the Market! 🏡 Discover the charm of this move-in-ready 3-bedroom bungalow at 3547 Alvina Ave, Warren MI! Spacious yard, fresh updates, and the perfect spot to start your next chapter. Ready to make it yours? Schedule a private walkthrough today.',
-    status: 'Published',
-    time: '10:27 AM',
-    views: 95,
-    comments: 12,
-    leads: 3,
-  }
-];
+// No seeded posts — posts load from the connected social accounts. The list
+// starts empty so no demo posts appear as if they were actually published.
+const INITIAL_POSTS: SocialPost[] = [];
 
-const ENGAGEMENTS = [
-  { name: 'Lauren Lee', action: 'clicked post link', time: 'Jun 26 at 9:45 PM', avatar: 'L' },
-  { name: 'Testing Jossman', action: 'clicked post link', time: 'May 22 at 12:49 AM', avatar: 'T' },
-  { name: 'Paul', action: 'registered via post', time: 'Apr 22 at 9:10 AM', avatar: 'P' },
-  { name: 'Hannah', action: 'registered via post', time: 'Apr 19 at 10:14 AM', avatar: 'H' },
-  { name: 'Frank', action: 'registered via post', time: 'Apr 1 at 3:25 PM', avatar: 'F' },
-  { name: 'Katie', action: 'registered via post', time: 'Mar 25 at 2:00 AM', avatar: 'K' },
-  { name: 'Alisha Moulton', action: 'registered via post', time: 'Mar 20 at 11:10 AM', avatar: 'A' },
-];
+const ENGAGEMENTS: { name: string; action: string; time: string; avatar: string }[] = [];
 
 export default function SocialAgentTab({ workspaceId }: { workspaceId: string }) {
   const [subTab, setSubTab] = useState<'posts' | 'planner' | 'listing-feed'>('posts');
@@ -135,7 +92,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
 
         <div className="flex items-center gap-4">
           <div className="flex bg-muted/60 border border-border/60 rounded-xl p-1 gap-1 text-[10px] font-black uppercase tracking-wider">
-            <button
+            <button type="button"
               onClick={() => setSubTab('planner')}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 subTab === 'planner' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -143,7 +100,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
             >
               <Calendar className="w-3.5 h-3.5" /> Planner
             </button>
-            <button
+            <button type="button"
               onClick={() => setSubTab('posts')}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 subTab === 'posts' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -151,7 +108,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
             >
               <List className="w-3.5 h-3.5" /> Posts
             </button>
-            <button
+            <button type="button"
               onClick={() => setSubTab('listing-feed')}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 subTab === 'listing-feed' ? 'bg-background text-indigo-500 shadow-xs' : 'text-muted-foreground hover:text-foreground'
@@ -161,7 +118,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
             </button>
           </div>
 
-          <button
+          <button type="button"
             onClick={() => setShowComposer(true)}
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] px-4.5 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
           >
@@ -173,7 +130,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
       {/* Walkthrough Instructions */}
       {showWalkthrough && (
         <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-5 relative animate-fadeIn flex flex-col md:flex-row gap-5 shadow-xs">
-          <button 
+          <button type="button" 
             onClick={() => setShowWalkthrough(false)}
             className="absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             title="Dismiss walkthrough"
@@ -261,7 +218,10 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
             <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">Your Posts Timeline</h3>
             
             <div className="space-y-6">
-              {posts.map(post => (
+              {posts.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No posts scheduled.</div>
+              ) : (
+                posts.map(post => (
                 <div key={post.id} className="bg-card border border-border/60 rounded-2xl overflow-hidden shadow-sm hover:border-border transition-colors">
                   
                   {/* Post top channels list and time */}
@@ -310,12 +270,12 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
 
                   {/* Actions card footer */}
                   <div className="px-5 py-3 border-t border-border/40 bg-muted/10 flex justify-between items-center">
-                    <button
+                    <button type="button"
                       className="bg-indigo-600/10 text-indigo-500 hover:bg-indigo-600/20 font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
                     >
                       <Megaphone className="w-3 h-3" /> Boost Post
                     </button>
-                    <button
+                    <button type="button"
                       onClick={() => handleDeletePost(post.id)}
                       className="text-muted-foreground hover:text-rose-500 transition-colors p-1.5 cursor-pointer"
                       title="Delete Post"
@@ -325,7 +285,8 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
                   </div>
 
                 </div>
-              ))}
+              ))
+              )}
             </div>
 
           </div>
@@ -353,7 +314,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
               <h3 className="text-sm font-black text-foreground uppercase tracking-wider">
                 Create Social Post Composer
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setShowComposer(false)}
                 className="text-muted-foreground hover:text-foreground text-sm cursor-pointer"
               >
@@ -365,7 +326,7 @@ export default function SocialAgentTab({ workspaceId }: { workspaceId: string })
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <label className="text-[10px] font-black uppercase">Post Message Content</label>
-                  <button
+                  <button type="button"
                     type="button"
                     onClick={() => setSpellCheckEnabled(!spellCheckEnabled)}
                     className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider transition-colors cursor-pointer border ${

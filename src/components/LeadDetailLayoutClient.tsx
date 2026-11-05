@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
+import React, { useState, useTransition, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -14,6 +15,7 @@ import LeadStatusSelector from './LeadStatusSelector';
 import LeadTagsEditor from './LeadTagsEditor';
 import SearchAlertsWidget from './SearchAlertsWidget';
 import LeadScoreWidget from './LeadScoreWidget';
+import LeadQualifyWidget from './LeadQualifyWidget';
 import LeadAutomationsWidget from './LeadAutomationsWidget';
 import CommunicationsHub from './CommunicationsHub';
 import { createDealAction } from '@/lib/actions/deal';
@@ -107,6 +109,75 @@ export default function LeadDetailLayoutClient({
   const [isPending, startTransition] = useTransition();
 
   // Tab State
+  // Owned Properties tab state (real persistence via /api/owned-properties)
+  const [ownedProps, setOwnedProps] = useState<any[]>([]);
+  const [loadingProps, setLoadingProps] = useState(false);
+  const [showAddProp, setShowAddProp] = useState(false);
+  const [newProp, setNewProp] = useState({ address: '', propertyType: 'Single Family', label: 'Home', beds: '', baths: '', squareFeet: '', estValue: '' });
+
+  const loadOwnedProps = async () => {
+    if (!lead?.contact?.id) return;
+    setLoadingProps(true);
+    try {
+      const res = await fetch('/api/owned-properties?contactId=' + encodeURIComponent(lead.contact.id));
+      const data = await res.json();
+      setOwnedProps(res.ok ? (data.properties || []) : []);
+    } catch {
+      setOwnedProps([]);
+    } finally {
+      setLoadingProps(false);
+    }
+  };
+
+  useEffect(() => { loadOwnedProps(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [lead?.contact?.id]);
+
+  const handleAddProperty = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/owned-properties', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId: lead.contact.id, ...newProp }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to add property');
+      toast.success('Property added');
+      setShowAddProp(false);
+      setNewProp({ address: '', propertyType: 'Single Family', label: 'Home', beds: '', baths: '', squareFeet: '', estValue: '' });
+      loadOwnedProps();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleDeleteProperty = async (id: string) => {
+    if (!window.confirm('Remove this property?')) return;
+    try {
+      const res = await fetch('/api/owned-properties?id=' + encodeURIComponent(id), { method: 'DELETE' });
+      if (!res.ok) throw new Error((await res.json()).error || 'Delete failed');
+      toast.success('Property removed');
+      loadOwnedProps();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  // Live valuation via /api/property-data (BS&A / Realcomp). Honest error when
+  // no data provider key is configured instead of a fake estimate.
+  const handleLookupValue = async (address: string) => {
+    try {
+      const res = await fetch('/api/property-data?address=' + encodeURIComponent(address));
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Lookup failed');
+      const assessed = data.raw?.assessedValue ?? data.property?.assessedValue;
+      toast.success(assessed
+        ? `Assessed value: $${Number(assessed).toLocaleString()} (source: ${data.source})`
+        : `Lookup complete (source: ${data.source}) — no assessment returned`);
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
   const [activeTab, setActiveTab] = useState<'overview' | 'properties' | 'searches' | 'transactions' | 'documents' | 'automations' | 'communications'>('overview');
 
   // Inline Note Logging State
@@ -183,12 +254,39 @@ export default function LeadDetailLayoutClient({
   // 3-dots dropdown state
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const dropdownPanelRef = React.useRef<HTMLDivElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 288, maxHeight: 450 });
+
+  React.useLayoutEffect(() => {
+    if (!showMoreDropdown) return;
+    const positionDropdown = () => {
+      const anchor = dropdownRef.current?.getBoundingClientRect();
+      if (!anchor) return;
+      const width = Math.min(288, window.innerWidth - 16);
+      const maxHeight = Math.min(450, window.innerHeight - 16);
+      const below = window.innerHeight - anchor.bottom - 8;
+      const above = anchor.top - 8;
+      const top = below >= maxHeight || below >= above ? anchor.bottom + 8 : anchor.top - maxHeight - 8;
+      setDropdownPosition({
+        left: Math.max(8, Math.min(anchor.right - width, window.innerWidth - width - 8)),
+        top: Math.max(8, Math.min(top, window.innerHeight - maxHeight - 8)),
+        width, maxHeight,
+      });
+    };
+    positionDropdown();
+    window.addEventListener('resize', positionDropdown);
+    window.addEventListener('scroll', positionDropdown, true);
+    return () => {
+      window.removeEventListener('resize', positionDropdown);
+      window.removeEventListener('scroll', positionDropdown, true);
+    };
+  }, [showMoreDropdown]);
 
   // Close dropdown on outside click
   React.useEffect(() => {
     if (!showMoreDropdown) return;
     const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (!dropdownRef.current?.contains(e.target as Node) && !dropdownPanelRef.current?.contains(e.target as Node)) {
         setShowMoreDropdown(false);
       }
     };
@@ -200,7 +298,10 @@ export default function LeadDetailLayoutClient({
   React.useEffect(() => {
     if (!showMoreDropdown) return;
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setShowMoreDropdown(false);
+      if (e.key === 'Escape') {
+        setShowMoreDropdown(false);
+        dropdownRef.current?.querySelector('button')?.focus();
+      }
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
@@ -726,7 +827,7 @@ export default function LeadDetailLayoutClient({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Lead Detail</h1> <span title="Complete lead profile with contact info, activity timeline, campaign enrollments, search alerts, and automation history." aria-label="About this section: Complete lead profile with contact info, activity timeline, campaign enrollments, search alerts, and automation history." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Lead Detail</h1> <span title="Complete lead profile with contact info, activity timeline, campaign enrollments, search alerts, and automation history." aria-label="About this section: Complete lead profile with contact info, activity timeline, campaign enrollments, search alerts, and automation history." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       {/* Top Breadcrumb & Prev/Next Bar */}
       <div className="flex items-center justify-between gap-4 py-1.5 px-4 bg-card/65 backdrop-blur border border-border/60 rounded-xl shadow-sm">
         <div className="flex items-center gap-4">
@@ -788,7 +889,7 @@ export default function LeadDetailLayoutClient({
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2.5 shrink-0 self-end md:self-auto">
-          <button 
+          <button type="button" 
             onClick={() => {
               setNoteType('CALL');
               setNoteContent('Scheduled verify criteria follow-up call.');
@@ -799,7 +900,7 @@ export default function LeadDetailLayoutClient({
           >
             <Calendar className="w-3.5 h-3.5" /> Log Call Option
           </button>
-          <button 
+          <button type="button" 
             onClick={() => {
               setActiveTab('communications');
               toast.success('Redirecting to Chat dialer...');
@@ -836,7 +937,7 @@ export default function LeadDetailLayoutClient({
               </span>
               
               <div className="absolute top-0 right-0 flex items-center gap-1">
-                <button 
+                <button type="button" 
                   onClick={() => {
                     setEditFirstName(lead.contact.firstName);
                     setEditLastName(lead.contact.lastName || '');
@@ -856,42 +957,47 @@ export default function LeadDetailLayoutClient({
 
                 {/* 3-dots Menu Button */}
                 <div className="relative inline-block" ref={dropdownRef}>
-                  <button 
+                  <button type="button" 
                     onClick={() => setShowMoreDropdown(!showMoreDropdown)}
                     className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors cursor-pointer font-black text-sm leading-none"
                     title="More options"
+                    aria-expanded={showMoreDropdown}
+                    aria-haspopup="dialog"
+                    aria-controls={`lead-options-${lead.id}`}
                   >
                     •••
                   </button>
                   
-                  {showMoreDropdown && (
-                    <div className="absolute right-0 mt-2 w-72 bg-background border-2 border-border rounded-2xl shadow-2xl z-[100] text-left p-4 space-y-4 text-xs font-semibold overflow-y-auto max-h-[450px]" style={{ backgroundColor: 'var(--background)', backdropFilter: 'none', opacity: 1 }}>
+                  {showMoreDropdown && createPortal(
+                    // Escape the lead column's overflow and stacking context so the
+                    // panel can overlap the dashboard sidebar at narrow widths.
+                    <div ref={dropdownPanelRef} id={`lead-options-${lead.id}`} role="dialog" aria-label="Lead options" className="fixed bg-background border-2 border-border rounded-2xl shadow-2xl z-[100] text-left p-4 space-y-4 text-xs font-semibold overflow-y-auto" style={{ ...dropdownPosition, backgroundColor: 'var(--background)', backdropFilter: 'none', opacity: 1 }}>
                       
                       <div>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider mb-1.5 border-b border-border/40 pb-1">Lead Nurturing</p>
                         <div className="grid grid-cols-1 gap-1">
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Mailer tool opened!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📬 Send Mailers</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Market snapshot configured!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📊 Add Market Snapshots</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Market reports added!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📈 Add Market Reports</button>
-                          <button onClick={() => { setShowMoreDropdown(false); setActiveTab('automations'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🎯 Add Smart Plans</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Welcome email scheduled!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">✉️ Send Welcome Email</button>
-                          <button onClick={() => { setShowMoreDropdown(false); setShowAddTask(true); setActiveTab('overview'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📅 Add Task</button>
-                          <button onClick={() => { setShowMoreDropdown(false); setShowAddShowing(true); setActiveTab('overview'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">⏰ Add Appointment / Showing</button>
-                          <button onClick={() => { setShowMoreDropdown(false); setActiveTab('documents'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📁 Add Document</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Linked to Microsoft Teams!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">👥 Send to Microsoft Teams</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('AI Sales Agent activated!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🤖 Activate Sales Agent</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Closely Link Sent!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🔗 Send Closely Link</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Mailing label generated!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🏷️ Mailing Label</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Consent Request Sent!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">✅ Send Consent Request</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Mailer tool opened!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📬 Send Mailers</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Market snapshot configured!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📊 Add Market Snapshots</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Market reports added!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📈 Add Market Reports</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); setActiveTab('automations'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🎯 Add Smart Plans</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Welcome email scheduled!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">✉️ Send Welcome Email</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); setShowAddTask(true); setActiveTab('overview'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📅 Add Task</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); setShowAddShowing(true); setActiveTab('overview'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">⏰ Add Appointment / Showing</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); setActiveTab('documents'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📁 Add Document</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Linked to Microsoft Teams!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">👥 Send to Microsoft Teams</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('AI Sales Agent activated!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🤖 Activate Sales Agent</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Closely Link Sent!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🔗 Send Closely Link</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Mailing label generated!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🏷️ Mailing Label</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Consent Request Sent!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">✅ Send Consent Request</button>
                         </div>
                       </div>
 
                       <div>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider mb-1.5 border-b border-border/40 pb-1">Lead Closing</p>
                         <div className="grid grid-cols-1 gap-1">
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('CMA Builder opened!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📋 Create CMA</button>
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Listing presentation tool launched!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📝 Create Listing Presentation</button>
-                          <button onClick={() => { setShowMoreDropdown(false); setShowAddDeal(true); setActiveTab('transactions'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">💼 Create Transaction</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('CMA Builder opened!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📋 Create CMA</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Listing presentation tool launched!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">📝 Create Listing Presentation</button>
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); setShowAddDeal(true); setActiveTab('transactions'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">💼 Create Transaction</button>
                         </div>
                       </div>
 
@@ -922,8 +1028,8 @@ export default function LeadDetailLayoutClient({
                       <div>
                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-wider mb-1.5 border-b border-border/40 pb-1">Others</p>
                         <div className="grid grid-cols-1 gap-1">
-                          <button onClick={() => { setShowMoreDropdown(false); toast.success('Lead details exported to clipboard!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🔗 Share Lead</button>
-                          <button 
+                          <button type="button" onClick={() => { setShowMoreDropdown(false); toast.success('Lead details exported to clipboard!'); }} className="text-left py-1 px-1.5 hover:bg-muted rounded text-[11px] font-bold">🔗 Share Lead</button>
+                          <button type="button" 
                             onClick={() => {
                               setShowMoreDropdown(false);
                               setEditFirstName(lead.contact.firstName);
@@ -943,11 +1049,12 @@ export default function LeadDetailLayoutClient({
                         </div>
                       </div>
 
-                    </div>
+                    </div>,
+                    document.body
                   )}
                 </div>
 
-                <button 
+                <button type="button" 
                   onClick={handleDeleteLead}
                   className="p-1 hover:bg-red-500/10 rounded text-red-500 hover:text-red-400 transition-colors cursor-pointer"
                   title="Delete lead"
@@ -974,7 +1081,7 @@ export default function LeadDetailLayoutClient({
                   className="mt-1 w-full bg-muted/40 hover:bg-muted/60 border border-border/80 rounded-lg px-2.5 py-1.5 text-xs text-foreground font-semibold focus:outline-none focus:ring-1 focus:ring-primary transition-all cursor-pointer"
                 >
                   <option value="">-- Choose Segment --</option>
-                  {allSegments.map(s => (
+                  {allSegments.length === 0 ? <p className="text-sm text-muted-foreground py-2">No segments available.</p> : allSegments.map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
                 </select>
@@ -983,7 +1090,7 @@ export default function LeadDetailLayoutClient({
 
             {/* Quick Action Dial Bar */}
             <div className="grid grid-cols-3 gap-2 py-1 border-t border-b border-border/60">
-              <button 
+              <button type="button" 
                 onClick={() => {
                   setNoteType('CALL');
                   setActiveTab('overview');
@@ -995,7 +1102,7 @@ export default function LeadDetailLayoutClient({
                 <span className="text-[9px] font-bold mt-1">Call</span>
               </button>
               
-              <button 
+              <button type="button" 
                 onClick={() => {
                   setNoteType('SMS');
                   setActiveTab('overview');
@@ -1007,7 +1114,7 @@ export default function LeadDetailLayoutClient({
                 <span className="text-[9px] font-bold mt-1">Text</span>
               </button>
 
-              <button 
+              <button type="button" 
                 onClick={() => {
                   setNoteType('EMAIL');
                   setActiveTab('overview');
@@ -1027,7 +1134,7 @@ export default function LeadDetailLayoutClient({
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Phone Numbers</span>
-                  <button 
+                  <button type="button" 
                     onClick={openPhonesEmailsEditor}
                     className="text-[10px] text-primary hover:underline font-bold cursor-pointer"
                   >
@@ -1045,7 +1152,7 @@ export default function LeadDetailLayoutClient({
                   ) : (
                     <span className="text-muted-foreground italic">No primary phone</span>
                   )}
-                  {secondaryPhones.map((ph, idx) => (
+                  {secondaryPhones.length === 0 ? <p className="text-sm text-muted-foreground py-2">No secondary phones.</p> : secondaryPhones.map((ph, idx) => (
                     <div key={idx} className="flex items-center justify-between text-foreground">
                       <span className="flex items-center gap-1.5">
                         <Phone className="w-3.5 h-3.5 text-muted-foreground/60" /> {ph.value}
@@ -1060,7 +1167,7 @@ export default function LeadDetailLayoutClient({
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Email Addresses</span>
-                  <button 
+                  <button type="button" 
                     onClick={openPhonesEmailsEditor}
                     className="text-[10px] text-primary hover:underline font-bold cursor-pointer"
                   >
@@ -1078,7 +1185,7 @@ export default function LeadDetailLayoutClient({
                   ) : (
                     <span className="text-muted-foreground italic">No primary email</span>
                   )}
-                  {secondaryEmails.map((em, idx) => (
+                  {secondaryEmails.length === 0 ? <p className="text-sm text-muted-foreground py-2">No secondary emails.</p> : secondaryEmails.map((em, idx) => (
                     <div key={idx} className="flex items-center justify-between text-foreground">
                       <span className="flex items-center gap-1.5 truncate">
                         <Mail className="w-3.5 h-3.5 text-muted-foreground/60" /> {em.value}
@@ -1123,7 +1230,7 @@ export default function LeadDetailLayoutClient({
               <div className="pt-2 border-t border-border/40 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">Family & Spouse</span>
-                  <button 
+                  <button type="button" 
                     onClick={() => setShowAddFamily(true)}
                     className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer"
                   >
@@ -1142,7 +1249,7 @@ export default function LeadDetailLayoutClient({
                     </div>
                   )}
 
-                  {familyMembersList.map((mem, idx) => (
+                  {familyMembersList.length === 0 ? <p className="text-sm text-muted-foreground py-2">No family members listed.</p> : familyMembersList.map((mem, idx) => (
                     <div key={idx} className="p-2 bg-muted/20 border border-border/40 rounded-lg flex justify-between items-center text-foreground">
                       <span>{mem.name}</span>
                       <span className="text-[9px] bg-muted border border-border px-1 rounded uppercase text-muted-foreground">{mem.relationship}</span>
@@ -1239,7 +1346,7 @@ export default function LeadDetailLayoutClient({
               { id: 'automations', label: 'Automations & Plans' },
               { id: 'communications', label: 'Communications Dialer' },
             ].map(tab => (
-              <button
+              <button type="button"
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
@@ -1366,7 +1473,7 @@ export default function LeadDetailLayoutClient({
                         { id: 'DOCUMENT', label: 'Docs' },
                         { id: 'PINNED', label: '📌 Pinned' },
                       ].map(chip => (
-                        <button
+                        <button type="button"
                           key={chip.id}
                           onClick={() => setTimelineFilter(chip.id)}
                           className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer ${
@@ -1425,7 +1532,7 @@ export default function LeadDetailLayoutClient({
                               {act.formattedContent || act.content}
                             </p>
                             <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/20">
-                              <button
+                              <button type="button"
                                 onClick={() => handleTogglePin(act.id)}
                                 className={`text-[10px] font-bold flex items-center gap-1 px-2 py-0.5 rounded transition-colors cursor-pointer ${act.isPinned ? 'text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
                                 title={act.isPinned ? 'Unpin' : 'Pin to top'}
@@ -1433,7 +1540,7 @@ export default function LeadDetailLayoutClient({
                                 {act.isPinned ? <PinOff className="w-3 h-3" /> : <Pin className="w-3 h-3" />}
                                 {act.isPinned ? 'Unpin' : 'Pin'}
                               </button>
-                              <button
+                              <button type="button"
                                 onClick={() => handleDeleteActivity(act.id)}
                                 className="text-[10px] font-bold text-red-500 hover:text-red-400 flex items-center gap-1 px-2 py-0.5 rounded hover:bg-red-500/10 transition-colors cursor-pointer"
                                 title="Delete"
@@ -1457,7 +1564,7 @@ export default function LeadDetailLayoutClient({
                   <div className="bg-card border border-border/60 rounded-2xl p-4.5 shadow-sm space-y-4">
                     <div className="flex items-center justify-between border-b border-border/40 pb-2">
                       <span className="text-xs font-black text-foreground uppercase tracking-wider">Pending Tasks</span>
-                      <button 
+                      <button type="button" 
                         onClick={() => setShowAddTask(!showAddTask)}
                         className="p-1 hover:bg-muted text-primary rounded cursor-pointer"
                         title="Add Task"
@@ -1527,7 +1634,7 @@ export default function LeadDetailLayoutClient({
                       {lead.tasks.length === 0 ? (
                         <p className="text-xs text-muted-foreground text-center py-6">No pending follow-ups or tasks.</p>
                       ) : (
-                        lead.tasks.map(task => (
+                        (lead.tasks || []).length === 0 ? <p className="text-sm text-muted-foreground py-2">No tasks yet.</p> : lead.tasks.map(task => (
                           <div key={task.id} className="p-3 bg-muted/20 border border-border/50 rounded-xl flex items-start gap-2 group">
                             <input 
                               type="checkbox" 
@@ -1557,13 +1664,13 @@ export default function LeadDetailLayoutClient({
                               )}
                               {/* Edit/Delete buttons - show on hover */}
                               <div className="flex items-center gap-2 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
+                                <button type="button"
                                   onClick={() => openEditTask(task)}
                                   className="text-[9px] font-bold text-muted-foreground hover:text-foreground px-1.5 py-0.5 hover:bg-muted rounded transition-colors cursor-pointer"
                                 >
                                   ✏️ Edit
                                 </button>
-                                <button
+                                <button type="button"
                                   onClick={() => handleDeleteTask(task.id)}
                                   className="text-[9px] font-bold text-red-500 hover:text-red-400 px-1.5 py-0.5 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
                                 >
@@ -1581,7 +1688,7 @@ export default function LeadDetailLayoutClient({
                           <div className="bg-card border border-border max-w-sm w-full rounded-2xl p-5 shadow-xl space-y-4">
                             <div className="flex justify-between items-center border-b border-border/50 pb-2">
                               <h4 className="font-bold text-sm text-foreground">✏️ Edit Task</h4>
-                              <button onClick={() => setEditingTaskId(null)} className="p-1 hover:bg-muted rounded text-muted-foreground">
+                              <button type="button" onClick={() => setEditingTaskId(null)} className="p-1 hover:bg-muted rounded text-muted-foreground">
                                 <X className="w-4 h-4" />
                               </button>
                             </div>
@@ -1632,7 +1739,7 @@ export default function LeadDetailLayoutClient({
                   <div className="bg-card border border-border/60 rounded-2xl p-4.5 shadow-sm space-y-4">
                     <div className="flex items-center justify-between border-b border-border/40 pb-2">
                       <span className="text-xs font-black text-foreground uppercase tracking-wider">Scheduled Showings</span>
-                      <button 
+                      <button type="button" 
                         onClick={() => setShowAddShowing(!showAddShowing)}
                         className="p-1 hover:bg-muted text-primary rounded cursor-pointer"
                         title="Schedule Showing"
@@ -1715,106 +1822,123 @@ export default function LeadDetailLayoutClient({
             {/* PROPERTIES TAB */}
             {activeTab === 'properties' && (
               <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm space-y-6">
-                
-                {/* Title and Add Property button */}
+
                 <div className="flex items-center justify-between border-b border-border/40 pb-3">
                   <div>
                     <h3 className="font-extrabold text-base text-foreground">Owned Properties</h3>
-                    <p className="text-xs text-muted-foreground">Known real estate assets and mailing addresses verified for {lead.contact.firstName}.</p>
+                    <p className="text-xs text-muted-foreground">Real estate assets on file for {lead.contact.firstName}.</p>
                   </div>
-                  <button 
-                    onClick={() => {
-                      toast.success('Simulated: Added secondary property fields!');
-                    }}
+                  <button type="button"
+                    onClick={() => setShowAddProp((v: boolean) => !v)}
                     className="px-3.5 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1"
                   >
                     <Plus className="w-3.5 h-3.5" /> Add Property
                   </button>
                 </div>
 
-                {/* Lofty alert banner card */}
-                <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/15">
-                      <Sparkles className="w-4 h-4 text-indigo-400" />
-                    </div>
-                    <span className="text-xs font-bold text-foreground">
-                      These <strong className="text-indigo-400 font-extrabold">2 properties</strong> could be your next listings — start nurturing them today
-                    </span>
-                  </div>
-                  <button 
-                    onClick={() => toast.success('Smart plans activated for nurturing owned properties!')} 
-                    className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black rounded-lg uppercase tracking-wider cursor-pointer"
+                {showAddProp && (
+                  <form
+                    onSubmit={handleAddProperty}
+                    className="p-4 bg-muted/30 border border-border/60 rounded-xl space-y-3 max-w-lg"
                   >
-                    Start Nurturing
-                  </button>
-                </div>
-
-                {/* Sub cards grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-3.5 bg-muted/20 border border-border/40 rounded-xl space-y-1.5 text-left">
-                    <span className="text-lg">🏠</span>
-                    <h5 className="font-extrabold text-[11px] text-foreground leading-snug">Know their equity & home value</h5>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Auto-fill est. value, loan balance & interest rate — no research needed.</p>
-                  </div>
-                  <div className="p-3.5 bg-muted/20 border border-border/40 rounded-xl space-y-1.5 text-left">
-                    <span className="text-lg">📊</span>
-                    <h5 className="font-extrabold text-[11px] text-foreground leading-snug">Stay top of mind, automatically</h5>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Home reports go out in your name every month — zero effort on your end.</p>
-                  </div>
-                  <div className="p-3.5 bg-muted/20 border border-border/40 rounded-xl space-y-1.5 text-left">
-                    <span className="text-lg">💡</span>
-                    <h5 className="font-extrabold text-[11px] text-foreground leading-snug">Catch sellers before they move</h5>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">Instant alerts when a homeowner shows any seller signal or engagement.</p>
-                  </div>
-                </div>
-
-                {/* Properties List */}
-                <div className="space-y-4 pt-1">
-                  
-                  {/* Property 1 (Mailing Address) */}
-                  <div className="p-4 bg-muted/30 border border-border/60 rounded-xl flex items-center justify-between gap-4">
-                    <div className="space-y-2 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.5 rounded font-black uppercase">Mailing Address</span>
-                        <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded font-black uppercase">Home</span>
+                    <h4 className="font-bold text-xs text-foreground uppercase">Add Owned Property</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="col-span-2">
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Address *</label>
+                        <input type="text" required value={newProp.address}
+                          onChange={(e) => setNewProp({ ...newProp, address: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none" />
                       </div>
-                      <h4 className="font-extrabold text-sm text-foreground truncate">{lead.contact.address || '45409 North Ave, Macomb, MI 48042'}</h4>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
-                        <span>EST. <strong className="text-foreground">--</strong></span>
-                        <button onClick={() => toast.success('Valuation criteria updated')} className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer">
-                          Unlock equity, loan & interest rate &rsaquo;
-                        </button>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Type</label>
+                        <select value={newProp.propertyType} onChange={(e) => setNewProp({ ...newProp, propertyType: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground">
+                          <option>Single Family</option><option>Condo</option><option>Townhouse</option><option>Multi Family</option><option>Land</option>
+                        </select>
                       </div>
-                    </div>
-                    <button onClick={() => toast.success('Options drawer opened')} className="text-muted-foreground hover:text-foreground font-extrabold text-sm p-1.5 bg-muted hover:bg-muted/80 border border-border/80 rounded-lg cursor-pointer">
-                      •••
-                    </button>
-                  </div>
-
-                  {/* Property 2 (Single Family Home) */}
-                  <div className="p-4 bg-muted/30 border border-border/60 rounded-xl flex items-center justify-between gap-4">
-                    <div className="space-y-2 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[9px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded font-black uppercase">Single Family</span>
-                        <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded font-black uppercase">Home</span>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Label</label>
+                        <select value={newProp.label} onChange={(e) => setNewProp({ ...newProp, label: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground">
+                          <option>Home</option><option>Rental</option><option>Vacation</option><option>Land</option>
+                        </select>
                       </div>
-                      <h4 className="font-extrabold text-sm text-foreground truncate">{lead.contact.address || '45409 North Ave, Macomb, MI 48042'}</h4>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
-                        <span>EST. <strong className="text-foreground">--</strong></span>
-                        <span>3 beds | 2 baths | 1386 sqft</span>
-                        <span className="text-muted-foreground/45">&bull;</span>
-                        <button onClick={() => toast.success('Equity metrics loaded')} className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer">
-                          Unlock equity, loan & interest rate &rsaquo;
-                        </button>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Beds</label>
+                        <input type="number" min="0" value={newProp.beds} onChange={(e) => setNewProp({ ...newProp, beds: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Baths</label>
+                        <input type="number" min="0" step="0.5" value={newProp.baths} onChange={(e) => setNewProp({ ...newProp, baths: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Sq Ft</label>
+                        <input type="number" min="0" value={newProp.squareFeet} onChange={(e) => setNewProp({ ...newProp, squareFeet: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground block uppercase">Est. Value ($)</label>
+                        <input type="number" min="0" value={newProp.estValue} onChange={(e) => setNewProp({ ...newProp, estValue: e.target.value })}
+                          className="w-full bg-background border border-border/60 rounded-lg px-3 py-1.5 text-xs text-foreground" />
                       </div>
                     </div>
-                    <button onClick={() => toast.success('Options drawer opened')} className="text-muted-foreground hover:text-foreground font-extrabold text-sm p-1.5 bg-muted hover:bg-muted/80 border border-border/80 rounded-lg cursor-pointer">
-                      •••
-                    </button>
-                  </div>
+                    <div className="flex gap-2 pt-1">
+                      <button type="submit" className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg">Save Property</button>
+                      <button type="button" onClick={() => setShowAddProp(false)} className="px-3 py-1.5 border border-border text-xs font-bold rounded-lg">Cancel</button>
+                    </div>
+                  </form>
+                )}
 
-                </div>
+                {lead.contact.address && (
+                  <div className="p-4 bg-muted/30 border border-border/60 rounded-xl">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.5 rounded font-black uppercase">Mailing Address</span>
+                    </div>
+                    <h4 className="font-extrabold text-sm text-foreground truncate mt-2">{lead.contact.address}</h4>
+                  </div>
+                )}
+
+                {loadingProps ? (
+                  <p className="text-sm text-muted-foreground">Loading properties...</p>
+                ) : ownedProps.length === 0 ? (
+                  <div className="p-8 text-center border border-dashed border-border/60 rounded-xl">
+                    <p className="text-sm text-muted-foreground">No owned properties recorded yet.</p>
+                    <p className="text-xs text-muted-foreground/70 mt-1">Use <strong>Add Property</strong> to record real estate assets for this contact.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 pt-1">
+                    {ownedProps.map((p: any) => (
+                      <div key={p.id} className="p-4 bg-muted/30 border border-border/60 rounded-xl flex items-center justify-between gap-4">
+                        <div className="space-y-2 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[9px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded font-black uppercase">{p.propertyType}</span>
+                            <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded font-black uppercase">{p.label}</span>
+                          </div>
+                          <h4 className="font-extrabold text-sm text-foreground truncate">{p.address}</h4>
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1 flex-wrap">
+                            <span>EST. <strong className="text-foreground">{p.estValue ? '$' + Number(p.estValue).toLocaleString() : '--'}</strong></span>
+                            {(p.beds || p.baths || p.squareFeet) ? (
+                              <span>{p.beds ?? '--'} beds | {p.baths ?? '--'} baths | {p.squareFeet ? Number(p.squareFeet).toLocaleString() : '--'} sqft</span>
+                            ) : null}
+                            <button type="button"
+                              onClick={() => handleLookupValue(p.address)}
+                              className="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5 cursor-pointer">
+                              Look up value &amp; equity &rsaquo;
+                            </button>
+                          </div>
+                        </div>
+                        <button type="button"
+                          onClick={() => handleDeleteProperty(p.id)}
+                          title="Remove property"
+                          className="text-muted-foreground hover:text-red-500 font-extrabold text-sm p-1.5 bg-muted hover:bg-muted/80 border border-border/80 rounded-lg cursor-pointer">
+                          &bull;&bull;&bull;
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
               </div>
             )}
@@ -1823,6 +1947,7 @@ export default function LeadDetailLayoutClient({
             {activeTab === 'searches' && (
               <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm space-y-6">
                 <LeadScoreWidget leadId={lead.id} />
+                <LeadQualifyWidget leadId={lead.id} />
                 <SearchAlertsWidget leadId={lead.id} alerts={lead.searchAlerts} />
               </div>
             )}
@@ -1835,7 +1960,7 @@ export default function LeadDetailLayoutClient({
                     <h3 className="font-extrabold text-base text-foreground">Transactions & Deals Connection</h3>
                     <p className="text-xs text-muted-foreground">Manage deal stage pipelines and transaction values for this lead.</p>
                   </div>
-                  <button 
+                  <button type="button" 
                     onClick={() => setShowAddDeal(!showAddDeal)}
                     className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer"
                   >
@@ -1910,7 +2035,7 @@ export default function LeadDetailLayoutClient({
                       <p className="text-xs">Establish potential pipeline values by linking a deal record.</p>
                     </div>
                   ) : (
-                    lead.contact.deals.map(deal => (
+                    (lead.contact.deals || []).length === 0 ? <p className="text-sm text-muted-foreground py-2">No deals yet.</p> : lead.contact.deals.map(deal => (
                       <div key={deal.id} className="p-4 border border-border/60 rounded-xl bg-card hover:border-border transition-colors flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/15 flex items-center justify-center">
@@ -1944,7 +2069,7 @@ export default function LeadDetailLayoutClient({
                     <h3 className="font-extrabold text-base text-foreground">Documents Upload Hub</h3>
                     <p className="text-xs text-muted-foreground">Store contracts, disclosures, and scan documents linked to this lead.</p>
                   </div>
-                  <button 
+                  <button type="button" 
                     onClick={() => toast.success('Select a cloud provider to authorize.')}
                     className="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold rounded-lg transition-colors cursor-pointer"
                   >
@@ -1960,8 +2085,25 @@ export default function LeadDetailLayoutClient({
                     <p className="text-sm font-bold text-foreground">Upload Documents</p>
                     <p className="text-xs text-muted-foreground mt-0.5">Drag and drop file folders here, or click to upload from local machine.</p>
                   </div>
-                  <button 
-                    onClick={() => toast.success('Mock File upload initialized.')}
+                  <button type="button"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.onchange = async () => {
+                        const file = input.files?.[0];
+                        if (!file) return;
+                        try {
+                          const res = await fetch('/api/uploads', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ filename: file.name, size: file.size, contentType: file.type, leadId: lead.id }),
+                          });
+                          if (res.ok) toast.success('Document upload initialized');
+                          else toast.error('Upload failed — check AWS S3 configuration');
+                        } catch { toast.error('Network error'); }
+                      };
+                      input.click();
+                    }}
                     className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg shadow cursor-pointer"
                   >
                     Upload a Document
@@ -1977,7 +2119,7 @@ export default function LeadDetailLayoutClient({
                     { name: 'DocuSign', icon: '📝' },
                     { name: 'Onedrive', icon: '☁️' },
                   ].map(prov => (
-                    <button 
+                    <button type="button" 
                       key={prov.name}
                       onClick={() => toast.success(`Simulating integration with ${prov.name}`)}
                       className="p-3 bg-muted/30 border border-border/60 hover:bg-muted/50 rounded-xl text-center space-y-1 transition-colors cursor-pointer"
@@ -2010,7 +2152,7 @@ export default function LeadDetailLayoutClient({
                       )}
                     </h4>
                     <p className="text-xs text-muted-foreground">Send real-time neighborhood metrics, pricing comps, and local trends dynamically.</p>
-                    <button 
+                    <button type="button" 
                       onClick={() => setShowMarketSnapshotModal(true)}
                       className="text-xs font-bold text-primary hover:underline cursor-pointer"
                     >
@@ -2032,7 +2174,7 @@ export default function LeadDetailLayoutClient({
                       )}
                     </h4>
                     <p className="text-xs text-muted-foreground">Automated monthly CMA equity updates and property valuation metrics.</p>
-                    <button 
+                    <button type="button" 
                       onClick={() => setShowValuationModal(true)}
                       className="text-xs font-bold text-primary hover:underline cursor-pointer"
                     >
@@ -2068,7 +2210,7 @@ export default function LeadDetailLayoutClient({
               <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
                 ✏️ Edit Lead Contact Details
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setIsEditingContact(false)}
                 className="p-1 hover:bg-muted rounded text-muted-foreground"
               >
@@ -2194,7 +2336,7 @@ export default function LeadDetailLayoutClient({
               <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
                 📞 Manage Phones & Emails
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setIsEditingPhonesEmails(false)}
                 className="p-1 hover:bg-muted rounded text-muted-foreground cursor-pointer"
               >
@@ -2207,7 +2349,7 @@ export default function LeadDetailLayoutClient({
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Phone Numbers</label>
-                  <button
+                  <button type="button"
                     type="button"
                     onClick={() => {
                       if (quickPhones.length >= 10) {
@@ -2223,7 +2365,7 @@ export default function LeadDetailLayoutClient({
                 </div>
                 
                 <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                  {quickPhones.map((ph, idx) => (
+                  {quickPhones.length === 0 ? <p className="text-xs text-muted-foreground py-1">No phone numbers.</p> : quickPhones.map((ph, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <select
                         value={ph.label}
@@ -2294,7 +2436,7 @@ export default function LeadDetailLayoutClient({
                 </div>
 
                 <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                  {quickEmails.map((em, idx) => (
+                  {quickEmails.length === 0 ? <p className="text-xs text-muted-foreground py-1">No email addresses.</p> : quickEmails.map((em, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <select
                         value={em.label}
@@ -2370,7 +2512,7 @@ export default function LeadDetailLayoutClient({
               <h4 className="font-extrabold text-sm text-foreground flex items-center gap-1.5">
                 <UserPlus className="w-4 h-4 text-primary" /> Add Family Contact
               </h4>
-              <button 
+              <button type="button" 
                 onClick={() => setShowAddFamily(false)}
                 className="p-1 hover:bg-muted rounded text-muted-foreground"
               >
@@ -2455,7 +2597,7 @@ export default function LeadDetailLayoutClient({
               <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
                 📊 Configure Neighborhood Market Snapshot
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setShowMarketSnapshotModal(false)}
                 className="p-1 hover:bg-muted rounded text-muted-foreground"
               >
@@ -2518,7 +2660,7 @@ export default function LeadDetailLayoutClient({
               <h3 className="font-extrabold text-base text-foreground flex items-center gap-1.5">
                 📈 Configure Homeowner Valuation Report
               </h3>
-              <button 
+              <button type="button" 
                 onClick={() => setShowValuationModal(false)}
                 className="p-1 hover:bg-muted rounded text-muted-foreground"
               >

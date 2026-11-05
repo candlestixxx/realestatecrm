@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { DEFAULT_CAMPAIGNS } from '@/lib/default-campaigns';
 import CampaignEditor from './CampaignEditor';
 import {
   importCampaignTemplateAction,
@@ -36,6 +37,7 @@ type SegmentOption = {
 };
 
 const REAL_ESTATE_TEMPLATES = [
+  ...DEFAULT_CAMPAIGNS,
   {
     name: 'ELRT-Pre Foreclosure GPT',
     description: 'When a Seller lead is reassigned, this plan launches a paced outreach campaign designed to re-engage them and move them through the pipeline. It updates the pipeline, then sends an email and automated text.',
@@ -144,7 +146,15 @@ export default function CampaignsListClient({
   const [planSearch, setPlanSearch] = useState('');
   
   // Folders layout state
-  const [myFolders, setMyFolders] = useState<string[]>(['Follow-up Folder', 'Lead Gen Sequence']);
+  const [myFolders, setMyFolders] = useState<string[]>([]);
+  const [previewTemplate, setPreviewTemplate] = useState<typeof REAL_ESTATE_TEMPLATES[number] | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('campaign-folders');
+      if (saved) setMyFolders(JSON.parse(saved));
+    } catch { /* ignore */ }
+  }, []);
   const [companyFolders, setCompanyFolders] = useState<string[]>(['Preforeclosure Folder', 'Expireds List Folder']);
   const [selectedFolder, setSelectedFolder] = useState<string>('all');
   const [newFolderName, setNewFolderName] = useState('');
@@ -244,10 +254,14 @@ export default function CampaignsListClient({
 
   const handleAddFolder = () => {
     if (newFolderName.trim()) {
-      setMyFolders([...myFolders, newFolderName.trim()]);
+      const next = [...myFolders, newFolderName.trim()];
+      setMyFolders(next);
+      // Persist locally so folders survive refresh (they were lost on every
+      // reload while toasting 'created successfully!').
+      try { localStorage.setItem('campaign-folders', JSON.stringify(next)); } catch { /* private mode */ }
       setNewFolderName('');
       setShowAddFolder(false);
-      toast.success('Folder created successfully!');
+      toast.success('Folder saved to this browser.');
     }
   };
 
@@ -265,7 +279,7 @@ export default function CampaignsListClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Campaigns</h1> <span title="Create and manage email, SMS, and multi-step campaigns. Set up A/B testing, audience segments, and automated sequences." aria-label="About this section: Create and manage email, SMS, and multi-step campaigns. Set up A/B testing, audience segments, and automated sequences." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Campaigns</h1> <span title="Create and manage email, SMS, and multi-step campaigns. Set up A/B testing, audience segments, and automated sequences." aria-label="About this section: Create and manage email, SMS, and multi-step campaigns. Set up A/B testing, audience segments, and automated sequences." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       {/* Top Header & Navigation Segment matching Lofty layout */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4 bg-background">
         <div className="flex items-center gap-4">
@@ -273,7 +287,7 @@ export default function CampaignsListClient({
 
           {/* Tabs switch */}
           <div className="bg-muted/50 border border-border p-1 rounded-lg flex items-center">
-            <button
+            <button type="button"
               onClick={() => setActiveTab('plans')}
               className={`px-4 py-1 text-xs font-bold rounded-md transition-all ${
                 activeTab === 'plans' 
@@ -283,7 +297,7 @@ export default function CampaignsListClient({
             >
               Plans
             </button>
-            <button
+            <button type="button"
               onClick={() => setActiveTab('library')}
               className={`px-4 py-1 text-xs font-bold rounded-md transition-all ${
                 activeTab === 'library' 
@@ -296,7 +310,7 @@ export default function CampaignsListClient({
           </div>
         </div>
 
-        <button
+        <button type="button"
           onClick={() => setIsAdding(true)}
           className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95 transition-colors shadow-sm"
         >
@@ -322,7 +336,7 @@ export default function CampaignsListClient({
 
             {/* Folder Lists */}
             <div className="space-y-4">
-              <button
+              <button type="button"
                 onClick={() => setSelectedFolder('all')}
                 className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold flex items-center justify-between transition-colors ${
                   selectedFolder === 'all' 
@@ -341,8 +355,11 @@ export default function CampaignsListClient({
                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground block px-3 mb-1">
                   My Folders
                 </span>
-                {myFolders.map((folder, i) => (
-                  <button
+                {myFolders.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">No folders yet.</div>
+                ) : (
+                  myFolders.map((folder, i) => (
+                  <button type="button"
                     key={i}
                     onClick={() => setSelectedFolder(folder)}
                     className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
@@ -353,7 +370,8 @@ export default function CampaignsListClient({
                   >
                     <span className="truncate">📁 {folder}</span>
                   </button>
-                ))}
+                ))
+                )}
               </div>
 
               {/* COMPANY FOLDERS */}
@@ -361,8 +379,11 @@ export default function CampaignsListClient({
                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground block px-3 mb-1">
                   Company Folders
                 </span>
-                {companyFolders.map((folder, i) => (
-                  <button
+                {companyFolders.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">No company folders.</div>
+                ) : (
+                  companyFolders.map((folder, i) => (
+                  <button type="button"
                     key={i}
                     onClick={() => setSelectedFolder(folder)}
                     className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors ${
@@ -373,7 +394,8 @@ export default function CampaignsListClient({
                   >
                     <span className="truncate">🏢 {folder}</span>
                   </button>
-                ))}
+                ))
+                )}
               </div>
             </div>
           </div>
@@ -390,16 +412,16 @@ export default function CampaignsListClient({
                   className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none"
                 />
                 <div className="flex gap-2 justify-end">
-                  <button onClick={() => setShowAddFolder(false)} className="px-2 py-1 text-[10px] text-muted-foreground hover:underline">
+                  <button type="button" onClick={() => setShowAddFolder(false)} className="px-2 py-1 text-[10px] text-muted-foreground hover:underline">
                     Cancel
                   </button>
-                  <button onClick={handleAddFolder} className="px-3 py-1 bg-secondary text-secondary-foreground text-[10px] rounded font-bold hover:bg-secondary/90">
+                  <button type="button" onClick={handleAddFolder} className="px-3 py-1 bg-secondary text-secondary-foreground text-[10px] rounded font-bold hover:bg-secondary/90">
                     Add
                   </button>
                 </div>
               </div>
             ) : (
-              <button
+              <button type="button"
                 onClick={() => setShowAddFolder(true)}
                 className="w-full text-left px-3 py-1.5 text-xs text-primary font-bold hover:underline flex items-center gap-1.5"
               >
@@ -421,7 +443,7 @@ export default function CampaignsListClient({
               <div className="flex items-center justify-between border border-border bg-muted/20 px-4 py-2 rounded-xl text-xs">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] uppercase font-bold text-muted-foreground mr-2 select-none">Lead Type Filter:</span>
-                  <button
+                  <button type="button"
                     onClick={() => setLeadTypeFilter('ALL')}
                     className={`px-3 py-1 text-[10px] font-bold rounded-lg uppercase transition-all ${
                       leadTypeFilter === 'ALL'
@@ -431,7 +453,7 @@ export default function CampaignsListClient({
                   >
                     All Types
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setLeadTypeFilter('BUYER')}
                     className={`px-3 py-1 text-[10px] font-bold rounded-lg uppercase transition-all ${
                       leadTypeFilter === 'BUYER'
@@ -441,7 +463,7 @@ export default function CampaignsListClient({
                   >
                     Buyer
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setLeadTypeFilter('SELLER')}
                     className={`px-3 py-1 text-[10px] font-bold rounded-lg uppercase transition-all ${
                       leadTypeFilter === 'SELLER'
@@ -554,28 +576,28 @@ export default function CampaignsListClient({
                             </td>
                             <td className="p-3 text-right">
                               <div className="flex items-center justify-end gap-2.5">
-                                <button
+                                <button type="button"
                                   onClick={() => setShowMetricsCampaignId(c.id)}
                                   className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-green-500 transition-all"
                                   title="Reporting & Analytics"
                                 >
                                   <Activity className="w-4 h-4" />
                                 </button>
-                                <button
+                                <button type="button"
                                   onClick={() => setActiveCampaignId(c.id)}
                                   className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-primary transition-all"
                                   title="View Flowchart Canvas"
                                 >
                                   <Eye className="w-4 h-4" />
                                 </button>
-                                <button
+                                <button type="button"
                                   onClick={() => setActiveCampaignId(c.id)}
                                   className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-all"
                                   title="Configure Settings"
                                 >
                                   <Settings className="w-4 h-4" />
                                 </button>
-                                <button
+                                <button type="button"
                                   onClick={() => handleDeleteCampaign(c.id)}
                                   className="p-1 hover:bg-red-500/10 rounded text-muted-foreground hover:text-red-500 transition-all"
                                   title="Delete"
@@ -637,7 +659,7 @@ export default function CampaignsListClient({
                               s.type === 'EMAIL' ? 'bg-blue-500/10 text-blue-500 border-blue-500/25' :
                               s.type === 'SMS' ? 'bg-green-500/10 text-green-500 border-green-500/25' :
                               s.type === 'CALL' ? 'bg-amber-500/10 text-amber-500 border-amber-500/25' :
-                              'bg-slate-500/10 text-slate-500 border-slate-500/25'
+                              'bg-muted/10 text-muted-foreground border-border/25'
                             }`}
                             title={`Step ${sIdx + 1}: ${s.type}`}
                           >
@@ -655,18 +677,15 @@ export default function CampaignsListClient({
                   </div>
 
                   <div className="pt-4 flex items-center gap-2 mt-4 border-t border-border/60">
-                    <button
+                    <button type="button"
                       onClick={() => handleImportTemplate(tmpl)}
                       title="Import this template as a new Smart Plan in your workspace"
                       className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-extrabold rounded-lg hover:bg-secondary/90 transition-all shadow-sm text-center"
                     >
                       Use Template
                     </button>
-                    <button
-                      onClick={() => {
-                        // Mock details preview
-                        toast.success(`Opening preview for: ${tmpl.name}`);
-                      }}
+                    <button type="button"
+                      onClick={() => setPreviewTemplate(tmpl)}
                       className="p-2 border border-border rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all"
                       title="Preview Steps"
                     >
@@ -701,7 +720,7 @@ export default function CampaignsListClient({
           <div className="bg-background border border-border shadow-xl rounded-2xl w-full max-w-lg overflow-hidden flex flex-col">
             <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
               <h3 className="font-bold text-md text-foreground">Create New Smart Plan</h3>
-              <button onClick={() => setIsAdding(false)} className="text-muted-foreground hover:text-foreground">
+              <button type="button" onClick={() => setIsAdding(false)} className="text-muted-foreground hover:text-foreground">
                 ✕
               </button>
             </div>
@@ -791,7 +810,7 @@ export default function CampaignsListClient({
                   <p className="text-[10px] text-muted-foreground">{metricsCampaign.name}</p>
                 </div>
               </div>
-              <button onClick={() => setShowMetricsCampaignId(null)} className="text-muted-foreground hover:text-foreground text-sm font-bold">
+              <button type="button" onClick={() => setShowMetricsCampaignId(null)} className="text-muted-foreground hover:text-foreground text-sm font-bold">
                 ✕
               </button>
             </div>
@@ -805,56 +824,58 @@ export default function CampaignsListClient({
                 </div>
                 <div className="p-4 bg-muted/10 border border-border rounded-xl text-center space-y-1">
                   <span className="text-[9px] font-black uppercase text-muted-foreground block">Email Open Rate</span>
-                  <span className="text-xl font-extrabold text-green-500">72.4%</span>
+                  <span className="text-xl font-extrabold text-green-500">—</span>
                 </div>
                 <div className="p-4 bg-muted/10 border border-border rounded-xl text-center space-y-1">
                   <span className="text-[9px] font-black uppercase text-muted-foreground block">SMS Reply Rate</span>
-                  <span className="text-xl font-extrabold text-primary">28.1%</span>
+                  <span className="text-xl font-extrabold text-primary">—</span>
                 </div>
                 <div className="p-4 bg-muted/10 border border-border rounded-xl text-center space-y-1">
                   <span className="text-[9px] font-black uppercase text-muted-foreground block">Conversion Rate</span>
-                  <span className="text-xl font-extrabold text-indigo-500">14.5%</span>
+                  <span className="text-xl font-extrabold text-indigo-500">—</span>
                 </div>
               </div>
 
-              {/* Delivery stats chart summary */}
+              {/* Delivery stats chart summary — figures come from real dispatch logs only.
+                  Until a provider webhook reports delivery, these show 0 rather than
+                  fabricated percentages. */}
               <div className="bg-muted/5 border border-border rounded-xl p-4 space-y-3">
                 <h4 className="font-bold text-sm text-foreground border-b border-border pb-1.5 flex justify-between items-center">
                   <span>📈 Delivery Statistics Breakdown</span>
-                  <span className="text-[10px] text-muted-foreground font-medium">Confidence Score: High</span>
+                  <span className="text-[10px] text-muted-foreground font-medium">{metricsCampaign._count?.leads ? 'Based on enrolled leads' : 'No delivery data yet'}</span>
                 </h4>
                 <div className="grid grid-cols-3 gap-6 py-2">
                   <div className="space-y-1">
                     <div className="flex justify-between font-bold">
                       <span className="text-muted-foreground">Emails Sent:</span>
-                      <span className="text-foreground">{(metricsCampaign._count?.leads || 0) * 4 || 128}</span>
+                      <span className="text-foreground">0</span>
                     </div>
                     <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-green-500 h-full w-[94%]" />
+                      <div className="bg-green-500 h-full w-[0%]" />
                     </div>
-                    <span className="text-[9.5px] text-muted-foreground block">94% delivery rate success</span>
+                    <span className="text-[9.5px] text-muted-foreground block">Connect an email provider to track delivery</span>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex justify-between font-bold">
                       <span className="text-muted-foreground">SMS Delivered:</span>
-                      <span className="text-foreground">{(metricsCampaign._count?.leads || 0) * 3 || 96}</span>
+                      <span className="text-foreground">0</span>
                     </div>
                     <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-primary h-full w-[98%]" />
+                      <div className="bg-primary h-full w-[0%]" />
                     </div>
-                    <span className="text-[9.5px] text-muted-foreground block">98% network delivery success</span>
+                    <span className="text-[9.5px] text-muted-foreground block">Connect Twilio to track delivery</span>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex justify-between font-bold">
                       <span className="text-muted-foreground">Tasks Triggered:</span>
-                      <span className="text-foreground">{(metricsCampaign._count?.leads || 0) * 2 || 64}</span>
+                      <span className="text-foreground">0</span>
                     </div>
                     <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-indigo-500 h-full w-[88%]" />
+                      <div className="bg-indigo-500 h-full w-[0%]" />
                     </div>
-                    <span className="text-[9.5px] text-muted-foreground block">88% agent execution completion</span>
+                    <span className="text-[9.5px] text-muted-foreground block">Tasks appear as the campaign runs</span>
                   </div>
                 </div>
               </div>
@@ -867,10 +888,9 @@ export default function CampaignsListClient({
                     <p className="p-6 text-center text-muted-foreground italic">No steps defined in this campaign.</p>
                   ) : (
                     metricsSteps.map((step: any, index: number) => {
-                      // Generate mock stats for each step type
-                      const sentMock = (metricsCampaign._count?.leads || 0) || 12;
-                      const openMock = Math.round(sentMock * 0.72);
-                      const replyMock = Math.round(sentMock * 0.28);
+                      // Per-step delivery counts come from real dispatch logs. Until a
+                      // provider reports delivery, show 0 instead of invented numbers.
+                      const sentCount = 0;
 
                       return (
                         <div key={index} className="p-3 flex items-center justify-between text-xs hover:bg-muted/5 transition-colors">
@@ -895,24 +915,24 @@ export default function CampaignsListClient({
                           <div className="flex gap-4 shrink-0 font-bold text-[11px] text-right">
                             <div>
                               <span className="text-muted-foreground text-[9.5px] uppercase block">Dispatched</span>
-                              <span className="text-foreground">{sentMock}</span>
+                              <span className="text-foreground">{sentCount}</span>
                             </div>
                             {step.type === 'EMAIL' && (
                               <div>
                                 <span className="text-muted-foreground text-[9.5px] uppercase block">Opened</span>
-                                <span className="text-green-500">{openMock} ({Math.round((openMock/sentMock)*100 || 72)}%)</span>
+                                <span className="text-green-500">—</span>
                               </div>
                             )}
                             {step.type === 'SMS' && (
                               <div>
                                 <span className="text-muted-foreground text-[9.5px] uppercase block">Replied</span>
-                                <span className="text-primary">{replyMock} ({Math.round((replyMock/sentMock)*100 || 28)}%)</span>
+                                <span className="text-primary">—</span>
                               </div>
                             )}
                             {(step.type === 'CALL' || step.type === 'TASK') && (
                               <div>
                                 <span className="text-muted-foreground text-[9.5px] uppercase block">Completed</span>
-                                <span className="text-indigo-500">{Math.round(sentMock * 0.85)} ({85}%)</span>
+                                <span className="text-indigo-500">—</span>
                               </div>
                             )}
                           </div>
@@ -925,11 +945,58 @@ export default function CampaignsListClient({
             </div>
 
             <div className="p-4 border-t border-border bg-muted/10 flex justify-end shrink-0">
-              <button
+              <button type="button"
                 onClick={() => setShowMetricsCampaignId(null)}
                 className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95 transition-all shadow-md"
               >
                 Close Metrics Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Template step preview (real data — was a 'Opening preview...' toast) */}
+      {previewTemplate && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setPreviewTemplate(null)}>
+          <div className="bg-card border border-border/60 rounded-2xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5 border-b border-border/40">
+              <h3 className="text-lg font-extrabold text-foreground">{previewTemplate.name}</h3>
+              <p className="text-xs text-muted-foreground mt-1">{previewTemplate.description}</p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <span className="text-[9px] bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded font-black uppercase">{previewTemplate.leadType}</span>
+                <span className="text-[9px] bg-muted text-muted-foreground border border-border px-1.5 py-0.5 rounded font-black uppercase">{previewTemplate.duration} Days</span>
+                <span className="text-[9px] bg-muted text-muted-foreground border border-border px-1.5 py-0.5 rounded font-black uppercase">{previewTemplate.scope}</span>
+                <span className="text-[9px] bg-muted text-muted-foreground border border-border px-1.5 py-0.5 rounded font-black uppercase">{previewTemplate.steps.length} Steps</span>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-5 space-y-3">
+              {previewTemplate.steps.map((s, i) => (
+                <div key={s.id} className="p-3 bg-muted/20 border border-border/40 rounded-xl">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-black uppercase border ${
+                      s.type === 'EMAIL' ? 'bg-blue-500/10 text-blue-400 border-blue-500/25' :
+                      s.type === 'SMS' ? 'bg-green-500/10 text-green-400 border-green-500/25' :
+                      s.type === 'CALL' ? 'bg-amber-500/10 text-amber-400 border-amber-500/25' :
+                      'bg-muted text-muted-foreground border-border'
+                    }`}>{s.type}</span>
+                    <span className="text-[10px] text-muted-foreground font-bold">
+                      Step {i + 1} · waits {s.delayValue} {s.delayUnit.toLowerCase()}{s.delayValue === 1 ? '' : 's'}
+                    </span>
+                  </div>
+                  {(s as any).subject && <p className="text-xs font-bold text-foreground mt-2">{(s as any).subject}</p>}
+                  <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line">{s.content}</p>
+                </div>
+              ))}
+            </div>
+            <div className="p-4 border-t border-border/40 flex justify-end gap-2 shrink-0">
+              <button type="button" onClick={() => handleImportTemplate(previewTemplate)}
+                className="px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold rounded-lg hover:bg-secondary/90">
+                Use Template
+              </button>
+              <button type="button" onClick={() => setPreviewTemplate(null)}
+                className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/95">
+                Close
               </button>
             </div>
           </div>

@@ -178,3 +178,85 @@
 - [x] Multi-channel A/B testing in leadG (email/SMS variants) — wired 2026-10-06
 - [x] CI/CD pipeline for automated builds and testing
 - [x] Live audio WebSocket monitor UI panel in dashboard
+
+### Repository Sync (2026-10-09, v0.58.43)
+- [x] Fetch all remotes + tags (root + 5 submodules; no nested submodules)
+- [x] Fast-forward submodule mains to origin/main (foreclosureworkflow +2, legacyleads +1, media-workflow +3)
+- [x] leadg gitlink advanced 2 commits to origin/main (1e14cca)
+- [x] Verified all 10 feature branches fully merged (zero unique commits) — no cherry-pick needed
+- [x] Commit submodule launchers (start-3002, start-3004) + gitignore transient logs
+- [x] Fix start-all.ps1 media-workflow path (dist/index.js → dist/src/index.js)
+- [x] Version bump → 0.58.43 (VERSION.md / package.json / package-lock.json / CHANGELOG)
+- [x] Regenerate docs/SUBMODULE_MAP.md + docs/LIBRARIES.md
+
+### Follow-ups for next session
+- [x] Decide on uncommitted submodule dependency bumps (lucide-react ^1.16→^1.52 in foreclosureworkflow; lucide-react ^1.25→^1.52 + @next/swc-win32-x64-msvc in legacyleads/frontend) — committed v0.58.45
+- [x] Archive the 10 redundant remote feature branches (fast-forwarded to origin/main v0.58.46)
+- [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
+
+### Production Deploy (2026-10-16/17, v0.58.50)
+- [x] Deploy realestatecrm to Hetzner as `excellegacyrealtygroup.site` (HTTPS + SSL)
+- [x] Domain rebrand (13 files)
+- [x] Auth working on prod (CredentialsProvider)
+- [x] Fix 5 missing React hook imports (useState/useEffect/useRef)
+- [x] Create `/api/posts` route (was 404)
+- [x] Fix `/api/contracts` payload normalization (was 400)
+- [x] Fix `/api/chat/rooms` error handling (was 500)
+- [x] Fix posts route to use existing Prisma model
+- [x] Create missing ChatRoom/ChatParticipant/ChatMessage tables in SQLite
+- [x] Fix DATABASE_URL path (was ./dev.db, now prisma/dev.db)
+- [x] LeadG standalone output fix in system-tray.ps1 + start-all.bat
+- [x] All 4 bug-fix endpoints verified on prod (200)
+- [x] Tooltip markers added to remaining dashboard pages
+- [x] Loading + error states verified on all 51 pages
+
+### Remaining Production Gaps
+- [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
+- [ ] Deploy 8 sub-services to Hetzner
+- [ ] Google Maps API key (`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`)
+- [ ] HubSpot OAuth for `/api/lead-gen/social`
+- [ ] Legacyleads `/listings` to real data: no local Postgres on 5432 (no binaries/docker); `migrations/01_initial_schema.sql` creates `properties` but the route queries a `listings` table ("StandardStatus"/"ListPrice"/"PostalCode"/geom) that no migration defines — needs a `listings` table migration + MLS ingestion gateway before this can go green (endpoint now fails honestly with message + code, covered by DB-down regression test)
+- [ ] Redis/Memurai for media-workflow MessageBroker
+
+### Repository Sync (2026-10-17, v0.58.51)
+- [x] Fetch all remotes + tags (root + 5 submodules; no nested submodules)
+- [x] Upstream robertpelloni/realestatecrm == origin/main (6d6d1f3) — no merge needed
+- [x] All 5 submodules verified at origin/main with clean working trees
+- [x] All 10 feature branches re-verified fully merged (zero unique commits) — no cherry-pick needed
+- [x] Reconciled start-all.ps1 to canonical 9-service list (ContentPlanner API 3031 + standalone server paths)
+- [x] Version bump → 0.58.51 (fixed package.json/package-lock drift from 0.58.43)
+- [x] Regenerate docs/SUBMODULE_MAP.md + docs/LIBRARIES.md
+
+### Follow-ups for next session
+- [ ] Delete 10 redundant remote feature branches (manual: `git push origin --delete <branch>`)
+- [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
+- [ ] Deploy 8 sub-services to Hetzner
+
+### Codebase Analysis (2026-10-21) — verified findings
+- [x] Test suites repaired: media-workflow 0→60 passing (TS5107 fix + spec-aligned error messages), contentplanner 24→35 (jest Haste collision), leadg 9, legacyleads 11 — **115 tests passing across 4 submodules**
+- [x] Untracked 470MB deploy tarballs + build logs (gitignored)
+- [x] Prisma model audit: 40 models, only `VerificationToken` unreferenced (NextAuth artifact — expected)
+
+#### Real gaps found (ordered by impact)
+- [ ] **5 API routes still return mock data**: `skip-trace` (whitepages/public-records mocks), `property-data` (source='mock'), `avatar`, `agents/handshake`, `cron/mls-scrub` — these need real provider keys or honest "demo mode" labeling in UI
+- [ ] **Root e2e tests need a running server** (node:test against localhost:3000) — not wired into CI; add a CI job with a service container or convert to Playwright
+- [ ] **foreclosureworkflow has 0 tests** — the only subproject with none; parser logic (LLMNoticeParser) is the riskiest untested code
+- [ ] **legacyleads `/listings` mock data** → real MLS/property-data
+- [ ] **main CRM `tsconfig.json` has `ignoreBuildErrors: true`** — type errors ship silently; tighten gradually
+- [ ] **API keys still unwired**: Twilio, SendGrid/Resend, Stripe, Google Maps, HubSpot OAuth, BS&A, Magnific, OpenAI (embeddings/voice)
+- [ ] 10 redundant remote feature branches safe to delete (`git push origin --delete <branch>`)
+
+### Cross-Service Integration Gap (2026-10-22, found during UI click-through)
+- [x] **Workspace mapping between main CRM and ContentPlanner** — DONE (v0.58.58): CRM proxy syncs the active workspace into ContentPlanner (same id) and signs it into the service JWT; API reads scope to the JWT workspace claim.
+- [ ] OAuth client keys for social publishing: TWITTER_CLIENT_ID/SECRET, LINKEDIN_CLIENT_ID/SECRET, META_CLIENT_ID/SECRET (auth-url currently returns an honest 503)
+- [ ] Wire remaining provider keys per HANDOFF v0.58.55 list (Twilio lookup, Whitepages/PDL, BS&A, Canva, Magnific, Tavily, NewsAPI, HeyGen/D-ID, AGENT_SECRET, BROWSERLESS_WS_ENDPOINT)
+
+## Repository Sync Follow-Up (v0.48.0)
+- [x] Sync local main to origin/main (fast-forward, no conflicts)
+- [x] Audit 5 AI feature branches - all contained in main
+- [x] Fast-forward local feature branches to main tip e07aa1d
+- [ ] Push updated feature branches + main version bump (blocked: SEC_E_NO_CREDENTIALS - no git push credentials in environment)
+- [ ] Free C: disk space (0 GB free blocks npm install / production build)
+
+- [x] Shared buyer/seller welcome and two-year nurture defaults, editor weeks/months/years, calendar scheduling.
+- [ ] Campaign reply-based pausing and per-message delivery analytics remain separate follow-up work.

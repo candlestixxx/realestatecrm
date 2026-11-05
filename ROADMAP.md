@@ -63,7 +63,7 @@
 - [x] Audit improvements (audit trail)
 - [x] Accessibility refinement
 - [x] UI polish
-- [ ] Load testing and bug fixing
+- [x] Load testing and bug fixing (2026-10-31: scripts/load-test.js ALL PASS 350/350; e2e-smoke 21/22, sole fail = legacyleads /listings 500 with no local Postgres — backend returns honest error + code, covered by new regression test)
 
 ## Phase 8 — MLS / MiRealSource parity [COMPLETE]
 - [x] Listing search parity (MLS search)
@@ -150,3 +150,29 @@ _Last synced 2026-10-06 (v0.57.6). Chat, learning/memory, SEO/sitemap, and OG sh
 - leadG: NextAuth + auth middleware
 - contentplanner: Social provider enhancements (LinkedIn/Meta/Twitter)
 - legacyleads: New frontend pages (contacts, fsbo-expired, help, neighborhoods, settings)
+
+## Phase 14 — Repository Synchronization v0.58.43 [COMPLETE]
+- [x] Fetch all remotes + tags across main + 5 submodules (no nested submodules)
+- [x] Upstream check: robertpelloni/realestatecrm and candlestixxx/realestatecrm resolve to identical `main` (62fbdc6) — no divergent upstream
+- [x] Fast-forward submodule `main` branches to `origin/main`: foreclosureworkflow (+2), legacyleads (+1), media-workflow (+3); leadg gitlink advanced 2 commits
+- [x] Verified all 10 feature branches across submodules are fully merged (ancestors of main, zero unique commits) — no cherry-pick required
+- [x] Committed submodule launcher scripts (start-3002, start-3004) + gitignored transient logs
+- [x] Fixed start-all.ps1 media-workflow start path (dist/index.js → dist/src/index.js)
+- [x] Version bump 0.54.0 → 0.58.43 (VERSION.md, package.json, package-lock.json, CHANGELOG)
+- [x] Regenerated structural maps (docs/SUBMODULE_MAP.md, docs/LIBRARIES.md)
+
+## Phase 15 — Repository Synchronization v0.58.51 [COMPLETE]
+- [x] Fetch all remotes + tags across main + 5 submodules (no nested submodules)
+- [x] Upstream check: robertpelloni/realestatecrm and candlestixxx/realestatecrm resolve to identical `main` (6d6d1f3) — no divergent upstream
+- [x] Verified all 5 submodules at `origin/main` with clean working trees — no fast-forward required
+- [x] Re-verified all 10 feature branches fully merged (ancestors of main, zero unique commits) — no cherry-pick required
+- [x] Reconciled start-all.ps1 with canonical 9-service definitions (added ContentPlanner API 3031, standalone Next.js server paths)
+- [x] Version bump → 0.58.51 (VERSION.md, package.json, package-lock.json, CHANGELOG) — fixed package.json/package-lock drift (were 0.58.43)
+- [x] Regenerated structural maps (docs/SUBMODULE_MAP.md, docs/LIBRARIES.md)
+
+## Phase 5 - Repository Synchronization [v0.48.0 - ACCOMPLISHED]
+- [x] Origin sync: local main fast-forwarded 4eaba9c -> e07aa1d
+- [x] Forward-merge audit: 5 AI-generated feature branches fully contained in main (no unique work lost)
+- [x] Reverse catch-up: all 5 feature branches fast-forwarded locally to e07aa1d (remote push pending credentials)
+- [x] Submodule audit: no submodules present (no-op)
+- [ ] Push credentials: restore authenticated GitHub push so branch catch-up + version bump can deploy

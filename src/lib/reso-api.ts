@@ -4,7 +4,7 @@ import prisma from './prisma';
  * Normalizes standard RESO Web API fields into our internal CRM `PropertyListing` schema.
  */
 export async function syncResoListing(workspaceId: string, resoPayload: any) {
-  // Mock RESO mapping sequence
+  // Standard RESO Web API field mapping (ListingId/ListingKey → PropertyListing)
   const mlsNumber = resoPayload.ListingId || resoPayload.ListingKey;
 
   if (!mlsNumber) {

@@ -96,7 +96,7 @@ export default function AgentCoreConsole() {
             <p className="text-sm text-muted-foreground mb-4">Type a natural-language command to control your CRM.</p>
             <div className="flex flex-wrap justify-center gap-2">
               {EXAMPLE_COMMANDS.map(cmd => (
-                <button
+                <button type="button"
                   key={cmd}
                   onClick={() => sendCommand(cmd)}
                   className="px-3 py-1.5 text-xs bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-full border border-border transition-colors"
@@ -108,7 +108,7 @@ export default function AgentCoreConsole() {
           </div>
         )}
 
-        {messages.map((msg, i) => (
+        {messages.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No messages yet. Try a command above.</div> : messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] rounded-xl px-4 py-2.5 ${
               msg.role === 'user'
@@ -159,7 +159,7 @@ export default function AgentCoreConsole() {
             className="flex-1 px-4 py-2.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary/50 text-foreground placeholder:text-muted-foreground"
             disabled={isLoading}
           />
-          <button
+          <button type="button"
             type="submit"
             disabled={isLoading || !input.trim()}
             className="px-5 py-2.5 bg-secondary text-secondary-foreground text-sm font-bold rounded-lg hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"

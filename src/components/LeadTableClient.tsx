@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import Link from 'next/link';
@@ -8,9 +8,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AddTaskModal from './AddTaskModal';
 import AddLeadModal from './AddLeadModal';
-import { addTaskAction } from '@/lib/actions/task';
 import { bulkEnrollLeadsInCampaignAction } from '@/lib/actions/campaign';
-import { deleteLeadAction, importLeadsBulkAction, assignLeadAction, enrollLeadInSmartPlanAction, updateLeadTagsAction, bulkUpdateLeadTagsAction, bulkAssignLeadAction, bulkDeleteLeadAction } from '@/lib/actions/lead';
+import { deleteLeadAction, assignLeadAction, enrollLeadInSmartPlanAction, updateLeadTagsAction, bulkUpdateLeadTagsAction, bulkAssignLeadAction } from '@/lib/actions/lead';
 import { addLeadsToSegmentBulkAction } from '@/lib/actions/segment';
 
 type LeadRow = {
@@ -128,7 +127,7 @@ function LeadQuickMenu({
   return (
     <div className="relative" ref={menuRef}>
       {triggerMode === 'tag' ? (
-        <button
+        <button type="button"
           onClick={openMenu}
           className="px-1.5 py-0.5 text-[9px] font-bold rounded border border-dashed border-muted-foreground/40 text-muted-foreground hover:border-primary hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
           title="Add tags"
@@ -136,7 +135,7 @@ function LeadQuickMenu({
           + Tag
         </button>
       ) : (
-        <button
+        <button type="button"
           onClick={openMenu}
           className="px-2.5 py-1.5 bg-muted/60 text-foreground hover:bg-muted border border-border rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center gap-1"
           title="More Actions"
@@ -153,7 +152,7 @@ function LeadQuickMenu({
           {panel === 'main' && (
             <div className="py-1">
               {/* Assign Agent */}
-              <button
+              <button type="button"
                 onClick={() => setPanel('assign')}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
               >
@@ -170,7 +169,7 @@ function LeadQuickMenu({
               </button>
 
               {/* Tags / Hashtags */}
-              <button
+              <button type="button"
                 onClick={() => { setTagInput(lead.tags || ''); setPanel('tags'); }}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
               >
@@ -187,7 +186,7 @@ function LeadQuickMenu({
               </button>
 
               {/* Smart Plan */}
-              <button
+              <button type="button"
                 onClick={() => setPanel('smartplan')}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left"
               >
@@ -202,7 +201,7 @@ function LeadQuickMenu({
               </button>
 
               {/* AI Assistant */}
-              <button
+              <button type="button"
                 onClick={() => {
                   setOpen(false);
                   router.push(`/dashboard/leads/${lead.id}?tab=ai`);
@@ -219,7 +218,7 @@ function LeadQuickMenu({
               <div className="border-t border-border my-1" />
 
               {/* Delete */}
-              <button
+              <button type="button"
                 onClick={async () => {
                   setOpen(false);
                   if (confirm(`Delete "${lead.contact.firstName} ${lead.contact.lastName || ''}"?`)) {
@@ -239,7 +238,7 @@ function LeadQuickMenu({
           {panel === 'assign' && (
             <div>
               <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
-                <button onClick={() => setPanel('main')} className="text-muted-foreground hover:text-foreground">
+                <button type="button" onClick={() => setPanel('main')} className="text-muted-foreground hover:text-foreground">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
@@ -247,7 +246,7 @@ function LeadQuickMenu({
                 <span className="text-xs font-bold">Assign to Agent</span>
               </div>
               <div className="py-1 max-h-52 overflow-y-auto">
-                <button
+                <button type="button"
                   onClick={() => handleAssign(null)}
                   disabled={isSaving}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-muted/60 transition-colors text-left ${
@@ -259,7 +258,7 @@ function LeadQuickMenu({
                   {!lead.userId && <span className="ml-auto text-primary">✓</span>}
                 </button>
                 {users.map(user => (
-                  <button
+                  <button type="button"
                     key={user.id}
                     onClick={() => handleAssign(user.id)}
                     disabled={isSaving}
@@ -283,7 +282,7 @@ function LeadQuickMenu({
           {panel === 'tags' && (
             <div>
               <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
-                <button onClick={() => setPanel('main')} className="text-muted-foreground hover:text-foreground">
+                <button type="button" onClick={() => setPanel('main')} className="text-muted-foreground hover:text-foreground">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
@@ -304,7 +303,7 @@ function LeadQuickMenu({
                 {/* Quick-add chips */}
                 <div className="flex flex-wrap gap-1">
                   {['#hot', '#warm', '#cold', '#investor', '#cash-buyer', '#motivated'].map(chip => (
-                    <button
+                    <button type="button"
                       key={chip}
                       onClick={() => {
                         const current = tagInput.split(',').map(t => t.trim()).filter(Boolean);
@@ -319,13 +318,13 @@ function LeadQuickMenu({
                   ))}
                 </div>
                 <div className="flex gap-2 pt-1">
-                  <button
+                  <button type="button"
                     onClick={() => setPanel('main')}
                     className="flex-1 px-2 py-1.5 bg-muted border border-border rounded text-[10px] hover:bg-muted/80"
                   >
                     Cancel
                   </button>
-                  <button
+                  <button type="button"
                     onClick={handleSaveTags}
                     disabled={isSaving}
                     className="flex-1 px-2 py-1.5 bg-primary text-primary-foreground rounded text-[10px] font-bold hover:bg-primary/90 disabled:opacity-50"
@@ -340,7 +339,7 @@ function LeadQuickMenu({
           {panel === 'smartplan' && (
             <div>
               <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
-                <button onClick={() => setPanel('main')} className="text-muted-foreground hover:text-foreground">
+                <button type="button" onClick={() => setPanel('main')} className="text-muted-foreground hover:text-foreground">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
@@ -352,7 +351,7 @@ function LeadQuickMenu({
                   <p className="px-3 py-4 text-xs text-muted-foreground text-center">No Smart Plans found.</p>
                 ) : (
                   campaigns.map(camp => (
-                    <button
+                    <button type="button"
                       key={camp.id}
                       onClick={() => handleEnrollSmartPlan(camp.id)}
                       disabled={isSaving}
@@ -932,14 +931,10 @@ export function LeadTableClient({
   const handleBulkAssign = async (userId: string | null) => {
     if (selectedIds.size === 0) { toast.error('Select at least one lead.'); return; }
 
-    // Check if we need a full-database query instead (if selectAllMode is true)
-    if (selectAllMode) {
-      toast.error('Bulk assigning across all pages is coming soon. For now, please assign one page at a time by setting Per Page to "Show all".');
-      return;
-    }
+    // When selectAllMode is active, apply to all filtered leads (across pages)
+    const ids = selectAllMode ? displayLeads.map(l => l.id) : Array.from(selectedIds);
 
     setIsBulkAssigning(true);
-    const ids = Array.from(selectedIds);
     const res = await bulkAssignLeadAction(ids, userId);
     setIsBulkAssigning(false);
 
@@ -949,6 +944,7 @@ export function LeadTableClient({
       toast.success(`Assigned ${ids.length} lead(s).`);
       setShowBulkAssignPanel(false);
       setSelectedIds(new Set());
+      setSelectAllMode(false);
       router.refresh();
     }
   };
@@ -956,13 +952,10 @@ export function LeadTableClient({
   const handleBulkChangeTags = async () => {
     if (selectedIds.size === 0) { toast.error('Select at least one lead.'); return; }
 
-    if (selectAllMode) {
-      toast.error('Bulk tagging across all pages is coming soon. For now, please tag one page at a time by setting Per Page to "Show all".');
-      return;
-    }
+    // When selectAllMode is active, apply to all filtered leads (across pages)
+    const ids = selectAllMode ? displayLeads.map(l => l.id) : Array.from(selectedIds);
 
     setIsBulkTagSaving(true);
-    const ids = Array.from(selectedIds);
     const res = await bulkUpdateLeadTagsAction(ids, bulkTagInput);
     setIsBulkTagSaving(false);
 
@@ -973,6 +966,7 @@ export function LeadTableClient({
       setShowBulkTagPanel(false);
       setBulkTagInput('');
       setSelectedIds(new Set());
+      setSelectAllMode(false);
       router.refresh();
     }
   };
@@ -1114,7 +1108,7 @@ export function LeadTableClient({
             
             {/* Three Dots Import/Export Dropdown */}
             <div className="relative" ref={threeDotsRef}>
-              <button
+              <button type="button"
                 onClick={() => setShowThreeDotsMenu(prev => !prev)}
                 className="p-2 border border-border rounded-xl hover:bg-muted/50 transition-colors cursor-pointer"
                 title="More Ingestion Options"
@@ -1125,21 +1119,21 @@ export function LeadTableClient({
               {showThreeDotsMenu && (
                 <div className="absolute right-0 top-full mt-2.5 z-50 w-52 bg-card border border-border/80 rounded-2xl shadow-xl overflow-hidden py-2 animate-fadeIn text-xs font-semibold text-muted-foreground">
                   <p className="px-3 pb-1.5 text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest border-b border-border/40">Leads Actions</p>
-                  <button
+                  <button type="button"
                     onClick={() => { setShowCsvImportModal(true); setShowThreeDotsMenu(false); }}
                     className="w-full flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-muted/60 transition-colors text-left"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                     <span>Import CSV File</span>
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => { handleExportCSV(); setShowThreeDotsMenu(false); }}
                     className="w-full flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-muted/60 transition-colors text-left"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                     <span>Export CSV File</span>
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => { setShowAiIntakeModal(true); setShowThreeDotsMenu(false); }}
                     className="w-full flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-muted/60 transition-colors text-left text-amber-600 hover:text-amber-700"
                   >
@@ -1151,7 +1145,7 @@ export function LeadTableClient({
             </div>
 
             {/* All Filters Toggle Sidebar Button */}
-            <button
+            <button type="button"
               onClick={() => setShowFiltersSidebar(prev => !prev)}
               className={`px-4.5 py-2.5 border rounded-xl flex items-center gap-2 transition-all font-black uppercase text-[10px] tracking-widest cursor-pointer ${
                 showFiltersSidebar || displayLeads.length !== initialLeads.length
@@ -1182,7 +1176,7 @@ export function LeadTableClient({
             {/* Quick Views */}
             <div className="flex items-center gap-1.5 ml-2">
               {['All Leads', 'My Leads', 'Priorities', 'Expired', 'Preforeclosure'].map(view => (
-                <button
+                <button type="button"
                   key={view}
                   onClick={() => { setActiveView(view); setCurrentPage(1); }}
                   className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
@@ -1196,7 +1190,10 @@ export function LeadTableClient({
               ))}
 
               {/* Custom views */}
-              {customViews.map(view => (
+              {customViews.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No custom views saved.</div>
+              ) : (
+                customViews.map(view => (
                 <div
                   key={view.name}
                   onClick={() => { setActiveView(view.name); setCurrentPage(1); }}
@@ -1215,10 +1212,11 @@ export function LeadTableClient({
                     ×
                   </span>
                 </div>
-              ))}
+              ))
+              )}
 
               {/* Add Custom View Button */}
-              <button
+              <button type="button"
                 onClick={() => setShowCustomViewModal(true)}
                 className="px-2.5 py-1.5 border border-dashed border-border hover:border-muted-foreground/40 rounded-lg hover:text-foreground flex items-center gap-1 transition-all cursor-pointer text-[10px] font-black uppercase tracking-wider"
               >
@@ -1239,7 +1237,7 @@ export function LeadTableClient({
           ].map(chip => {
             const count = countByStatus(chip.id);
             return (
-              <button
+              <button type="button"
                 key={chip.id}
                 onClick={() => { setActiveStatus(chip.id); setCurrentPage(1); }}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
@@ -1269,25 +1267,25 @@ export function LeadTableClient({
               <span>Leads Selected</span>
             </span>
             <div className="flex items-center gap-2">
-              <button
+              <button type="button"
                 onClick={() => bulkAction('Assign')}
                 className="px-3 py-1.5 bg-background border border-border hover:bg-muted rounded-xl transition-all cursor-pointer"
               >
                 👤 Assign
               </button>
-              <button
+              <button type="button"
                 onClick={() => bulkAction('Tags')}
                 className="px-3 py-1.5 bg-background border border-border hover:bg-muted rounded-xl transition-all cursor-pointer"
               >
                 🏷️ Tags
               </button>
-              <button
+              <button type="button"
                 onClick={() => bulkAction('Enroll Smart Plan')}
                 className="px-3 py-1.5 bg-background border border-border hover:bg-muted rounded-xl transition-all cursor-pointer"
               >
                 🤖 Smart Plan
               </button>
-              <button
+              <button type="button"
                 onClick={() => bulkAction('Delete')}
                 className="px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/15 rounded-xl transition-all cursor-pointer border border-red-500/20"
               >
@@ -1424,7 +1422,7 @@ export function LeadTableClient({
             </div>
             
             <div className="flex items-center gap-1.5">
-              <button
+              <button type="button"
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage <= 1}
                 className="px-3 py-1.5 border border-border rounded-xl hover:bg-muted transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
@@ -1434,7 +1432,7 @@ export function LeadTableClient({
               
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).slice(Math.max(0, currentPage - 3), Math.min(totalPages, currentPage + 2)).map(p => (
-                  <button
+                  <button type="button"
                     key={p}
                     onClick={() => setCurrentPage(p)}
                     className={`w-8 h-8 rounded-lg font-bold transition-all cursor-pointer ${
@@ -1446,7 +1444,7 @@ export function LeadTableClient({
                 ))}
               </div>
 
-              <button
+              <button type="button"
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage >= totalPages}
                 className="px-3 py-1.5 border border-border rounded-xl hover:bg-muted transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
@@ -1464,7 +1462,7 @@ export function LeadTableClient({
         <div className="w-80 bg-card border-l border-border/80 p-5 shadow-2xl flex flex-col h-screen sticky top-0 overflow-y-auto animate-slideIn">
           <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-4">
             <span className="font-extrabold text-sm text-foreground uppercase tracking-wider">All Filters</span>
-            <button
+            <button type="button"
               onClick={() => setShowFiltersSidebar(false)}
               className="p-1.5 hover:bg-muted/60 rounded-lg text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
@@ -1484,7 +1482,7 @@ export function LeadTableClient({
                   onChange={(e) => setSidebarSearch(e.target.value)}
                   className="flex-1 bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none font-medium"
                 />
-                <button
+                <button type="button"
                   onClick={() => setCurrentPage(1)}
                   className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors cursor-pointer"
                 >
@@ -1495,7 +1493,7 @@ export function LeadTableClient({
 
             {/* Address Collapsible accordion */}
             <div className="border-b border-border/40 pb-3">
-              <button
+              <button type="button"
                 onClick={() => setCollapsedSections(prev => ({ ...prev, address: !prev.address }))}
                 className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
               >
@@ -1515,7 +1513,7 @@ export function LeadTableClient({
 
             {/* Lead Owner Collapsible Accordion */}
             <div className="border-b border-border/40 pb-3">
-              <button
+              <button type="button"
                 onClick={() => setCollapsedSections(prev => ({ ...prev, owner: !prev.owner }))}
                 className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
               >
@@ -1539,7 +1537,7 @@ export function LeadTableClient({
 
             {/* Agent Collapsible Accordion */}
             <div className="border-b border-border/40 pb-3">
-              <button
+              <button type="button"
                 onClick={() => setCollapsedSections(prev => ({ ...prev, agent: !prev.agent }))}
                 className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
               >
@@ -1562,7 +1560,7 @@ export function LeadTableClient({
 
             {/* Lead Type / Status Collapsible Accordion */}
             <div className="border-b border-border/40 pb-3">
-              <button
+              <button type="button"
                 onClick={() => setCollapsedSections(prev => ({ ...prev, type: !prev.type }))}
                 className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
               >
@@ -1587,7 +1585,7 @@ export function LeadTableClient({
 
             {/* Source Collapsible Accordion */}
             <div className="border-b border-border/40 pb-3">
-              <button
+              <button type="button"
                 onClick={() => setCollapsedSections(prev => ({ ...prev, source: !prev.source }))}
                 className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
               >
@@ -1612,7 +1610,7 @@ export function LeadTableClient({
 
             {/* Tags Collapsible Accordion */}
             <div className="border-b border-border/40 pb-3">
-              <button
+              <button type="button"
                 onClick={() => setCollapsedSections(prev => ({ ...prev, tags: !prev.tags }))}
                 className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
               >
@@ -1632,7 +1630,7 @@ export function LeadTableClient({
 
             {/* Score Collapsible Accordion */}
             <div className="border-b border-border/40 pb-3">
-              <button
+              <button type="button"
                 onClick={() => setCollapsedSections(prev => ({ ...prev, score: !prev.score }))}
                 className="w-full flex items-center justify-between font-bold text-foreground text-xs py-1 cursor-pointer"
               >
@@ -1654,7 +1652,7 @@ export function LeadTableClient({
 
           {/* Reset button & Create View button inside Panel footer */}
           <div className="border-t border-border/40 pt-4 mt-6 flex gap-2 text-xs font-bold text-foreground">
-            <button
+            <button type="button"
               onClick={() => {
                 setFilterAddress('');
                 setFilterOwner('ALL');
@@ -1671,7 +1669,7 @@ export function LeadTableClient({
             >
               Clear All
             </button>
-            <button
+            <button type="button"
               onClick={() => setShowCustomViewModal(true)}
               className="flex-1 py-2.5 bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl transition-all shadow-md cursor-pointer text-center"
             >
@@ -1687,7 +1685,7 @@ export function LeadTableClient({
           <div className="bg-card border border-border shadow-2xl rounded-2xl w-full max-w-sm overflow-hidden text-xs font-semibold text-muted-foreground">
             <div className="p-4 border-b border-border/40 flex justify-between items-center bg-muted/10">
               <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">Create Custom View</h3>
-              <button onClick={() => setShowCustomViewModal(false)} className="text-muted-foreground hover:text-foreground">
+              <button type="button" onClick={() => setShowCustomViewModal(false)} className="text-muted-foreground hover:text-foreground">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
@@ -1702,7 +1700,7 @@ export function LeadTableClient({
                   className="w-full bg-background border border-border rounded-xl px-3 py-2 text-foreground font-bold focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
-              <button
+              <button type="button"
                 onClick={handleCreateCustomView}
                 className="w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-md cursor-pointer"
               >
@@ -1721,7 +1719,7 @@ export function LeadTableClient({
                 <h3 className="font-extrabold text-lg text-foreground">📥 Universal CSV Field Mapper</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">Upload a CSV file and match your columns to CRM fields.</p>
               </div>
-              <button 
+              <button type="button" 
                 onClick={() => {
                   setShowCsvImportModal(false);
                   setCsvHeaders([]);
@@ -1851,7 +1849,7 @@ export function LeadTableClient({
 
             {csvHeaders.length > 0 && (
               <div className="p-4 border-t border-border bg-muted/20 flex justify-between items-center shrink-0">
-                <button
+                <button type="button"
                   onClick={() => {
                     setCsvHeaders([]);
                     setCsvRows([]);
@@ -1861,7 +1859,7 @@ export function LeadTableClient({
                   Clear File
                 </button>
                 <div className="flex gap-2">
-                  <button
+                  <button type="button"
                     onClick={() => {
                       setShowCsvImportModal(false);
                       setCsvHeaders([]);
@@ -1873,7 +1871,7 @@ export function LeadTableClient({
                   >
                     Cancel
                   </button>
-                  <button
+                  <button type="button"
                     onClick={handleImportSubmit}
                     disabled={isImporting}
                     className="px-5 py-1.5 bg-primary text-primary-foreground font-bold rounded hover:bg-primary/90 text-xs shadow-md disabled:opacity-50 cursor-pointer"
@@ -1896,7 +1894,7 @@ export function LeadTableClient({
                 <h3 className="font-extrabold text-lg text-foreground">✨ AI Agent Lead Intake</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">Paste any email text, Zillow/Realtor notification to extract details.</p>
               </div>
-              <button 
+              <button type="button" 
                 onClick={() => {
                   setShowAiIntakeModal(false);
                   setAiIntakeText('');
@@ -1927,7 +1925,7 @@ export function LeadTableClient({
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <button
+                        <button type="button"
                           onClick={handleAiParse}
                           disabled={isParsing || !aiIntakeText.trim()}
                           className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/95 text-xs shadow-md disabled:opacity-50 cursor-pointer"
@@ -2074,14 +2072,14 @@ export function LeadTableClient({
 
             {parsedLeadData && (
               <div className="p-4 border-t border-border bg-muted/20 flex justify-between items-center shrink-0">
-                <button
+                <button type="button"
                   onClick={() => setParsedLeadData(null)}
                   className="px-3 py-1.5 bg-muted border border-border text-xs rounded hover:bg-muted/80 cursor-pointer"
                 >
                   Reparse Text
                 </button>
                 <div className="flex gap-2">
-                  <button
+                  <button type="button"
                     onClick={() => {
                       setShowAiIntakeModal(false);
                       setAiIntakeText('');
@@ -2093,7 +2091,7 @@ export function LeadTableClient({
                   >
                     Cancel
                   </button>
-                  <button
+                  <button type="button"
                     onClick={handleAiImportSubmit}
                     disabled={isImporting}
                     className="px-5 py-1.5 bg-primary text-primary-foreground font-bold rounded hover:bg-primary/90 text-xs shadow-md disabled:opacity-50 cursor-pointer"

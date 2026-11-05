@@ -3,11 +3,14 @@ import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
 import prisma from '@/lib/prisma';
 import CampaignsListClient from '@/components/CampaignsListClient';
+import { ensureDefaultCampaigns } from '@/lib/ensure-default-campaigns';
 
 export default async function CampaignsPage() {
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
   const workspaceId = access.workspaceId;
+
+  await ensureDefaultCampaigns(workspaceId);
 
   const campaigns = await prisma.smartPlan.findMany({
     where: { workspaceId },

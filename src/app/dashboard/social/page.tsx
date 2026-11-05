@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { contentPlannerApiUrl } from '@/lib/contentplanner-api';
 import toast from 'react-hot-toast';
 
 interface SocialAccount {
@@ -17,7 +18,7 @@ const PLATFORMS = [
   { id: 'instagram', name: 'Instagram', icon: '📸', color: 'bg-pink-500' },
   { id: 'linkedin', name: 'LinkedIn', icon: '💼', color: 'bg-indigo-600' },
   { id: 'twitter', name: 'X (Twitter)', icon: '🐦', color: 'bg-black' },
-  { id: 'tiktok', name: 'TikTok', icon: '🎵', color: 'bg-gray-900' },
+  { id: 'tiktok', name: 'TikTok', icon: '🎵', color: 'bg-card' },
   { id: 'gmb', name: 'Google Business', icon: '📍', color: 'bg-green-600' },
 ];
 
@@ -43,21 +44,33 @@ export default function SocialConnectionsPage() {
   const connectPlatform = async (platform: string) => {
     setConnecting(platform);
     try {
-      // In production, this would redirect to OAuth flow
-      // For now, create a placeholder connection
+      // Try ContentPlanner OAuth flow first (works when real API keys are configured).
+      try {
+        const oauthRes = await fetch(contentPlannerApiUrl('/social/auth-url?provider=' + platform.toLowerCase()));
+        if (oauthRes.ok) {
+          const oauthData = await oauthRes.json();
+          if (oauthData.authUrl && !oauthData.authUrl.includes('MOCK_')) {
+            window.open(oauthData.authUrl, '_blank');
+            toast.success('Redirecting to ' + platform + ' authorization...');
+            return;
+          }
+        }
+      } catch { /* ContentPlanner API may be down — fall through to local record */ }
+
+      // Fallback: create a local connection record.
       const res = await fetch('/api/social', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           platform,
-          accountName: `@${platform}_account`,
+          accountName: '@' + platform + '_account',
         }),
       });
       if (!res.ok) throw new Error('Failed');
-      toast.success(`Connected to ${platform}!`);
+      toast.success('Connected to ' + platform + ' (local record — OAuth keys pending).');
       loadAccounts();
     } catch {
-      toast.error(`Failed to connect ${platform}`);
+      toast.error('Failed to connect ' + platform);
     } finally {
       setConnecting(null);
     }
@@ -75,12 +88,12 @@ export default function SocialConnectionsPage() {
   };
 
   const getPlatformInfo = (platform: string) =>
-    PLATFORMS.find(p => p.id === platform) || { id: platform, name: platform, icon: '🔗', color: 'bg-gray-500' };
+    PLATFORMS.find(p => p.id === platform) || { id: platform, name: platform, icon: '🔗', color: 'bg-muted' };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Social Connections <span title="Connect social media accounts for automated content publishing. Manage Facebook, Instagram, LinkedIn, and Twitter/X." aria-label="About this section: Connect social media accounts for automated content publishing. Manage Facebook, Instagram, LinkedIn, and Twitter/X." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+        <h1 className="text-2xl font-bold text-foreground">Social Connections <span title="Connect social media accounts for automated content publishing. Manage Facebook, Instagram, LinkedIn, and Twitter/X." aria-label="About this section: Connect social media accounts for automated content publishing. Manage Facebook, Instagram, LinkedIn, and Twitter/X." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
         <p className="text-sm text-muted-foreground mt-1">
           Connect your social media accounts for unified publishing and inbox management.
         </p>
@@ -88,7 +101,7 @@ export default function SocialConnectionsPage() {
 
       {/* Connected Accounts */}
       <div>
-        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Connected Accounts</h2>
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Connected Accounts <span title="Social media accounts linked for unified publishing and inbox management." aria-label="About Connected Accounts: Social media accounts linked for publishing and inbox." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-1 align-middle">?</span></h2>
         {isLoading ? (
           <div className="text-center py-8 text-muted-foreground text-sm">Loading...</div>
         ) : accounts.length === 0 ? (
@@ -112,7 +125,7 @@ export default function SocialConnectionsPage() {
                         <p className="text-xs text-muted-foreground">{account.accountName}</p>
                       </div>
                     </div>
-                    <span className={`text-[9px] px-2 py-1 rounded-full font-bold uppercase ${account.isActive ? 'bg-green-500/15 text-green-500' : 'bg-gray-500/15 text-gray-500'}`}>
+                    <span className={`text-[9px] px-2 py-1 rounded-full font-bold uppercase ${account.isActive ? 'bg-green-500/15 text-green-500' : 'bg-muted/15 text-muted-foreground'}`}>
                       {account.isActive ? 'Active' : 'Paused'}
                     </span>
                   </div>
@@ -120,7 +133,7 @@ export default function SocialConnectionsPage() {
                     <span className="text-[10px] text-muted-foreground">
                       {account.lastSyncAt ? `Synced ${new Date(account.lastSyncAt).toLocaleDateString()}` : 'Never synced'}
                     </span>
-                    <button onClick={() => disconnect(account.id)}
+                    <button type="button" onClick={() => disconnect(account.id)}
                       className="text-xs text-red-500 hover:underline">
                       Disconnect
                     </button>
@@ -134,12 +147,12 @@ export default function SocialConnectionsPage() {
 
       {/* Available Platforms */}
       <div>
-        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Add Connection</h2>
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">Add Connection <span title="Link a new social media platform account for posting and engagement tracking." aria-label="About Add Connection: Link a new social media platform." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-1 align-middle">?</span></h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {PLATFORMS.map(platform => {
             const isConnected = accounts.some(a => a.platform === platform.id && a.isActive);
             return (
-              <button
+              <button type="button"
                 key={platform.id}
                 onClick={() => !isConnected && connectPlatform(platform.id)}
                 disabled={isConnected || connecting === platform.id}
@@ -161,6 +174,130 @@ export default function SocialConnectionsPage() {
           })}
         </div>
       </div>
+
+      {/* Recent Posts from Content Planner */}
+      <RecentPostsSection />
+
+      {/* Social Analytics from Content Planner */}
+      <SocialAnalyticsSummary />
+    </div>
+  );
+}
+
+function SocialAnalyticsSummary() {
+  const [analytics, setAnalytics] = useState<{ totalViews: number; totalLikes: number; totalShares: number } | null>(null);
+
+  useEffect(() => {
+    fetch(contentPlannerApiUrl('/analytics'))
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && typeof data === 'object') {
+          setAnalytics({
+            totalViews: data.totalViews || 0,
+            totalLikes: data.totalLikes || 0,
+            totalShares: data.totalShares || 0,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  if (!analytics) return null;
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Engagement Overview</h2>
+        <span
+          title="Aggregated engagement metrics from the Content Planner analytics API (port 3031)."
+          aria-label="Engagement overview from Content Planner analytics"
+          className="cursor-help text-muted-foreground text-xs"
+        >ⓘ</span>
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { label: 'Total Views', value: analytics.totalViews.toLocaleString(), icon: '👁️' },
+          { label: 'Total Likes', value: analytics.totalLikes.toLocaleString(), icon: '❤️' },
+          { label: 'Total Shares', value: analytics.totalShares.toLocaleString(), icon: '🔄' },
+        ].map(s => (
+          <div key={s.label} className="bg-background border border-border rounded-xl p-4 text-center">
+            <div className="text-2xl mb-1">{s.icon}</div>
+            <p className="text-2xl font-extrabold text-foreground">{s.value}</p>
+            <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+interface PlannerPost {
+  id: string;
+  content: string;
+  status: string;
+  platform?: string | null;
+  scheduledAt?: string | null;
+  createdAt: string;
+}
+
+function RecentPostsSection() {
+  const [posts, setPosts] = useState<PlannerPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [apiUp, setApiUp] = useState(true);
+
+  useEffect(() => {
+    fetch(contentPlannerApiUrl('/posts'))
+      .then(res => {
+        if (!res.ok) throw new Error('API down');
+        return res.json();
+      })
+      .then(data => {
+        setPosts(Array.isArray(data) ? data.slice(0, 8) : []);
+        setApiUp(true);
+      })
+      .catch(() => setApiUp(false))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Recent Posts</h2>
+        <span
+          title="Fetched from Content Planner API (port 3031). Shows your latest scheduled and draft posts."
+          aria-label="Recent posts are fetched from the Content Planner service on port 3031"
+          className="cursor-help text-muted-foreground text-xs"
+        >ⓘ</span>
+      </div>
+      {isLoading ? (
+        <div className="text-sm text-muted-foreground">Loading posts...</div>
+      ) : !apiUp ? (
+        <div className="text-sm text-muted-foreground border border-border rounded-xl p-4">
+          Content Planner API is not reachable. Start it from the system tray or run <code className="text-xs bg-muted px-1 rounded">start-api.bat</code> in <code className="text-xs bg-muted px-1 rounded">apps/contentplanner/packages/api</code>.
+        </div>
+      ) : posts.length === 0 ? (
+        <div className="text-sm text-muted-foreground border border-border rounded-xl p-4">
+          No posts yet. Create content in the <a href={process.env.NEXT_PUBLIC_CONTENT_PLANNER_URL || "#"} target="_blank" rel="noopener noreferrer" className="text-secondary underline">Content Planner</a>.
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {posts.map(post => (
+            <div key={post.id} className="bg-background border border-border rounded-xl p-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                  post.status === 'PUBLISHED' ? 'bg-green-500/15 text-green-500'
+                  : post.status === 'SCHEDULED' ? 'bg-blue-500/15 text-blue-500'
+                  : 'bg-muted/15 text-muted-foreground'
+                }`}>{post.status}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {new Date(post.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              <p className="text-xs text-foreground line-clamp-2">{post.content}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -36,7 +36,11 @@ export default async function middleware(req: NextRequest) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET ?? 'realestatecrm-dev-secret' });
     if (!token) {
       const signInUrl = new URL('/auth/signin', req.url);
-      signInUrl.searchParams.set('callbackUrl', req.url);
+      // Use a RELATIVE callback path. req.url behind the nginx proxy is the
+      // internal upstream URL (http://0.0.0.0:3210/...), which produced broken
+      // post-login redirects to 0.0.0.0:3210. Relative paths are host-agnostic
+      // and NextAuth resolves them against the public origin.
+      signInUrl.searchParams.set('callbackUrl', url.pathname + url.search);
       return NextResponse.redirect(signInUrl);
     }
   }

@@ -13,42 +13,26 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
   const [keywords, setKeywords] = useState('');
   const [tone, setTone] = useState('Professional');
   
-  // Phase 2 outline structure
-  const [title, setTitle] = useState('Top Reasons to Move to Macomb County in 2026');
-  const [headings, setHeadings] = useState<string[]>([
-    'Introduction: The Growing Real Estate Hub of Metro Detroit',
-    '1. High-Performing School Districts & Safe Suburbs',
-    '2. Affordability & Diverse Listing Options',
-    '3. Parks, Lake St. Clair Access & Local Attractions',
-    'Conclusion: Finding Your Dream Property in Macomb County'
-  ]);
+  // Phase 2 outline structure — starts empty; the AI outline step populates these.
+  const [title, setTitle] = useState('');
+  const [headings, setHeadings] = useState<string[]>([]);
   const [includeCTA, setIncludeCTA] = useState(true);
 
-  // Phase 3 meta settings
-  const [seoTitle, setSeoTitle] = useState('Top Reasons to Move to Macomb County in 2026 | Excel Legacy Realty');
-  const [metaDesc, setMetaDesc] = useState('Looking to move to Macomb County, Michigan? Discover the best neighborhood listings, parks, schools, and real estate options with Excel Legacy.');
-  const [slug, setSlug] = useState('move-to-macomb-county-2026');
-  const [gmbVerification, setGmbVerification] = useState('GMB-VERIFY-8834920');
+  // Phase 3 meta settings — starts empty; filled in by the author.
+  const [seoTitle, setSeoTitle] = useState('');
+  const [metaDesc, setMetaDesc] = useState('');
+  const [slug, setSlug] = useState('');
+  const [gmbVerification, setGmbVerification] = useState('');
 
   const [isGenerating, setIsGenerating] = useState(false);
-  const [articles, setArticles] = useState([
-    {
-      id: 'art-1',
-      title: 'St. Clair Shores Lakefront Living Guide',
-      slug: 'st-clair-shores-lakefront-guide',
-      keywords: 'st clair shores, waterfront listings, macomb county',
-      status: 'PUBLISHED',
-      createdAt: '2026-07-12'
-    },
-    {
-      id: 'art-2',
-      title: 'Warren MI Seller Market Valuation Checklist',
-      slug: 'warren-seller-market-valuation',
-      keywords: 'home valuation warren, house prices, sell home mi',
-      status: 'DRAFT',
-      createdAt: '2026-07-10'
-    }
-  ]);
+  const [articles, setArticles] = useState<Array<{
+    id: string;
+    title: string;
+    slug: string;
+    keywords: string;
+    status: string;
+    createdAt: string;
+  }>>([]);
 
   const handleGenerateOutline = (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,7 +102,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
       {/* Walkthrough Instructions */}
       {showWalkthrough && (
         <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-5 relative animate-fadeIn flex flex-col md:flex-row gap-5 shadow-xs">
-          <button 
+          <button type="button" 
             onClick={() => setShowWalkthrough(false)}
             className="absolute top-3.5 right-3.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             title="Dismiss walkthrough"
@@ -225,7 +209,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                   <BookOpen className="w-5 h-5 text-indigo-500" />
                   <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">Review & Edit Article Outline</h3>
                 </div>
-                <button
+                <button type="button"
                   onClick={() => setPhase(1)}
                   className="text-xs font-bold text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer"
                 >
@@ -246,7 +230,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
 
                 <div className="space-y-3">
                   <label className="block text-[10px] font-black uppercase">Section Headings (H2 / Outlines)</label>
-                  {headings.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No blog posts yet. Create your first post to improve SEO.</div> : (headings.map((heading, idx) => (
+                  {headings.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No blog posts yet. Create your first post to improve SEO.</div> : (headings.map((heading, idx) => (
                     <div key={idx} className="flex gap-2 items-center">
                       <span className="w-5 h-5 rounded-md bg-muted text-[10px] font-black flex items-center justify-center text-muted-foreground">
                         {idx + 1}
@@ -259,7 +243,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                       />
                     </div>
                   )))}
-                  <button
+                  <button type="button"
                     onClick={handleAddHeading}
                     className="text-[10px] font-black text-indigo-500 hover:text-indigo-600 uppercase flex items-center gap-1 cursor-pointer mt-1"
                   >
@@ -281,7 +265,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                   />
                 </div>
 
-                <button
+                <button type="button"
                   onClick={() => setPhase(3)}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
                 >
@@ -298,7 +282,7 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                   <Settings className="w-5 h-5 text-indigo-500" />
                   <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">Publish Meta & Tracking Credentials</h3>
                 </div>
-                <button
+                <button type="button"
                   onClick={() => setPhase(2)}
                   className="text-xs font-bold text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer"
                 >
@@ -358,13 +342,13 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                 </div>
 
                 <div className="flex gap-3 pt-3 border-t border-border/40">
-                  <button
+                  <button type="button"
                     onClick={() => handlePublish('DRAFT')}
                     className="flex-1 py-3 bg-muted hover:bg-muted/80 text-foreground font-black uppercase tracking-widest text-[10px] rounded-xl transition-all cursor-pointer"
                   >
                     Save Draft
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => handlePublish('PUBLISHED')}
                     className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-md cursor-pointer"
                   >
@@ -418,7 +402,10 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
             </h3>
             
             <div className="space-y-3">
-              {articles.map(art => (
+              {articles.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-2">No articles yet. Generate your first SEO article.</div>
+              ) : (
+                articles.map(art => (
                 <div key={art.id} className="p-3 border border-border/40 rounded-xl hover:border-border transition-colors flex flex-col gap-1.5">
                   <div className="flex justify-between items-start gap-2">
                     <span className="text-xs font-extrabold text-foreground leading-tight line-clamp-1">{art.title}</span>
@@ -433,7 +420,8 @@ export default function SEOBlogTab({ workspaceId }: { workspaceId: string }) {
                     <span>{art.createdAt}</span>
                   </div>
                 </div>
-              ))}
+              ))
+              )}
             </div>
           </div>
 

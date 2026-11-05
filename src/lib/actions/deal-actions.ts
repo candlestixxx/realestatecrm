@@ -4,12 +4,19 @@ import { getServerSession } from 'next-auth/next';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
+import { isDealStage } from '@/lib/deal-stages';
 import { revalidatePath } from 'next/cache';
 
 // Update deal stage
 export async function updateDealStageAction(dealId: string, stage: string) {
   const session = await getServerSession(authOptions);
   const access = await requireWorkspaceAccess(session);
+
+  // Whitelist: previously any string was persisted as a stage, silently
+  // removing the deal from the board.
+  if (!isDealStage(stage)) {
+    return { error: 'Invalid deal stage.' };
+  }
 
   try {
     const deal = await prisma.deal.findFirst({

@@ -8,7 +8,7 @@
  * for deep-links) plus a description of when to touch it.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import RoutingRulesWidget from '@/components/RoutingRulesWidget';
 import {
@@ -28,6 +28,24 @@ interface SettingsTab {
 }
 
 const TABS: SettingsTab[] = [
+  {
+    id: 'branding',
+    label: 'Branding',
+    description: 'Brokerage name, logo, colors, and client portal identity.',
+    tooltip:
+      'White-label branding shown on the client portal, e-signing pages, and outbound emails. Each workspace carries its own identity.',
+    href: '/dashboard/settings/branding',
+    icon: '🎨',
+  },
+  {
+    id: 'team',
+    label: 'Team',
+    description: 'Invite agents, assign brokerage roles, and manage access.',
+    tooltip:
+      'Team management for the workspace. Roles follow the brokerage hierarchy: Owner, Broker, Associate Broker, Realtor Agent, Agent, Office Manager.',
+    href: '/dashboard/settings/team',
+    icon: '👥',
+  },
   {
     id: 'integrations',
     label: 'Lead Integrations',
@@ -91,6 +109,15 @@ const TABS: SettingsTab[] = [
     href: '#routing',
     icon: '🔀',
   },
+  {
+    id: 'folders',
+    label: 'Folder Monitoring',
+    description: 'Watch folders for auto-importing property photos and documents.',
+    tooltip:
+      'Monitor network shares, MLS downloads, and local folders for new files. Matching files are auto-imported into the CRM.',
+    href: '#folders',
+    icon: '📁',
+  },
 ];
 
 function InfoBadge({ text }: { text: string }) {
@@ -112,6 +139,38 @@ function InfoBadge({ text }: { text: string }) {
   );
 }
 
+function FolderMonitoringPanel() {
+  const [folders, setFolders] = useState<{ id: string; label: string; path: string; enabled: boolean }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    fetch('/api/folder-detection')
+      .then(r => r.json())
+      .then(d => setFolders(d.watchFolders || []))
+      .catch(() => setFolders([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p className="text-sm text-muted-foreground">Loading watch folders...</p>;
+  if (folders.length === 0) return <p className="text-sm text-muted-foreground">No watch folders configured.</p>;
+
+  return (
+    <div className="space-y-3">
+      {folders.map(f => (
+        <div key={f.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/30 p-3">
+          <div>
+            <div className="text-sm font-semibold">{f.label}</div>
+            <div className="text-xs text-muted-foreground font-mono">{f.path}</div>
+          </div>
+          <span className={'text-xs font-semibold px-2 py-1 rounded ' + (f.enabled ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground')}>
+            {f.enabled ? 'Active' : 'Inactive'}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function SettingsTabs() {
   const [active, setActive] = useState('integrations');
   const current = TABS.find((t) => t.id === active) ?? TABS[0];
@@ -119,7 +178,7 @@ export default function SettingsTabs() {
   return (
     <TooltipProvider delayDuration={200}>
       <div className="space-y-6 max-w-5xl mx-auto">
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Settings</h1> <span title="Configure AI model keys, email, voice, MCP servers, integrations, and AI memory preferences." aria-label="About this section: Configure AI model keys, email, voice, MCP servers, integrations, and AI memory preferences." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Settings</h1> <span title="Configure AI model keys, email, voice, MCP servers, integrations, and AI memory preferences." aria-label="About this section: Configure AI model keys, email, voice, MCP servers, integrations, and AI memory preferences." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground text-sm mt-1">
@@ -191,6 +250,10 @@ export default function SettingsTabs() {
 
           {current.id === 'routing' && (
             <RoutingRulesWidget />
+          )}
+
+          {current.id === 'folders' && (
+            <FolderMonitoringPanel />
           )}
 
           <div className="rounded-lg border border-border/60 bg-muted/30 p-4 text-xs text-muted-foreground leading-relaxed">

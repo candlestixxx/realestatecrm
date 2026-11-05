@@ -79,7 +79,7 @@ export default function ShareWidget({ url, title, description = '' }: ShareWidge
       </span>
 
       {/* Native share button — visible only on devices with Web Share API */}
-      <button
+      <button type="button"
         onClick={handleNativeShare}
         className="hidden md:hidden items-center gap-1 px-3 py-1.5 rounded-full border border-border text-xs font-medium hover:bg-muted transition-colors"
         aria-label="Open native share sheet"
@@ -103,7 +103,7 @@ export default function ShareWidget({ url, title, description = '' }: ShareWidge
         </a>
       ))}
 
-      <button
+      <button type="button"
         onClick={handleCopy}
         className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-border text-xs font-medium hover:bg-muted transition-colors"
         title="Copy link"

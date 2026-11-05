@@ -117,7 +117,7 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <h2 className="text-sm font-bold text-foreground">💬 Team Chat</h2>
-        <button
+        <button type="button"
           onClick={() => setShowNewChat(!showNewChat)}
           className="text-xs text-secondary hover:underline font-medium"
         >
@@ -144,24 +144,26 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
               className="w-full px-3 py-1.5 text-xs border border-border rounded-lg bg-background"
             />
           )}
-          <button
+          <button type="button"
             onClick={async () => {
-              const res = await fetch('/api/chat/rooms', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  type: newChatType,
-                  name: newChatName || undefined,
-                  participantIds: [],
-                }),
-              });
-              const data = await res.json();
-              if (data.room) {
-                setRooms((prev) => [data.room, ...prev]);
-                setActiveRoom(data.room);
-                setShowNewChat(false);
-                setNewChatName('');
-              }
+              try {
+                const res = await fetch('/api/chat/rooms', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    type: newChatType,
+                    name: newChatName || undefined,
+                    participantIds: [],
+                  }),
+                });
+                const data = await res.json();
+                if (data.room) {
+                  setRooms((prev) => [data.room, ...prev]);
+                  setActiveRoom(data.room);
+                  setShowNewChat(false);
+                  setNewChatName('');
+                }
+              } catch { /* network error */ }
             }}
             className="w-full px-3 py-1.5 bg-secondary text-secondary-foreground text-xs font-bold rounded-lg hover:bg-secondary/90"
           >
@@ -181,7 +183,7 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
             </div>
           ) : (
             rooms.map((room) => (
-              <button
+              <button type="button"
                 key={room.id}
                 onClick={() => setActiveRoom(room)}
                 className={
@@ -213,7 +215,10 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
             <>
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
-                {messages.map((msg) => {
+                {messages.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">No messages yet. Start the conversation!</div>
+                ) : (
+                  messages.map((msg) => {
                   const isOwn = msg.sender.id === currentUserId;
                   return (
                     <div
@@ -243,7 +248,8 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
                       </div>
                     </div>
                   );
-                })}
+                })
+                )}
                 <div ref={bottomRef} />
               </div>
 
@@ -261,7 +267,7 @@ export default function TeamChat({ currentUserId }: { currentUserId: string }) {
                   placeholder="Type a message..."
                   className="flex-1 px-3 py-2 text-xs border border-border rounded-lg bg-background"
                 />
-                <button
+                <button type="button"
                   onClick={sendMessage}
                   disabled={!newMessage.trim()}
                   className="px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold rounded-lg hover:bg-secondary/90 disabled:opacity-50"

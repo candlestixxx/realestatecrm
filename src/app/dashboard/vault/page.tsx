@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 // Document vault — secure storage for contracts, disclosures, and client docs.
 // API: /api/vault (GET list, POST create). Presigned S3 uploads.
 
@@ -49,12 +49,12 @@ export default function VaultPage() {
 
   return (
     <div className="p-6 max-w-4xl">
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Document Vault</h1> <span title="Secure document storage and sharing. Upload contracts, disclosures, inspection reports, and other transaction documents." aria-label="About this section: Secure document storage and sharing. Upload contracts, disclosures, inspection reports, and other transaction documents." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Document Vault</h1> <span title="Secure document storage and sharing. Upload contracts, disclosures, inspection reports, and other transaction documents." aria-label="About this section: Secure document storage and sharing. Upload contracts, disclosures, inspection reports, and other transaction documents." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Lock className="w-6 h-6 text-primary" /> Document Vault
         </h1>
-        <button onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90">
+        <button type="button" onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90">
           <Plus className="w-4 h-4" /> New Document
         </button>
       </div>
@@ -87,8 +87,8 @@ export default function VaultPage() {
               <p className="font-medium truncate">{d.title}</p>
               <p className="text-xs text-muted-foreground">Created {new Date(d.createdAt).toLocaleDateString()}</p>
             </div>
-            <button className="p-1.5 hover:bg-muted rounded" title="Download"><Download className="w-4 h-4" /></button>
-            <button className="p-1.5 hover:bg-destructive/10 rounded text-destructive" title="Delete"><Trash2 className="w-4 h-4" /></button>
+            <button type="button" className="p-1.5 hover:bg-muted rounded" title="Download"><Download className="w-4 h-4" /></button>
+            <button type="button" className="p-1.5 hover:bg-destructive/10 rounded text-destructive" title="Delete"><Trash2 className="w-4 h-4" /></button>
           </div>
         ))}
       </div>

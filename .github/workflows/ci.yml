@@ -37,6 +37,18 @@ jobs:
             dir: apps/media-workflow
             install: npm ci --legacy-peer-deps
             build: npm run build
+          - app: contentplanner
+            dir: apps/contentplanner
+            install: npm ci --legacy-peer-deps
+            build: npm run build
+          - app: foreclosureworkflow
+            dir: apps/foreclosureworkflow
+            install: npm ci --legacy-peer-deps
+            build: npm run build
+          - app: legacyleads-frontend
+            dir: apps/legacyleads/frontend
+            install: npm ci --legacy-peer-deps
+            build: npm run build
     steps:
       - uses: actions/checkout@v4
         with:

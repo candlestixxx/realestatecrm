@@ -62,8 +62,8 @@ export default function MCPSettingsClient() {
 
   return (
     <div className="space-y-6">
-      {loading && <div className="flex items-center justify-center py-8"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600" /><span className="ml-2 text-sm text-gray-500">Loading settings...</span></div>}
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">MCP Server</h1> <span title="Expose CRM tools to MCP-compatible agents (Claude, Cursor, etc.). Control which tools external agents may invoke." aria-label="About this section: Expose CRM tools to MCP-compatible agents (Claude, Cursor, etc.). Control which tools external agents may invoke." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      {loading && <div className="flex items-center justify-center py-8"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600" /><span className="ml-2 text-sm text-muted-foreground">Loading settings...</span></div>}
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">MCP Server</h1> <span title="Expose CRM tools to MCP-compatible agents (Claude, Cursor, etc.). Control which tools external agents may invoke." aria-label="About this section: Expose CRM tools to MCP-compatible agents (Claude, Cursor, etc.). Control which tools external agents may invoke." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       <div>
         <h1 className="text-2xl font-bold text-foreground">MCP Server</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -85,7 +85,7 @@ export default function MCPSettingsClient() {
               value={endpointUrl}
               className="flex-1 px-3 py-2 text-sm bg-muted/50 border border-border rounded-lg text-foreground font-mono"
             />
-            <button onClick={() => copyToClipboard(endpointUrl, 'Endpoint URL')}
+            <button type="button" onClick={() => copyToClipboard(endpointUrl, 'Endpoint URL')}
               className="px-3 py-2 text-xs font-bold text-secondary border border-border rounded-lg hover:bg-muted transition-colors">
               Copy
             </button>
@@ -108,7 +108,7 @@ export default function MCPSettingsClient() {
               placeholder="Enter MCP_TOKEN value to test"
               className="flex-1 px-3 py-2 text-sm bg-muted/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground"
             />
-            <button onClick={() => setShowToken(!showToken)}
+            <button type="button" onClick={() => setShowToken(!showToken)}
               className="px-3 py-2 text-xs font-bold text-muted-foreground border border-border rounded-lg hover:bg-muted transition-colors">
               {showToken ? 'Hide' : 'Show'}
             </button>
@@ -117,7 +117,7 @@ export default function MCPSettingsClient() {
 
         {/* Test */}
         <div>
-          <button onClick={testConnection} disabled={testing}
+          <button type="button" onClick={testConnection} disabled={testing}
             className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-bold rounded-lg hover:bg-secondary/90 disabled:opacity-50 transition-colors">
             {testing ? 'Testing...' : 'Test Connection'}
           </button>
@@ -157,7 +157,7 @@ export default function MCPSettingsClient() {
     }
   }
 }`}</pre>
-        <button onClick={() => copyToClipboard(JSON.stringify({
+        <button type="button" onClick={() => copyToClipboard(JSON.stringify({
           mcpServers: {
             'agentcore-crm': {
               url: endpointUrl || 'https://your-domain.com/api/mcp',

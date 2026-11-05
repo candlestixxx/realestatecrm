@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Loader2, RefreshCw, CheckCircle2, XCircle, Clock, ArrowRight } from 'lucide-react';
+import { Loader2, RefreshCw, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 type SyncLog = {

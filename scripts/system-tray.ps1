@@ -62,7 +62,7 @@ $Services = [ordered]@{
     'leadg' = @{
         Label = 'LeadG'
         Port = 3001
-        Cmd = 'node node_modules\next\dist\bin\next start -p 3001'
+        Cmd = 'set PORT=3001 && set NEXTAUTH_SECRET=dev_secret_change_me && set NEXTAUTH_URL=http://localhost:3001 && node .next\standalone\server.js'
         WorkDir = (Join-Path $Root 'apps\leadg')
         HealthPath = '/auth/signin'
         Log = 'server.log'
@@ -80,16 +80,25 @@ $Services = [ordered]@{
     'contentplanner' = @{
         Label = 'Content Planner (web)'
         Port = 3003
-        Cmd = 'node node_modules\next\dist\bin\next start -p 3003'
+        Cmd = 'node ..\..\node_modules\next\dist\bin\next start -p 3003'
         WorkDir = (Join-Path $Root 'apps\contentplanner\apps\web')
         HealthPath = '/'
+        Log = 'server.log'
+        ErrLog = 'server-err.log'
+    }
+    'contentplanner-api' = @{
+        Label = 'Content Planner (API)'
+        Port = 3031
+        Cmd = 'cmd /c start-api.bat'
+        WorkDir = (Join-Path $Root 'apps\contentplanner\packages\api')
+        HealthPath = '/posts'
         Log = 'server.log'
         ErrLog = 'server-err.log'
     }
     'media-workflow' = @{
         Label = 'Media Workflow API'
         Port = 3004
-        Cmd = 'node dist\src\index.js'
+        Cmd = 'set PORT=3004 && node dist\src\index.js'
         WorkDir = (Join-Path $Root 'apps\media-workflow')
         HealthPath = $null
         Log = 'server.log'
@@ -293,6 +302,13 @@ $miStartAll.Add_Click({ Start-AllServices })
 
 $miStopAll = $menu.Items.Add('Stop All Services')
 $miStopAll.Add_Click({ Stop-AllServices })
+
+$menu.Items.Add((New-Object System.Windows.Forms.ToolStripSeparator))
+
+$miWatchdog = $menu.Items.Add('Start Watchdog (auto-restart)')
+$miWatchdog.Add_Click({
+    Start-Process -FilePath 'powershell.exe' -ArgumentList '-ExecutionPolicy','Bypass','-File', (Join-Path $Root 'scripts\watch-services.ps1') -WindowStyle Minimized
+})
 
 $menu.Items.Add((New-Object System.Windows.Forms.ToolStripSeparator))
 

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 // Team chat — real-time messaging for the workspace.
 // Uses /api/chat/rooms and /api/chat/messages for room/message CRUD.
 
@@ -38,14 +38,15 @@ export default function ChatPage() {
     if (!input.trim() || !activeRoom) return;
     const msg = { body: input, roomId: activeRoom };
     setInput('');
-    // Optimistic add
     setMessages(prev => [...prev, { id: 'temp', body: input, sender: 'You', sentAt: new Date().toISOString() }]);
-    await fetch('/api/chat/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) });
+    try {
+      await fetch('/api/chat/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) });
+    } catch { /* optimistic message stays; retried on next poll */ }
   }
 
   return (
     <div className="p-6 max-w-5xl h-[calc(100vh-4rem)]">
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Team Chat</h1> <span title="Private and group messaging with your team. Create channels, share files, and mention teammates for quick collaboration." aria-label="About this section: Private and group messaging with your team. Create channels, share files, and mention teammates for quick collaboration." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Team Chat</h1> <span title="Private and group messaging with your team. Create channels, share files, and mention teammates for quick collaboration." aria-label="About this section: Private and group messaging with your team. Create channels, share files, and mention teammates for quick collaboration." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
         <MessageSquare className="w-6 h-6 text-primary" /> Team Chat
       </h1>
@@ -53,10 +54,10 @@ export default function ChatPage() {
         <div className="w-56 border rounded-lg p-3 shrink-0 overflow-y-auto">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-muted-foreground">Rooms</span>
-            <button className="p-1 hover:bg-muted rounded" title="New room"><Plus className="w-4 h-4" /></button>
+            <button type="button" className="p-1 hover:bg-muted rounded" title="New room"><Plus className="w-4 h-4" /></button>
           </div>
           {rooms.map(r => (
-            <button key={r.id} onClick={() => setActiveRoom(r.id)}
+            <button type="button" key={r.id} onClick={() => setActiveRoom(r.id)}
               className={`w-full text-left px-3 py-2 rounded-md text-sm mb-1 transition-colors ${activeRoom === r.id ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted'}`}>
               <Users className="w-3.5 h-3.5 inline mr-1.5" />{r.name}
             </button>
@@ -78,7 +79,7 @@ export default function ChatPage() {
             <input placeholder="Type a message..." value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
               className="flex-1 rounded-md border px-3 py-2 text-sm" />
-            <button onClick={handleSend} className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90">
+            <button type="button" onClick={handleSend} className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90">
               <Send className="w-4 h-4" />
             </button>
           </div>

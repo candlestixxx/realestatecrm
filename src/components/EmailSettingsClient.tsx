@@ -7,7 +7,7 @@ import { EmailConfig } from '@/lib/email-config';
 
 export default function EmailSettingsClient({ initialConfig }: { initialConfig: EmailConfig }) {
   const [provider, setProvider] = useState<EmailConfig['provider']>(initialConfig.provider);
-  const [fromEmail, setFromEmail] = useState(initialConfig.fromEmail || 'info@excellegacy.com');
+  const [fromEmail, setFromEmail] = useState(initialConfig.fromEmail || 'info@excellegacyrealtygroup.site');
 
   // AWS SES State
   const [awsAccessKey, setAwsAccessKey] = useState(initialConfig.awsAccessKey || '');
@@ -86,7 +86,7 @@ export default function EmailSettingsClient({ initialConfig }: { initialConfig: 
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Email Settings</h1> <span title="Configure email providers, SMTP settings, templates, and signature preferences." aria-label="About this section: Configure email providers, SMTP settings, templates, and signature preferences." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></div>
+      <div className="flex items-center mb-4"><h1 className="text-xl font-semibold">Email Settings</h1> <span title="Configure email providers, SMTP settings, templates, and signature preferences." aria-label="About this section: Configure email providers, SMTP settings, templates, and signature preferences." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></div>
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Email System Integration</h1>
         <p className="text-muted-foreground">Configure SMTP, Amazon SES, or Resend to send real marketing campaigns and triggers.</p>
@@ -119,7 +119,7 @@ export default function EmailSettingsClient({ initialConfig }: { initialConfig: 
                 type="email"
                 value={fromEmail}
                 onChange={(e) => setFromEmail(e.target.value)}
-                placeholder="info@excellegacy.com"
+                placeholder="info@excellegacyrealtygroup.site"
                 className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none"
               />
               <p className="text-[10px] text-muted-foreground italic">Note: In SMTP, this should match your mail username. In SES, this email address must be verified.</p>

@@ -59,20 +59,20 @@ export default function PublishingCalendarPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Publishing Calendar <span title="Schedule and manage content publishing across social media platforms. Drag-and-drop calendar view with optimal posting times." aria-label="About this section: Schedule and manage content publishing across social media platforms. Drag-and-drop calendar view with optimal posting times." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+          <h1 className="text-2xl font-bold text-foreground">Publishing Calendar <span title="Schedule and manage content publishing across social media platforms. Drag-and-drop calendar view with optimal posting times." aria-label="About this section: Schedule and manage content publishing across social media platforms. Drag-and-drop calendar view with optimal posting times." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-sm text-muted-foreground mt-1">
             Schedule and manage your content across all platforms.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => navigateMonth(-1)}
+          <button type="button" onClick={() => navigateMonth(-1)}
             className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors">
             ←
           </button>
           <span className="text-lg font-bold text-foreground min-w-[180px] text-center">
             {MONTHS[month]} {year}
           </span>
-          <button onClick={() => navigateMonth(1)}
+          <button type="button" onClick={() => navigateMonth(1)}
             className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors">
             →
           </button>

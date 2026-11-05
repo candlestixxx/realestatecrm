@@ -7,7 +7,7 @@ import { MetadataRoute } from 'next';
  * dashboard must never appear in search results (contains PII).
  */
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://excellegacy.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://excellegacyrealtygroup.site';
 
   return {
     rules: [

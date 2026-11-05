@@ -67,14 +67,14 @@ export default function LeadMapPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Lead Map <span title="Visualize lead locations on an interactive map. Cluster markers by proximity and filter by lead status." aria-label="About this section: Visualize lead locations on an interactive map. Cluster markers by proximity and filter by lead status." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+          <h1 className="text-2xl font-bold text-foreground">Lead Map <span title="Visualize lead locations on an interactive map. Cluster markers by proximity and filter by lead status." aria-label="About this section: Visualize lead locations on an interactive map. Cluster markers by proximity and filter by lead status." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-sm text-muted-foreground mt-1">
             Geographic view of your leads with status and contact info.
           </p>
         </div>
         <div className="flex items-center gap-2">
           {['all', 'hot', 'active', 'cold', 'preforeclosure'].map(f => (
-            <button
+            <button type="button"
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold capitalize transition-colors ${
@@ -190,7 +190,7 @@ export default function LeadMapPage() {
                 >
                   View Lead
                 </a>
-                <button
+                <button type="button"
                   onClick={async () => {
                     if (!selectedLead.address) { toast.error('No address on file'); return; }
                     try {
@@ -200,8 +200,11 @@ export default function LeadMapPage() {
                         body: JSON.stringify({ address: selectedLead.address, leadId: selectedLead.id }),
                       });
                       const data = await res.json();
+                      const isMock = String(data?.match?.provider || '').includes('mock');
                       if (data.match?.found) {
-                        toast.success(`Skip trace found: ${data.match.name || 'contact info'}`);
+                        toast.success(
+                          `Skip trace found: ${data.match.name || 'contact info'}` + (isMock ? ' (demo data — wire a skip-trace key for live results)' : '')
+                        );
                       } else {
                         toast('No additional info found', { icon: 'ℹ️' });
                       }
@@ -225,7 +228,9 @@ export default function LeadMapPage() {
 
           {/* Lead List */}
           <div className="mt-4 space-y-1 max-h-[300px] overflow-y-auto">
-            {filteredLeads.slice(0, 20).map(lead => (
+            {filteredLeads.length === 0 ? (
+              <p className="text-xs text-muted-foreground text-center py-4">No leads with coordinates for this filter.</p>
+            ) : filteredLeads.slice(0, 20).map(lead => (
               <div
                 key={lead.id}
                 onClick={() => setSelectedLead(lead)}

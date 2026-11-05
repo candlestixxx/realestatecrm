@@ -70,7 +70,7 @@ export default function ApprovalsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Approval Workflows <span title="Review and approve pending actions including offers, listings, marketing campaigns, and content. Set multi-step approval chains." aria-label="About this section: Review and approve pending actions including offers, listings, marketing campaigns, and content. Set multi-step approval chains." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+        <h1 className="text-2xl font-bold text-foreground">Approval Workflows <span title="Review and approve pending actions including offers, listings, marketing campaigns, and content. Set multi-step approval chains." aria-label="About this section: Review and approve pending actions including offers, listings, marketing campaigns, and content. Set multi-step approval chains." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
         <p className="text-sm text-muted-foreground mt-1">
           Review and approve content, media assets, and marketing materials before publishing.
         </p>
@@ -79,7 +79,7 @@ export default function ApprovalsPage() {
       {/* Filters */}
       <div className="flex gap-2">
         {['pending', 'approved', 'rejected', 'all'].map(f => (
-          <button
+          <button type="button"
             key={f}
             onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-lg text-sm font-bold capitalize transition-colors ${
@@ -137,13 +137,13 @@ export default function ApprovalsPage() {
 
                   {parsed.status === 'PENDING' && (
                     <div className="flex gap-2">
-                      <button
+                      <button type="button"
                         onClick={() => handleAction(item.id, 'approved')}
                         className="px-4 py-2 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700"
                       >
                         ✓ Approve
                       </button>
-                      <button
+                      <button type="button"
                         onClick={() => handleAction(item.id, 'rejected')}
                         className="px-4 py-2 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700"
                       >

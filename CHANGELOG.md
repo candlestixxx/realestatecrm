@@ -1,3 +1,421 @@
+## v0.61.5 (2026-11-03)
+
+### Investment calculators for client presentations
+- Buyer + seller calculator at /dashboard/calculators (affordability, DSCR, cap rate, cash-on-cash, net sheets, plain-English verdict)
+- Shared engine in src/lib/calculators.ts, embeddable CALCULATOR block for agent tenant sites, linked in Command Center + sidebar
+- Fixed stray import in tenant page and stray brace in SidebarNav from prior session; new tests/calculators.test.mts (6 tests)
+
+## v0.61.4 (2026-11-02)
+
+### Live — legacyleads backend on Hetzner (:3217)
+- Fixed `tsc` output path (`dist/index.js`, not `dist/src/index.js`) in backend `start` + deploy script
+- `deploy-legacyleads-api.sh` now grants the app role table access post-migration (fresh DBs 500'd with 42501 otherwise) and keeps LF endings (CRLF breaks the remote run; never pipe scripts to ssh via PowerShell — scp + run)
+- Installed `postgresql-16-postgis-3` on the server; provisioned role/DB/migrations; nginx `/legacyleads-api/` live
+- Verified: `:3217/health` 200, `/listings` → `{data: [], count: 0}` locally and publicly; frontend rebuilt with prod API URL and redeployed
+
+## v0.61.3 (2026-11-02)
+
+### Added — legacyleads backend deploy pipeline (:3217)
+- `migrations/02_listings_schema.sql`: the `listings` table (`StandardStatus`/`ListPrice`/`PostalCode`/geom + GIST) the API queries but no migration defined (table starts empty; ingestion gateway still pending)
+- Backend `build` (`tsc`) + `start` (`node dist/src/index.js`) scripts (tsc clean, backend suite 13/13)
+- `deploy/package-legacyleads-api.py` + `deploy/deploy-legacyleads-api.sh` + `deploy/add-legacyleads-api-nginx.sh`: idempotent Postgres role/DB/PostGIS/migrations, pm2 `legacyleads-api`
+- Frontend `fetchListings` now reads backend `{data}` shape (was `json.listings`, always empty on success)
+- DEPLOY.md: :3217 service row + first-deploy section (build frontend with `NEXT_PUBLIC_API_URL=https://excellegacyrealtygroup.site/legacyleads-api`)
+
+## v0.61.2 (2026-10-31)
+
+### Fixed — service launch + health probes
+- `start-all.ps1` + `scripts/system-tray.ps1` media-workflow entries now pass `PORT=3004` (was defaulting to 3000 → EADDRINUSE crash; matches `start-all.bat`). 9/9 services verified up.
+- `check-status.ps1` probe timeout 3s → 10s (cold Next.js standalone renders flaked on 3s; LeadG healthy at 200)
+- legacyleads `GET /listings` returned opaque `{"error":""}` when Postgres unreachable → honest fallback message + `code` (submodule `1a450af`), with DB-down regression test (backend suite 13/13)
+
+### Verified
+- Root unit tests 18/18, legacyleads backend 13/13, `load-test.js` ALL PASS 350/350, `e2e-smoke.js` 21/22 (sole fail = /listings 500 with no local Postgres — environmental, now honestly reported)
+- ROADMAP Phase 7 load-testing checkbox closed
+
+## v0.61.1 (2026-10-31)
+
+### Added — UI consolidation (nav gaps closed)
+- CommandCenter: new Marketing Hub, Settings Hub, AI Memory, Branding, Team cards (all with tooltips)
+- SidebarNav: new Marketing Hub link in Outreach & Marketing
+- SMS Text Codes + Website Builder cards/links repointed to canonical parents (`/dashboard/marketing`, `/dashboard/websites`)
+- Stale Gemini references corrected to DeepSeek V4 (AI Co-Pilot + AI Model Keys tooltips)
+
+### Fixed — tasks page dead controls
+- "Complete" button was dead (no handler) → now a real Complete/Reopen toggle via existing `toggleTaskStatusAction`
+- Removed dead "Edit" button with no handler (fake-UI class)
+- Fixed duplicate `type="button"` + `type="submit"` on Search button
+
+### Fixed — scripts/probes
+- `check-status.ps1` now probes 9/9 services (added ContentPlanner API :3031)
+- `scripts/e2e-smoke.js` now covers ContentPlanner API `/health`
+- `scripts/watch-services.ps1` LeadG command aligned to canonical `.next/standalone/server.js`
+- Archived tracked root `build-*.txt` logs to `scripts/archive/root-logs-2026-10/` (history-preserving renames)
+
+### Docs
+- `DEPLOY.md`: DeepSeek as primary LLM, OpenAI embeddings/voice fallback note, ContentPlanner API :3216 + Postgres + service-JWT secret notes
+- `HANDOFF.md`: v0.61.0 entry covering v0.59–v0.61 + CDP lane
+
+## v0.61.0 (2026-10-26)
+
+### Fixed — fake-UI sweep (full-page pattern audit, 5 fakes killed)
+- AddDealModal 'Cancel' fired a success toast while discarding the form
+- CampaignsListClient folders: claimed 'created' but never persisted (now saved, honest label)
+- CampaignsListClient template preview: 'Mock details preview' did nothing -> real step-preview modal
+- IntegrationCenter: fake 'integration enabled' toggles with no connection behind them -> honest per-vendor status; fake 'Redirecting...' -> real navigation to email settings
+- AgentProfileModal: browser-only storage no longer claims server success
+
+### Fixed — deal pipeline stage drift
+- Canonical `lib/deal-stages.ts` (LEAD -> ... -> CLOSED_WON | CLOSED_LOST): LEAD deals were invisible on both kanbans and no CLOSED_LOST existed anywhere
+- Stage strings validated in dealSchema and updateDealStageAction (previously any string persisted silently)
+
+### Added — money-path test suite (tests/money-paths.test.mts, 6/6 passing)
+- Auth regression (wrong password -> no session), e-sign lifecycle with consent/integrity/attribution assertions, team RBAC, branding validation, deal stage whitelist
+
+## v0.60.0 (2026-10-26)
+
+### Added — White-label Branding (B phase 3)
+- Per-workspace identity: logo, primary/accent colors, portal slug (globally unique), email footer, brokerage phone/address
+- `/api/branding` GET/PUT (manage:workspace RBAC, hex-color and slug validation, uniqueness checks)
+- Settings -> Branding page with color pickers and live client-portal preview
+- Client portal renders brokerage branding; e-signing pages show the inviting brokerage via the signing token
+- Portal fixes: Sign Out was a dead button (now real), Support number is a tel: link, branded footer added
+
+## v0.59.0 (2026-10-26)
+
+### Security — CRITICAL auth bypass (found while building team invites)
+`CredentialsProvider.authorize()` returned any DB user found by email with **no password verification** — anyone knowing an agent's email could sign in as them (prod has 4 real users incl. a BROKER). `User.passwordHash` (scrypt) is now enforced; passwordless accounts cannot password-sign in until set via team admin flow or magic link. Verified live: wrong-password login as the broker now returns 401 with an empty session.
+
+### Added — Team Management (white-label team phase 2)
+- `/api/team` GET/POST/PATCH/DELETE — RBAC via existing permission matrix, hierarchy guards (cannot assign above own rank), last-OWNER protection
+- Invites create accounts with one-time temp passwords (shown once, never stored plaintext)
+- Admin password reset + self-service change (current password required)
+- Settings -> Team page: members table, role dropdowns, invite, reset, remove
+
+### Added — v0.58.63 recap
+- Real e-sign contracts replacing the fabricated "blockchain" contracts API (deleted)
+
+## v0.58.63 (2026-10-22)
+
+### Fixed — Lead Detail "Properties" tab (found via 'Simulated:' toast report)
+The tab was fabricated UI: 5 buttons fired fake toasts (incl. 'Simulated: Added secondary property fields!'), two hardcoded duplicate cards showed invented stats ('3 beds | 2 baths | 1386 sqft') and a fake fallback address ('45409 North Ave...').
+
+- **New `OwnedProperty` model** (contact-scoped, workspace-tenant-safe) + prod migration
+- **`/api/owned-properties`** GET/POST/DELETE (cross-workspace writes rejected)
+- **Real Add Property form** (address/type/label/beds/baths/sqft/value), persisted list, real delete
+- **Live valuation** button → `/api/property-data` (BS&A/Realcomp; honest config error without a key)
+- Mailing-address card renders real contact data only; honest empty state
+
+## v0.58.62 (2026-10-22)
+
+### Added — Vapi Web SDK (client-side key now live)
+- **"Talk to Riley (Browser)"** in LeadG's NativeDialer: live in-browser voice conversation with the assistant via `@vapi-ai/web` — the Vapi PUBLIC key's actual purpose (was stored but unused).
+- `GET /api/vapi/config` (LeadG) serves public SDK values dynamically — key rotation needs no rebuild.
+- NativeDialer now has 3 calling modes: **Talk to Riley (Browser)** · **AI Call (Riley)** (server-side outbound, private key) · **Live Call (Twilio WebRTC)**.
+
+## v0.58.61 (2026-10-22)
+
+### Fixed — systemic sub-app fetch routing (production-only bug)
+- **Every sub-app client fetch('/api/...') hit the MAIN CRM instead of its own API** (root-absolute paths under the nginx /leadg//contentplanner/ mounts → 404s; LeadG pages could not load ANY data in production). Added prefix-aware `apiUrl()` helpers (`src/lib/api-base.ts`) in LeadG + ContentPlanner web; all 24 client fetches converted. Verified: `/leadg/api/*` → 401/200 (own routes) vs root `/api/*` → 404 (main CRM).
+
+### Added — Vapi AI call trigger
+- `POST /api/vapi/call` (LeadG): server-side Vapi outbound call — assistant Riley dials the lead through the Vapi line; private key never reaches the browser.
+- NativeDialer: **"AI Call (Riley)"** button alongside the Twilio WebRTC call (works today without a Twilio number).
+
+## v0.58.60 (2026-10-22)
+
+### Fixed (from live console errors)
+- **`GET /api/leads` 404**: the route never existed — the Lead Map fetched it on load and crashed. New `GET/POST /api/leads` (workspace-scoped listing with limit/status/type/q + lead creation).
+- **Lead Map had no coordinate data model**: added `latitude`/`longitude` to Contact (migrated on prod SQLite) + Nominatim geocoding (`src/lib/geocode.ts`, keyless) on lead creation — leads now plot on the map.
+- **`Cannot read properties of undefined (reading 'avg')`** in Reporting: MarketTrendsSection read `trends.deals.*` but `/api/syndication` returns `dataPoints.*`. Rewrote to the real shape; privacy-suppressed values ('suppressed'/'insufficient_data') render as '—' instead of crashing.
+
+### Verified on prod
+- `/api/leads?limit=200` → 401 (route exists, auth required — was 404)
+- `/api/syndication` shape matches the component
+- 7/7 services green
+
+## v0.58.59 (2026-10-22)
+
+### Connected — Vapi voice AI + Twilio
+- **Vapi wired live**: private/public keys + assistant "Riley" (`915f9d01-...`) + phone number `+1 (586) 737-3387` (`7f1c7bc5-...`). Assistant bound to the phone number so inbound calls also reach Riley. LeadG adapters fall back to `VAPI_API_KEY`/`VAPI_ASSISTANT_ID`/`VAPI_PHONE_NUMBER_ID` env when per-user settings are absent.
+- **Twilio wired live**: account active; **Twilio Lookup (skip-trace provider A) verified live** — the skip-trace cascade in the main CRM + LegacyLeads now hits real carrier data. LeadG Twilio SMS env fallback added (`TWILIO_SID`/`TWILIO_TOKEN`/`TWILIO_FROM_NUMBER`).
+- **SendGrid + Lob env fallback** added to LeadG adapters (keys work the moment they're provided).
+- **Deploy scripts preserve ALL integration env vars** (VAPI/TWILIO/SENDGRID/LOB/DEEPSEEK/enrichment) — previously only DEEPSEEK survived redeploys.
+- `apps/leadg/.env.example` documents all integration variables.
+
+### Pending
+- Twilio phone number purchase (account has 0 numbers) — required for SMS/WhatsApp dispatch + Twilio voice fallback.
+
+## v0.58.58 (2026-10-22)
+
+### Added — cross-service workspace mapping
+- The CRM proxy now resolves the caller's active workspace (`resolveWorkspaceAccess`) and mirrors it into ContentPlanner via `POST /workspace/sync` (same id — idempotent upsert).
+- Service JWTs carry a `workspaceId` claim; ContentPlanner API routes default their read scope to it (explicit query params still win). Dashboard panels now see only their active workspace's data instead of recent-across-workspace.
+- Verified on Hetzner: workspace sync persists, scoped reads return workspace-filtered results, all 7 panel endpoints 200.
+
+## v0.58.57 (2026-10-22)
+
+### Fixed — UI panel click-through findings
+- **All ContentPlanner panel endpoints returned 401 in the browser** (posts/campaigns/analytics/notifications/video/podcast/social): the API requires a Bearer JWT the browser cannot hold. New session-authenticated proxy `/api/contentplanner/[...path]` signs a short-lived service JWT server-side (`CONTENTPLANNER_SERVICE_SECRET` ↔ API `AUTH_JWT_SECRET`) and forwards — verified all 7 panel endpoints return 200.
+- **OAuth flow broken**: `/social/auth-url` + `/social/callback` were behind the API's auth (the provider's browser redirect carries no token). Now mounted as public PKCE-secured endpoints; account listing stays protected.
+- **Deploy scripts wiped runtime config**: `deploy-contentplanner.sh` reverted the Postgres DATABASE_URL to a SQLite path; `deploy-contentplanner-api.sh` dropped `AUTH_JWT_SECRET`. Both now preserve DATABASE_URL/DEEPSEEK/AUTH_JWT_SECRET across redeploys.
+- Notifications + social accounts GET endpoints tolerate missing workspaceId (returns recent) — cross-service workspace mapping pending (noted in TODO).
+- Dashboard bundle verified: proxy path present, 0 stale `localhost:3031` refs.
+
+### Verified
+- Tests: 116 passing (contentplanner 35, media-workflow 60, leadg 9, legacyleads 12)
+- Click-through: 7/7 panel endpoints 200 on Hetzner; OAuth auth-url returns honest 503 (Twitter/LinkedIn/Meta client keys pending)
+
+## v0.58.56 (2026-10-22)
+
+### Added
+- **ContentPlanner Express API deployed on Hetzner** (PM2 `contentplanner-api`, port 3216, public at `/contentplanner-api/` with WebSocket proxying). Previously undeployed — the dashboard's Content Pipeline, notifications, engagement, video/podcast panels silently fetched from a nonexistent service in production.
+- ContentPlanner Postgres database provisioned on Hetzner (was SQLite URL with a postgres-only schema — every DB call would fail).
+
+### Fixed
+- **Prisma Linux engines**: contentplanner/leadg/foreclosure schemas now declare `binaryTargets = [native, windows, debian-openssl-3.0.x]` — Windows builds only packaged `query_engine-windows.dll`, so every DB call on Hetzner threw `PrismaClientInitializationError`.
+- Dashboard hardcoded `http://localhost:3031` fetches (marketing-studio ×6, social ×3) → relative `/contentplanner-api/` via `contentPlannerApiUrl()` helper (works on any host; local dev via `NEXT_PUBLIC_CONTENT_PLANNER_API_URL`).
+- `trigger/content` route fallback URL fixed (stale port 3008 → `127.0.0.1:3031`).
+- contentplanner: `dotenv`/`tsx` declared (were hoisting-only deps — fresh installs failed); `@next/swc-win32-x64-msvc` moved to optionalDependencies (EBADPLATFORM on Linux).
+
+### Deployment
+All 7 services green on https://excellegacyrealtygroup.site: Main CRM (v0.58.56), LeadG, Foreclosure, ContentPlanner web + **API (new)**, MediaWorkflow, LegacyLeads.
+
+## v0.58.55 (2026-10-21)
+
+### Removed — all mock/placeholder data (production live-data readiness)
+- **Main CRM**: skip-trace now uses real Twilio Lookup + Whitepages Pro cascade; property-data returns 503 when BS&A/Realcomp unconfigured (was fabricating a fake parcel record); avatar returns 503 (was fake `wss://` stream URL); mls-scrub suppresses only on real listings (`?simulate=true` = dry run; was fabricating MLS numbers/prices); agents/handshake requires AGENT_SECRET (was accepting any token) and enrolls campaigns for real (was fake success); workflow forms default empty instead of pre-filled fake buyers/sellers; demo record seeding opt-in via `DEMO_SEED=true`.
+- **contentplanner**: AI providers throw explicit config errors (was returning "Mocked ... generation"); real Tavily/NewsAPI/RSS research providers; notifications/video/podcast routes persist to real Prisma tables (were in-memory stores with fabricated data); social OAuth does real code→token exchange (was MOCK_*_CLIENT_ID + fake connected accounts); **auth middleware now validates HS256 JWTs** (was attaching a mock OWNER user to every request — security fix); WebSocket broadcasts real queue counts (was random numbers).
+- **leadg**: adapters fail explicitly when unconfigured (were silently returning fake success via Mock*Providers); Vapi phone number ID + server URL from env (were placeholder strings); warm transfer executes for real; appointment dates extracted via LLM (was hardcoded "tomorrow"); call summaries report "Not provided" for missing fields (was fabricated motivation/timeline).
+- **legacyleads**: `/listings` real PostGIS query (was MOCK-123); skip-trace cascade uses Twilio/Whitepages/PeopleDataLabs (was 3 mock providers with 555-xxxx phones); AI Sync queue pulls real geofence leads (was hardcoded address).
+- **media-workflow**: Canva/Magnific integrations throw when unconfigured (were returning fake export paths/URLs); social publishing marks posts Failed without tokens (was marking Published with fake URLs); JustSold pipeline wires the real Canva export.
+- **foreclosureworkflow**: real BS&A tax-assessor scraping (was hardcoded "123 Resolved Main St").
+
+### Tests
+- 116 passing across 4 submodules (contentplanner 35, media-workflow 60, leadg 9, legacyleads 12) — rewritten against the live-provider contracts with network/SDK mocked at the boundary.
+
+## v0.58.54 (2026-10-21)
+
+### Fixed
+- **Post-login redirect bug**: middleware used `req.url` (internal upstream URL `0.0.0.0:3210`) for `callbackUrl`. Now relative (`url.pathname + url.search`) — verified on prod: `callbackUrl=%2Fdashboard`.
+- **Deploy scripts wiped DEEPSEEK_API_KEY**: all 5 `deploy-*.sh` rewrote `.env` with hardcoded values on every deploy. They now preserve `DEEPSEEK*` lines and move old builds to timestamped backups instead of deleting.
+
+### Changed
+- **All 5 sub-services (LeadG, Foreclosure, ContentPlanner, MediaWorkflow, LegacyLeads) rebuilt + redeployed** with DeepSeek V4 LLM code. Live-verified from the server (`SUBSERVICE LIVE` via `deepseek-v4-flash`).
+- Probed DeepSeek V4 endpoints: **no embeddings (404) and no audio (404)** — RAG embeddings + voice TTS/STT confirmed to stay on OpenAI.
+- PM2 error scan post-deploy: 0 new errors on fresh traffic (historical "Failed to find Server Action" lines are stale-browser artifacts from the redeploy).
+
+## v0.58.53 (2026-10-21)
+
+### Changed
+- **DeepSeek as the primary LLM** for all chat/completion calls across the main CRM and 4 submodules (LeadG, ContentPlanner, Foreclosure, MediaWorkflow). Driven by `DEEPSEEK_API_KEY` + `DEEPSEEK_MODEL` (default `deepseek-v4-flash`; set `deepseek-v4-pro` for the highest-quality tier).
+  - Main CRM: AI chat, lead parsing, AgentCore, lead qualification, social copy.
+  - LeadG: sentiment/email/score prediction, conversation + reflection engines, Twilio gather/status.
+  - ContentPlanner `OpenAIProvider`, Foreclosure `LLMNoticeParser`, MediaWorkflow `SocialCopyService`.
+- All DeepSeek clients are OpenAI-compatible (base URL `https://api.deepseek.com/v1`); OpenAI remains the automatic fallback when `DEEPSEEK_API_KEY` is unset.
+
+### Notes / Runtime Verification (DeepSeek V4)
+- **Embeddings**: RAG vector sync remains on OpenAI (`OPENAI_API_KEY`) pending confirmation whether DeepSeek V4 exposes an embeddings endpoint — `fallbackEmbedding` covers the gap gracefully.
+- **Voice TTS/STT**: `src/lib/voice.ts` remains on OpenAI pending confirmation DeepSeek has an audio API.
+- **Structured outputs**: LeadG structured prompts use `json_object` mode (works across all DeepSeek generations). `generateObject` (lead parsing) + `streamText` tool-calling to be verified with a live key against `deepseek-v4-flash`.
+
+## v0.58.52 (2026-10-17)
+
+### Fixed
+- **LeadG NextAuth Configuration error**: LeadG uses JWT sessions which require `NEXTAUTH_SECRET`, but its standalone server command didn't set it, so `/api/auth/signin` redirected to `/api/auth/error?error=Configuration`. Added `NEXTAUTH_SECRET`/`NEXTAUTH_URL` to all three launchers (`system-tray.ps1`, `start-all.bat`, `start-all.ps1`).
+
+### Changed
+- Archived 8 one-off diagnostic/fix scripts (`add-tooltips.py`, `audit-ui.py`, `code-quality-scan.py`, `extended-scan.py`, `fix-buttons.py`, `fix-console-logs.py`, `fix-localhost-refs.py`, `fix-localhost-refs2.py`) from `scripts/` root into `scripts/archive/` — root now holds only reusable utilities.
+
+### Notes (full-service smoke test)
+- All 9 services start and bind their ports. Two non-fatal warnings: (1) `next start` emits an advisory "output: standalone" warning for the 4 Next.js web apps — they still serve correctly; (2) `media-workflow` and `legacyleads-api` log Redis `ECONNREFUSED` (graceful degradation, already documented).
+
+## v0.58.51 (2026-10-17)
+
+### Changed
+- Repository synchronization: all 5 submodules verified at `origin/main` (clean working trees, no nested submodules)
+- Upstream `robertpelloni/realestatecrm` confirmed identical to `origin/main` (no divergent upstream to merge)
+- `start-all.ps1` reconciled with canonical service definitions (9 services, standalone Next.js server paths) — added ContentPlanner API (3031), LeadG standalone server, corrected contentplanner/legacyleads start paths
+- Version string synchronized: `package.json`/`package-lock.json` 0.58.43 → 0.58.51 (VERSION.md/CHANGELOG already at 0.58.50)
+
+### Notes
+- All 10 feature branches across submodules re-verified as fully merged (ancestors of `main`, zero unique commits) — no forward/reverse merge required
+
+## v0.58.50 (2026-10-17)
+
+### Fixed
+- **Missing React hook imports**:** added `useState`/`useEffect`/`useRef` imports to 5 files (marketing-studio, canva, LeadDetailLayoutClient, SettingsTabs) — fixes `ReferenceError: useState is not defined` in production
+- **`/api/posts` 404**: created route for publishing calendar — reads from BlogPost model, maps to calendar's expected shape
+- **`/api/contracts` 400**: fixed payload shape mismatch — UI sends `{ template: { type }, parties, action }` but API expected `{ template, workspaceId, action }`. Now auto-resolves workspaceId from session and normalizes template shape
+- **`/api/chat/rooms` 500**: added try/catch graceful degradation + created missing ChatRoom/ChatParticipant/ChatMessage tables in production SQLite
+- **DATABASE_URL mismatch on prod**: `.env` had `file:./dev.db` resolving to wrong path — fixed to `file:/var/www/excellegacyrealtygroup/prisma/dev.db`
+- **Domain rebrand**: all references updated to `excellegacyrealtygroup.site` with SSL cert deployed
+- **16 buttons missing `type="button"`** inside forms across 13 files — prevents unintended form submission
+- **Unguarded `.map()`** in reporting/page.tsx — added null guard + empty state
+- **`react-hot-toast` vs `sonner`**: VoiceCommandPanel used `sonner` (not installed) — switched to `react-hot-toast`
+
+### Added
+- **`VoiceCommandPanel`**: new UI component wiring `/api/agentcore/voice-command` on AgentCore page — natural language command input with parsed action + confidence display
+- **`/api/leads/[id]/read`**: View Detail button on lead alerts now marks lead as read
+- **`audit-ui.py`**: consolidated nav coverage + API wiring + tooltip coverage audit script
+- **`code-quality-scan.py`**: scans for missing hook imports, template literal bugs, unguarded `.map()`, missing `type=button`
+- **`package-v3.py`**: production deploy packaging script (83 MB tarball)
+
+### Documentation
+- DEPLOY.md: added full Hetzner production deployment section (server details, DNS, deploy process, critical notes)
+- TODO.md: added production deploy checklist + remaining gaps
+
+## v0.58.49 (2026-10-09)
+
+### Fixed
+- **Critical**: fixed Server Components render error (digest `3737717021`) on all dashboard pages — `access` variable was block-scoped inside `try` but used outside it in `DashboardLayout`. Hoisted to outer scope with null safety.
+- **Lead alerts**: created missing `/api/leads/latest-unread` (GET) and `/api/leads/[id]/read` (POST) API routes — `LeadAlertListener` was polling a 404 endpoint every 10 minutes
+- **Google Maps**: only load Maps script when `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` is configured — eliminates `NoApiKeys`/`InvalidKey` console warnings
+
+## v0.58.48 (2026-10-09)
+
+### Fixed
+- **Accessibility**: added `type="button"` to 470 buttons across 127 files — prevents unintended form submission (HTML default is `type="submit"`)
+
+## v0.58.47 (2026-10-09)
+
+### Fixed
+- **Dark mode**: replaced all 369 hardcoded `bg-white`, `text-gray-*`, `bg-gray-*`, `border-gray-*`, `text-slate-*`, `bg-slate-*`, `border-slate-*`, `text-zinc-*`, `bg-zinc-*`, `border-zinc-*` classes across 87+ files with theme tokens (`bg-card`, `text-muted-foreground`, `text-foreground`, `border-border`, `bg-muted`) — dark mode now renders correctly everywhere
+
+## v0.58.46 (2026-10-09)
+
+### Added
+- `scripts/watch-services.ps1` — auto-restart watchdog for all 9 services (checks every 60s)
+- System tray "Start Watchdog" menu item
+
+### Fixed
+- `start-all.bat` — removed `/min` flag (breaks non-interactive contexts) and blocking `timeout`
+
+## v0.58.45 (2026-10-09)
+
+### Changed
+- Social page Connect button now tries ContentPlanner OAuth flow (`/social/auth-url`) first, falls back to local record when mock keys are detected
+- Archived 12 unused legacy components to `src/components/_archive/` (superseded by LeadDetailLayoutClient)
+
+## v0.58.44 (2026-10-09)
+
+### Added
+- `start-all.bat` — one-command startup for all 9 services with log redirection
+
+### Fixed
+- Contracts page: heading tooltips, action button tips (deploy/execute/dispute), try/catch on generate handler
+- Map page: lead list empty state guard when filter yields no results
+- Imports page: aria-label on hidden file input for accessibility
+
+### Changed
+- Help Center social topic expanded to cover Content Pipeline (videos/podcasts) and Social Analytics engagement metrics
+
+## v0.58.43 (2026-10-09)
+
+### Changed
+- Repository synchronization: all 5 submodules fast-forwarded to latest `origin/main` (foreclosureworkflow +2, legacyleads +1, media-workflow +3; leadg gitlink advanced 2 commits to `origin/main`)
+- Committed submodule launcher scripts (`foreclosureworkflow/start-3002.js|.bat`, `media-workflow/start-3004.bat`) and gitignored transient logs
+- `start-all.ps1` media-workflow start path corrected (`dist/index.js` → `dist/src/index.js`)
+- Version string synchronized across `VERSION.md`, `package.json`, `package-lock.json` (0.54.0 → 0.58.43)
+
+### Notes
+- All feature branches across all 5 submodules verified as fully merged (ancestors of `main`, zero unique commits) — no forward-merge or cherry-pick required
+
+## v0.58.42 (2026-10-07)
+
+### Added
+- ContentPlanner API (port 3031) added to ServiceHealthGrid for full 9-service visibility
+
+### Changed
+- Removed unused imports across 21 dashboard files (33 imports total)
+
+## v0.58.41 (2026-10-07)
+
+### Fixed
+- MarketingStats now fetches from ContentPlanner Express API (port 3031) instead of Next.js web (port 3003) which does not serve JSON endpoints
+
+### Added
+- Platform breakdown section in Marketing Stats (per-platform views/likes/shares from ContentPlanner analytics API)
+- ContentPlanner notifications panel on Marketing Studio (unread badge, latest 5 notifications)
+- Content Pipeline section on Marketing Studio (video projects + podcast episodes from ContentPlanner API)
+- Engagement Overview on social page (views/likes/shares from ContentPlanner analytics)
+- Tooltip markers on section headings in marketing-studio, social, and agent-studio
+
+## v0.58.40 (2026-10-07)
+
+### Fixed
+- ContentPlanner API startup: removed @langchain/textsplitters dependency (broken CJS exports-map under tsx/Node 26), replaced with pure-JS text chunking. Lazy-import scrapeUrlText to avoid module-load failures.
+- ContentPlanner API runs via ts-node-dev (local binary) instead of npx tsx which auto-restored deleted node_modules.
+
+## v0.58.39 (2026-10-07)
+
+### Added
+- 6 missing pages added to SidebarNav: Property Data, Data Imports, Canva Designs, Objection Handling, AI Avatar Video, Client Portal
+
+
+## v0.58.38 (2026-10-07)
+
+### Added
+- Workflow Sessions resume panel on workflows page (wires /api/workflow-sessions)
+- Canva Connect button now POSTs to /api/canva with clear error on missing API key
+
+
+## v0.58.37 (2026-10-07)
+
+### Fixed
+- TeamChat currentUserId now uses real session user instead of hardcoded 'current-user'
+
+
+## v0.58.36 (2026-10-07)
+
+### Added
+- ContentPlanner recent posts panel on social page (fetches from :3031/posts)
+- ContentPlanner API (port 3031) registered in system tray as 'Content Planner (API)'
+- start-api.bat launcher for ContentPlanner Express API
+
+### Fixed
+- @langchain/core module resolution broken in ContentPlanner (tsx/ts-node-dev exports map) - added document.cjs/documents.cjs + utils/tiktoken shims
+
+
+## v0.58.35 - 2026-10-07
+- 2 new help topics: Data Export & Market Trends, Folder Monitoring & Comparable Sales (16 total)
+## v0.58.34 - 2026-10-07
+- ContentPlanner analytics (views/likes/shares) integrated into Marketing Studio stats
+## v0.58.33 - 2026-10-07
+- Marketing Studio stats now fetch live data from ContentPlanner API (posts, scheduled, campaigns)
+## v0.58.32 - 2026-10-07
+- ContentPlanner + LegacyLeads integration cards in Marketing Studio (HANDOFF item 5 progress)
+- ContentPlanner: Posts, Campaigns, Brand Kits, Analytics (port 3003)
+- LegacyLeads: Property Search, Skip Trace, Compliance (port 3005)
+## v0.58.31 - 2026-10-07
+- Remove 33 unused imports across 21 files (icons, actions, utils)
+## v0.58.30 - 2026-10-07
+- Bulk assign/tag now works across all pages (selectAllMode uses displayLeads IDs)
+- Social connect toast clarifies simulated OAuth status
+- Listing Entry workflow status fixed: Coming Soon -> Ready (page exists at /workflows/listing-entry)
+## v0.58.29 - 2026-10-07
+- Wire /api/voice/accent-morphing to voice settings as Accent Morphing Test panel (5 APIs wired this session)
+- All user-facing unused APIs now wired (remaining: crm-records via server-action, lead-gen/social needs HubSpot keys)
+## v0.58.28 - 2026-10-07
+- Wire /api/mls/historical to listings page as Comparable Sales panel (4 APIs wired this session)
+- Remaining unused: /api/crm-records (server-action), /api/lead-gen/social (needs HubSpot keys), /api/voice/accent-morphing
+## v0.58.27 - 2026-10-07
+- Wire /api/folder-detection to SettingsTabs as Folder Monitoring tab (8th tab)
+- 3 previously unused APIs now wired: /api/export, /api/syndication, /api/folder-detection
+## v0.58.26 - 2026-10-07
+- Wire /api/export to reporting page as CSV export button
+- Wire /api/syndication to reporting page as Market Trends widget (avg deal value, volume, list price, deals closed)
+## v0.58.25 - 2026-10-06
+- AICreatorTab step 2 wizard blocks.map empty state fix (was double-guarded in preview)
+- Verified all state-array .map() calls now have empty states (3 remaining scan hits are false positives)
+## v0.58.24 - 2026-10-06
+- Empty states for 16 unguarded state-array .map() calls across 12 components (CampaignEditor, CampaignsListClient, EditLeadModal, LeadTableClient, LeadTagsEditor, TeamChat, WebsiteBuilder, AICreatorTab, SEOBlogTab, SocialAgentTab, WebsitesClient, workflow-studio)
+## [0.58.12] - 2026-10-06
+
+### Added
+- Empty states for LeadScoreWidget factors and recommendations
+
+
 ## [0.58.11] - 2026-10-06
 
 ### Added
@@ -351,6 +769,15 @@ submodules match.
 - All references to "HyperNexus" renamed to "AgentCore" (name conflict with external tool).
 # CHANGELOG.md
 
+## [0.48.0] - Repository Synchronization & Intelligent Merge
+
+- **Upstream/Origin Sync:** Fast-forwarded local main from 4eaba9c to e07aa1d (4 commits, incl. aa79bbf Massive UI/backend sync: dashboard pages, help center, website builder, Lofty/sync-queue integrations, 61 files / 5,648 insertions). No divergence, no conflicts.
+- **Forward Merge:** All 5 feature branches (dashboard-newest, jules-4619064495533350109-142a2060, jules-ai-drip-execution-12255780436860473735, rag-consolidation-cleanup, rag-consolidation-cleanup-17409520208133646924) verified fully contained in main - no unique commits to merge.
+- **Reverse Catch-Up:** Local copies of all 5 feature branches fast-forwarded to e07aa1d; remote push blocked on missing push credentials (see HANDOFF.md).
+- **Submodules:** None - no .gitmodules in repo; recursive update is a no-op.
+- **Gitignore Governance:** Removed .hypernexus session-file exclusions so memory/session documentation remains tracked, per directive.
+- **Version Governance:** Bumped global version 0.47.0 to 0.48.0 in VERSION.md, package.json, package-lock.json.
+
 ## [0.46.5] - MyPlusLeads Hourly Sync Optimization & Lead Quick Actions
 
 - **MyPlusLeads Scheduler Enhancements:** Updated `src/lib/sync-scheduler.ts` to query MyPlusLeads every 15 minutes during the morning drop window (4:00 AM - 7:00 AM) and hourly for the remainder of the day, ensuring straggler leads are imported periodically.
@@ -671,3 +1098,13 @@ submodules match.
 
 
 
+
+## 0.61.6 — Shared buyer and seller campaigns (2026-11-04)
+- Added four original brokerage-wide default plans, editable delay units through years, calendar month-end handling, validated schedules, workspace enrollment checks, atomic pending task replacement, and a minute-based server dispatcher.
+- Automated sends require live providers. Call and general tasks remain open for agents. Failed sends are retained as ERROR for review.
+
+## 0.61.7 — Campaign list verification fix (2026-11-04)
+- Restored the missing useEffect import found by the Hetzner campaign type check. Expanded regression checks to cover all four default templates.
+
+## 0.61.8 — Lead options menu layering (2026-11-04)
+- Render the lead detail three-dot options panel in a body portal, positioned against its trigger and above the sidebar. Clamp to the viewport, track scrolling/resizing, preserve outside-click dismissal, and restore trigger focus on Escape.

@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { Home, Search, Loader2, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import SourceBadge from '@/components/SourceBadge';
 
 export default function PropertyDataPage() {
   const [query, setQuery] = useState('');
@@ -39,6 +40,10 @@ export default function PropertyDataPage() {
         </form>
         {result && (
           <div className="rounded-lg border p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Lookup Result</span>
+              <SourceBadge source={result?.source} />
+            </div>
             <pre className="text-sm whitespace-pre-wrap">{JSON.stringify(result, null, 2).substring(0, 500)}</pre>
           </div>
         )}

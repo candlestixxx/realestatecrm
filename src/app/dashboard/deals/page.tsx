@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { authOptions } from '@/lib/auth';
 import { dealSchema } from '@/lib/validations/deal';
 import { requireWorkspaceAccess } from '@/lib/workspace-access';
+import { DEAL_STAGES } from '@/lib/deal-stages';
 import { syncDealToVectorStore } from '@/lib/rag';
 
 import { AppRole, isAtLeastRole } from '@/lib/permissions';
@@ -91,19 +92,13 @@ export default async function DealsPage() {
     orderBy: { firstName: 'asc' },
   });
 
-  const stages = [
-    { id: 'QUALIFICATION', label: 'Qualification' },
-    { id: 'PROPOSAL', label: 'Proposal/Showing' },
-    { id: 'NEGOTIATION', label: 'Negotiation' },
-    { id: 'UNDER_CONTRACT', label: 'Under Contract' },
-    { id: 'CLOSED_WON', label: 'Closed Won' },
-  ];
+  const stages = DEAL_STAGES.map(s => ({ id: s.id, label: s.label, open: s.open }));
 
   return (
     <div className="space-y-6 h-[calc(100vh-6rem)] flex flex-col">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-shrink-0">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Deals Pipeline <span title="Track deals through your pipeline stages from initial offer to closing. Manage deal requirements, stakeholders, and timelines." aria-label="About this section: Track deals through your pipeline stages from initial offer to closing. Manage deal requirements, stakeholders, and timelines." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 text-[9px] text-gray-500 cursor-help ml-2 align-middle">?</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight">Deals Pipeline <span title="Track deals through your pipeline stages from initial offer to closing. Manage deal requirements, stakeholders, and timelines." aria-label="About this section: Track deals through your pipeline stages from initial offer to closing. Manage deal requirements, stakeholders, and timelines." className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] text-muted-foreground cursor-help ml-2 align-middle">?</span></h1>
           <p className="text-muted-foreground">Track and manage your active transactions.</p>
         </div>
         <div className="flex gap-2">

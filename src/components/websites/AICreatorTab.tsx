@@ -208,13 +208,21 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
     } else if (opt === 'BRAND') {
       handleSendPrompt(undefined, 'Create a Company Brand page for Excel Legacy Realty');
     } else if (opt === 'IMAGE') {
-      const url = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=350&q=80';
+      // Real media entry — previously attached a hardcoded stock photo URL
+      // that silently became part of the user's published website content.
+      const url = window.prompt('Image URL to attach (direct link to .jpg/.png):')?.trim();
+      if (!url) return;
       setUploadedMedia([...uploadedMedia, url]);
-      toast.success('Simulated photo attached! Type prompt to finalize.');
+      toast.success('Image attached. Type a prompt to finalize.');
     } else if (opt === 'VIDEO') {
-      const url = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+      // Real media entry — previously attached a hardcoded YouTube video.
+      const raw = window.prompt('Video URL (YouTube/Vimeo/direct link):')?.trim();
+      if (!raw) return;
+      // Normalize YouTube watch URLs to embeddable form.
+      const yt = raw.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/);
+      const url = yt ? `https://www.youtube.com/embed/${yt[1]}` : raw;
       setUploadedMedia([...uploadedMedia, url]);
-      toast.success('Simulated video link attached! Type prompt to finalize.');
+      toast.success('Video attached. Type a prompt to finalize.');
     }
   };
 
@@ -240,7 +248,10 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
             <>
               {/* Chat history panel */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {chatHistory.map((msg, idx) => (
+                {chatHistory.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">Start a conversation to generate content.</div>
+                ) : (
+                  chatHistory.map((msg, idx) => (
                   <div 
                     key={idx} 
                     className={`flex flex-col max-w-[85%] rounded-2xl p-3.5 text-xs font-semibold leading-relaxed ${
@@ -261,7 +272,8 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                       </div>
                     )}
                   </div>
-                ))}
+                ))
+                )}
                 {isGenerating && (
                   <div className="flex max-w-[85%] rounded-2xl p-3.5 bg-muted/50 border border-border/40 text-muted-foreground animate-pulse text-xs font-semibold items-center gap-2">
                     <RefreshCw className="w-4 h-4 animate-spin" /> Compiling layout blocks...
@@ -289,7 +301,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
 
               {/* Chat input box */}
               <form onSubmit={(e) => handleSendPrompt(e)} className="p-4 border-t border-border/40 flex gap-2 relative bg-muted/10 items-center">
-                <button
+                <button type="button"
                   type="button"
                   onClick={() => setShowHelperMenu(!showHelperMenu)}
                   className="bg-muted hover:bg-muted/80 p-2.5 rounded-xl border border-border/60 text-muted-foreground cursor-pointer flex items-center justify-center shrink-0"
@@ -340,7 +352,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
               {blocks.length > 0 && (
                 <div className="p-4 bg-indigo-500/5 border-t border-border/40 flex justify-between items-center shrink-0">
                   <span className="text-[10px] font-black text-indigo-500 uppercase tracking-wider">Outline Compiled!</span>
-                  <button
+                  <button type="button"
                     onClick={() => setWizardStep(2)}
                     className="bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-[9px] px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1"
                   >
@@ -355,7 +367,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
             <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn p-4 space-y-4">
               <div className="flex justify-between items-center border-b border-border/40 pb-2">
                 <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">Step 2: Modify Block Outlines</h3>
-                <button 
+                <button type="button" 
                   onClick={() => setWizardStep(1)}
                   className="text-[10px] font-black uppercase text-muted-foreground hover:text-foreground flex items-center gap-0.5 cursor-pointer"
                 >
@@ -374,7 +386,9 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                   />
                 </div>
 
-                {blocks.map((block, idx) => (
+                {blocks.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2">No content blocks yet. Generate or add blocks above.</div>
+                ) : (blocks.map((block, idx) => (
                   <div key={block.id} className="p-4 border border-border/50 bg-muted/10 rounded-2xl space-y-3">
                     <span className="text-[9px] font-black uppercase tracking-widest text-indigo-500">{block.type} BLOCK</span>
                     
@@ -425,10 +439,10 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                       </div>
                     )}
                   </div>
-                ))}
+                )))}
               </div>
 
-              <button
+              <button type="button"
                 onClick={() => setWizardStep(3)}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
               >
@@ -441,7 +455,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
             <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn p-4 space-y-4">
               <div className="flex justify-between items-center border-b border-border/40 pb-2">
                 <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">Step 3: Tracking & Publishing</h3>
-                <button 
+                <button type="button" 
                   onClick={() => setWizardStep(2)}
                   className="text-[10px] font-black uppercase text-muted-foreground hover:text-foreground flex items-center gap-0.5 cursor-pointer"
                 >
@@ -518,13 +532,13 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
               </div>
 
               <div className="flex gap-3 pt-3 border-t border-border/40 shrink-0">
-                <button
+                <button type="button"
                   onClick={() => handleSavePage('DRAFT')}
                   className="flex-1 py-3 bg-muted hover:bg-muted/80 text-foreground font-black uppercase tracking-widest text-[10px] rounded-xl transition-all cursor-pointer"
                 >
                   Save Draft
                 </button>
-                <button
+                <button type="button"
                   onClick={() => handleSavePage('PUBLISHED')}
                   className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-md cursor-pointer"
                 >
@@ -537,33 +551,33 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
         </div>
 
         {/* Right Preview Column (Assembles dynamically on block update) */}
-        <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[580px] relative">
+        <div className="lg:col-span-7 bg-card border border-border rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[580px] relative">
           
-          <div className="px-4 py-3 bg-slate-950 border-b border-slate-800 flex justify-between items-center text-[10px] text-slate-400 font-bold">
+          <div className="px-4 py-3 bg-card border-b border-border flex justify-between items-center text-[10px] text-muted-foreground font-bold">
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
             </span>
-            <span className="font-mono bg-slate-900 px-3 py-1 rounded border border-slate-850">
-              {subdomain}.excellegacy.com/{generatedSlug}
+            <span className="font-mono bg-card px-3 py-1 rounded border border-border">
+              {subdomain}.excellegacyrealtygroup.site/{generatedSlug}
             </span>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 text-slate-100 select-none bg-slate-900/50">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 text-foreground select-none bg-card/50">
             {blocks.map(block => (
-              <div key={block.id} className="p-5 bg-slate-950/80 border border-slate-850 rounded-2xl space-y-3">
+              <div key={block.id} className="p-5 bg-card/80 border border-border rounded-2xl space-y-3">
                 {block.type === 'HEADER' && (
                   <div className="text-center space-y-2">
                     <h2 className="text-lg font-black text-white">{block.title || 'Brand Presentation Heading'}</h2>
-                    <p className="text-[11px] text-slate-400 font-semibold">{block.subtitle}</p>
+                    <p className="text-[11px] text-muted-foreground font-semibold">{block.subtitle}</p>
                   </div>
                 )}
                 
                 {block.type === 'VIDEO' && (
                   <div className="space-y-2">
                     <span className="text-[9px] font-black uppercase tracking-wider text-rose-400">Featured Tour Video</span>
-                    <div className="aspect-video bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center">
+                    <div className="aspect-video bg-card border border-border rounded-xl flex items-center justify-center">
                       <Play className="w-8 h-8 text-rose-500 fill-rose-500 animate-pulse" />
                     </div>
                   </div>
@@ -575,7 +589,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                       <MapPin className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
                       <div>
                         <span className="text-xs font-black text-white">{block.address || 'MI Area Realcomp Sync Listing'}</span>
-                        <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{block.remarks}</p>
+                        <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{block.remarks}</p>
                       </div>
                     </div>
                     <div className="flex gap-4 text-[10px] font-black text-indigo-400 uppercase tracking-wider">
@@ -589,10 +603,10 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                 {block.type === 'LEAD_CAPTURE' && (
                   <div className="space-y-3 pt-2">
                     <div className="space-y-2">
-                      <input type="text" disabled placeholder="First Name" className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-[10px] opacity-70" />
-                      <input type="text" disabled placeholder="Email Address" className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-[10px] opacity-70" />
+                      <input type="text" disabled placeholder="First Name" className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-[10px] opacity-70" />
+                      <input type="text" disabled placeholder="Email Address" className="w-full bg-card border border-border rounded-lg px-3 py-1.5 text-[10px] opacity-70" />
                     </div>
-                    <button disabled className="w-full py-2 bg-indigo-600 rounded-lg font-black text-[10px] uppercase tracking-wider text-white opacity-90">
+                    <button type="button" disabled className="w-full py-2 bg-indigo-600 rounded-lg font-black text-[10px] uppercase tracking-wider text-white opacity-90">
                       {block.ctaText || 'Submit Inbound Contact'}
                     </button>
                   </div>
@@ -601,7 +615,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
             ))}
             
             {blocks.length === 0 && (
-              <div className="h-full flex items-center justify-center text-slate-500 italic font-semibold text-xs text-center">
+              <div className="h-full flex items-center justify-center text-muted-foreground italic font-semibold text-xs text-center">
                 Awaiting prompt input to compile website canvas...
               </div>
             )}
@@ -615,7 +629,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-2xl w-full max-w-2xl shadow-2xl p-8 space-y-6 relative text-center">
             
-            <button
+            <button type="button"
               onClick={() => {
                 setShowPublishedModal(false);
                 setWizardStep(1);
@@ -647,7 +661,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                   <span className="text-[10px] font-black uppercase text-indigo-500 tracking-wider">Post to your social channels</span>
                   <p className="text-[11px] text-muted-foreground font-semibold leading-relaxed">Direct leads from your social profiles to your new landing page campaign.</p>
                 </div>
-                <button
+                <button type="button"
                   onClick={() => {
                     setShowPublishedModal(false);
                     setWizardStep(1);
@@ -666,7 +680,7 @@ export default function AICreatorTab({ workspaceId }: { workspaceId: string }) {
                   <span className="text-[10px] font-black uppercase text-indigo-500 tracking-wider">Boost your landing page</span>
                   <p className="text-[11px] text-muted-foreground font-semibold leading-relaxed">A one-time low cost could help you get thousands of impressions from your social channel.</p>
                 </div>
-                <button
+                <button type="button"
                   onClick={() => {
                     toast.success('Campaign boost initialized successfully!');
                     setShowPublishedModal(false);

@@ -46,6 +46,13 @@ Multi-repo real estate CRM consolidating 9 sub-projects as dashboard sub-pages v
 - RAG consolidated into `src/lib/rag.ts` (rag-sync.ts merged and removed)
 - Uses fallback Pinecone / OpenAI Hosted Vector DB before launch
 
+## LLM Provider (DeepSeek V4 — verified 2026-10-21)
+- All chat/completion calls use DeepSeek via `src/lib/ai/deepseek.ts` + `apps/leadg/src/lib/ai/llm.ts`
+- Key source: `C:\Users\hyper\.pi\agent\auth.json` → `auth.json` → `deepseek.key`; mirrored to local `.env` + 6 Hetzner service `.env` files
+- Model IDs: `deepseek-v4-flash` (alias → `deepseek-flash`, default) and `deepseek-v4-pro`; both REASONING models — reasoning_content consumes max_tokens (keep >= 4096 or content is empty)
+- DeepSeek V4 quirks: `response_format: json_schema` REJECTED → use `mode:'json'` (json_object) in generateObject; tool calling + json_object OK
+- OpenAI kept for: RAG embeddings (`src/lib/rag.ts`) + voice TTS/STT (`src/lib/voice.ts`)
+
 ## Key Routes Index
 | Route | Purpose |
 |---|---|

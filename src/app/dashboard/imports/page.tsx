@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 // Data imports — bulk import leads, contacts, and listings from CSV/Excel.
 // API: /api/imports (POST multipart form data with file field).
 
 import { useState, useRef } from 'react';
 import { Upload, FileSpreadsheet, CheckCircle, Loader2, Info } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function ImportsPage() {
   const [uploading, setUploading] = useState(false);
@@ -46,7 +46,7 @@ export default function ImportsPage() {
           )}
           <p className="font-medium mb-1">{uploading ? 'Importing...' : 'Drop file here or click to browse'}</p>
           <p className="text-xs text-muted-foreground">Supports CSV, XLSX, XLS (max 10MB)</p>
-          <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleUpload} className="hidden" />
+          <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleUpload} aria-label="Upload CSV or Excel file" className="hidden" />
         </div>
         {result && (
           <div className="mt-4 flex items-center gap-2 text-sm">

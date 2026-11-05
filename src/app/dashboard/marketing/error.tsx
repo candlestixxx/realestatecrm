@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
   return (
@@ -9,7 +9,7 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
         <p className="text-sm text-muted-foreground max-w-md">
           {error.message || 'An unexpected error occurred while loading this section.'}
         </p>
-        <button
+        <button type="button"
           onClick={reset}
           className="px-4 py-2 bg-secondary text-secondary-foreground text-sm font-bold rounded-lg hover:bg-secondary/90 transition-colors"
         >

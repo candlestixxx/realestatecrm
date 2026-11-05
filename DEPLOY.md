@@ -37,10 +37,13 @@ DATABASE_URL="file:./dev.db"
 NEXTAUTH_SECRET="your-secret-here"
 NEXTAUTH_URL="http://localhost:3000"
 
-# OpenAI (for AI features)
+# DeepSeek (PRIMARY LLM — all chat/parse/qualify/copy calls default to deepseek-v4-flash; override with DEEPSEEK_MODEL=deepseek-v4-pro)
+DEEPSEEK_API_KEY="sk-..."
+
+# OpenAI (embeddings for src/lib/rag.ts + voice STT/TTS fallback — DeepSeek has no embeddings/audio endpoints)
 OPENAI_API_KEY="sk-..."
 
-# ElevenLabs (for voice features)
+# ElevenLabs (legacy voice provider — superseded by OpenAI TTS fallback)
 ELEVENLABS_API_KEY="..."
 
 # Pinecone (optional, for vector search)
@@ -214,3 +217,105 @@ npm run tray
 - Service-specific: `apps/*/server*.log` and `apps/*/*.err*.log` 
 - System tray logs: same service directories
 
+
+## Production Deployment (Hetzner)
+
+### Server Details
+- **Domain**: `excellegacyrealtygroup.site`
+- **IP**: `5.161.250.43`
+- **SSH**: `ssh hetzner` (as `root`)
+- **Deploy path**: `/var/www/excellegacyrealtygroup/`
+- **PM2 process**: `excellegacyrealtygroup` (port 3210)
+- **SSL**: Let's Encrypt via certbot (auto-renewing, expires 2027-01-14)
+- **Nginx**: `/etc/nginx/sites-available/excellegacyrealtygroup.site`
+
+### DNS Configuration
+| Type | Name | Value |
+|------|------|-------|
+| A | @ | 5.161.250.43 |
+| CNAME | www | excellegacyrealtygroup.site |
+
+### Deploy Process
+```bash
+# 1. Build locally (900s timeout required)
+cmd /c "npm run build > build-out.txt 2>&1"
+
+# 2. Package (use deploy/package-v3.py)
+python deploy/package-v3.py
+
+# 3. Upload
+scp deploy-v3.tar.gz hetzner:/tmp/deploy-v3.tar.gz
+
+# 4. Extract and restart
+ssh hetzner "cd /var/www/excellegacyrealtygroup && rm -rf .next standalone server.js middleware.ts && tar xzf /tmp/deploy-v3.tar.gz && ln -sfn client node_modules/@prisma/client-2c3a283f134fdcb6 && pm2 restart excellegacyrealtygroup"
+
+# 5. Test
+ssh hetzner "bash /tmp/test-fixes.sh"
+```
+
+### Critical Deployment Notes
+- **Prisma Turbopack symlink**: After every deploy, recreate:
+  `ln -sfn client node_modules/@prisma/client-2c3a283f134fdcb6`
+- **DATABASE_URL**: Must be `file:./prisma/dev.db` (NOT `file:./dev.db`)
+- **Auth credentials**: `admin@excellegacyrealtygroup.site` / `admin123` (hardcoded in `src/lib/auth.ts`)
+- **Build timeout**: Always use 900s for `npm run build` (600s not enough)
+
+### Health Checks
+```bash
+curl -sk https://excellegacyrealtygroup.site/           # ? 200/307
+curl -sk https://excellegacyrealtygroup.site/api/auth/session  # ? 200
+ssh hetzner "pm2 logs excellegacyrealtygroup --lines 10 --nostream"
+```
+
+### Current Production State (verified 2026-10-21, v0.58.52)
+
+| Service | PM2 process | Port | Public path |
+|---|---|---|---|
+| Main CRM | `excellegacyrealtygroup` | 3210 | `/` |
+| LeadG | `leadg` | 3211 | `/leadg/` |
+| Foreclosure | `foreclosure` | 3212 | `/foreclosure/` |
+| ContentPlanner | `contentplanner` | 3213 | `/contentplanner/` |
+| Media Workflow | `media-workflow` | 3214 | `/media-workflow/` |
+| LegacyLeads | `legacyleads` | 3215 | `/legacyleads/` |
+| ContentPlanner API | `contentplanner-api` | 3216 | `/contentplanner-api/` (WebSocket proxied) |
+| LegacyLeads API | `legacyleads-api` | 3217 | `/legacyleads-api/` (new; DB provisioned on first deploy) |
+
+- **ContentPlanner DB**: Postgres (`contentplanner` user+DB; password in `/root/.contentplanner-pgpass`) — schema is postgresql, NOT SQLite.
+- **ContentPlanner service JWT**: main CRM proxies `/api/contentplanner/*` with a short-lived HS256 token; secret in `/root/.contentplanner-svc-secret`. Deploy scripts must preserve it alongside `DATABASE_URL`/`DEEPSEEK*`/`AUTH_JWT_SECRET`.
+- **Deploy scripts preserve integration keys**: all `deploy-*.sh` preserve `DEEPSEEK*` lines (and voice/messaging keys) — never redeploy with a script that wipes env.
+
+### LegacyLeads API (:3217) first deploy
+The backend previously had no deploy path (prod ran no backend process).
+Pipeline (all committed): `deploy/package-legacyleads-api.py` (packs src + lockfile + tsconfig + `migrations/`, no node_modules) → `scp deploy-legacyleads-api.tar.gz hetzner:/tmp/` → `ssh hetzner 'bash /var/www/legacyleads-api/deploy-legacyleads-api.sh'` → `ssh hetzner 'bash add-legacyleads-api-nginx.sh'` (run from `deploy/`).
+The deploy script provisions idempotently: `legacyleads` Postgres role/DB (password in `/root/.legacyleads-pgpass`, chmod 600), PostGIS extension, migrations `01` + `02_listings`, `.env` (PORT=3217, local Redis), PM2 `legacyleads-api` from compiled `dist/`.
+Heads-up: the `listings` table starts EMPTY (no MLS ingestion gateway yet) — `/listings` returns `{data: [], count: 0}` until ingestion lands.
+Status 2026-11-02: backend LIVE on :3217 (PM2 `legacyleads-api`), nginx `/legacyleads-api/` Live, frontend rebuilt with `NEXT_PUBLIC_API_URL` and redeployed — end-to-end path verified to `{data: [], count: 0}`.
+Frontend wiring: rebuild `apps/legacyleads/frontend` with `NEXT_PUBLIC_API_URL=https://excellegacyrealtygroup.site/legacyleads-api` so the browser client hits the new route instead of `localhost:3006` (already supported by `src/app/lib/api.ts`; no code change needed).
+
+- **NEXTAUTH_URL** must be `https://excellegacyrealtygroup.site` (NOT `localhost:3000`).
+- **Redis** runs on `127.0.0.1:6379` (systemd `redis-server`, active). Required by:
+  - `media-workflow` — `src/utils/MessageBroker.ts` (Redis Pub/Sub for background pipeline jobs).
+  - `legacyleads` backend — `src/queue.ts` (BullMQ job queue for AI sync / skip-trace).
+  - (Main CRM rate-limiting is in-memory — no Redis needed.)
+
+### Deploy (main CRM, nondestructive backup-and-swap)
+
+> PowerShell quoting trap: invoking the ssh command in double quotes lets
+> PowerShell expand `$(date +%s)` LOCALLY (Get-Date error) and sends an empty
+> `BK=` to the server — the old build is then NOT backed up. Always
+> single-quote the remote command, or compute the timestamp before ssh.
+> Never pipe script files to ssh via PowerShell (`Get-Content x.sh | ssh ...`):
+> the pipe reintroduces CRLF and bash chokes. `scp` the script up, then run
+> `ssh hetzner 'bash /tmp/script.sh'`.
+```bash
+# local: rebuild + package
+npm run build
+python deploy/package-v3.py
+scp deploy-v3.tar.gz hetzner:/tmp/deploy-v3.tar.gz
+
+# server: move old build aside, extract, restart
+ssh hetzner 'cd /var/www/excellegacyrealtygroup && BK=/tmp/ercm-backup-$(date +%s) && mkdir -p $BK && mv .next node_modules server.js middleware.ts package.json static public post-deploy.sh $BK/ 2>/dev/null; tar xzf /tmp/deploy-v3.tar.gz && ln -sfn client node_modules/@prisma/client-2c3a283f134fdcb6 && pm2 restart excellegacyrealtygroup --update-env'
+```
+
+### Campaign defaults (0.61.6)
+On Hetzner with Node 24+, run DATABASE_URL pointing to the production SQLite database and node scripts/load-default-campaigns.mjs from the source checkout. This adds four company plans to each workspace without enrolling contacts or overwriting edited defaults. Future workspaces initialize on Campaigns page access. Server instrumentation scans due email/SMS tasks every minute. Live email/SMS provider configuration is required. ERROR or stranded IN_PROGRESS sends require operator review before reopening to avoid duplicate sends.

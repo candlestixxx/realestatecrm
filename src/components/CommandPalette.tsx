@@ -96,7 +96,7 @@ export function CommandPalette() {
 
   return (
     <>
-      <button
+      <button type="button"
         onClick={() => setOpen(true)}
         className="flex items-center text-sm text-muted-foreground bg-muted/50 hover:bg-muted transition-colors px-3 py-1.5 rounded-md border border-border shrink-0 select-none cursor-pointer"
       >
@@ -164,7 +164,9 @@ export function CommandPalette() {
                     </Command.Group>
                   )}
 
-                  {results.map((result) => (
+                  {results.length === 0 && debouncedText ? (
+                    <div className="px-4 py-3 text-sm text-muted-foreground">No results for &quot;{debouncedText}&quot;</div>
+                  ) : results.map((result) => (
                     <Command.Item
                       key={`${result.type}-${result.id}`}
                       value={`${result.type}-${result.id}`}

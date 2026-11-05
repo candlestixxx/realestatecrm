@@ -225,7 +225,7 @@ export default function SearchAlertsWidget({
           <h3 className="text-lg font-bold">Automated MLS Search Alerts</h3>
           <p className="text-xs text-muted-foreground">Instantly alert this lead when matching MLS properties hit the market.</p>
         </div>
-        <button
+        <button type="button"
           onClick={() => setIsOpen(true)}
           className="px-3 py-1.5 bg-secondary/15 text-secondary hover:bg-secondary/20 text-xs font-bold rounded-lg border border-secondary/30 transition-colors uppercase tracking-wider"
         >
@@ -289,7 +289,7 @@ export default function SearchAlertsWidget({
                     </p>
                   )}
                 </div>
-                <button
+                <button type="button"
                   onClick={() => handleDelete(alert.id)}
                   disabled={isDeleting === alert.id}
                   className="px-2.5 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-500/10 rounded-lg transition-colors border border-transparent hover:border-red-500/20 disabled:opacity-50"

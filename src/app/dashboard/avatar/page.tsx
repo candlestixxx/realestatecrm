@@ -1,14 +1,16 @@
-﻿'use client';
+'use client';
 // AI Avatar — generate AI presenter videos for listings (HeyGen integration).
 // API: /api/avatar (POST with action field: create-session, speak, end-session).
 
 import { useState } from 'react';
 import { Video, Play, Loader2, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import SourceBadge from '@/components/SourceBadge';
 
 export default function AvatarPage() {
   const [action, setAction] = useState('create-session');
   const [result, setResult] = useState<string | null>(null);
+  const [resultProvider, setResultProvider] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleAction() {
@@ -21,6 +23,7 @@ export default function AvatarPage() {
       });
       const data = await res.json();
       setResult(data.message || data.error || JSON.stringify(data).substring(0, 200));
+      setResultProvider(data.provider || (data.error ? 'error' : null));
     } finally { setLoading(false); }
   }
 
@@ -39,11 +42,16 @@ export default function AvatarPage() {
             <option value="speak">Speak</option>
             <option value="end-session">End Session</option>
           </select>
-          <button onClick={handleAction} disabled={loading} className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5">
+          <button type="button" onClick={handleAction} disabled={loading} className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />} Run
           </button>
         </div>
-        {result && <p className="mt-4 text-sm text-muted-foreground">{result}</p>}
+        {result && (
+          <div className="mt-4 flex items-start gap-2">
+            {resultProvider && <SourceBadge source={resultProvider} />}
+            <p className="text-sm text-muted-foreground">{result}</p>
+          </div>
+        )}
       </div>
     </TooltipProvider>
   );

@@ -98,7 +98,7 @@ export default function AIChat() {
   return (
     <>
       {!isOpen && (
-        <button
+        <button type="button"
           onClick={() => setIsOpen(true)}
           className="fixed bottom-6 right-6 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center hover:bg-primary/90 transition-transform hover:scale-105 z-50"
           aria-label="Open AI Assistant"
@@ -111,10 +111,10 @@ export default function AIChat() {
         <div className="fixed bottom-6 right-6 w-full max-w-sm sm:w-[450px] h-[600px] bg-background border border-border shadow-2xl rounded-2xl flex flex-col z-50 overflow-hidden">
           <div className="bg-primary p-4 flex justify-between items-center text-primary-foreground">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+              <div className="w-2 h-2 rounded-full bg-card animate-pulse"></div>
               <h3 className="font-bold text-sm tracking-tight uppercase">Gemini AI Command Center</h3>
             </div>
-            <button
+            <button type="button"
               onClick={() => setIsOpen(false)}
               className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
             >
@@ -130,7 +130,7 @@ export default function AIChat() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/5">
-            {messages.length === 0 ? <div className="text-center py-8 text-gray-500 text-sm">No messages yet. Start a conversation with the AI assistant.</div> : (messages.map((m) => (
+            {messages.length === 0 ? <div className="text-center py-8 text-muted-foreground text-sm">No messages yet. Start a conversation with the AI assistant.</div> : (messages.map((m) => (
               <div
                 key={m.id}
                 className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
@@ -139,7 +139,7 @@ export default function AIChat() {
                   className={`max-w-[85%] rounded-2xl p-4 text-sm shadow-sm ${
                     m.role === 'user' 
                       ? 'bg-primary text-primary-foreground rounded-br-none' 
-                      : 'bg-white dark:bg-muted/30 border border-border rounded-bl-none'
+                      : 'bg-card dark:bg-muted/30 border border-border rounded-bl-none'
                   }`}
                 >
                   {m.content}
@@ -194,7 +194,7 @@ export default function AIChat() {
                 className="flex-1 bg-muted/30 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 disabled={isLoading}
               />
-              <button
+              <button type="button"
                 type="button"
                 onClick={toggleVoiceMode}
                 disabled={isTranscribing}
@@ -203,8 +203,9 @@ export default function AIChat() {
               >
                 {isTranscribing ? <Loader2 className="w-4 h-4 animate-spin" /> : isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
               </button>
-              <button
+              <button type="button"
                 type="submit"
+                aria-label="Send message"
                 disabled={!input.trim() || isLoading}
                 className="px-3 py-2 bg-primary text-primary-foreground rounded-md disabled:opacity-50"
               >

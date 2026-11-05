@@ -9,7 +9,7 @@ import { MetadataRoute } from 'next';
  * routes are intentionally excluded (they require auth).
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://excellegacy.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://excellegacyrealtygroup.site';
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },

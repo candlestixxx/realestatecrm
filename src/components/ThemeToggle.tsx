@@ -33,7 +33,7 @@ export function ThemeToggle() {
   })();
 
   return (
-    <button
+    <button type="button"
       onClick={cycleTheme}
       className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/60 bg-muted/30 hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-all text-[11px] font-semibold"
       title={`Theme: ${resolvedDisplay}. Click to cycle: system → light → dark`}
