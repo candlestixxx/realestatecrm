@@ -184,7 +184,32 @@ export default function ListingsPage() {
         </button>
       </div>
 
-      {/* MLS Search Filters */}
+            {/* Listings = money: live inventory + pipeline totals */}
+      {!loading && listings.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+          <div className="bg-card rounded-lg border p-4">
+            <div className="text-xs text-muted-foreground">Active inventory</div>
+            <div className="text-xl font-bold text-foreground">${listings.filter(l => l.status === 'ACTIVE').reduce((a, l) => a + (l.listPrice || 0), 0).toLocaleString()}</div>
+          </div>
+          <div className="bg-card rounded-lg border p-4">
+            <div className="text-xs text-muted-foreground">Pending</div>
+            <div className="text-xl font-bold text-foreground">${listings.filter(l => l.status === 'PENDING').reduce((a, l) => a + (l.listPrice || 0), 0).toLocaleString()}</div>
+          </div>
+          <div className="bg-card rounded-lg border p-4">
+            <div className="text-xs text-muted-foreground">Closed volume</div>
+            <div className="text-xl font-bold text-foreground">${listings.filter(l => l.status === 'SOLD').reduce((a, l) => a + ((l.soldPrice || l.listPrice) || 0), 0).toLocaleString()}</div>
+          </div>
+          <div className="bg-card rounded-lg border p-4">
+            <div className="text-xs text-muted-foreground">Est. commission (3%)</div>
+            <div className="text-xl font-bold text-green-600">${Math.round(listings.reduce((a, l) => a + ((l.soldPrice || l.listPrice) || 0), 0) * 0.03).toLocaleString()}</div>
+          </div>
+          <div className="bg-card rounded-lg border p-4">
+            <div className="text-xs text-muted-foreground">Open offers</div>
+            <div className="text-xl font-bold text-foreground">{listings.reduce((a, l) => a + l.offers.length, 0)}</div>
+          </div>
+        </div>
+      )}
+{/* MLS Search Filters */}
       <div className="bg-card rounded-lg border p-4 mb-6">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
           <select value={filters.status} onChange={e => setFilters(f => ({ ...f, status: e.target.value }))} className="border rounded px-3 py-2 text-sm">

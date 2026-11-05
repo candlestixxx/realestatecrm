@@ -1,3 +1,8 @@
+## v0.61.9 (2026-11-05)
+
+### Listings are money: homes live in the CRM
+- `prisma/seed-listings.mjs`: idempotent seeder, 6 Michigan homes upserted by MLS number (ACTIVE/PENDING/SOLD) + matching Deals (value = price) so the pipeline reflects listing dollars; safe to re-run, wipes nothing
+- `/dashboard/listings` money strip: Active inventory, Pending, Closed volume, Est. commission (3%), Open offers — computed live from listings
 ## v0.61.5 (2026-11-03)
 
 ### Investment calculators for client presentations
