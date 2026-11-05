@@ -6,7 +6,7 @@
 // Embeddable: also rendered by tenant sites via CALCULATOR block.
 
 import { useMemo, useState } from 'react';
-import { analyzeBuyer, analyzeSeller, fmtUSD, fmtPct, buyerPriceForDSCR, buyerPriceForCashOnCash, buyerPriceForAffordability, buyerPriceForPayment, sellerPriceForNet, priceGame, estimatedAnnualTax, taxRatePctFromRecord } from '@/lib/calculators';
+import { analyzeBuyer, analyzeSeller, fmtUSD, fmtPct, buyerPriceForDSCR, buyerPriceForCashOnCash, buyerPriceForAffordability, buyerPriceForPayment, sellerPriceForNet, priceGame, estimatedAnnualTax, taxRatePctFromRecord, integrityPrice, fiveYearPath } from '@/lib/calculators';
 import { useEffect, useRef } from 'react';
 import { Home, Calculator as CalcIcon, Landmark, KeyRound, Target, ImagePlus, Search, Check, Loader2 } from 'lucide-react';
 
@@ -192,6 +192,9 @@ export default function InvestmentCalculators(props: { defaultMode?: Mode; compa
     } catch { /* buyers optional in appointment */ }
   }
   useEffect(() => { loadMlsConn(); }, []);
+  // Meeting of the minds: RED = seller ask, GREEN = agent integrity price.
+  const [sellerAsk, setSellerAsk] = useState(475000);
+  const [marketTrend, setMarketTrend] = useState(3);
   // Seller state
   const [value, setValue] = useState(450000);
   const [mortgage, setMortgage] = useState(280000);
@@ -231,7 +234,13 @@ export default function InvestmentCalculators(props: { defaultMode?: Mode; compa
   const sellerTarget = sellerPriceForNet(sellerInputs, targetNet);
   const sellerGame = priceGame(value, sellerTarget);
   const sellerAtTarget = sellerTarget ? analyzeSeller({ ...sellerInputs, marketValue: Math.round(sellerTarget) }) : null;
-  const GAME_STYLE: Record<string, string> = { higher: 'border-blue-500/50 bg-blue-500/10', lower: 'border-red-500/50 bg-red-500/10', at: 'border-green-500/50 bg-green-500/10' };
+  const mlsFact = mls.length && mls[0]?.listPrice ? Number(mls[0].listPrice) : (rec?.marketValue ? null : null);
+  const integrity = integrityPrice({ sellerAsk, mlsPrice: mlsFact, countyMarketValue: rec?.marketValue || null, assessedValue: rec?.assessedValue || null });
+  const greenPath = integrity.agentPrice ? fiveYearPath(integrity.agentPrice, marketTrend) : [];
+  const redPath = fiveYearPath(sellerAsk, marketTrend);
+  const scaleMin = Math.min(sellerAsk, integrity.bandLow || sellerAsk) * 0.94;
+  const scaleMax = Math.max(sellerAsk, integrity.bandHigh || sellerAsk) * 1.04;
+  const pctOnScale = (v: number) => Math.max(0, Math.min(100, ((v - scaleMin) / Math.max(1, scaleMax - scaleMin)) * 100));  const GAME_STYLE: Record<string, string> = { higher: 'border-blue-500/50 bg-blue-500/10', lower: 'border-red-500/50 bg-red-500/10', at: 'border-green-500/50 bg-green-500/10' };
   return (
     <div className="space-y-4">
       <div className="flex gap-4">
@@ -357,6 +366,44 @@ export default function InvestmentCalculators(props: { defaultMode?: Mode; compa
       {layer === 'number' && (
         <div className="space-y-3">
           <h3 className="text-sm font-black uppercase tracking-wider">The Number - where everyone lands</h3>
+          <div className="rounded-2xl border border-border p-4">
+            <div className="text-xs font-black uppercase tracking-wider">Meeting of the minds - red vs green</div>
+            <p className="mt-1 text-xs text-muted-foreground">RED is the seller number. GREEN is the agent price, built only from facts everyone can see: the MLS and the county. If red sits inside the light-green room, you already agree.</p>
+            <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+              <NumField label="Seller ask (RED)" value={sellerAsk} onChange={setSellerAsk} prefix="$" step={1000} />
+              <NumField label="Market growth / yr" value={marketTrend} onChange={setMarketTrend} suffix="%" step={0.5} hint="Today market, 5-yr view" />
+              <Stat label="Agent price (GREEN)" value={integrity.agentPrice ? fmtUSD(integrity.agentPrice) : '--'} sub={integrity.bandLow ? 'Fair room ' + fmtUSD(integrity.bandLow) + ' - ' + fmtUSD(integrity.bandHigh || 0) : 'Pull records first'} />
+              <Stat label="Gap to green" value={integrity.agentPrice ? fmtUSD(Math.abs(integrity.sellerGap)) : '--'} sub={integrity.position === 'inside' ? 'Inside the room - together' : integrity.position === 'above' ? 'Red is over the room' : integrity.position === 'below' ? 'Red is under - room to rise' : ''} />
+            </div>
+            {integrity.agentPrice ? (
+              <div className="relative mt-6 mb-2 h-10 rounded-full bg-muted" role="img" aria-label="Price scale: seller red number versus agent green price">
+                <div className="absolute top-0 h-10 rounded-full bg-green-500/25" style={{ left: pctOnScale(integrity.bandLow || 0) + '%', width: Math.max(2, pctOnScale(integrity.bandHigh || 0) - pctOnScale(integrity.bandLow || 0)) + '%' }} />
+                <div className="absolute top-[-6px] h-[52px] w-1.5 rounded bg-green-600" style={{ left: pctOnScale(integrity.agentPrice) + '%' }} title="Green - agent price" />
+                <div className="absolute top-[-6px] h-[52px] w-1.5 rounded bg-red-600" style={{ left: pctOnScale(sellerAsk) + '%' }} title="Red - seller ask" />
+                <span className="absolute -bottom-5 text-[10px] font-bold text-green-700 dark:text-green-300" style={{ left: pctOnScale(integrity.agentPrice) + '%' }}>GREEN {fmtUSD(integrity.agentPrice)}</span>
+                <span className="absolute -top-5 text-[10px] font-bold text-red-600" style={{ left: pctOnScale(sellerAsk) + '%' }}>RED {fmtUSD(sellerAsk)}</span>
+              </div>
+            ) : null}
+            <ul className="mt-6 list-disc space-y-1 pl-5 text-xs leading-relaxed">
+              {integrity.reasons.map((r, i) => (<li key={i}>{r}</li>))}
+            </ul>
+            {integrity.agentPrice ? <button type="button" onClick={() => { if (integrity.agentPrice) { setSellerAsk(integrity.agentPrice); setValue(integrity.agentPrice); } }} className="mt-3 rounded-lg bg-green-600 px-4 py-2 text-xs font-bold text-white">Meet at the green number</button> : null}
+          </div>
+          <div className="rounded-2xl border border-border p-4">
+            <div className="text-xs font-black uppercase tracking-wider">The next 5 years - from today</div>
+            <p className="mt-1 text-xs text-muted-foreground">If the market grows {marketTrend}% a year, here is the simple path. No tricks - same math for red and green.</p>
+            <div className="mt-3 grid grid-cols-3 gap-2 md:grid-cols-6">
+              {[0, 1, 2, 3, 4, 5].map((y) => (
+                <div key={y} className="rounded-xl border border-border p-2 text-center">
+                  <div className="text-[10px] font-bold uppercase text-muted-foreground">{y === 0 ? 'Today' : 'Year ' + y}</div>
+                  <div className="text-[11px] font-bold text-red-600">{fmtUSD(redPath[y] || sellerAsk)}</div>
+                  <div className="text-[11px] font-bold text-green-700 dark:text-green-300">{greenPath[y] ? fmtUSD(greenPath[y]) : '--'}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 flex justify-center gap-4 text-[10px] font-bold"><span className="text-red-600">RED = seller ask path</span><span className="text-green-700 dark:text-green-300">GREEN = agent price path</span></div>
+            {integrity.agentPrice ? <p className="mt-2 text-center text-xs font-semibold">In 5 years: red path {fmtUSD(redPath[5])} - green path {fmtUSD(greenPath[5] || 0)}. Buying or selling at green today keeps the profit real, not wished.</p> : null}
+          </div>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div className={'rounded-2xl border p-4 ' + GAME_STYLE[buyerGame.direction]}><div className="text-[11px] font-black uppercase tracking-wider">Buyer side</div><div className="text-2xl font-black">{buyerTarget ? fmtUSD(Math.round(buyerTarget)) : '--'}</div><p className="text-xs">{buyerGame.label}</p>{buyerAtTarget ? <p className="mt-1 text-xs font-semibold">At that price: payment {fmtUSD(buyerAtTarget.totalMonthly)}/mo - verdict: {buyerAtTarget.verdictLabel}.</p> : null}<button type="button" onClick={() => setLayer('numbers')} className="mt-2 rounded-lg bg-primary px-3 py-1.5 text-[11px] font-bold text-primary-foreground">Play buyer numbers</button></div>
             <div className={'rounded-2xl border p-4 ' + GAME_STYLE[sellerGame.direction]}><div className="text-[11px] font-black uppercase tracking-wider">Seller side</div><div className="text-2xl font-black">{sellerTarget ? fmtUSD(Math.round(sellerTarget)) : '--'}</div><p className="text-xs">{sellerGame.label}</p>{sellerAtTarget ? <p className="mt-1 text-xs font-semibold">Seller keeps {fmtUSD(sellerAtTarget.netProceeds)} at that price.</p> : null}<button type="button" onClick={() => setLayer('numbers')} className="mt-2 rounded-lg bg-primary px-3 py-1.5 text-[11px] font-bold text-primary-foreground">Play seller numbers</button></div>

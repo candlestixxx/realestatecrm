@@ -232,6 +232,63 @@ export function priceGame(currentPrice: number, targetPrice: number | null): Pri
   return { direction: 'higher', gap, gapPct, label: 'LOWER than the number - there is room to go UP ' + fmtUSD(Math.abs(gap)) + ' and still hit the target.' };
 }
 
+// --- Meeting of the minds: RED seller ask vs GREEN integrity price --------
+// Why: the seller walks in with a number (red). The agent must show, with
+// county + MLS facts the client can see, the price where the home will
+// actually sell (green) and the fair band around it. Plain words on
+// purpose - a 5th grader should follow every line.
+
+export interface IntegrityInputs {
+  sellerAsk: number;
+  mlsPrice?: number | null;
+  countyMarketValue?: number | null;
+  assessedValue?: number | null;
+}
+
+export interface IntegrityResult {
+  agentPrice: number | null;
+  bandLow: number | null;
+  bandHigh: number | null;
+  sellerGap: number;
+  sellerGapPct: number | null;
+  position: 'inside' | 'above' | 'below' | 'unknown';
+  reasons: string[];
+}
+
+export function integrityPrice(i: IntegrityInputs): IntegrityResult {
+  const facts: { label: string; value: number }[] = [];
+  if (i.mlsPrice && i.mlsPrice > 0) facts.push({ label: 'Homes like this on the MLS are priced at', value: i.mlsPrice });
+  if (i.countyMarketValue && i.countyMarketValue > 0) facts.push({ label: 'The county (BS&A / Realist) says this home is worth', value: i.countyMarketValue });
+  const reasons: string[] = facts.map((f) => f.label + ' ' + fmtUSD(f.value) + '.');
+  if (i.assessedValue && i.assessedValue > 0) reasons.push('For taxes, the county counts it at ' + fmtUSD(i.assessedValue) + '. Taxes follow that number, not the wish price.');
+  if (!facts.length) return { agentPrice: null, bandLow: null, bandHigh: null, sellerGap: 0, sellerGapPct: null, position: 'unknown', reasons: ['Pull the county record (House layer) or load the MLS listing first - then the green line can be drawn honestly.'] };
+  // Green = middle of the facts. MLS weighs a bit more (live market),
+  // county anchors it (public record). Both are shown, nothing hidden.
+  let agentPrice: number;
+  if (facts.length === 2) agentPrice = Math.round(facts[0].value * 0.6 + facts[1].value * 0.4);
+  else agentPrice = Math.round(facts[0].value);
+  const bandLow = Math.round(agentPrice * 0.97);
+  const bandHigh = Math.round(agentPrice * 1.03);
+  reasons.push('The green price is the middle of those facts: ' + fmtUSD(agentPrice) + '.');
+  reasons.push('Fair room to talk: ' + fmtUSD(bandLow) + ' to ' + fmtUSD(bandHigh) + '. Inside that room, buyers say yes and the bank appraisal agrees.');
+  const sellerGap = (i.sellerAsk || 0) - agentPrice;
+  const sellerGapPct = agentPrice > 0 ? (sellerGap / agentPrice) * 100 : null;
+  let position: IntegrityResult['position'] = 'inside';
+  if (!i.sellerAsk) position = 'unknown';
+  else if (i.sellerAsk > bandHigh) { position = 'above'; reasons.push('The red seller number is ' + fmtUSD(Math.abs(sellerGap)) + ' over the green price. Over the room, homes sit, then chase the market down.'); }
+  else if (i.sellerAsk < bandLow) { position = 'below'; reasons.push('The red seller number is ' + fmtUSD(Math.abs(sellerGap)) + ' under the green price. There is room to ask more and still be fair.'); }
+  else reasons.push('The red seller number already sits inside the fair room. You are together - this is the meeting of the minds.');
+  return { agentPrice, bandLow, bandHigh, sellerGap, sellerGapPct, position, reasons };
+}
+
+// 5-year path: what a price becomes at a steady yearly growth rate.
+// Year 0 is the day of presentation; years 1-5 project forward from it.
+export function fiveYearPath(price: number, yearlyPct: number): number[] {
+  const out: number[] = [];
+  for (let y = 0; y <= 5; y++) out.push(Math.round(price * Math.pow(1 + (yearlyPct || 0) / 100, y)));
+  return out;
+}
+
 // Public-record helpers (BS&A / Realcomp payloads from /api/property-data).
 // Why: the house layers show county/MLS facts next to the calculator, and
 // "Use in calculator" must translate them honestly - estimated annual tax

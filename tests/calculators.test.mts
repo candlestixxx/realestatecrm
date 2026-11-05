@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { analyzeBuyer, analyzeSeller, monthlyPI, fmtUSD, buyerPriceForDSCR, buyerPriceForCashOnCash, buyerPriceForAffordability, sellerPriceForNet, priceGame, estimatedAnnualTax, taxRatePctFromRecord } from "../src/lib/calculators.ts";
+import { analyzeBuyer, analyzeSeller, monthlyPI, fmtUSD, buyerPriceForDSCR, buyerPriceForCashOnCash, buyerPriceForAffordability, sellerPriceForNet, priceGame, estimatedAnnualTax, taxRatePctFromRecord, integrityPrice, fiveYearPath } from "../src/lib/calculators.ts";
 
 test("monthlyPI matches amortization", () => {
   const pi = monthlyPI(360000, 6.5, 30);
@@ -72,6 +72,20 @@ test("public-record helpers: estimated tax and rate from county values", () => {
   const r = taxRatePctFromRecord(450000, 200000);
   assert.ok(r !== null && Math.abs(r - 0.9333) < 0.01);
   assert.equal(taxRatePctFromRecord(0, 200000), null);
+});
+
+test("meeting of the minds: green price sits between MLS and county facts", () => {
+  const r = integrityPrice({ sellerAsk: 500000, mlsPrice: 460000, countyMarketValue: 440000, assessedValue: 210000 });
+  assert.equal(r.agentPrice, 452000);
+  assert.equal(r.position, "above");
+  assert.ok(r.bandLow !== null && r.bandHigh !== null && r.bandLow < (r.agentPrice || 0) && (r.agentPrice || 0) < r.bandHigh);
+  const inside = integrityPrice({ sellerAsk: 455000, mlsPrice: 460000, countyMarketValue: 440000 });
+  assert.equal(inside.position, "inside");
+  assert.equal(integrityPrice({ sellerAsk: 400000 }).position, "unknown");
+  const path = fiveYearPath(452000, 3);
+  assert.equal(path.length, 6);
+  assert.equal(path[0], 452000);
+  assert.ok(path[5] > 520000);
 });
 
 test("fmtUSD formats", () => {
