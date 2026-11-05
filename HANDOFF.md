@@ -566,3 +566,9 @@ Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPA
 - MLS ingestion to fill legacyleads listings (table empty)
 - Real API keys still key-blocked (Twilio, SendGrid, Whitepages/PDL, etc.)
 - Consider prettier --write pass (repo-wide style drift, untouched files warn too)
+
+## v0.61.9 (2026-11-05) — listings are money
+- Seeded 6 Michigan homes (EXL-1001..1006, ACTIVE/PENDING/SOLD) + 6 matching Deals via idempotent `prisma/seed-listings.mjs` (upsert by mlsNumber, deals by title; never wipes)
+- `/dashboard/listings` money strip: Active inventory / Pending / Closed volume / Est. commission 3% / Open offers
+- Live verified: main 200, `/api/listings?workspaceId=excel-legacy-team` = 8 homes (6 seeded + 2 pre-existing), ACTIVE $1,049,000 / PENDING $1,185,000 / SOLD $395,000, offers 0
+- Local main == origin/main (952fe5d) after rebase over 7fa752a (other lane); Hetzner `excellegacyrealtygroup` v0.61.9 online
