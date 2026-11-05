@@ -1,4 +1,4 @@
-## v0.61.9 (2026-11-05)
+## v0.61.10 (2026-11-05)
 
 ### HIGHER or LOWER - find the one number (Excel Legacy Realty Group)
 - Solve-for-price game in /dashboard/calculators: agent picks the win condition (DSCR, cash-on-cash, % of income, monthly payment for buyers; walk-away net for sellers) and the calculator solves the exact price where the profit works
@@ -6,6 +6,11 @@
 - Closed-form solvers in src/lib/calculators.ts (buyerPriceForDSCR/CashOnCash/Affordability/Payment, sellerPriceForNet, priceGame); +4 round-trip tests (10 total, all passing)
 - Purpose: agent, buyer, and seller watch the same numbers live in the listing appointment and arrive at one agreed price - service and integrity, the Excel Legacy way
 
+## v0.61.9 (2026-11-05)
+
+### Listings are money: homes live in the CRM
+- `prisma/seed-listings.mjs`: idempotent seeder, 6 Michigan homes upserted by MLS number (ACTIVE/PENDING/SOLD) + matching Deals (value = price) so the pipeline reflects listing dollars; safe to re-run, wipes nothing
+- `/dashboard/listings` money strip: Active inventory, Pending, Closed volume, Est. commission (3%), Open offers — computed live from listings
 ## v0.61.5 (2026-11-03)
 
 ### Investment calculators for client presentations
@@ -1093,7 +1098,6 @@ submodules match.
 - Added `listCampaigns` and `enrollInCampaign` tools to the Gemini AI chatbot logic (`src/app/api/chat/route.ts`).
 =======
 - Added `listCampaigns` and `enrollInCampaign` tools to the Gemini AI chatbot logic (`src/app/api/chat/route.ts`).
->>>>>>> origin/main
 - Gemini can now automatically list and enroll leads into Drip Campaigns to dispatch live SMS/emails as part of agent workflow automation.
 
 ## [0.47.0] - Voice & Speech Provider Selection
