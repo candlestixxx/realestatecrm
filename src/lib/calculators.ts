@@ -232,6 +232,20 @@ export function priceGame(currentPrice: number, targetPrice: number | null): Pri
   return { direction: 'higher', gap, gapPct, label: 'LOWER than the number - there is room to go UP ' + fmtUSD(Math.abs(gap)) + ' and still hit the target.' };
 }
 
+// Public-record helpers (BS&A / Realcomp payloads from /api/property-data).
+// Why: the house layers show county/MLS facts next to the calculator, and
+// "Use in calculator" must translate them honestly - estimated annual tax
+// uses the same 2.1% of taxable value the prefill-offer endpoint uses.
+export function estimatedAnnualTax(taxableValue: number): number {
+  if (!taxableValue || taxableValue <= 0) return 0;
+  return Math.round(taxableValue * 0.021);
+}
+
+export function taxRatePctFromRecord(marketValue: number, taxableValue: number): number | null {
+  if (!marketValue || marketValue <= 0 || !taxableValue || taxableValue <= 0) return null;
+  return (estimatedAnnualTax(taxableValue) / marketValue) * 100;
+}
+
 export function fmtUSD(n: number, digits = 0): string {
   if (!isFinite(n)) return '--';
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: digits, maximumFractionDigits: digits });

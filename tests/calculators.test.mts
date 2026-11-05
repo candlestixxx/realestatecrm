@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { analyzeBuyer, analyzeSeller, monthlyPI, fmtUSD, buyerPriceForDSCR, buyerPriceForCashOnCash, buyerPriceForAffordability, sellerPriceForNet, priceGame } from "../src/lib/calculators.ts";
+import { analyzeBuyer, analyzeSeller, monthlyPI, fmtUSD, buyerPriceForDSCR, buyerPriceForCashOnCash, buyerPriceForAffordability, sellerPriceForNet, priceGame, estimatedAnnualTax, taxRatePctFromRecord } from "../src/lib/calculators.ts";
 
 test("monthlyPI matches amortization", () => {
   const pi = monthlyPI(360000, 6.5, 30);
@@ -65,6 +65,13 @@ test("HIGHER-or-LOWER: game direction and gap", () => {
   assert.equal(priceGame(380000, 400000).direction, "higher");
   assert.equal(priceGame(400000, 400000).direction, "at");
   assert.equal(priceGame(450000, null).gapPct, null);
+});
+
+test("public-record helpers: estimated tax and rate from county values", () => {
+  assert.equal(estimatedAnnualTax(200000), 4200);
+  const r = taxRatePctFromRecord(450000, 200000);
+  assert.ok(r !== null && Math.abs(r - 0.9333) < 0.01);
+  assert.equal(taxRatePctFromRecord(0, 200000), null);
 });
 
 test("fmtUSD formats", () => {
