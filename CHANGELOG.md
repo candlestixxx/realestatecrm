@@ -1,3 +1,13 @@
+## v0.62.0 (2026-11-05)
+
+### Per-agent MLS connections (RESO) + commission override (owner option b)
+- New `MlsConnection` model: each realtor connects their own MLS (MiRealSource / Realcomp / other RESO) with a RESO server token or OAuth client, or registers Member ID only for the brokerage feed. Secrets AES-256-GCM encrypted, never returned by API, never logged. MLS browser passwords are rejected by design.
+- `src/lib/reso-normalize.ts` (pure, tested) + rebuilt `src/lib/reso-api.ts`: RESO OData fetch, test-connection, per-agent sync, and brokerage-feed sync that auto-assigns listings to agents by MLS Member ID. Sync now writes the dashboard `Listing` model (was `PropertyListing`, unread by the UI).
+- APIs: `GET/POST/DELETE/PATCH /api/mls/connections` (test + per-agent sync via PATCH action) and `POST /api/mls/sync` (agent or broker scope), all session + workspace authenticated.
+- Settings -> Integrations gains a Connect MLS form (save / test / sync mine / disconnect / sync brokerage feed).
+- Commission (option b): `Listing.commissionBps` (default 300 = 3%) and `buyerConcessionBps`, editable per listing in the detail modal, validated 0-1000 bps in the listings API; money strip now sums per-listing rates and shows the negotiability notice. Shared math in `src/lib/commission.ts`.
+- Local verification: production build passes on the base commit (Gemini's claimed CI build failure not reproduced); new `tests/mls-reso.test.mts` + calculators 11/11.
+
 ## v0.61.9 (2026-11-05)
 
 ### Listings are money: homes live in the CRM

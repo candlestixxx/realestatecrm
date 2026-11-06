@@ -1,3 +1,7 @@
+## v0.62.0 — Per-agent MLS (RESO) + commission override (2026-11-05)
+
+Owner decisions (via Muse lane): commission option **b** (3% default + per-listing override), Hank pause **lifted** (owner to confirm in Muse main chat per Bobbi's rule). Built: `MlsConnection` per-agent MLS connections (RESO token / OAuth / Member-ID-only, encrypted secrets, no MLS passwords), RESO sync into dashboard `Listing` with broker-feed auto-assign by Member ID, `/api/mls/connections` + `/api/mls/sync`, Connect MLS form in Settings → Integrations, per-listing commission/buyer-concession editing on `/dashboard/listings`. BSA stays a workspace-level key; Realist is SSO-only (deep-link, no token API). Step 1 verification: base build green (Gemini CI claim not reproduced), suite 22/27 with server up. Next: pilot agent (Member ID + RESO token), set broker feed env on Hetzner, deploy.
+
 ## v0.61.0 — Auth bypass fix, team/branding, fake-UI purge, CDP lane (2026-10-26 → 2026-10-31)
 
 **v0.59.0 — CRITICAL auth bypass fixed**: `CredentialsProvider.authorize()` verified email only, no password check — anyone with an agent's email could sign in as them. Now scrypt `passwordHash` enforced. Plus team management (`/api/team`, RBAC, invites, last-OWNER guard) and real e-sign contracts (fabricated "blockchain" API deleted).

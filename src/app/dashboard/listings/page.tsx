@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { getClientWorkspaceSlug, withWorkspace } from '@/lib/workspace-client';
+import { commissionForListing, COMMISSION_NEGOTIABILITY_NOTICE } from '@/lib/commission';
 
 interface Listing {
   id: string;
@@ -22,6 +23,9 @@ interface Listing {
   description: string | null;
   photos: string | null;
   listDate: string | null;
+  commissionBps?: number | null;
+  buyerConcessionBps?: number | null;
+  mlsSource?: string | null;
   offers: { id: string; amount: number; status: string }[];
 }
 
@@ -200,8 +204,8 @@ export default function ListingsPage() {
             <div className="text-xl font-bold text-foreground">${listings.filter(l => l.status === 'SOLD').reduce((a, l) => a + ((l.soldPrice || l.listPrice) || 0), 0).toLocaleString()}</div>
           </div>
           <div className="bg-card rounded-lg border p-4">
-            <div className="text-xs text-muted-foreground">Est. commission (3%)</div>
-            <div className="text-xl font-bold text-green-600">${Math.round(listings.reduce((a, l) => a + ((l.soldPrice || l.listPrice) || 0), 0) * 0.03).toLocaleString()}</div>
+            <div className="text-xs text-muted-foreground">Est. commission (default 3%, per-listing)</div>
+            <div className="text-xl font-bold text-green-600">${listings.reduce((a, l) => a + commissionForListing(l), 0).toLocaleString()}</div>
           </div>
           <div className="bg-card rounded-lg border p-4">
             <div className="text-xs text-muted-foreground">Open offers</div>
@@ -285,6 +289,26 @@ export default function ListingsPage() {
               <div><span className="text-sm text-muted-foreground">Property Type</span><div>{selected.propertyType?.replace('_', ' ') || '—'}</div></div>
             </div>
             {selected.description && <div className="mb-4 text-sm text-muted-foreground">{selected.description}</div>}
+
+            <div className="mb-4 border rounded p-3">
+              <h3 className="font-semibold mb-2 text-sm">Commission for this listing</h3>
+              <div className="flex flex-wrap items-end gap-3 text-sm">
+                <label>Listing commission %
+                  <input id="commission-pct" type="number" step="0.05" min="0" max="10" defaultValue={((selected.commissionBps ?? 300) / 100).toFixed(2)} className="block border rounded px-3 py-2 mt-1 w-32" />
+                </label>
+                <label>Buyer concession %
+                  <input id="concession-pct" type="number" step="0.05" min="0" max="10" defaultValue={((selected.buyerConcessionBps ?? 0) / 100).toFixed(2)} className="block border rounded px-3 py-2 mt-1 w-32" />
+                </label>
+                <button type="button" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" onClick={async () => {
+                  const cp = Number((document.getElementById('commission-pct') as HTMLInputElement)?.value);
+                  const bp = Number((document.getElementById('concession-pct') as HTMLInputElement)?.value);
+                  await fetch('/api/listings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: selected.id, commissionBps: Math.round(cp * 100), buyerConcessionBps: Math.round(bp * 100) }) });
+                  setSelected(null); fetchListings();
+                }}>Save rate</button>
+                <span className="text-muted-foreground">Est. ${commissionForListing(selected).toLocaleString()}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">{COMMISSION_NEGOTIABILITY_NOTICE}</p>
+            </div>
 
             {/* Comps Analysis */}
             <CompsAnalysis address={selected.address} city={selected.city} zip={selected.zip} />

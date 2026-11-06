@@ -35,6 +35,7 @@ model User {
   notifications        SystemNotification[]
   auditLogs            AuditLog[]
   agentSites           AgentSite[]
+  mlsConnections       MlsConnection[]
 }
 
 model Workspace {
@@ -73,6 +74,7 @@ model Workspace {
   partnerPermissions PartnerPermission[]
   auditLogs      AuditLog[]
   listings       Listing[]
+  mlsConnections MlsConnection[]
   offers         Offer[]
   clientPortals  ClientPortal[]
   websiteTemplates WebsiteTemplate[]
@@ -729,11 +731,42 @@ model Listing {
   listDate        DateTime?
   soldDate        DateTime?
   daysOnMarket    Int?
+  commissionBps        Int      @default(300)
+  buyerConcessionBps   Int      @default(0)
+  mlsSource            String?
+  mlsOrganizationId    String?
+  listAgentMlsId       String?
   workspaceId     String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   offers          Offer[]
+}
+
+model MlsConnection {
+  id                    String    @id @default(cuid())
+  userId                String
+  workspaceId           String
+  mlsName               String
+  endpointUrl           String?
+  authType              String    @default("SERVER_TOKEN")
+  encryptedToken        String?
+  encryptedClientSecret String?
+  clientId              String?
+  memberMlsId           String?
+  organizationId        String?
+  isActive              Boolean   @default(true)
+  lastSyncAt            DateTime?
+  lastSyncStatus        String?
+  lastError             String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace             Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mlsName])
+  @@index([workspaceId])
+  @@index([memberMlsId])
 }
 
 model Offer {

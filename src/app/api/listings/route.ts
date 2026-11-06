@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     mlsNumber, status, listPrice, address, city, state, zip,
     bedrooms, bathrooms, squareFeet, lotSize, yearBuilt, propertyType,
     description, photos, virtualTourUrl, listingAgentId, sellerContactId, listDate, workspaceId,
+    commissionBps, buyerConcessionBps,
   } = body;
 
   if (!address || !workspaceId) {
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest) {
         bedrooms, bathrooms, squareFeet, lotSize, yearBuilt, propertyType,
         description, photos: photos ? JSON.stringify(photos) : null,
         virtualTourUrl, listingAgentId, sellerContactId,
+        commissionBps: cleanBps(commissionBps) ?? 300, buyerConcessionBps: cleanBps(buyerConcessionBps) ?? 0,
         listDate: listDate ? new Date(listDate) : new Date(), workspaceId,
       },
     });
@@ -59,6 +61,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
+function cleanBps(v: unknown): number | undefined {
+  if (v === undefined || v === null || v === '') return undefined;
+  const n = Math.round(Number(v));
+  if (!Number.isFinite(n) || n < 0 || n > 1000) return -1;
+  return n;
+}
+
 export async function PATCH(request: NextRequest) {
   let body;
     try {
@@ -68,6 +77,13 @@ export async function PATCH(request: NextRequest) {
     }
   const { id, ...data } = body;
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+  for (const k of ['commissionBps', 'buyerConcessionBps'] as const) {
+    if (k in data) {
+      const c = cleanBps(data[k]);
+      if (c === -1) return NextResponse.json({ error: `${k} must be between 0 and 1000 (basis points)` }, { status: 400 });
+      data[k] = c;
+    }
+  }
   const existing = await prisma.listing.findUnique({ where: { id } });
   if (!existing) return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
   const listing = await prisma.listing.update({ where: { id }, data });
