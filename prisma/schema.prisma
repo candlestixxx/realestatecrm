@@ -598,6 +598,25 @@ model VoiceSettings {
 
   workspace         Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
+// Per-realtor MLS connection (Realcomp). One row per agent+provider.
+// secretEnc is AES-256-GCM (src/lib/mls-crypto.ts) - plaintext MLS
+// passwords/tokens are never stored or sent to the browser.
+model MlsCredential {
+  id            String    @id @default(cuid())
+  userId        String
+  workspaceId   String
+  provider      String    @default("realcomp") // realcomp
+  mlsUsername   String
+  secretEnc     String
+  status        String    @default("saved_unverified") // saved_unverified, connected, failed
+  lastTestedAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, provider])
+  @@index([workspaceId])
+}
+
 model BlogPost {
   id          String   @id @default(cuid())
   slug        String   @unique

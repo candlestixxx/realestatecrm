@@ -152,6 +152,157 @@ export function analyzeSeller(i: SellerInputs): SellerResult {
   return { equityGross, commission, closingCosts, totalSellingCosts, netProceeds, costPct, gain, roiPct, annualizedPct, verdict, verdictLabel, verdictReason };
 }
 
+// --- HIGHER or LOWER: solve-for-price game ---------------------------------
+// Why: in a listing appointment the agent and client play "higher or lower"
+// against ONE number - the price where the deal pencils. Instead of arguing
+// opinions, both sides move the price up/down and watch profit appear or
+// vanish until they land on the same number. These solvers invert the buyer
+// and seller math above (closed form, no iteration) so the target price
+// updates live as the agent drags any input.
+
+function buyerMonthlyFactor(i: BuyerInputs): { alpha: number; fixed: number } {
+  // totalMonthly = price * alpha + fixed  (fixed = insurance + HOA)
+  const downPayment = ((i.price || 0) * (i.downPct || 0)) / 100;
+  const loanAmount = Math.max(0, (i.price || 0) - downPayment);
+  const perDollar = loanAmount > 0 ? monthlyPI(loanAmount, i.annualRate || 0, i.termYears || 30) / loanAmount : 0;
+  const alpha = (1 - (i.downPct || 0) / 100) * perDollar + (i.annualTaxRate || 0) / 1200;
+  const fixed = (i.annualInsurance || 0) / 12 + (i.hoaMonthly || 0);
+  return { alpha, fixed };
+}
+
+export function buyerPriceForDSCR(i: BuyerInputs, targetDSCR: number): number | null {
+  if (!targetDSCR || targetDSCR <= 0 || !(i.monthlyRent > 0)) return null;
+  const { alpha, fixed } = buyerMonthlyFactor(i);
+  if (alpha <= 0) return null;
+  const p = (i.monthlyRent / targetDSCR - fixed) / alpha;
+  return p > 0 ? p : null;
+}
+
+export function buyerPriceForCashOnCash(i: BuyerInputs, targetCoCPct: number): number | null {
+  if (!(i.monthlyRent > 0)) return null;
+  const { alpha, fixed } = buyerMonthlyFactor(i);
+  const beta = alpha + (i.maintenancePct || 0) / 1200;
+  const gamma = ((i.downPct || 0) + (i.closingCostPct || 0)) / 100;
+  const denom = 12 * beta + (targetCoCPct / 100) * gamma;
+  if (denom <= 0) return null;
+  const p = (12 * (i.monthlyRent - fixed)) / denom;
+  return p > 0 ? p : null;
+}
+
+export function buyerPriceForPayment(i: BuyerInputs, targetMonthly: number): number | null {
+  if (!targetMonthly || targetMonthly <= 0) return null;
+  const { alpha, fixed } = buyerMonthlyFactor(i);
+  if (alpha <= 0) return null;
+  const p = (targetMonthly - fixed) / alpha;
+  return p > 0 ? p : null;
+}
+
+export function buyerPriceForAffordability(i: BuyerInputs, targetPct: number): number | null {
+  if (!targetPct || targetPct <= 0 || !(i.monthlyIncome > 0)) return null;
+  return buyerPriceForPayment(i, (i.monthlyIncome * targetPct) / 100);
+}
+
+export function sellerPriceForNet(i: SellerInputs, targetNet: number): number | null {
+  const keepRate = 1 - ((i.commissionPct || 0) + (i.closingCostPct || 0)) / 100;
+  if (keepRate <= 0) return null;
+  const p = (targetNet + (i.mortgageBalance || 0) + (i.repairs || 0) + (i.concessions || 0)) / keepRate;
+  return p > 0 ? p : null;
+}
+
+export type PriceDirection = 'higher' | 'lower' | 'at';
+
+export interface PriceGame {
+  direction: PriceDirection;
+  gap: number;
+  gapPct: number | null;
+  label: string;
+}
+
+// The game call: is the asking price HIGHER or LOWER than the number where
+// everyone wins? 'lower' = price must come down to hit the target,
+// 'higher' = there is room to pay/ask more, 'at' = already on the number.
+export function priceGame(currentPrice: number, targetPrice: number | null): PriceGame {
+  if (targetPrice === null || !isFinite(targetPrice) || targetPrice <= 0) {
+    return { direction: 'at', gap: 0, gapPct: null, label: 'Add rent, income, or a target to find the number.' };
+  }
+  const gap = currentPrice - targetPrice;
+  const gapPct = (gap / targetPrice) * 100;
+  if (Math.abs(gapPct) < 0.5) return { direction: 'at', gap, gapPct, label: 'AT THE NUMBER - this price already works for everyone.' };
+  if (gap > 0) return { direction: 'lower', gap, gapPct, label: 'HIGHER than the number - price needs to come DOWN ' + fmtUSD(Math.abs(gap)) + ' to hit the target.' };
+  return { direction: 'higher', gap, gapPct, label: 'LOWER than the number - there is room to go UP ' + fmtUSD(Math.abs(gap)) + ' and still hit the target.' };
+}
+
+// --- Meeting of the minds: RED seller ask vs GREEN integrity price --------
+// Why: the seller walks in with a number (red). The agent must show, with
+// county + MLS facts the client can see, the price where the home will
+// actually sell (green) and the fair band around it. Plain words on
+// purpose - a 5th grader should follow every line.
+
+export interface IntegrityInputs {
+  sellerAsk: number;
+  mlsPrice?: number | null;
+  countyMarketValue?: number | null;
+  assessedValue?: number | null;
+}
+
+export interface IntegrityResult {
+  agentPrice: number | null;
+  bandLow: number | null;
+  bandHigh: number | null;
+  sellerGap: number;
+  sellerGapPct: number | null;
+  position: 'inside' | 'above' | 'below' | 'unknown';
+  reasons: string[];
+}
+
+export function integrityPrice(i: IntegrityInputs): IntegrityResult {
+  const facts: { label: string; value: number }[] = [];
+  if (i.mlsPrice && i.mlsPrice > 0) facts.push({ label: 'Homes like this on the MLS are priced at', value: i.mlsPrice });
+  if (i.countyMarketValue && i.countyMarketValue > 0) facts.push({ label: 'The county (BS&A / Realist) says this home is worth', value: i.countyMarketValue });
+  const reasons: string[] = facts.map((f) => f.label + ' ' + fmtUSD(f.value) + '.');
+  if (i.assessedValue && i.assessedValue > 0) reasons.push('For taxes, the county counts it at ' + fmtUSD(i.assessedValue) + '. Taxes follow that number, not the wish price.');
+  if (!facts.length) return { agentPrice: null, bandLow: null, bandHigh: null, sellerGap: 0, sellerGapPct: null, position: 'unknown', reasons: ['Pull the county record (House layer) or load the MLS listing first - then the green line can be drawn honestly.'] };
+  // Green = middle of the facts. MLS weighs a bit more (live market),
+  // county anchors it (public record). Both are shown, nothing hidden.
+  let agentPrice: number;
+  if (facts.length === 2) agentPrice = Math.round(facts[0].value * 0.6 + facts[1].value * 0.4);
+  else agentPrice = Math.round(facts[0].value);
+  const bandLow = Math.round(agentPrice * 0.97);
+  const bandHigh = Math.round(agentPrice * 1.03);
+  reasons.push('The green price is the middle of those facts: ' + fmtUSD(agentPrice) + '.');
+  reasons.push('Fair room to talk: ' + fmtUSD(bandLow) + ' to ' + fmtUSD(bandHigh) + '. Inside that room, buyers say yes and the bank appraisal agrees.');
+  const sellerGap = (i.sellerAsk || 0) - agentPrice;
+  const sellerGapPct = agentPrice > 0 ? (sellerGap / agentPrice) * 100 : null;
+  let position: IntegrityResult['position'] = 'inside';
+  if (!i.sellerAsk) position = 'unknown';
+  else if (i.sellerAsk > bandHigh) { position = 'above'; reasons.push('The red seller number is ' + fmtUSD(Math.abs(sellerGap)) + ' over the green price. Over the room, homes sit, then chase the market down.'); }
+  else if (i.sellerAsk < bandLow) { position = 'below'; reasons.push('The red seller number is ' + fmtUSD(Math.abs(sellerGap)) + ' under the green price. There is room to ask more and still be fair.'); }
+  else reasons.push('The red seller number already sits inside the fair room. You are together - this is the meeting of the minds.');
+  return { agentPrice, bandLow, bandHigh, sellerGap, sellerGapPct, position, reasons };
+}
+
+// 5-year path: what a price becomes at a steady yearly growth rate.
+// Year 0 is the day of presentation; years 1-5 project forward from it.
+export function fiveYearPath(price: number, yearlyPct: number): number[] {
+  const out: number[] = [];
+  for (let y = 0; y <= 5; y++) out.push(Math.round(price * Math.pow(1 + (yearlyPct || 0) / 100, y)));
+  return out;
+}
+
+// Public-record helpers (BS&A / Realcomp payloads from /api/property-data).
+// Why: the house layers show county/MLS facts next to the calculator, and
+// "Use in calculator" must translate them honestly - estimated annual tax
+// uses the same 2.1% of taxable value the prefill-offer endpoint uses.
+export function estimatedAnnualTax(taxableValue: number): number {
+  if (!taxableValue || taxableValue <= 0) return 0;
+  return Math.round(taxableValue * 0.021);
+}
+
+export function taxRatePctFromRecord(marketValue: number, taxableValue: number): number | null {
+  if (!marketValue || marketValue <= 0 || !taxableValue || taxableValue <= 0) return null;
+  return (estimatedAnnualTax(taxableValue) / marketValue) * 100;
+}
+
 export function fmtUSD(n: number, digits = 0): string {
   if (!isFinite(n)) return '--';
   return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: digits, maximumFractionDigits: digits });
