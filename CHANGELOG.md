@@ -1,3 +1,8 @@
+## v0.62.1 (2026-11-06)
+
+### Fail-closed encryption guard
+- src/lib/encryption.ts now throws in production if ENCRYPTION_SECRET is unset (previously fell back to a public repo default). ENCRYPTION_SECRET + MLS_ENC_KEY were generated and set on Hetzner (values never logged) before any pilot MLS token is stored.
+
 ## v0.62.0 (2026-11-05)
 
 ### Per-agent MLS connections (RESO) + commission override (owner option b)

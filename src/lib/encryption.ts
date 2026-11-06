@@ -6,11 +6,21 @@ const SALT_LENGTH = 64;
 const TAG_LENGTH = 16;
 const KEY_LENGTH = 32;
 
-const ENCRYPTION_SECRET = process.env.ENCRYPTION_SECRET || 'a-very-secret-key-that-is-at-least-32-chars-long';
+const DEV_FALLBACK = 'a-very-secret-key-that-is-at-least-32-chars-long';
+const ENCRYPTION_SECRET = process.env.ENCRYPTION_SECRET || DEV_FALLBACK;
+
+// Fail closed in production: never encrypt agent secrets (e.g. MLS tokens)
+// under the public fallback key that ships in the repo.
+function assertProductionSecret() {
+  if (process.env.NODE_ENV === 'production' && ENCRYPTION_SECRET === DEV_FALLBACK) {
+    throw new Error('ENCRYPTION_SECRET must be set in production to store encrypted secrets.');
+  }
+}
 
 const getKey = (salt: Buffer) => crypto.scryptSync(ENCRYPTION_SECRET, salt, KEY_LENGTH);
 
 export const encrypt = (text: string): string => {
+  assertProductionSecret();
   const salt = crypto.randomBytes(SALT_LENGTH);
   const iv = crypto.randomBytes(IV_LENGTH);
   const key = getKey(salt);
@@ -21,6 +31,7 @@ export const encrypt = (text: string): string => {
 };
 
 export const decrypt = (encryptedText: string): string => {
+  assertProductionSecret();
   try {
     const buffer = Buffer.from(encryptedText, 'base64');
     const salt = buffer.subarray(0, SALT_LENGTH);
