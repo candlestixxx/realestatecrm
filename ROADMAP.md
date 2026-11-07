@@ -1,3 +1,6 @@
+
+## v0.62.3 repository sync (2026-11-06)
+All submodule feature branches reconciled to main (zero unique commits found; reverse-merged by fast-forward). Next functional frontier is live MLS data: pilot agent Member ID / broker RESO feed, then provider keys (Twilio number, Resend, OpenAI). See SUBMODULE_MAP.md for the structural map.
 # Roadmap
 
 *Core Objective: Build a CRM with the technical depth of Lofty, simplified by an omnipresent AI Assistant (Agentic Co-Pilot).*

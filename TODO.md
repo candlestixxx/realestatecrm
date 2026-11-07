@@ -260,3 +260,5 @@
 
 - [x] Shared buyer/seller welcome and two-year nurture defaults, editor weeks/months/years, calendar scheduling.
 - [ ] Campaign reply-based pausing and per-message delivery analytics remain separate follow-up work.
+
+- [x] v0.62.3 sync: submodule branches reconciled
