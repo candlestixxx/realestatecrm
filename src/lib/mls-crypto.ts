@@ -5,6 +5,12 @@
 import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'crypto';
 
 function key(): Buffer {
+  // Unified master secret (v0.62.2): ENCRYPTION_SECRET is the one server
+  // secret for encrypted credentials across stores (shared with
+  // src/lib/encryption.ts). MLS_ENC_KEY / NEXTAUTH_SECRET remain as
+  // fallbacks so payloads written before unification still decrypt.
+  const master = process.env.ENCRYPTION_SECRET || '';
+  if (master) return createHash('sha256').update('mls:' + master).digest();
   const raw = process.env.MLS_ENC_KEY || '';
   if (raw) {
     const b = Buffer.from(raw, 'base64');

@@ -1,3 +1,9 @@
+## v0.62.2 (2026-11-06)
+
+### Prod DB schema sync + unified credential secret
+- Production SQLite DB was behind the schema (missing OwnedProperty/Contract/ContractSignature/ChatRoom/ChatParticipant/ChatMessage tables, Contact lat/lng, User.passwordHash, and all Workspace branding columns). Applied the Prisma-generated additive diff on the server with a timestamped DB backup; row counts preserved (User 4, Workspace 1, Listing 8, Deal 8, Contact 24) and prisma/seed-listings.mjs now runs cleanly against prod.
+- mls-crypto now derives its key from the shared ENCRYPTION_SECRET master first (MLS_ENC_KEY / NEXTAUTH_SECRET kept as decrypt fallbacks), unifying both MLS credential stores on one server secret. No MLS credentials were stored yet, so nothing was invalidated. Note: 2 pre-existing SocialAccount tokens were encrypted under the old fallback key and may need reconnecting.
+
 ## v0.62.1 (2026-11-06)
 
 ### Fail-closed encryption guard
