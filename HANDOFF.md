@@ -1,3 +1,6 @@
+## v0.62.4 — Executive Protocol repository sync (2026-11-07)
+Fetch-all (root + 5 submodules, tags). Root is not a GitHub fork (no upstream parent). Branch audit proved every submodule feature branch has **zero unique commits vs main in both directions** (identical to main) — v0.62.3 reconciliation holds, so no forward/reverse merges or cherry-picks were needed and nothing was at risk of loss. .gitignore retention verified (DBs intentionally tracked). Scripts validated in place. SUBMODULE_MAP.md regenerated (v0.62.4). Waiting on owner: pilot MLS Member ID / broker RESO feed, Twilio number, Resend, OPENAI_API_KEY.
+
 ## v0.62.3 — Executive Protocol repository sync (2026-11-06)
 Fetch-all (root + 5 submodules recursive, tags). Root is not a GitHub fork (no upstream parent). Branch audit proved every submodule feature branch had **zero unique commits vs main**, so no forward merges/cherry-picks were needed and nothing was at risk of loss. Reverse merge done by fast-forward: all 10 branches pushed to main (contentplanner 2, foreclosureworkflow 3, leadg 1, legacyleads 1, media-workflow 3). Scripts validated in place. SUBMODULE_MAP.md regenerated. v0.62.1/v0.62.2 (encryption guard, prod-DB schema sync, unified credential secret) live on Hetzner. Waiting on owner: pilot MLS Member ID / broker RESO feed, Twilio number, Resend, OPENAI_API_KEY.
 
