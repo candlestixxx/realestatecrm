@@ -1174,3 +1174,8 @@ submodules match.
 
 ## 0.61.8 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Lead options menu layering (2026-11-04)
 - Render the lead detail three-dot options panel in a body portal, positioned against its trigger and above the sidebar. Clamp to the viewport, track scrolling/resizing, preserve outside-click dismissal, and restore trigger focus on Escape.
+
+## 0.62.5 - Trust Funding course + priority rule (2026-11-08)
+- New public route /trust-course: free Trust Funding 101 mini-course (email gate to lead capture) plus  full 1-on-1 package with buy-reserve and free-consult scheduling, branded Excel Legacy Realty Group.
+- New scripts/with-low-priority.sh: house rule that heavyweight processes run below normal priority (nice/ionice on Linux, BelowNormal inheritance on Windows).
+

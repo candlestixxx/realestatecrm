@@ -71,3 +71,6 @@ Multi-repo real estate CRM consolidating 9 sub-projects as dashboard sub-pages v
 | `/api/contracts` | Blockchain smart contracts |
 | `/api/campaigns/ab-test` | A/B test analytics |
 | `/api/audit` | Audit trail |
+
+## Process Priority Rule (2026-11-08)
+House rule: every heavyweight step (next build, packaging, seeds, bulk deploys) runs at below-normal priority so it can never hang the system. Linux/Hetzner: prefix with scripts/with-low-priority.sh (nice -n 10 ionice -c3). Windows: set the deploying shell BelowNormal once - children inherit it: (Get-Process -Id $PID).PriorityClass = 'BelowNormal'.

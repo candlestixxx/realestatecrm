@@ -319,3 +319,6 @@ ssh hetzner 'cd /var/www/excellegacyrealtygroup && BK=/tmp/ercm-backup-$(date +%
 
 ### Campaign defaults (0.61.6)
 On Hetzner with Node 24+, run DATABASE_URL pointing to the production SQLite database and node scripts/load-default-campaigns.mjs from the source checkout. This adds four company plans to each workspace without enrolling contacts or overwriting edited defaults. Future workspaces initialize on Campaigns page access. Server instrumentation scans due email/SMS tasks every minute. Live email/SMS provider configuration is required. ERROR or stranded IN_PROGRESS sends require operator review before reopening to avoid duplicate sends.
+
+## Heavyweight Process Priority Rule
+Run all heavy steps below normal priority. Linux/Hetzner: scripts/with-low-priority.sh <command>. Windows: (Get-Process -Id $PID).PriorityClass = 'BelowNormal' before npm run build. Never run heavy builds at normal priority.
