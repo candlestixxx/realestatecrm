@@ -262,3 +262,10 @@
 - [ ] Campaign reply-based pausing and per-message delivery analytics remain separate follow-up work.
 
 - [x] v0.62.3 sync: submodule branches reconciled
+
+## v0.62.5 Trust Course follow-ups
+- [ ] Real digital purchase: Stripe Checkout for the 497 package (needs STRIPE_SECRET_KEY + webhook to mark lead WON). Current Buy flow is reserve-by-invoice.
+- [ ] A2P 10DLC brand/campaign once Twilio number is bought (required for US production SMS).
+- [ ] Course completion events -> lead scoring (lesson progress POSTs, score bump per lesson).
+- [ ] Attorney review of all six lesson bodies before paid promotion.
+
