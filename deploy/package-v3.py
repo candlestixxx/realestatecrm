@@ -55,6 +55,9 @@ if os.path.isdir('public'):
 # 5. Prisma schema + migrations
 for root, dirs, files in os.walk('prisma'):
     for f in files:
+        # NEVER ship local sqlite files: a dev db would overwrite prod on swap.
+        if f.endswith(('.db', '.db-journal', '.db-wal', '.db-shm')):
+            continue
         full = os.path.join(root, f)
         tf.add(full, arcname=os.path.relpath(full, '.'))
         count += 1
@@ -77,3 +80,4 @@ count += 1
 tf.close()
 sz = os.path.getsize('deploy-v3.tar.gz') / 1024 / 1024
 print(f'deploy-v3.tar.gz: {sz:.1f} MB ({count} files)')
+
