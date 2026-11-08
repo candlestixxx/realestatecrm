@@ -211,6 +211,15 @@ const SECTIONS: Section[] = [
           'Prospects text a keyword to your number; the system auto-creates a lead and enrolls them in a campaign.',
       },
       {
+        label: 'Trust Funding Course',
+        description: 'Free mini-course + $497 1-on-1 package. Share the link; course leads land in your pipeline.',
+        href: '/trust-course',
+        icon: '🎓',
+        tooltip:
+          'Public lead magnet at /trust-course. Free, Full Package, and Consultation signups arrive as leads with Trust sources - work them like any inbound lead.',
+        badge: 'New',
+      },
+      {
         label: 'Mass Outreach',
         description: 'Bulk SMS/Email to any segment with compliance guardrails.',
         href: '/dashboard/leads',
