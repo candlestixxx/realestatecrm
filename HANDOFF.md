@@ -584,3 +584,10 @@ Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPA
 - `/dashboard/listings` money strip: Active inventory / Pending / Closed volume / Est. commission 3% / Open offers
 - Live verified: main 200, `/api/listings?workspaceId=excel-legacy-team` = 8 homes (6 seeded + 2 pre-existing), ACTIVE $1,049,000 / PENDING $1,185,000 / SOLD $395,000, offers 0
 - Local main == origin/main (952fe5d) after rebase over 7fa752a (other lane); Hetzner `excellegacyrealtygroup` v0.61.9 online
+
+## v0.62.5 (2026-11-08) - Trust Funding course deployed, db-overwrite incident
+- New public route /trust-course (200 live): free Trust Funding 101 mini-course with email gate plus 497 full 1-on-1 package (buy-reserve) and free consult scheduling; all forms post to /api/leads/external; Excel Legacy Realty Group branding; not-legal-advice disclaimers.
+- House rule: heavyweight steps run below normal priority. New scripts/with-low-priority.sh (nice+ionice); Windows: scope BelowNormal to the build child only via Start-Process -PriorityClass, never the harness shell (setting the shell itself wedged the box for an hour).
+- INCIDENT: package-v3.py shipped local prisma/dev.db and the swap overwrote prod db (API showed 2 local test rows). Restored 8 homes from /opt/crm-releases/backups/runtime-before-0.62.5 (verified EXL-1001..1006 in backup first). Fixed package-v3.py to skip .db/.db-journal/.db-wal/.db-shm (f94a92f).
+- Hetzner excellegacyrealtygroup v0.62.5 online; main 200, /trust-course 200 public, listings 8 homes live, Twilio SID/auth/API-key pair intact in prod .env. Still need TWILIO_PHONE_NUMBER (upgrade-blocked) for live SMS; Resend and MLS feed still open.
+
