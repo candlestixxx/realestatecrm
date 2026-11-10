@@ -591,3 +591,11 @@ Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPA
 - INCIDENT: package-v3.py shipped local prisma/dev.db and the swap overwrote prod db (API showed 2 local test rows). Restored 8 homes from /opt/crm-releases/backups/runtime-before-0.62.5 (verified EXL-1001..1006 in backup first). Fixed package-v3.py to skip .db/.db-journal/.db-wal/.db-shm (f94a92f).
 - Hetzner excellegacyrealtygroup v0.62.5 online; main 200, /trust-course 200 public, listings 8 homes live, Twilio SID/auth/API-key pair intact in prod .env. Still need TWILIO_PHONE_NUMBER (upgrade-blocked) for live SMS; Resend and MLS feed still open.
 
+
+## v0.62.5b (2026-11-10) - second deploy shipped + verified
+- Tarball deploy-v3.tar.gz (87,596,213 bytes) scanned SAFE: zero sqlite files.
+- MD5 match local==remote 36a77fe879123724357b03e7a6f41e89; scp err log empty.
+- Hetzner swap: backup runtime-before-0.62.5b, in-place extract, post-deploy.sh
+  (Prisma symlink + DATABASE_URL fixed), pm2 restart excellegacyrealtygroup v0.62.5 online.
+- Verified: main 200, /trust-course 200, 8 listings live (EXL-1001..1006 + 2 test rows),
+  6 TWILIO lines in prod .env, server-err.log empty.
