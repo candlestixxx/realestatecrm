@@ -8,17 +8,16 @@
 - Prod: Hetzner root@5.161.250.43, /var/www/excellegacyrealtygroup, pm2 excellegacyrealtygroup
 - Rule: HETZNER-ONLY. Never start local :3000. Heavy jobs run BelowNormal, child-only.
 
-## Verified state (2026-11-09)
-- main @ 7e6eab6, tracked tree clean. package.json 0.62.5.
-- Prod runs first v0.62.5: / + /trust-course = 200, 8 listings live (EXL-1001..1006 + 2).
-- v0.62.5b BUILT, NOT shipped: Trust Course card in CommandCenter + version label.
-- deploy-v3.tar.gz scanned SAFE: zero *.db (only cockroachdb/sandbox/font substring hits).
-- Upload to /root/deploy-v3-0.62.5b.tar.gz IN FLIGHT (unconfirmed). Next: remote size +
-  md5 compare, backup, extract, post-deploy.sh, pm2 restart, verify 200s + listings API.
+## Verified state (2026-11-10)
+- main @ 38e93a8, package.json 0.62.5. Prod runs v0.62.5b verified.
+- v0.62.5b SHIPPED + VERIFIED (HANDOFF entry): deploy-v3.tar.gz 87,596,213 bytes SAFE zero sqlite, MD5 local==remote 36a77fe879123724357b03e7a6f41e89, backup runtime-before-0.62.5b, post-deploy.sh (Prisma symlink + DATABASE_URL), pm2 excellegacyrealtygroup v0.62.5 online.
+- Verified: main / 200, /trust-course 200, 8 listings live (EXL-1001..1006 + 2 test rows), 6 TWILIO lines in prod .env, server-err.log empty.
+- Trust Course card live in CommandCenter (src/components/dashboard/CommandCenter.tsx) + version label.
 - package-v3.py fix committed: never package *.db (caused Nov-8 prod wipe, restored).
+- Concurrent lane: opencode hardening src/app/api/workflow-sessions/route.ts (auth + workspace scoping + safeData) — Codex formatted + added missing POST-update workspace guard. Pending commit.
 
 ## Next steps (in order)
-1. Confirm upload, ship v0.62.5b, verify prod, HANDOFF entry, push.
+1. Push local main (3-4 commits incl. capsule + HANDOFF v0.62.5b + workflow-sessions hardening) — run on authenticated machine, pushes stall here.
 2. Command Center regroup: Money Now / Marketing / Operations / System hub cards.
 3. Toasts + tooltips coverage: only 9/54 dashboard pages mention tooltip.
 

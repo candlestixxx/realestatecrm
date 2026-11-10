@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
 import prisma from '@/lib/prisma';
-import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
+import { authOptions } from '@/lib/auth';
+import { requireWorkspaceAccess } from '@/lib/workspace-access';
+
+function safeData(raw: unknown): Record<string, unknown> {
+  if (typeof raw !== 'string') return {};
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
 
 /**
  * Workflow Sessions API
@@ -10,8 +21,15 @@ import { DEFAULT_WORKSPACE_SLUG } from '@/lib/workspace-context';
  * DELETE: remove a session.
  */
 export async function GET(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  let access;
+  try {
+    access = await requireWorkspaceAccess(session);
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const { searchParams } = new URL(request.url);
-  const workspaceId = searchParams.get('workspaceId') || DEFAULT_WORKSPACE_SLUG;
+  const workspaceId = access.workspaceId;
   const type = searchParams.get('type');
   const status = searchParams.get('status');
   const leadId = searchParams.get('leadId');
@@ -35,11 +53,11 @@ export async function GET(request: NextRequest) {
   });
 
   return NextResponse.json({
-    sessions: sessions.map(s => ({
+    sessions: sessions.map((s) => ({
       id: s.id,
       type: s.type,
       status: s.status,
-      data: JSON.parse(s.data),
+      data: safeData(s.data),
       leadId: s.leadId,
       dealId: s.dealId,
       leadName: s.lead?.contact
@@ -54,6 +72,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  let access;
+  try {
+    access = await requireWorkspaceAccess(session);
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   let body;
   try {
     body = await request.json();
@@ -61,36 +86,36 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { id, type, status, data, workspaceId, userId, leadId, dealId } = body;
+  const { id, type, status, data, userId, leadId, dealId } = body;
   if (!type) {
     return NextResponse.json({ error: 'type required' }, { status: 400 });
   }
 
-  const wsId = workspaceId || DEFAULT_WORKSPACE_SLUG;
+  const wsId = access.workspaceId;
   const dataJson = typeof data === 'string' ? data : JSON.stringify(data || {});
 
   if (id) {
-    // P2025 guard — update on missing id throws → 500. findUnique → 404 first.
     const existing = await prisma.workflowSession.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
-    const session = await prisma.workflowSession.update({
+    if (existing.workspaceId !== wsId) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
+    const updated = await prisma.workflowSession.update({
       where: { id },
       data: {
         status: status || undefined,
         data: dataJson,
       },
     });
-    return NextResponse.json({ id: session.id, updated: true });
+    return NextResponse.json({ id: updated.id, updated: true });
   }
 
-  // FK validation — workspaceId must exist or Prisma throws P2003 → 500
   const workspace = await prisma.workspace.findUnique({ where: { id: wsId } });
   if (!workspace) {
     return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
   }
-  // Optional FKs — validate only when provided
   if (userId) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -104,8 +129,7 @@ export async function POST(request: NextRequest) {
     if (!deal) return NextResponse.json({ error: 'Deal not found' }, { status: 404 });
   }
 
-  // Create new session
-  const session = await prisma.workflowSession.create({
+  const created = await prisma.workflowSession.create({
     data: {
       type,
       status: status || 'DRAFT',
@@ -117,16 +141,30 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  return NextResponse.json({ id: session.id, created: true }, { status: 201 });
+  return NextResponse.json({ id: created.id, created: true }, { status: 201 });
 }
 
 export async function DELETE(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  let access;
+  try {
+    access = await requireWorkspaceAccess(session);
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
   if (!id) {
     return NextResponse.json({ error: 'id required' }, { status: 400 });
   }
 
+  const existing = await prisma.workflowSession.findUnique({ where: { id } });
+  if (!existing) {
+    return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+  }
+  if (existing.workspaceId !== access.workspaceId) {
+    return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+  }
   await prisma.workflowSession.delete({ where: { id } });
   return NextResponse.json({ deleted: true });
 }
