@@ -33,3 +33,9 @@ STRIPE $497 keys | attorney review of 6 Trust lessons.
   another live tab unasked.
 - Identity line for cross-AI messages: [Muse Spark in Codex desktop in
   C:\Users\hyper\workspace\realestatecrm on laptop]
+
+## Operator availability (noted 2026-11-09)
+- Morning of 2026-11-10: ACE Car Wash meeting, window 9:00 AM-12:00 PM ET.
+- 1:00 PM ET same day: meetup with Rex (business connection).
+- Calendar writes unavailable from this Codex session (Google connectors unwired
+  here); create events manually or via a connected harness. Confirm exact times.
