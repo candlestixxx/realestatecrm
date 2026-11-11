@@ -606,3 +606,6 @@ Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPA
 - No opencode/Muse CLI process running now; opencode lane edit to workflow-sessions integrated: auth + workspace scoping on GET/POST/DELETE + safeData, formatted, plus missing POST-update workspace guard added by Codex.
 - $HOME/.pi exists (pi harness sessions live there) but deep listing exceeds 10s exec cap - pi lane: pull this repo state before editing.
 - Pending: commit route hardening + capsule (this commit), push on authenticated machine, Command Center regroup, tooltips, key-blocked API keys from owner.
+
+## Re-verify (2026-11-11) - prod healthy
+- pm2 excellegacyrealtygroup v0.62.5 online, uptime 23h (56 restarts all from deploy churn, stable since). Main / 200, /trust-course 200, /api/listings returns EXL-1001 Sterling Heights ACTIVE $425,000. server-err.log 0 bytes. Local main 4 ahead of origin - push still needs authenticated machine.

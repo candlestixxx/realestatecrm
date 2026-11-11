@@ -41,6 +41,21 @@ type SectionId =
   | 'platform'
   | 'subprojects';
 
+type HubId = 'money' | 'marketing' | 'operations' | 'system';
+
+interface Hub {
+  id: HubId;
+  label: string;
+}
+
+const HUBS: Hub[] = [
+  { id: 'money', label: 'Money Now' },
+  { id: 'marketing', label: 'Marketing' },
+  { id: 'operations', label: 'Operations' },
+  { id: 'system', label: 'System' },
+];
+// HUBS groups SECTIONS in the rail by business value; rail grouping follows.
+
 interface FeatureCard {
   label: string;
   description: string;
@@ -57,6 +72,7 @@ interface FeatureCard {
 
 interface Section {
   id: SectionId;
+  hub: HubId;
   title: string;
   tagline: string;
   features: FeatureCard[];
@@ -69,8 +85,9 @@ interface Section {
 const SECTIONS: Section[] = [
   {
     id: 'overview',
-    title: 'Command Center',
-    tagline: 'Live business pulse and highest-frequency actions',
+    hub: 'money',
+    title: 'Money Now',
+    tagline: "Today's revenue actions - intake, tasks, pipeline, inbox, and map",
     features: [
       {
         label: 'Lead Intake & Routing',
@@ -133,57 +150,8 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    id: 'pipeline',
-    title: 'Pipeline & Relationships',
-    tagline: 'Contacts, segmentation, and the deals that move revenue',
-    features: [
-      {
-        label: 'Leads & Contacts',
-        description: 'Full CRM records with multi-phone/email, tags, intelligence tabs, quick-edit.',
-        href: '/dashboard/leads',
-        icon: '👥',
-        tooltip:
-          'Primary record store. Each lead has a detail view with social scrapes, public records, campaign enrollment, and activity timeline.',
-        statKey: 'leads',
-      },
-      {
-        label: 'Filtered Segments',
-        description: 'Saved dynamic lists for targeting, campaigns, and bulk actions.',
-        href: '/dashboard/segments',
-        icon: '🎯',
-        tooltip:
-          'Build a filter once, reuse it everywhere. Segments power drip enrollment, mass outreach, and exports.',
-      },
-      {
-        label: 'Deals Pipeline',
-        description: 'Kanban-style stages, offer tracking, disclosure e-sign, portal sharing.',
-        href: '/dashboard/deals',
-        icon: '💼',
-        tooltip:
-          'Each deal links to workflows, offers, and the client portal. Stage changes can trigger automations.',
-        statKey: 'pipeline',
-      },
-      {
-        label: 'Task Checklist',
-        description: 'Personal and team tasks with deadlines, assignment, and priority.',
-        href: '/dashboard/tasks',
-        icon: '📋',
-        tooltip:
-          'Tasks can be created by AI, workflows, or manually. Filter by assignee or due date.',
-        statKey: 'tasks',
-      },
-      {
-        label: 'Workspace Segments',
-        description: 'Workspace-as-segment model for multi-tenant list isolation.',
-        href: '/dashboard/segments',
-        icon: '📊',
-        tooltip:
-          'Workspaces double as top-level segments. Switch workspaces in the header to change your visible lead pool.',
-      },
-    ],
-  },
-  {
     id: 'comms',
+    hub: 'marketing',
     title: 'Communications & Outreach',
     tagline: 'Every channel your clients use, wired to the CRM timeline',
     features: [
@@ -261,6 +229,7 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'marketing',
+    hub: 'marketing',
     title: 'Marketing & Content Studio',
     tagline: 'Generate, brand, schedule, and publish across every channel',
     features: [
@@ -335,7 +304,59 @@ const SECTIONS: Section[] = [
     ],
   },
   {
+    id: 'pipeline',
+    hub: 'operations',
+    title: 'Pipeline & Relationships',
+    tagline: 'Contacts, segmentation, and the deals that move revenue',
+    features: [
+      {
+        label: 'Leads & Contacts',
+        description: 'Full CRM records with multi-phone/email, tags, intelligence tabs, quick-edit.',
+        href: '/dashboard/leads',
+        icon: '👥',
+        tooltip:
+          'Primary record store. Each lead has a detail view with social scrapes, public records, campaign enrollment, and activity timeline.',
+        statKey: 'leads',
+      },
+      {
+        label: 'Filtered Segments',
+        description: 'Saved dynamic lists for targeting, campaigns, and bulk actions.',
+        href: '/dashboard/segments',
+        icon: '🎯',
+        tooltip:
+          'Build a filter once, reuse it everywhere. Segments power drip enrollment, mass outreach, and exports.',
+      },
+      {
+        label: 'Deals Pipeline',
+        description: 'Kanban-style stages, offer tracking, disclosure e-sign, portal sharing.',
+        href: '/dashboard/deals',
+        icon: '💼',
+        tooltip:
+          'Each deal links to workflows, offers, and the client portal. Stage changes can trigger automations.',
+        statKey: 'pipeline',
+      },
+      {
+        label: 'Task Checklist',
+        description: 'Personal and team tasks with deadlines, assignment, and priority.',
+        href: '/dashboard/tasks',
+        icon: '📋',
+        tooltip:
+          'Tasks can be created by AI, workflows, or manually. Filter by assignee or due date.',
+        statKey: 'tasks',
+      },
+      {
+        label: 'Workspace Segments',
+        description: 'Workspace-as-segment model for multi-tenant list isolation.',
+        href: '/dashboard/segments',
+        icon: '📊',
+        tooltip:
+          'Workspaces double as top-level segments. Switch workspaces in the header to change your visible lead pool.',
+      },
+    ],
+  },
+  {
     id: 'properties',
+    hub: 'operations',
     title: 'Properties & Data',
     tagline: 'Listings, MLS feeds, foreclosures, and data hygiene',
     features: [
@@ -394,6 +415,7 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'intelligence',
+    hub: 'operations',
     title: 'Intelligence & Compliance',
     tagline: 'Reporting, gamification, and full audit provenance',
     features: [
@@ -437,6 +459,7 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'automation',
+    hub: 'operations',
     title: 'Automation & Agents',
     tagline: 'Workflows, AI agents, and approval gates',
     features: [
@@ -493,6 +516,7 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'platform',
+    hub: 'system',
     title: 'Platform & Settings',
     tagline: 'Websites, partners, integrations, and system configuration',
     features: [
@@ -647,6 +671,7 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'subprojects',
+    hub: 'system',
     title: 'Sub-Projects',
     tagline: 'Independent services that power the Excel Legacy Realty platform',
     features: [
@@ -691,7 +716,7 @@ const SECTIONS: Section[] = [
         badge: 'LIVE',
       },
     ],
-  },
+  }
 ];
 
 // ---------------------------------------------------------------------------
