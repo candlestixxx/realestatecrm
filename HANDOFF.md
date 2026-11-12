@@ -1,3 +1,14 @@
+## v0.63.0 — TSF Master Bundle + Executive Protocol sync (2026-11-10)
+
+**Shipped:** Trust, Security & Future (TSF) Master Bundle at /trust-services — 8-module/24-lesson course any Excel Legacy realtor can teach (instructor guide + student workbook), 3 newly revised branded trust docs (logo, PDF+DOCX, public/trust-docs/), lead-magnet gate requiring name/email/validated phone/property address into the CRM, pricing $1,497 standalone / $997 client add-on / concierge +$500. Circular EL logo cropped from team flyer to public/brand/. Homepage services lead with Trust Services. Deployed to Hetzner (BUILD_ID IAA03uLbQG0duZqK8SM0otsf, PM2 excellegacyrealtygroup).
+
+**Protocol audit:** git fetch --all --tags on root + all 5 submodules (no nested submodules). Root has no upstream fork parent (origin=candlestixxx only); local main == origin/main (b7cdec5) plus this release. Every root branch (dashboard-newest, 2x jules, master, 2x rag-consolidation) and every submodule remote feature branch: **0 unique commits vs main** — forward merge set is empty, reverse merge already satisfied by ancestry. Nothing dropped, no conflicts. Submodules initialized, clean, at origin/main gitlinks (contentplanner 10b09e5, foreclosure 357b3eb, leadg c6f2825, legacyleads a8c4e3f, media-workflow 8746bec).
+
+**Not committed (owner files, unexplained by this release):** .hypercode/, data/, metamcp.db, prisma/*.bak|tmp|snapshot, scripts/LOFTY/, audit-*.jsonl. Memory/session/docs were NOT gitignored.
+
+**Next:** Stripe checkout for TSF, server-side download gate, social launch kit. Attorney-review disclaimer remains on every trust surface (realtors do not practice law).
+
+---
 ## v0.62.4 â€” Executive Protocol repository sync (2026-11-07)
 Fetch-all (root + 5 submodules, tags). Root is not a GitHub fork (no upstream parent). Branch audit proved every submodule feature branch has **zero unique commits vs main in both directions** (identical to main) â€” v0.62.3 reconciliation holds, so no forward/reverse merges or cherry-picks were needed and nothing was at risk of loss. .gitignore retention verified (DBs intentionally tracked). Scripts validated in place. SUBMODULE_MAP.md regenerated (v0.62.4). Waiting on owner: pilot MLS Member ID / broker RESO feed, Twilio number, Resend, OPENAI_API_KEY.
 

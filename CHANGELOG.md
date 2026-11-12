@@ -1,3 +1,11 @@
+## v0.63.0 (2026-11-10)
+
+### TSF Master Bundle — Trust, Security & Future
+- New /trust-services page (SEO + Service JSON-LD): TSF Master Bundle by THE EXCEL LEGACY REALTY GROUP — 8-module/24-lesson complete course taught by any team realtor, instructor guide + student workbook (PDF/DOCX).
+- Branded newly revised trust docs (Declaration, Appointment of Trustee, Affidavit/Certificate) with circular EL logo, in public/trust-docs/ (PDF + DOCX); generators in scripts/brand-trust-docs.py, brand-trust-pdfs.py, build-master-bundle.py.
+- Lead-magnet gating: Starter Kit unlocks only after full name, email, validated phone, and property address post to /api/leads/external. Pricing: Bundle $1,497 standalone / $997 client add-on, concierge +$500.
+- Homepage services section opens with Trust Services; sitemap adds /trust-services + /trust-course.
+- Executive Protocol repo sync: root + 5 submodules fetched with tags; zero unique commits on every feature branch (no merges needed, nothing dropped); submodules clean at origin/main.
 ## v0.62.4 (2026-11-07)
 
 ### Repository synchronization (Executive Protocol)

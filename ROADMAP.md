@@ -179,3 +179,6 @@ _Last synced 2026-10-06 (v0.57.6). Chat, learning/memory, SEO/sitemap, and OG sh
 - [x] Reverse catch-up: all 5 feature branches fast-forwarded locally to e07aa1d (remote push pending credentials)
 - [x] Submodule audit: no submodules present (no-op)
 - [ ] Push credentials: restore authenticated GitHub push so branch catch-up + version bump can deploy
+
+## v0.63.0 (2026-11-10)
+Trust, Security & Future (TSF) Master Bundle live on /trust-services: realtor-teachable course + branded trust docs + gated lead magnet, deployed to Hetzner. Next: Stripe checkout, hard download gate, social launch kit.
