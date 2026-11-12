@@ -42,6 +42,7 @@ jobs:
             dir: apps/contentplanner
             # lockfile drift (dotenv/tsx/esbuild missing from lock): install, not ci
             install: npm install --legacy-peer-deps
+            prebuild: npx prisma generate --schema packages/database/prisma/schema.prisma
             build: npm run build
           - app: foreclosureworkflow
             dir: apps/foreclosureworkflow

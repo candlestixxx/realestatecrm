@@ -1,3 +1,11 @@
+## v0.63.6 (2026-11-12)
+
+### Remaining submodule CI builds fixed
+- leadcaller (7ebe374): pin turbopack.root - Next inferred the parent CRM as workspace root and compiled its instrumentation/email-config (missing SES/nodemailer deps in this app).
+- legacyleads (d890579): remove Windows-only @next/swc-win32-x64-msvc dep (EBADPLATFORM on Linux; Next supplies per-platform SWC).
+- contentplanner (84aef5a): 25 strict TS errors fixed (env/payload/query bracket access, JWT parts undefined) - api tsc clean; CI adds prisma generate prebuild.
+- Gitlinks bumped: contentplanner 84aef5a, leadcaller 7ebe374, legacyleads d890579. CI at v0.63.5: main, parser, leadg, aicrm, foreclosure, media-workflow green.
+
 ## v0.63.5 (2026-11-12)
 
 ### Submodule CI builds fixed
