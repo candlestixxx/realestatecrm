@@ -1,3 +1,10 @@
+## v0.63.4 (2026-11-12)
+
+### Lint debt cleared - CI Build Main CRM unblocked
+- Fixed all 42 src lint errors: 15x jsx-no-duplicate-props (duplicate button type=; last-wins behavior preserved by removing the first), 18x react-hooks/error-boundaries in LeadDetailLayoutClient (JSON.parse isolated in try, JSX rendered after), 6x unescaped entities, missing TooltipContent import (imports page - real bug), missing key on CALCULATOR block, LiveAudioMonitor reconnect via ref (immutability).
+- eslint.config: CommonJS ops scripts (scripts/, deploy/, *.cjs) exempt from no-require-imports (70 errors; require() is correct there), apps/** ignored at root (submodules lint in their own repos; root lint no longer crawls submodule .next output).
+- Result: npx eslint . = 0 errors (16 pre-existing img/alt warnings remain). Local verification: root build OK, npm test 40/40, foreclosure unittest 47/47, 12/12 services HTTP 200.
+
 ## v0.63.3 (2026-11-12)
 
 ### CI: foreclosure parser job + new app builds

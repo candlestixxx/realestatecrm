@@ -1267,11 +1267,15 @@ export default function LeadDetailLayoutClient({
             {/* MLS Property details if available */}
             {(() => {
               if (!lead.publicRecords) return null;
+              let details: any = null;
               try {
-                const details = JSON.parse(lead.publicRecords);
-                if (!details || typeof details !== 'object') return null;
+                details = JSON.parse(lead.publicRecords);
+              } catch {
+                return null;
+              }
+              if (!details || typeof details !== 'object') return null;
 
-                return (
+              return (
                   <div className="pt-4 border-t border-border/60 space-y-2.5">
                     <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider block">MLS & Listing Details</span>
                     <div className="p-3 bg-muted/40 border border-border/60 rounded-xl space-y-2 text-xs font-semibold">
@@ -1309,10 +1313,7 @@ export default function LeadDetailLayoutClient({
                       )}
                     </div>
                   </div>
-                );
-              } catch (_) {
-                return null;
-              }
+              );
             })()}
 
             {/* Ownership Card */}
@@ -2349,7 +2350,7 @@ export default function LeadDetailLayoutClient({
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Phone Numbers</label>
-                  <button type="button"
+                  <button
                     type="button"
                     onClick={() => {
                       if (quickPhones.length >= 10) {
