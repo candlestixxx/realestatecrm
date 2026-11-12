@@ -1,3 +1,11 @@
+## v0.63.2 (2026-11-12)
+
+### New submodules wired into launchers + push released
+- Owner released the push hold in-session: root main pushed to RealEstateCRMLLC/RealEstateCRM (3cc22f4..5ccb815, incl. Gate 1 merge c1e865b + v0.63.1 869869a). Root feature branches (dashboard-newest, 2x jules, 2x rag-consolidation) pushed reverse-synced to main.
+- Wired AI CRM (3007), Lead Caller (3008), Prototype API (3009) into start-all.ps1, start-all.bat, check-status.ps1, and scripts/system-tray.ps1 service registry (12 services). check-status Prototype path now /api/health.
+- AI CRM had only a dev .next (no BUILD_ID): production build run below-normal, then started. All 12 services verified HTTP 200 (foreclosure 308 signin redirect; LegacyLeads web 404 on / known).
+- Correction to v0.63.1 addendum: scripts/kill-port.js health gate works as designed - it skips killing a healthy server unless KILL_PORT_FORCE=1; the stale instance was removed surgically by verified PID, not a script bug.
+
 ## v0.63.1 (2026-11-12)
 
 ### Org transfer to RealEstateCRMLLC + Executive Protocol sync

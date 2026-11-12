@@ -11,6 +11,9 @@ $services = @(
     @{ Name = "LegacyLeads Web"; Port = 3005; Path = "/" },
     @{ Name = "LegacyLeads API"; Port = 3006; Path = "/health" },
     @{ Name = "ContentPlanner API"; Port = 3031; Path = "/health" },
+    @{ Name = "AI CRM"; Port = 3007; Path = "/" },
+    @{ Name = "Lead Caller"; Port = 3008; Path = "/" },
+    @{ Name = "Prototype API"; Port = 3009; Path = "/api/health" },
     @{ Name = "Live Audio WS"; Port = 8090; Path = "/health" }
 )
 

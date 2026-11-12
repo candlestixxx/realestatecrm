@@ -1,5 +1,5 @@
 @echo off
-REM start-all.bat -- start all 9 realestatecrm services
+REM start-all.bat -- start all 12 realestatecrm services
 REM Logs redirect to each service's server.log / server-err.log
 
 set ROOT=C:\Users\hyper\workspace\realestatecrm
@@ -40,4 +40,17 @@ cd /d "%ROOT%\apps\legacyleads\backend"
 start "ll-api-3006" cmd /c "set PORT=3006 && npx tsx src/index.ts > server.log 2> server-err.log"
 
 echo.
-echo All 9 services launching.
+echo [10/12] AI CRM (3007)...
+cd /d "%ROOT%\apps\aicrm"
+start "aicrm-3007" cmd /c "node node_modules\next\dist\bin\next start -p 3007 > server.log 2> server-err.log"
+
+echo [11/12] Lead Caller (3008)...
+cd /d "%ROOT%\apps\leadcaller"
+start "leadcaller-3008" cmd /c "node node_modules\next\dist\bin\next start -p 3008 > server.log 2> server-err.log"
+
+echo [12/12] Prototype API (3009)...
+cd /d "%ROOT%\apps\prototype\server"
+start "prototype-3009" cmd /c "set PORT=3009 && node dist\index.js > server.log 2> server-err.log"
+
+echo.
+echo All 12 services launching.
