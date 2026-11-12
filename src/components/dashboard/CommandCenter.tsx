@@ -715,6 +715,30 @@ const SECTIONS: Section[] = [
         tooltip: 'Lead generation and skip-tracing service for property data, TCPA compliance, and credit management. Frontend + backend on port 3215.',
         badge: 'LIVE',
       },
+      {
+        label: 'AI CRM',
+        description: 'Standalone AI-first CRM with contacts, pipelines, funnels, and HyperNexus kernel chat.',
+        href: '/aicrm/',
+        icon: '🤖',
+        tooltip: 'Registered as a submodule in v0.63.1 (RealEstateCRMLLC/aicrm). Local dev: cd apps/aicrm && npm run dev (port 3001). Production nginx mount pending.',
+        badge: 'NEW',
+      },
+      {
+        label: 'Lead Caller',
+        description: 'AI real-estate concierge and outbound lead-calling workflows (Twilio/Vapi/SendGrid webhooks).',
+        href: '/leadcaller/',
+        icon: '☎️',
+        tooltip: 'Registered as a submodule in v0.63.1 (RealEstateCRMLLC/realestateleadcaller). Local dev: cd apps/leadcaller && npm run dev. Production nginx mount pending.',
+        badge: 'NEW',
+      },
+      {
+        label: 'Prototype',
+        description: 'Universal business-tool UI prototype (Next.js client + Express server, rapid feature sandbox).',
+        href: '/prototype/',
+        icon: '🧪',
+        tooltip: 'Registered as a submodule in v0.63.1 (RealEstateCRMLLC/realestateprototype). Local dev: cd apps/prototype && npm run dev. Sandbox only; production nginx mount pending.',
+        badge: 'NEW',
+      },
     ],
   }
 ];
@@ -913,9 +937,10 @@ export default function CommandCenter() {
               <h2 className="text-sm font-bold text-foreground">Excel Legacy Realty Group — Unified Platform</h2>
               <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                 This dashboard is the central command center for the Excel Legacy Realty Group real-estate operations platform.
-                It integrates <strong className="text-foreground">5 independent sub-services</strong> — LeadG (voice &amp; lead engine),
+                It integrates <strong className="text-foreground">8 independent sub-services</strong> — LeadG (voice &amp; lead engine),
                 Foreclosure Workflow (legal intake &amp; monitoring), Content Planner (social media &amp; campaigns),
-                Media Workflow (photo/video pipeline), and LegacyLeads (property data &amp; skip tracing) — into a single
+                Media Workflow (photo/video pipeline), LegacyLeads (property data &amp; skip tracing), AI CRM,
+                Lead Caller, and Prototype — into a single
                 operator experience. Use the <strong className="text-foreground">Sub-Projects</strong> section below to
                 access each service directly, or work within the CRM tools organized by business value.
               </p>

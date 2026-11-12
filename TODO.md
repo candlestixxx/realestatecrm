@@ -1,5 +1,11 @@
 # TODO.md
 
+### v0.63.1 follow-ups (2026-11-12)
+- [ ] PUSH HOLD: get Robert confirmation (main chat or here) to push c1e865b (gate1 merge) + v0.63.1 org-transfer commit to RealEstateCRMLLC/RealEstateCRM main; then push feature branches reverse-synced to main.
+- [ ] Wire nginx mounts + start-all/check-status/tray entries for /aicrm/, /leadcaller/, /prototype/ (cards live in CommandCenter, mounts pending).
+- [ ] Bobbi: ci.yml (1 file) still blocked on GitHub App Workflows permission for gate1 branch.
+- [ ] Decide disposition of untracked root clutter: .tormentnexus/, data/, catalog.db.bak-*, fix_leadg_*.cjs (archive vs track; nondestructive, owner call).
+
 ## Short-Term Tasks & Backlog
 
 ### Documentation & Standards

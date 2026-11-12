@@ -7,9 +7,9 @@ const CDP_HOST = process.env.MUSE_CDP_HOST || '127.0.0.1';
 const CDP_PORT = Number(process.env.MUSE_CDP_PORT || 9222);
 const CHAT_URL = 'https://muse.ai/';
 const TAB_ID_OVERRIDE = process.env.MUSE_CDP_TAB_ID || null;
-const OPEN_TIMEOUT_MS = 10000;
-const SEND_TIMEOUT_MS = 15000;
-const OVERALL_TIMEOUT_MS = 30000;
+const OPEN_TIMEOUT_MS = 30000;
+const SEND_TIMEOUT_MS = 60000;
+const OVERALL_TIMEOUT_MS = 120000;
 
 function cdpList() {
   return new Promise((resolve, reject) => {
@@ -29,7 +29,7 @@ function cdpList() {
       });
     });
     req.on('error', e => reject(new Error(`CDP list error: ${e.message}`)));
-    req.setTimeout(8000, () => req.destroy(new Error('CDP list timeout after 8s')));
+    req.setTimeout(30000, () => req.destroy(new Error('CDP list timeout after 30s')));
   });
 }
 

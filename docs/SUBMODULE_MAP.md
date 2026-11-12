@@ -6,12 +6,12 @@
 
 | Path | Remote URL | HEAD Commit | Branch |
 |---|---|---|---|
-| `.` (root) | https://github.com/candlestixxx/realestatecrm.git | `6d6d1f3` → new v0.58.51 sync commit | main |
-| `apps/leadg` | https://github.com/candlestixxx/leadG.git | `a937938` | main |
-| `apps/contentplanner` | https://github.com/candlestixxx/socialmediacontentplanner.git | `5f18eb2` | main |
-| `apps/foreclosureworkflow` | https://github.com/candlestixxx/forclosureworkflow.git | `334ba8a` | main |
-| `apps/media-workflow` | https://github.com/candlestixxx/re-agent-workflow-media-1.git | `f6d6cdf` | main |
-| `apps/legacyleads` | https://github.com/candlestixxx/LegacyLeads.git | `5496830` | main |
+| `.` (root) | https://github.com/RealEstateCRMLLC/RealEstateCRM.git | `6d6d1f3` → new v0.58.51 sync commit | main |
+| `apps/leadg` | https://github.com/RealEstateCRMLLC/leadG.git | `a937938` | main |
+| `apps/contentplanner` | https://github.com/RealEstateCRMLLC/socialmediacontentplanner.git | `5f18eb2` | main |
+| `apps/foreclosureworkflow` | https://github.com/RealEstateCRMLLC/forclosureworkflow.git | `334ba8a` | main |
+| `apps/media-workflow` | https://github.com/RealEstateCRMLLC/re-agent-workflow-media-1.git | `f6d6cdf` | main |
+| `apps/legacyleads` | https://github.com/RealEstateCRMLLC/LegacyLeads.git | `5496830` | main |
 
 ## Sync Summary (2026-10-17)
 
@@ -43,4 +43,4 @@
 
 ## Upstream Note
 
-Root repository resolves identically at `https://github.com/robertpelloni/realestatecrm.git` and `https://github.com/candlestixxx/realestatecrm.git` (same `main` HEAD). No divergent upstream to merge.
+Root repository resolves identically at `https://github.com/robertpelloni/realestatecrm.git` and `https://github.com/RealEstateCRMLLC/RealEstateCRM.git` (same `main` HEAD). No divergent upstream to merge.

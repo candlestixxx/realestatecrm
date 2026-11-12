@@ -9,11 +9,11 @@ ealestatecrm) that hosts the unified UI and serves as the single entry point. Fi
 
 | Submodule | Repo | Purpose |
 |-----------|------|---------|
-| pps/leadg | [leadG](https://github.com/candlestixxx/leadG) | Lead generation & AI outreach |
-| pps/contentplanner | [socialmediacontentplanner](https://github.com/candlestixxx/socialmediacontentplanner) | Social content planning & publishing |
-| pps/foreclosureworkflow | [forclosureworkflow](https://github.com/candlestixxx/forclosureworkflow) | Pre-foreclosure pipeline automation |
-| pps/media-workflow | [re-agent-workflow-media-1](https://github.com/candlestixxx/re-agent-workflow-media-1) | Media production & asset management |
-| pps/legacyleads | [LegacyLeads](https://github.com/candlestixxx/LegacyLeads) | Legacy lead data migration & archive |
+| pps/leadg | [leadG](https://github.com/RealEstateCRMLLC/leadG) | Lead generation & AI outreach |
+| pps/contentplanner | [socialmediacontentplanner](https://github.com/RealEstateCRMLLC/socialmediacontentplanner) | Social content planning & publishing |
+| pps/foreclosureworkflow | [forclosureworkflow](https://github.com/RealEstateCRMLLC/forclosureworkflow) | Pre-foreclosure pipeline automation |
+| pps/media-workflow | [re-agent-workflow-media-1](https://github.com/RealEstateCRMLLC/re-agent-workflow-media-1) | Media production & asset management |
+| pps/legacyleads | [LegacyLeads](https://github.com/RealEstateCRMLLC/LegacyLeads) | Legacy lead data migration & archive |
 
 ### AgentCore
 
@@ -49,7 +49,7 @@ The orchestration layer inside this CRM (formerly codenamed "HyperNexus") provid
 
 `ash
 # 1. Clone with submodules
-git clone --recurse-submodules https://github.com/candlestixxx/realestatecrm.git
+git clone --recurse-submodules https://github.com/RealEstateCRMLLC/RealEstateCRM.git
 cd realestatecrm
 
 # 2. Install dependencies

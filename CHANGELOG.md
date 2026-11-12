@@ -1,3 +1,14 @@
+## v0.63.1 (2026-11-12)
+
+### Org transfer to RealEstateCRMLLC + Executive Protocol sync
+- All remotes repointed from candlestixxx to RealEstateCRMLLC (root RealEstateCRM + 8 app repos verified live via ls-remote; old remote kept as legacy, tips identical). .gitmodules updated; each repo origin now tracks RealEstateCRMLLC/*.
+- Registered apps/aicrm, apps/leadcaller, apps/prototype as submodules (previously embedded untracked repos); gitdirs absorbed into .git/modules. Total submodules: 8.
+- Fetch --all --tags on root + 8 repos; every main fast-forwarded to origin/main (root v0.63.0 TSF/Command Center included). Branch audit: every feature branch had zero unique commits vs main except root gate1/foreclosure-parser-tests.
+- Forward merge (LOCAL ONLY, held from push per Bobbi/main-chat hold): gate1/foreclosure-parser-tests (5 commits, foreclosure parser tests + amount-parsing fixes) merged as c1e865b; verified 47/47 unittest pass (after tzdata install for Windows zoneinfo).
+- Reverse sync: all local feature branches updated to main tip locally. No pushes to any main pending owner confirmation in main chat.
+- scripts/muse-cdp.js timeouts lengthened (list 30s, ws-open 30s, per-send 60s, overall 120s).
+- Docs owner refs updated (README, DEPLOY, MEMORY, ROADMAP, docs/LIBRARIES, docs/SUBMODULE_MAP); SUBMODULE_MAP.md regenerated for 8 submodules.
+
 ## v0.63.0 (2026-11-10)
 
 ### TSF Master Bundle — Trust, Security & Future
