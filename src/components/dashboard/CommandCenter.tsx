@@ -829,27 +829,38 @@ function SectionRail({
       aria-label="Command center sections"
       className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 md:w-52 shrink-0"
     >
-      {SECTIONS.map((s) => {
-        const isActive = s.id === active;
+      {HUBS.map((hub) => {
+        const items = SECTIONS.filter((s) => s.hub === hub.id);
+        if (items.length === 0) return null;
         return (
-          <button
-            key={s.id}
-            type="button"
-            onClick={() => onSelect(s.id)}
-            className={
-              'flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-bold transition-all whitespace-nowrap ' +
-              (isActive
-                ? 'bg-primary/15 text-primary border border-primary/30'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground border border-transparent')
-            }
-          >
-            <span
-              className={
-                'h-1.5 w-1.5 rounded-full ' + (isActive ? 'bg-primary' : 'bg-muted-foreground/30')
-              }
-            />
-            {s.title}
-          </button>
+          <div key={hub.id} className="space-y-1">
+            <p className="hidden md:block px-3 pt-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+              {hub.label}
+            </p>
+            {items.map((s) => {
+              const isActive = s.id === active;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => onSelect(s.id)}
+                  className={
+                    "flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-bold transition-all whitespace-nowrap " +
+                    (isActive
+                      ? "bg-primary/15 text-primary border border-primary/30"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground border border-transparent")
+                  }
+                >
+                  <span
+                    className={
+                      "h-1.5 w-1.5 rounded-full " + (isActive ? "bg-primary" : "bg-muted-foreground/30")
+                    }
+                  />
+                  {s.title}
+                </button>
+              );
+            })}
+          </div>
         );
       })}
     </nav>
