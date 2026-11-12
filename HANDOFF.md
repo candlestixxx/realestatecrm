@@ -609,3 +609,11 @@ Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPA
 
 ## Re-verify (2026-11-11) - prod healthy
 - pm2 excellegacyrealtygroup v0.62.5 online, uptime 23h (56 restarts all from deploy churn, stable since). Main / 200, /trust-course 200, /api/listings returns EXL-1001 Sterling Heights ACTIVE $425,000. server-err.log 0 bytes. Local main 4 ahead of origin - push still needs authenticated machine.
+
+## 2026-11-11 CDP send SUCCESS (Codex desktop)
+- Default Edge on CDP :9222 via explicit --user-data-dir=<User Data> --profile-directory=Default (bare --remote-debugging-port never binds on Default; temp profiles bind fine).
+- Created https://muse.ai/ tab, sent coord-msg.txt (821 chars) with scripts/muse-cdp.js, verified message visible in chat DOM (HASMSG:true). Temp verify script + C:/Temp copies removed.
+
+## 2026-11-11 retry: sent to REAL Bobbi thread (Codex desktop)
+- First send had gone to a fresh blank Muse tab (auto-picked, titles not loaded yet). Retried with MUSE_CDP_TAB_ID=C0C0A204... (Chat-Bobbi) via wide-timeout sender (60s/120s).
+- Receipt TYPE:TYPED + SENT; full-page DOM search hit v0.62.5b at 22109. Temp helpers/logs removed.
