@@ -1,6 +1,6 @@
 # SUBMODULE_MAP.md
 
-Auto-generated structural map. Updated 2026-11-07 (v0.62.4 repository sync).
+Auto-generated structural map. Updated 2026-11-10 (v0.63.0 Executive Protocol sync — all branches zero unique commits vs main).
 
 ## apps/contentplanner
 - Remote: https://github.com/candlestixxx/socialmediacontentplanner.git

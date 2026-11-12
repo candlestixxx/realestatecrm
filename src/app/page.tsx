@@ -118,6 +118,36 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <section className="mx-auto max-w-7xl px-4 py-12 md:px-6 lg:px-8">
+        <h2 className="text-3xl font-bold">Our services</h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">Start with the newest way we protect our clients — then explore the workflows behind every transaction.</p>
+        <div className="mt-6 border-2 border-secondary p-6 md:flex md:items-center md:justify-between md:gap-8">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-widest text-primary">New — Trust Services</p>
+            <h3 className="mt-1 text-2xl font-bold">Personal Property Trust documents, course &amp; done-with-you assembly</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Free branded Declaration of Trust, Appointment of Trustee, and Affidavit &amp; Certificate of Trust;
+              a complete 8-module funding course for $497; or let the Excel Legacy Realty Team assemble and fund
+              your trust with you for $997 flat — attorney review built in.
+            </p>
+          </div>
+          <Link href="/trust-services" className="mt-4 shrink-0 bg-secondary px-5 py-3 text-sm font-bold text-black md:mt-0">Explore Trust Services</Link>
+        </div>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <Link href="/trust-course" className="border border-border p-5">
+            <h3 className="font-bold">Trust Funding 101 — free mini-course</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Six lessons plus the one-page funding checklist. Start here if your trust is signed but unfunded.</p>
+          </Link>
+          <Link href="/dashboard/listings" className="border border-border p-5">
+            <h3 className="font-bold">Buy &amp; sell with Excel Legacy</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Listings, offers, and transaction workflows run by licensed Michigan realtors and brokers.</p>
+          </Link>
+          <Link href="/dashboard" className="border border-border p-5">
+            <h3 className="font-bold">Client Command Center</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Live dashboard for leads, deals, campaigns, and every workflow in your transaction.</p>
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

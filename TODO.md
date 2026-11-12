@@ -269,3 +269,8 @@
 - [ ] Course completion events -> lead scoring (lesson progress POSTs, score bump per lesson).
 - [ ] Attorney review of all six lesson bodies before paid promotion.
 
+
+- [x] v0.63.0 TSF Master Bundle shipped (course, branded docs, gated lead magnet).
+- [ ] Stripe checkout for TSF Bundle ($1,497/$997) — currently invoice-intent lead capture.
+- [ ] Server-side hard gate for /trust-docs downloads (signed URL after lead capture).
+- [ ] Social/word-of-mouth TSF launch kit (posts, referral cards).
