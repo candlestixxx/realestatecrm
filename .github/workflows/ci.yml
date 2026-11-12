@@ -32,6 +32,7 @@ jobs:
           - app: leadg
             dir: apps/leadg
             install: npm ci --legacy-peer-deps
+            prebuild: npx prisma generate
             build: npm run build
           - app: media-workflow
             dir: apps/media-workflow
@@ -39,7 +40,8 @@ jobs:
             build: npm run build
           - app: contentplanner
             dir: apps/contentplanner
-            install: npm ci --legacy-peer-deps
+            # lockfile drift (dotenv/tsx/esbuild missing from lock): install, not ci
+            install: npm install --legacy-peer-deps
             build: npm run build
           - app: foreclosureworkflow
             dir: apps/foreclosureworkflow
@@ -47,16 +49,23 @@ jobs:
             build: npm run build
           - app: legacyleads-frontend
             dir: apps/legacyleads/frontend
-            install: npm ci --legacy-peer-deps
+            # lockfile was generated on Windows (pins win32 SWC): install, not ci
+            install: npm install --legacy-peer-deps
             build: npm run build
           - app: aicrm
             dir: apps/aicrm
             install: npm ci --legacy-peer-deps
+            prebuild: npx prisma generate
             build: npm run build
           - app: leadcaller
             dir: apps/leadcaller
             install: npm ci --legacy-peer-deps
+            prebuild: npx prisma generate
             build: npm run build
+    env:
+      # Prisma apps only read DATABASE_URL at build/generate time in CI;
+      # no real database is contacted during `next build` page-data collection.
+      DATABASE_URL: 'file:./ci.db'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,6 +77,10 @@ jobs:
       - name: Install dependencies
         working-directory: ${{ matrix.dir }}
         run: ${{ matrix.install }}
+      - name: Prebuild (Prisma generate, when needed)
+        if: ${{ matrix.prebuild }}
+        working-directory: ${{ matrix.dir }}
+        run: ${{ matrix.prebuild }}
       - name: Build
         working-directory: ${{ matrix.dir }}
         run: ${{ matrix.build }}

@@ -1,3 +1,10 @@
+## v0.63.5 (2026-11-12)
+
+### Submodule CI builds fixed
+- leadg (4648a7c, pushed to RealEstateCRMLLC/leadG): added missing tailwind.config.js + postcss.config.js (Tailwind v3) - fresh next build failed on Next's @tailwindcss/postcss v4 fallback; only the prebuilt standalone bundle worked. Verified locally: webpack compile now succeeds (later @vapi-ai/web type error is a local registry-TLS install gap; dep is in package.json+lock, CI installs it).
+- ci.yml matrix: prisma generate prebuild + CI DATABASE_URL for aicrm/leadcaller/leadg; contentplanner and legacyleads-frontend use npm install (lock drift / Windows-pinned lock) instead of npm ci, with reasons commented.
+- GitHub CI at v0.63.4: Build Main CRM GREEN (lint fix confirmed), Foreclosure Parser Tests GREEN; submodule matrix failures diagnosed above.
+
 ## v0.63.4 (2026-11-12)
 
 ### Lint debt cleared - CI Build Main CRM unblocked
