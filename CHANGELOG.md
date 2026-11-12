@@ -1,3 +1,9 @@
+## v0.63.3 (2026-11-12)
+
+### CI: foreclosure parser job + new app builds
+- Added test-foreclosure-parsers job (Python 3.12 + tzdata, unittest discover on scripts/pipelines/foreclosure, 47 tests) - closes Bobbi's gate1 ci.yml leftover directly with owner token (App Workflows permission not needed).
+- Build matrix adds aicrm and leadcaller (both production builds verified locally below-normal).
+
 ## v0.63.2 (2026-11-12)
 
 ### New submodules wired into launchers + push released
