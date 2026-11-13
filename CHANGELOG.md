@@ -1,3 +1,9 @@
+## v0.64.3 (2026-11-12)
+
+### Reproducible deploys for the 3 new apps
+- Added deploy/deploy-aicrm.sh (:3218), deploy/deploy-leadcaller.sh (:3219), deploy/deploy-prototype.sh (api :3012 + client :3221) mirroring the deploy-leadg.sh pattern: timestamped backups, prisma schema restore, absolute sqlite DATABASE_URL pushed in place, PM2 start + save. The v0.64.2 server deploys used ad-hoc /tmp scripts; these are the durable repo versions (nginx mounts are in excellegacyrealtygroup site config; see add-*-nginx.sh pattern).
+- CI: v0.64.1 + v0.64.2 runs fully green (3 consecutive).
+
 ## v0.64.2 (2026-11-12)
 
 ### Hetzner DBs provisioned + 3 new public mounts (owner decisions)
