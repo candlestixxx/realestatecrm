@@ -15,7 +15,7 @@
 ### v0.63.1 follow-ups (2026-11-12)
 - [x] PUSH HOLD released by Robert in-session 2026-11-12: pushed c1e865b + v0.63.1 (main 3cc22f4..5ccb815) + 5 reverse-synced feature branches to RealEstateCRMLLC/RealEstateCRM.
 - [x] start-all/check-status/tray entries for aicrm (3007), leadcaller (3008), prototype (3009) wired v0.63.2; 12/12 services verified.
-- [ ] Wire nginx mounts for /aicrm/, /leadcaller/, /prototype/ on Hetzner (CommandCenter cards live, prod mounts pending; needs deploy go).
+- [x] Wire nginx mounts for /aicrm/, /leadcaller/, /prototype/ on Hetzner (done v0.64.2; logins + /prototype/api/health verified 200).
 - [x] ci.yml foreclosure parser job added directly in v0.63.3 (App Workflows permission bypassed via owner token); watch first Actions run.
 - [x] Decide disposition of untracked root clutter: archived `fix_leadg_*.cjs`, `scratch_check.js`, `-w`, and `catalog.db.bak-*` nondestructively into `scripts/archive/` & `archive/backups/`; tracked non-sensitive `.tormentnexus/` & `data/*.json`.
 
