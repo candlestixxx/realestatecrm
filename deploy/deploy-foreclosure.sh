@@ -22,6 +22,10 @@ done
 
 tar xzf /tmp/deploy-foreclosure.tar.gz
 
+# Prisma schema restore (see deploy-leadg.sh note).
+mkdir -p prisma
+[ -f prisma/schema.prisma ] || cp "$BK/prisma/schema.prisma" prisma/ 2>/dev/null || true
+
 cat > .env << ENVEOF
 DATABASE_URL="file:./prisma/dev.db"
 NEXTAUTH_SECRET="excel-legacy-foreclosure-secret-2026"

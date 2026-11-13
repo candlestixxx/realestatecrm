@@ -1,3 +1,10 @@
+## v0.64.1 (2026-11-12)
+
+### Prod fix: /leadg/ and /foreclosure/ mounts (basePath)
+- Public /leadg/ and /foreclosure/ 404d: apps had no basePath, so /_next assets and the /login auth redirect resolved to the domain root (main CRM). Added basePath /leadg (leadG 45b0faa) and /foreclosure (forclosureworkflow dd0f852, incl. new lib/api-base apiUrl + 7 prefixed fetch sites); nginx proxy_pass for both mounts now forwards the full prefix (no trailing slash). Built both apps on Hetzner (nice -n 10), deployed via deploy-*.sh (old builds backed up). Verified: /leadg/login and /foreclosure/login 200 with prefix-correct /leadg/_next + /foreclosure/_next assets.
+- deploy-leadg.sh / deploy-foreclosure.sh: restore prisma/schema.prisma from backup after extract when tarball lacks it.
+- Antigravity v0.63.7 reconciliation + v0.64.0 Universal CRM deployed in the same session chain (see HANDOFF).
+
 ## v0.63.7+merge (2026-11-12)
 
 ### Antigravity session reconciliation (merged atop v0.64.0)

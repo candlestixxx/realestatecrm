@@ -27,6 +27,14 @@ done
 # Extract
 tar xzf /tmp/deploy-leadg.tar.gz
 
+# Prisma schema restore: the tarball may not carry prisma/ (packaged from
+# standalone). The old prisma/ was just moved to $BK; restore schema.prisma
+# (and seed) if the new tree lacks them. No .db files exist in prod prisma/
+# today; if one ever appears, it is preserved in $BK, never overwritten.
+mkdir -p prisma
+[ -f prisma/schema.prisma ] || cp "$BK/prisma/schema.prisma" prisma/ 2>/dev/null || true
+[ -f prisma/seed.ts ] || cp "$BK/prisma/seed.ts" prisma/ 2>/dev/null || true
+
 # Write .env (re-append preserved DeepSeek config)
 cat > .env << ENVEOF
 DATABASE_URL="file:./prisma/dev.db"
