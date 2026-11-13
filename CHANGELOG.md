@@ -1,3 +1,8 @@
+## v0.64.10 (2026-11-13)
+
+### Sidebar version sync fix
+- Browser verification of prod Command Center (headless, authenticated) caught the sidebar showing VERSION 0.61.8 while prod ran 0.64.7: src/lib/version.ts reads VERSION.md from the deploy dir at runtime, but deploy/package-v3.py never shipped it. Packager now includes VERSION.md; live file updated on Hetzner (no rebuild needed - runtime read). Browser pass also confirmed: KPI strip live (17 leads, ,069,000 pipeline, 8 listings), hub section switching, 58 FPS, /api/reporting 200.
+
 ## v0.64.9 (2026-11-13)
 
 ### Steady-state verification loop

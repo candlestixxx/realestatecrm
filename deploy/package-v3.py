@@ -62,6 +62,13 @@ for root, dirs, files in os.walk('prisma'):
         tf.add(full, arcname=os.path.relpath(full, '.'))
         count += 1
 
+# 5b. VERSION.md - src/lib/version.ts reads it at runtime from the deploy
+# dir (process.cwd). Without this the sidebar shows whatever stale copy a
+# previous full deploy left behind (it showed 0.61.8 while prod ran 0.64.x).
+if os.path.isfile('VERSION.md'):
+    tf.add('VERSION.md', arcname='VERSION.md')
+    count += 1
+
 # 6. Post-deploy script for Prisma symlink + DATABASE_URL fix
 import io
 post_deploy = b'''#!/bin/bash
