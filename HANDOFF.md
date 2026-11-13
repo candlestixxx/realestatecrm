@@ -1,3 +1,6 @@
+## Owner update - United Beats Mercury account open (2026-11-13)
+Robert confirmed United Beats LLC Mercury bank account is open. Relayed to Bobbi via CDP: proposal bank-account blocker resolved, Method = bank transfer (Mercury) or check payable to United Beats LLC. Settled already: pilot fee  setup + /mo (not salary), Rob Lykins excluded. Still pending Robert approval: term / due-date / acceptance wording in Bobbi draft, plus Hank signature.
+
 ## v0.64.7 - Coverage restored, log audit triaged (2026-11-13, Muse Code lane)
 Sync: root + 8 submodules 0/0, every remote feature branch 0 unique vs main (redundant). CI v0.64.6 in flight after 5 straight greens. Prod log audit: contentplanner-api trust-proxy fix (4c724d9) deployed+verified (its ERR_ERL log lines were actually Oct-22 stale); foreclosure/leadcaller hashed-external fixes holding; remaining log noise is stale/post-deploy. Dashboard audit found marketing-studio dropped from CommandCenter by other-lane consolidation - card restored (36/36, 65/65 tooltips, eslint clean). Tray verified in code: per-service Start/Stop/Restart, Start All/Stop All, Quit All Servers and Exit (Stop-AllServices, surgical PID-by-port). Gemini + ChatGPT tabs now present in Edge CDP alongside Bobbi - coordination extended to all three.
 
