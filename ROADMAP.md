@@ -1,3 +1,6 @@
+## v0.64.9 status (2026-11-13)
+Org transfer complete (RealEstateCRMLLC, 9 repos). Production live: main CRM v0.64.7 + 8 sub-services on Hetzner with Postgres/SQLite DBs provisioned and all nginx mounts public (incl. /aicrm/, /leadcaller/, /prototype/ added v0.64.2). CI fully green streak (8 runs). Dashboard: single Command Center, 36/36 pages, every card tooltip'd. Next functional frontier remains owner-gated: pilot Hank proposal signature, RESO MLS feed + pilot Member ID, Stripe/Twilio-number/Resend keys (see TODO Owner Keys).
+
 
 ## v0.62.3 repository sync (2026-11-06)
 All submodule feature branches reconciled to main (zero unique commits found; reverse-merged by fast-forward). Next functional frontier is live MLS data: pilot agent Member ID / broker RESO feed, then provider keys (Twilio number, Resend, OpenAI). See SUBMODULE_MAP.md for the structural map.

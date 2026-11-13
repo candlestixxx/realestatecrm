@@ -1,3 +1,11 @@
+## v0.64.9 (2026-11-13)
+
+### Steady-state verification loop
+- Sync: root + 8 submodules 0/0, all feature branches redundant (0 unique). CI green streak continues.
+- Prod sweep: 14 PM2 processes online, disk 89%->79% after build-tree cleanup (newest backups kept), no fresh project errors (only stale Server Action browser noise; unrelated vhost errors belong to other lanes).
+- Dashboard re-verified: 36/36 pages covered, 65/65 cards with tooltips; tray Quit All Servers verified in code.
+- Docs-only release (no app code change): prod stays at v0.64.7 app build; version string tracks repo state.
+
 ## v0.64.8 (2026-11-13)
 
 ### Deploy-script DB safety net
