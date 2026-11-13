@@ -1,3 +1,8 @@
+## v0.64.11 (2026-11-13)
+
+### System health prod ports corrected
+- /api/system/health registry prodPorts were the pre-deploy plan (3216/3217/3218) - actual Hetzner assignments: contentplanner-api 3216, legacyleads-api 3217, aicrm 3218, leadcaller 3219, prototype client 3221. TCP health probes now check the real ports (dashboard ServiceHealthGrid labels match reality).
+
 ## v0.64.10 (2026-11-13)
 
 ### Sidebar version sync fix

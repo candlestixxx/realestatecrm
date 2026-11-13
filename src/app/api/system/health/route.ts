@@ -9,7 +9,7 @@ import net from 'net';
  * not probe WebSocket or API-only services (ports 8090, 3031, 3006, 3009).
  * Probing loopback TCP listeners server-side checks all 12 runtime processes
  * in parallel (<600ms wall-clock) and supports both local dev ports (3000-3009,
- * 3031, 8090) and Hetzner production ports (3210-3218).
+ * 3031, 8090) and Hetzner production ports (3210-3221).
  */
 
 export const dynamic = 'force-dynamic';
@@ -74,7 +74,7 @@ const PLATFORM_SERVICES: ServiceDef[] = [
     id: 'contentplanner-api',
     name: 'ContentPlanner API',
     localPort: 3031,
-    prodPort: 3031,
+    prodPort: 3216,
     proxyPath: null,
     kind: 'api',
     role: 'Content analytics, video projects, podcasts & notification backend',
@@ -101,7 +101,7 @@ const PLATFORM_SERVICES: ServiceDef[] = [
     id: 'legacyleads-api',
     name: 'LegacyLeads API',
     localPort: 3006,
-    prodPort: 3006,
+    prodPort: 3217,
     proxyPath: null,
     kind: 'api',
     role: 'Skip-trace enrichment & credit management Express backend',
@@ -110,7 +110,7 @@ const PLATFORM_SERVICES: ServiceDef[] = [
     id: 'aicrm',
     name: 'AI CRM',
     localPort: 3007,
-    prodPort: 3216,
+    prodPort: 3218,
     proxyPath: '/aicrm/',
     kind: 'web',
     role: 'Standalone AI-first CRM with funnels & HyperNexus kernel chat',
@@ -119,7 +119,7 @@ const PLATFORM_SERVICES: ServiceDef[] = [
     id: 'leadcaller',
     name: 'Lead Caller',
     localPort: 3008,
-    prodPort: 3217,
+    prodPort: 3219,
     proxyPath: '/leadcaller/',
     kind: 'web',
     role: 'Autonomous real-estate concierge & Twilio/Vapi calling workflows',
@@ -128,10 +128,10 @@ const PLATFORM_SERVICES: ServiceDef[] = [
     id: 'prototype-api',
     name: 'Prototype API',
     localPort: 3009,
-    prodPort: 3218,
+    prodPort: 3221,
     proxyPath: '/prototype/',
     kind: 'api',
-    role: 'Universal business-tool rapid feature sandbox server',
+    role: 'Universal business-tool rapid feature sandbox (client :3221, Express API :3012)',
   },
 ];
 
