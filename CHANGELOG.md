@@ -1,3 +1,9 @@
+## v0.64.6 (2026-11-13)
+
+### MCP real data + prod DB seeding fixes
+- leadcaller (1413ce6): query_mls_inventory now queries the real CRM Lead table (zip/city) with honest empty results - removed hardcoded Downtown/Macomb mock listings; check_agent_availability reports calendar-not-connected instead of invented slots. Verified live via MCP tools/call.
+- Prod DB seeding: leadcaller + aicrm sqlite DBs were empty/missing on Hetzner (db push silently no-oped via .env precedence / Prisma 7 config) - seeded from their build-tree DBs, verified APIs return real data (aicrm /api/contacts 200). Deploy scripts should push with explicit schema + env in future (noted in HANDOFF).
+
 ## v0.64.5 (2026-11-13)
 
 ### LeadCaller MCP 500 fixed (live on Hetzner)
