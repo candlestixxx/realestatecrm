@@ -1,3 +1,9 @@
+## v0.64.4 (2026-11-13)
+
+### Fix: standalone packager dropped Turbopack hashed externals (LeadCaller MCP 500)
+- Root cause: deploy packaging walked the standalone tree without following symlinks; .next/node_modules/@modelcontextprotocol/sdk-<hash> (a symlinked dir) never made the tarball, so /api/mcp 500d with ERR_MODULE_NOT_FOUND on Hetzner. Same class as the @prisma/client-<hash> symlink fixed live for foreclosure.
+- New durable deploy/package-standalone.py (followlinks + dereference) replaces ad-hoc packaging; regression test tests/deploy-package.test.mts proves a symlinked hashed external lands in the tarball with real content (pass). Live leadcaller repaired by restoring .next/node_modules from the server build.
+
 ## v0.64.3 (2026-11-12)
 
 ### Reproducible deploys for the 3 new apps
