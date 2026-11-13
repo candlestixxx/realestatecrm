@@ -12,8 +12,8 @@ This simplicity is achieved by incorporating an **omnipresent AI Assistant** (Ge
 - **Data-Driven:** Unified records enriched by automated public record and social media scrapers.
 
 
-## 0.44.0 Update
-- **Segmentation Launch:** Formalized the "Workspace as Segment" model with a global cookie-based switcher.
-- **Bulk Management:** Overhauled the Leads module with selection logic, dynamic pagination (up to 100 per page), and a bulk action command bar.
-- **AI Sync:** Integrated Gemini 2.5 Flash as the default CRM assistant for executing automated drip campaigns and workflows.
-- **Onboarding:** Added an interactive tour component to bridge the gap for new users and explain the unified CRM mental model.
+## 0.63.7 Update — Unified Single-Page Operator Experience & High-Ticket Funnels
+- **All-in-One Executive Console:** Redesigned `CommandCenter` (`/dashboard`) around a strict business-value hierarchy (`1. Money Now`, `2. Outreach & Marketing`, `3. Operations & Intelligence`, `4. Platform & Sub-Services`) with an instant tool filter, a 6-KPI live executive strip, and toggleable All-in-One Page vs. Focused Section layouts so zero features are hidden.
+- **Zero-Hop Inline Configuration:** Consolidated all 10 workspace configuration domains (`Integrations`, `AI Keys`, `Voice`, `Email`, `Branding`, `Team`, `Routing`, `AI Memory`, `MCP`, `Folder Monitoring`) directly inline inside `/dashboard/settings`, and unified `Marketing Studio`, `SMS Text Codes`, and `Trust Lead Funnels` on `/dashboard/marketing`.
+- **High-Ticket Advisory + Real Estate Synergy:** Integrated the Personal Property Trust Services (`/trust-services` — Free Kit / \$997 Done-With-You Assembly / \$1,497 TSF Master Bundle) and Trust Funding 101 (`/trust-course`) funnels directly into the CRM intake & attribution loop.
+- **12-Service Platform Cohesion:** Unified health telemetry (`/api/system/health`), `BelowNormal` launcher scripts, and a zero-freeze Windows System Tray controller across the main CRM, Live Audio WS, and all 8 `RealEstateCRMLLC/*` submodules.

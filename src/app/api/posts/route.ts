@@ -20,14 +20,14 @@ export async function GET(request: NextRequest) {
 
   try {
     const posts = await prisma.blogPost.findMany({
-      where: status === 'SCHEDULED' ? { published: false } : undefined,
+      where: status === 'SCHEDULED' ? { isPublished: false } : undefined,
       orderBy: { createdAt: 'desc' },
       take: 100,
       select: {
         id: true,
         title: true,
         slug: true,
-        published: true,
+        isPublished: true,
         createdAt: true,
       },
     });
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const mapped = posts.map((p) => ({
       id: p.id,
       content: p.title,
-      status: p.published ? 'PUBLISHED' : 'SCHEDULED',
+      status: p.isPublished ? 'PUBLISHED' : 'SCHEDULED',
       scheduledAt: p.createdAt.toISOString(),
       platform: 'blog',
     }));

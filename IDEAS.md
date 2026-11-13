@@ -59,3 +59,16 @@ This document contains ideas for improvements, refactoring, new features, and pi
 - **Marketplace for Agent Services**: Agents can buy/sell leads, share referrals, and offer services.
 - **AI-Powered SEO Engine**: Automatic SEO optimization for agent websites with keyword research and ranking tracking.
 
+## 6. Next-Wave Architecture & Pivot Ideas Across the 9-Repo Ecosystem (v0.63.7)
+
+### Cross-Submodule Unification & Performance
+- **Single-Sign-On JWT Federation Across All 8 Submodules**: Extend the HS256 `workspaceId` service token pattern (currently bridging Main CRM <-> `contentplanner`) to `leadg`, `foreclosureworkflow`, `legacyleads`, `aicrm`, and `leadcaller` so clicking any Sub-Project card auto-logs the operator into the exact active workspace.
+- **Turso / Embedded libSQL Shared Read Replicas**: Replace separate per-submodule SQLite/Postgres silos in local dev with libSQL embedded replicas (`@prisma/adapter-libsql` is already installed in root!) so Foreclosure Intake, LeadG Voice dispositions, and Main CRM Leads read/write one transactional ledger with <1ms local reads.
+- **Rust / Tauri Native Desktop Shell**: Replace the PowerShell WinForms `system-tray.ps1` + separate browser tabs with a lightweight ~8 MB Rust Tauri desktop shell embedding the Command Center, native OS call notifications, global hotkeys, and built-in process supervisor.
+
+### High-Margin Product Expansions
+- **Interactive Trust Asset Vault & Annual Review Automation**: Pair `/trust-services` ($997 / $1,497 TSF Master Bundle) with an authenticated `/portal/trust` vault that auto-populates Exhibit A real-estate schedules from the client's `OwnedProperty` records and triggers automated annual 20-minute trust review reminders.
+- **Live County Auction Co-Pilot (`foreclosureworkflow` + `calculators`)**: Stream county sheriff-sale dockets directly into the Investor DSCR/Cap-Rate calculator to compute maximum bid ceilings (`70% ARV - Rehab - Redemption Carry`) in real time on auction morning.
+- **Realtime Voice-to-Offer Pipeline (`leadcaller` + `offer-draft`)**: Let an agent dictate offer price, earnest money, inspection days, and closing date over a 30-second voice memo right after a showing; AI parses the transcript into a pre-filled `Offer Draft` session queued in `Approvals` with a ready-to-send `/sign/[token]` link.
+
+

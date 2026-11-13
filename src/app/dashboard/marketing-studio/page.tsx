@@ -30,7 +30,7 @@ const TOOLS = [
     icon: '🎬',
     title: 'Media Studio',
     description: 'Create video content, reels, and visual assets.',
-    href: '/workflows/marketing-media',
+    href: '/dashboard/workflows/marketing-media',
     color: 'bg-blue-500/10 text-blue-500',
   },
   {
@@ -72,7 +72,7 @@ const TOOLS = [
     icon: '🏷️',
     title: 'SMS Text Codes',
     description: 'Create keyword-based SMS auto-response campaigns.',
-    href: '/dashboard/marketing/text-codes',
+    href: '/dashboard/marketing?tab=text-codes',
     color: 'bg-yellow-500/10 text-yellow-500',
   },
 ];

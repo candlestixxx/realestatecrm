@@ -88,7 +88,18 @@ const GROUPS: NavGroup[] = [
       {
         label: 'Marketing Hub',
         href: '/dashboard/marketing',
-        tooltip: 'Campaigns, text codes, and channel tools in one tabbed surface.',
+        tooltip: 'Unified studio, SMS text codes, and public lead funnels in one tabbed surface.',
+      },
+      {
+        label: 'TSF Master Bundle',
+        href: '/trust-services',
+        tooltip: 'Flagship Personal Property Trust funnel ($0 Free Kit / $997 Assembly / $1,497 Master Bundle). Signups feed Leads.',
+        badge: 'TSF',
+      },
+      {
+        label: 'Trust Funding Course',
+        href: '/trust-course',
+        tooltip: 'Public Trust Funding 101 mini-course and $497 1-on-1 package funnel.',
       },
       {
         label: 'Drip Campaigns',
@@ -123,7 +134,7 @@ const GROUPS: NavGroup[] = [
       },
       {
         label: 'SMS Text Codes',
-        href: '/dashboard/marketing',
+        href: '/dashboard/marketing?tab=text-codes',
         tooltip: 'Keyword auto-responses that capture leads from inbound texts.',
       },
       {
@@ -264,7 +275,12 @@ const GROUPS: NavGroup[] = [
       {
         label: 'Client Portal',
         href: '/dashboard/client-portal',
-        tooltip: 'External-facing dashboard for clients to view listings, documents, and messages.',
+        tooltip: 'Admin dashboard for curating shared listings, documents, and milestones in the client portal.',
+      },
+      {
+        label: 'Live Portal View',
+        href: '/portal',
+        tooltip: 'Open the external white-label client portal (/portal) exactly as buyers and sellers see it.',
       },
       {
         label: 'Website Builder',

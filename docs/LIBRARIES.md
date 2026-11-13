@@ -53,22 +53,17 @@ This document lists the major libraries, frameworks, and submodules used in the 
 ## 0.39.0 Audit
 - Confirmed versions for major dependencies: Next.js (16.2.6), React (19.0.0), Tailwind CSS (3.4.1), Prisma (6.19.3), NextAuth.js (4.24.11).
 
-## Git Submodules — Structural Map (verified 2026-10-17, v0.58.51)
+## Git Submodules â€” Structural Map (verified 2026-11-12, v0.63.7)
 
-| Path | Remote URL | Pinned Commit | Branch | Status |
+| Path | Remote URL (`RealEstateCRMLLC/*`) | Pinned Commit | Branch | Local Port(s) & Role |
 | :--- | :--- | :--- | :--- | :--- |
-| `apps/leadg` | https://github.com/RealEstateCRMLLC/leadG.git | `a937938` | `main` | Active — Voice agent (campaigns, calls, A/B testing) |
-| `apps/contentplanner` | https://github.com/RealEstateCRMLLC/socialmediacontentplanner.git | `5f18eb2` | `main` | Active — Content studio (AI generation, billing, social) |
-| `apps/foreclosureworkflow` | https://github.com/RealEstateCRMLLC/forclosureworkflow.git | `334ba8a` | `main` | Active — Foreclosure monitoring + tax assessors |
-| `apps/media-workflow` | https://github.com/RealEstateCRMLLC/re-agent-workflow-media-1.git | `f6d6cdf` | `main` | Active — Media pipeline + AI compliance |
-| `apps/legacyleads` | https://github.com/RealEstateCRMLLC/LegacyLeads.git | `5496830` | `main` | Active — Skip-tracing, Mapbox, TCPA |
+| `apps/leadg` | `https://github.com/RealEstateCRMLLC/leadG.git` | `4648a7c` | `main` | `:3001` â€” VoiceForge outbound calling, Riley Vapi SDK & A/B testing |
+| `apps/foreclosureworkflow` | `https://github.com/RealEstateCRMLLC/forclosureworkflow.git` | `357b3eb` | `main` | `:3002` â€” County foreclosure notice parser + BS&A tax-assessor prefill |
+| `apps/contentplanner` | `https://github.com/RealEstateCRMLLC/socialmediacontentplanner.git` | `84aef5a` | `main` | `:3003` (web), `:3031` (API) â€” Turborepo social studio, brand kits & analytics |
+| `apps/media-workflow` | `https://github.com/RealEstateCRMLLC/re-agent-workflow-media-1.git` | `3e5603c` | `main` | `:3004` â€” Photo storyboard, AI compliance & FFmpeg promo video studio |
+| `apps/legacyleads` | `https://github.com/RealEstateCRMLLC/LegacyLeads.git` | `d890579` | `main` | `:3005` (web), `:3006` (API) â€” Property search, batch skip-tracing & TCPA |
+| `apps/aicrm` | `https://github.com/RealEstateCRMLLC/aicrm.git` | `0054988` | `main` | `:3007` â€” Standalone AI-first CRM with funnels & HyperNexus kernel chat |
+| `apps/leadcaller` | `https://github.com/RealEstateCRMLLC/realestateleadcaller.git` | `12f988b` | `main` | `:3008` â€” Autonomous real-estate concierge & Twilio/Vapi calling workflows |
+| `apps/prototype` | `https://github.com/RealEstateCRMLLC/realestateprototype.git` | `6990db1` | `main` | `:3009` â€” Universal business-tool rapid feature sandbox server |
 
-### Archived Submodules (removed from .gitmodules 2026-06-10; features fully merged)
-
-| Path | Remote URL | Last Commit | Status |
-| :--- | :--- | :--- | :--- |
-| `apps/aicrm` | https://github.com/RealEstateCRMLLC/aicrm.git | `58b5337` | Archived — MCP, NL commands, workflow engine ported to main CRM |
-| `apps/leadcaller` | https://github.com/RealEstateCRMLLC/realestateleadcaller.git | `9eb331e` | Archived — merged into leadG |
-| `apps/prototype` | https://github.com/RealEstateCRMLLC/realestateprototype.git | `f561af8` | Archived — merged into contentplanner |
-
-> Root repository: https://github.com/robertpelloni/realestatecrm.git (resolves to candlestixxx/realestatecrm). Not a fork — no upstream parent.
+> Root repository: `https://github.com/RealEstateCRMLLC/RealEstateCRM.git` (identical commit lineage with `robertpelloni/realestatecrm` and `candlestixxx/realestatecrm`). All 8 submodules are active and tracked in `.gitmodules`.

@@ -171,46 +171,58 @@ px kill-port 3000 or change port in package.json |
 px prisma generate after schema changes |
 | NextAuth errors | Ensure NEXTAUTH_SECRET and NEXTAUTH_URL are set |
 
-## Build and Run Scripts (2026-06-10)
+## Build and Run Scripts (Updated 2026-11-12, v0.63.7)
 
 ### Build All Components
 ```powershell
-# Build main CRM + all 5 submodules (pass/fail summary)
+# Build main CRM + all 8 submodules (10 build targets, BelowNormal CPU priority)
 powershell -ExecutionPolicy Bypass -File build-all.ps1
 
-# Skip npm install (faster for incremental builds)
+# Skip npm install (faster incremental builds, runs prisma generate automatically)
 powershell -ExecutionPolicy Bypass -File build-all.ps1 -SkipInstall
+
+# Build a single named target (e.g. "Main CRM", "AI CRM", "Prototype Server")
+powershell -ExecutionPolicy Bypass -File build-all.ps1 -SkipInstall -Only "Main CRM"
 ```
 
 ### Start All Services
 ```powershell
-# Start all 8 services with correct ports and env vars
+# Start all 12 runtime services at BelowNormal priority with log redirection
 powershell -ExecutionPolicy Bypass -File start-all.ps1
+# Or double-click / invoke start-all.bat
 ```
 
-### Check Status
+### Check Status & Watchdog
 ```powershell
-# Quick health check of all services
+# Health check across all 12 service ports
 powershell -ExecutionPolicy Bypass -File check-status.ps1
+
+# Continuous 12-service auto-restart watchdog (400ms async TCP probes)
+powershell -ExecutionPolicy Bypass -File scripts/watch-services.ps1
 ```
 
-### System Tray (GUI)
+### System Tray (Windows GUI Controller)
 ```powershell
-# Interactive tray with Start/Stop/Restart/Quit per service
+# Non-blocking single-pass netstat tray controller with [ON]/[OFF] status,
+# Start/Stop/Restart per service, Open in Browser, and surgical Quit All Servers and Exit
 npm run tray
 ```
 
-### Service Ports
-| Port | Service | Notes |
-|------|---------|-------|
-| 3000 | Main CRM | Next.js production |
-| 3001 | LeadG | Next.js production |
-| 3002 | Foreclosure | NODE_ENV=production, NEXTAUTH_SECRET required |
-| 3003 | ContentPlanner | npx next start |
-| 3004 | Media Workflow | Node.js dist/index.js |
-| 3005 | LegacyLeads Web | Next.js production |
-| 3006 | LegacyLeads API | npx tsx (global tsx required) |
-| 8090 | Live Audio WS | WebSocket server |
+### Local Service Ports (12 Services)
+| Port | Service | Submodule / Path | Notes |
+|------|---------|------------------|-------|
+| 3000 | Main CRM | `.` (root) | Next.js standalone / production |
+| 8090 | Live Audio WS | `scripts/live-audio-server.mjs` | Standalone WebSocket voice server |
+| 3001 | LeadG | `apps/leadg` | VoiceForge outbound calling & Riley Vapi UI |
+| 3002 | Foreclosure | `apps/foreclosureworkflow` | County legal-notice parser & tax prefill |
+| 3003 | ContentPlanner Web | `apps/contentplanner/apps/web` | Social content studio UI |
+| 3031 | ContentPlanner API | `apps/contentplanner/apps/api` | Express analytics, video & podcast API |
+| 3004 | Media Workflow | `apps/media-workflow` | Express + Vite storyboard & FFmpeg studio |
+| 3005 | LegacyLeads Web | `apps/legacyleads/frontend` | Property search, skip-trace & TCPA UI |
+| 3006 | LegacyLeads API | `apps/legacyleads/backend` | Express skip-trace & PostGIS API |
+| 3007 | AI CRM | `apps/aicrm` | Standalone AI-first CRM (`dev.db` tracked) |
+| 3008 | Lead Caller | `apps/leadcaller` | Autonomous concierge & calling workflows |
+| 3009 | Prototype API | `apps/prototype/server` | Rapid feature sandbox Express API |
 
 ### Log Locations
 - Script-managed logs: `logs/` directory at project root

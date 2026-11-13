@@ -1,46 +1,24 @@
-# Submodule Structural Map — v0.58.51
+# Submodule Structural Map — v0.63.7
 
-> Regenerated 2026-10-17 during repository synchronization (EXECUTIVE PROTOCOL).
+> Regenerated 2026-11-12 during Executive Protocol repository synchronization & `RealEstateCRMLLC` organization consolidation. Canonical root map: [SUBMODULE_MAP.md](../SUBMODULE_MAP.md).
 
-## Repositories
+## Repositories (Root + 8 Active Submodules)
 
-| Path | Remote URL | HEAD Commit | Branch |
-|---|---|---|---|
-| `.` (root) | https://github.com/RealEstateCRMLLC/RealEstateCRM.git | `6d6d1f3` → new v0.58.51 sync commit | main |
-| `apps/leadg` | https://github.com/RealEstateCRMLLC/leadG.git | `a937938` | main |
-| `apps/contentplanner` | https://github.com/RealEstateCRMLLC/socialmediacontentplanner.git | `5f18eb2` | main |
-| `apps/foreclosureworkflow` | https://github.com/RealEstateCRMLLC/forclosureworkflow.git | `334ba8a` | main |
-| `apps/media-workflow` | https://github.com/RealEstateCRMLLC/re-agent-workflow-media-1.git | `f6d6cdf` | main |
-| `apps/legacyleads` | https://github.com/RealEstateCRMLLC/LegacyLeads.git | `5496830` | main |
+| Path | Remote URL | Pinned Commit | Branch | Local Port(s) |
+|---|---|---|---|---|
+| `.` (root) | `https://github.com/RealEstateCRMLLC/RealEstateCRM.git` | `v0.63.7` (`main` HEAD) | `main` | `3000`, `8090` (WS) |
+| `apps/aicrm` | `https://github.com/RealEstateCRMLLC/aicrm.git` | `0054988` | `main` | `3007` |
+| `apps/contentplanner` | `https://github.com/RealEstateCRMLLC/socialmediacontentplanner.git` | `84aef5a` | `main` | `3003`, `3031` |
+| `apps/foreclosureworkflow` | `https://github.com/RealEstateCRMLLC/forclosureworkflow.git` | `357b3eb` | `main` | `3002` |
+| `apps/leadcaller` | `https://github.com/RealEstateCRMLLC/realestateleadcaller.git` | `12f988b` | `main` | `3008` |
+| `apps/leadg` | `https://github.com/RealEstateCRMLLC/leadG.git` | `4648a7c` | `main` | `3001` |
+| `apps/legacyleads` | `https://github.com/RealEstateCRMLLC/LegacyLeads.git` | `d890579` | `main` | `3005`, `3006` |
+| `apps/media-workflow` | `https://github.com/RealEstateCRMLLC/re-agent-workflow-media-1.git` | `3e5603c` | `main` | `3004` |
+| `apps/prototype` | `https://github.com/RealEstateCRMLLC/realestateprototype.git` | `6990db1` | `main` | `3009` |
 
-## Sync Summary (2026-10-17)
+## Branch Reconciliation Summary (2026-11-12)
 
-- All 5 submodules verified at `origin/main` with clean working trees. No nested submodules exist.
-- Upstream `robertpelloni/realestatecrm` and `origin` (`candlestixxx/realestatecrm`) resolve to the identical `main` HEAD — no divergent upstream to merge.
-- No fast-forwards required this pass (all submodules already at `origin/main`).
-
-## Feature Branches (all verified fully merged — ancestors of `main`, zero unique commits)
-
-| Repo | Branch | Status |
-|---|---|---|
-| leadG | `main-14181498285415879315` | Redundant (behind by 2) |
-| socialmediacontentplanner | `foundation-build-11917896674798314449` | Redundant (behind by 2) |
-| socialmediacontentplanner | `jules-6504094641305471454-6d1e3af8` | Redundant (behind by 2) |
-| forclosureworkflow | `feat/foreclosure-crm-mvp-9726332118304912403` | Redundant (behind by 3) |
-| forclosureworkflow | `feat/s3-document-upload-17306733181207525663` | Redundant (behind by 3) |
-| forclosureworkflow | `foreclosure-crm-mvp-9726332118304912403` | Redundant (behind by 3) |
-| re-agent-workflow-media-1 | `feature/init-media-pipeline-17967464845567188821` | Redundant (behind by 2) |
-| re-agent-workflow-media-1 | `init-media-pipeline-17967464845567188821` | Redundant (behind by 2) |
-| re-agent-workflow-media-1 | `jules-10626851319290360880-c8876b20` | Redundant (behind by 2) |
-| LegacyLeads | `jules-initial-setup-9943991237688238805` | Redundant (behind by 2) |
-
-## Archived Repos (features merged into main CRM)
-| Repo | Status |
-|---|---|
-| aicrm | Archived (AgentCore features merged) |
-| realestateleadcaller | Archived (voice features merged into leadG) |
-| realestateprototype | Archived (UI features merged into main CRM) |
-
-## Upstream Note
-
-Root repository resolves identically at `https://github.com/robertpelloni/realestatecrm.git` and `https://github.com/RealEstateCRMLLC/RealEstateCRM.git` (same `main` HEAD). No divergent upstream to merge.
+- **Nested Submodules:** None (verified recursively across all 8 submodules).
+- **Forward-Merge Audit:** All 23 remote feature branches across root (6) + 8 submodules (17) inspected via `git rev-list --left-right --count main...origin/<branch>`; `0` unmerged commits existed ahead of `main` (prior `gate1/foreclosure-parser-tests` work already merged at `c1e865b`).
+- **Reverse-Merge Sync:** All 17 submodule feature branches and 6 root feature branches fast-forwarded to their respective `main` tips, repointed from `legacy/*` to `origin/*` (`RealEstateCRMLLC/*`), and pushed so zero branch drift remains.
+- **Conflict Marker Sweep:** Resolved residual `<<<<<<< HEAD` markers in `apps/aicrm` (`.gitignore`, `CHANGELOG.md`, `ROADMAP.md`, `TODO.md`) and `apps/media-workflow` (`.hypernexus-session.json`, `.hypernexus_startup_marker`). Verified `0` conflict markers across all 9 repositories.

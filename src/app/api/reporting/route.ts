@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     totalLeads, leadsByStatus, totalDeals, dealsByStage,
     totalContacts, totalListings, listingsByStatus,
     totalPartners, referralsByStatus, recentActivity,
+    openTasks, totalTasks, activeCampaigns, activeWorkflows,
   ] = await Promise.all([
     prisma.lead.count({ where: { workspaceId } }),
     prisma.lead.groupBy({ by: ['status'], where: { workspaceId }, _count: true }),
@@ -21,6 +22,10 @@ export async function GET(request: NextRequest) {
     prisma.partner.count({ where: { workspaceId, isActive: true } }),
     prisma.referral.groupBy({ by: ['status'], where: { workspaceId }, _count: true }),
     prisma.activity.findMany({ where: { workspaceId }, orderBy: { createdAt: 'desc' }, take: 10, include: { user: { select: { name: true } } } }),
+    prisma.task?.count({ where: { workspaceId, status: { not: 'DONE' } } }).catch(() => 0) ?? Promise.resolve(0),
+    prisma.task?.count({ where: { workspaceId } }).catch(() => 0) ?? Promise.resolve(0),
+    prisma.smartPlan?.count({ where: { workspaceId, isActive: true } }).catch(() => 0) ?? Promise.resolve(0),
+    prisma.workflowSession?.count({ where: { workspaceId, status: { not: 'COMPLETED' } } }).catch(() => 0) ?? Promise.resolve(0),
   ]);
 
   return NextResponse.json({
@@ -29,6 +34,9 @@ export async function GET(request: NextRequest) {
     contacts: { total: totalContacts },
     listings: { total: totalListings, byStatus: listingsByStatus },
     partners: { total: totalPartners, referralsByStatus },
+    tasks: { open: openTasks, total: totalTasks },
+    campaigns: { active: activeCampaigns },
+    workflows: { active: activeWorkflows },
     recentActivity,
   });
 }

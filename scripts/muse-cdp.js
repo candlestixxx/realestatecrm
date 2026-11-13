@@ -1,15 +1,36 @@
-// muse-cdp.js — send a message to Muse (Bobbi) via the muse.ai chat tab over CDP.
-// Usage: node scripts/muse-cdp.js "<message>" | --inspect | --list
+// muse-cdp.js — unified Muse (Bobbi) & browser-tab coordinator over Edge CDP (:9222).
+// Consolidates muse-cdp-nav/read/read2/read3/resume/send2/send3/wide (archived in scripts/archive/muse-cdp-variants/).
+//
+// Usage:
+//   node scripts/muse-cdp.js --list
+//   node scripts/muse-cdp.js --read [chars] [--tab <id>]
+//   node scripts/muse-cdp.js --inspect [--tab <id>]
+//   node scripts/muse-cdp.js --nav <url> [--tab <id>]
+//   node scripts/muse-cdp.js "<message>" [--tab <id>]
+
 const WebSocket = require('ws');
 const http = require('http');
 
 const CDP_HOST = process.env.MUSE_CDP_HOST || '127.0.0.1';
 const CDP_PORT = Number(process.env.MUSE_CDP_PORT || 9222);
 const CHAT_URL = 'https://muse.ai/';
-const TAB_ID_OVERRIDE = process.env.MUSE_CDP_TAB_ID || null;
 const OPEN_TIMEOUT_MS = 30000;
 const SEND_TIMEOUT_MS = 60000;
 const OVERALL_TIMEOUT_MS = 120000;
+
+function parseArgs(argv) {
+  const args = argv.slice(2);
+  let tabId = process.env.MUSE_CDP_TAB_ID || null;
+  const positional = [];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--tab' && args[i + 1]) {
+      tabId = args[++i];
+    } else {
+      positional.push(args[i]);
+    }
+  }
+  return { tabId, positional };
+}
 
 function cdpList() {
   return new Promise((resolve, reject) => {
@@ -33,11 +54,11 @@ function cdpList() {
   });
 }
 
-function pickChatTab(tabs) {
-  if (TAB_ID_OVERRIDE) {
-    const t = tabs.find(t => t.id === TAB_ID_OVERRIDE);
+function pickChatTab(tabs, tabIdOverride) {
+  if (tabIdOverride) {
+    const t = tabs.find(t => t.id === tabIdOverride || t.id.startsWith(tabIdOverride));
     if (t) return t;
-    console.error(`TAB override ${TAB_ID_OVERRIDE} not found, falling back to URL match`);
+    console.error(`TAB override ${tabIdOverride} not found, falling back to URL match`);
   }
   const cands = tabs.filter(
     t => typeof t.url === 'string' && t.url.startsWith(CHAT_URL) && !t.url.includes('/api/')
@@ -61,7 +82,7 @@ function cdp(wsUrl, actions) {
     let id = 0;
     const pending = new Map();
     const failPending = err => {
-      for (const [, res] of pending) res(Promise.reject(err));
+      for (const [, rej] of pending) rej(err);
       pending.clear();
     };
     const send = (method, params, timeoutMs = SEND_TIMEOUT_MS) =>
@@ -73,10 +94,14 @@ function cdp(wsUrl, actions) {
             rej(new Error(`${method} timed out after ${timeoutMs}ms`));
           }
         }, timeoutMs);
-        pending.set(mid, value => {
-          clearTimeout(timer);
-          res(value);
-        });
+        pending.set(
+          mid,
+          errOrNull => {
+            clearTimeout(timer);
+            if (errOrNull instanceof Error) rej(errOrNull);
+            else res(errOrNull);
+          }
+        );
         ws.send(JSON.stringify({ id: mid, method, params }), err => {
           if (err) {
             clearTimeout(timer);
@@ -85,29 +110,34 @@ function cdp(wsUrl, actions) {
           }
         });
       });
+
     const openTimer = setTimeout(() => {
-      try { ws.close(); } catch (e) { /* ignore */ }
+      try { ws.close(); } catch { /* ignore */ }
       done(reject, new Error(`CDP ws open timed out after ${OPEN_TIMEOUT_MS}ms: ${wsUrl}`));
     }, OPEN_TIMEOUT_MS);
+
     const overallTimer = setTimeout(() => {
-      try { ws.close(); } catch (e) { /* ignore */ }
-      failPending(new Error(`CDP overall timeout after ${OVERALL_TIMEOUT_MS}ms`));
-      done(reject, new Error(`CDP overall timeout after ${OVERALL_TIMEOUT_MS}ms`));
+      try { ws.close(); } catch { /* ignore */ }
+      const err = new Error(`CDP overall timeout after ${OVERALL_TIMEOUT_MS}ms`);
+      failPending(err);
+      done(reject, err);
     }, OVERALL_TIMEOUT_MS);
+
     ws.on('message', raw => {
       let msg;
       try {
         msg = JSON.parse(raw.toString());
-      } catch (e) {
+      } catch {
         return;
       }
       if (msg.id && pending.has(msg.id)) {
-        const res = pending.get(msg.id);
+        const cb = pending.get(msg.id);
         pending.delete(msg.id);
-        if (msg.error) res(Promise.reject(new Error(JSON.stringify(msg.error))));
-        else res(msg.result);
+        if (msg.error) cb(new Error(JSON.stringify(msg.error)));
+        else cb(msg.result);
       }
     });
+
     ws.on('open', async () => {
       clearTimeout(openTimer);
       try {
@@ -115,7 +145,7 @@ function cdp(wsUrl, actions) {
         ws.close();
         done(resolve);
       } catch (e) {
-        try { ws.close(); } catch (closeErr) { /* ignore */ }
+        try { ws.close(); } catch { /* ignore */ }
         done(reject, e);
       }
     });
@@ -125,15 +155,17 @@ function cdp(wsUrl, actions) {
     });
     ws.on('close', () => {
       if (!settled && pending.size > 0) {
-        failPending(new Error('CDP ws closed with pending requests'));
-        done(reject, new Error('CDP ws closed with pending requests'));
+        const err = new Error('CDP ws closed with pending requests');
+        failPending(err);
+        done(reject, err);
       }
     });
   });
 }
 
 async function main() {
-  const arg = process.argv[2];
+  const { tabId, positional } = parseArgs(process.argv);
+  const cmd = positional[0];
   let tabs;
   try {
     tabs = await cdpList();
@@ -141,34 +173,66 @@ async function main() {
     console.error(e.message);
     process.exit(1);
   }
-  if (arg === '--list') {
+
+  if (cmd === '--list') {
     console.log(`TABS: ${tabs.length}`);
     for (const t of tabs) console.log(`${t.id} | ${t.title} | ${t.url}`);
     process.exit(0);
   }
-  const tab = pickChatTab(tabs);
+
+  const tab = pickChatTab(tabs, tabId);
   const museCands = tabs.filter(
     t => typeof t.url === 'string' && t.url.startsWith(CHAT_URL) && !t.url.includes('/api/')
   );
   console.log(`CDP tabs: ${tabs.length}, muse.ai candidates: ${museCands.length}`);
   if (!tab) {
-    console.error('Muse chat tab not found');
+    console.error('Target tab not found');
     process.exit(1);
   }
   console.log(`Target: ${tab.title} | ${tab.url} | id=${tab.id}`);
+
   try {
     await cdp(tab.webSocketDebuggerUrl, async send => {
       try {
-        await send('Page.bringToFront', {});
-      } catch (e) { /* non-fatal */ }
-      await new Promise(r => setTimeout(r, 800));
-      if (arg === '--inspect') {
+        await send('Page.bringToFront', {}, 15000);
+      } catch { /* non-fatal */ }
+      await new Promise(r => setTimeout(r, 600));
+
+      if (cmd === '--nav') {
+        const url = positional[1] || process.env.MUSE_CDP_URL || CHAT_URL;
+        await send('Page.navigate', { url }, 30000);
+        console.log(`NAVIGATED: ${url}`);
+        return;
+      }
+
+      if (cmd === '--read') {
+        const maxChars = Number(positional[1] || 8000);
+        // Use innerText (not textContent) so Next.js RSC script payloads are excluded.
         const r = await send('Runtime.evaluate', {
           expression: `(() => {
-            const els = [...document.querySelectorAll('textarea, input[type="text"], [contenteditable="true"]')];
+            const frames = [...document.querySelectorAll('iframe')].map(f => {
+              try { return f.contentDocument?.body?.innerText || ''; } catch { return ''; }
+            }).filter(Boolean).join('\\n---IFRAME---\\n');
+            const body = (document.body && document.body.innerText) ? document.body.innerText : '';
+            const combined = [document.title, body, frames].filter(Boolean).join('\\n');
+            return combined.slice(-${maxChars});
+          })()`,
+          returnByValue: true,
+        });
+        console.log('TEXT-BEGIN');
+        console.log(r && r.result ? r.result.value : JSON.stringify(r));
+        console.log('TEXT-END');
+        return;
+      }
+
+      if (cmd === '--inspect') {
+        const r = await send('Runtime.evaluate', {
+          expression: `(() => {
+            const els = [...document.querySelectorAll('textarea, input[type="text"], [contenteditable="true"], [role="textbox"]')];
             return JSON.stringify(els.map(e => ({
-              tag: e.tagName, type: e.type || '', cls: (e.className || '').toString().slice(0, 80),
-              placeholder: e.placeholder || e.getAttribute('data-placeholder') || '',
+              tag: e.tagName, type: e.type || '', role: e.getAttribute('role') || '',
+              cls: (e.className || '').toString().slice(0, 80),
+              placeholder: e.placeholder || e.getAttribute('data-placeholder') || e.getAttribute('aria-label') || '',
               visible: e.offsetParent !== null, id: e.id || ''
             })), null, 1);
           })()`,
@@ -177,12 +241,15 @@ async function main() {
         console.log(`COMPOSERS: ${r.result.value}`);
         return;
       }
-      if (!arg) {
-        console.error('Usage: node scripts/muse-cdp.js "<message>"');
+
+      const msg = cmd || process.env.MUSE_CDP_MSG;
+      if (!msg) {
+        console.error('Usage: node scripts/muse-cdp.js "<message>" | --list | --read [chars] | --inspect | --nav <url>');
         process.exit(1);
       }
+
       const script = `(() => {
-        const els = [...document.querySelectorAll('textarea, input[type="text"], [contenteditable="true"]')]
+        const els = [...document.querySelectorAll('textarea, input[type="text"], [contenteditable="true"], [role="textbox"]')]
           .filter(e => e.offsetParent !== null);
         const el = els[els.length - 1];
         if (!el) return 'NO_COMPOSER';
@@ -190,20 +257,40 @@ async function main() {
         if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') {
           const proto = el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
           const setter = Object.getOwnPropertyDescriptor(proto, 'value').set;
-          setter.call(el, ${JSON.stringify(arg)});
+          setter.call(el, ${JSON.stringify(msg)});
           el.dispatchEvent(new Event('input', { bubbles: true }));
           el.dispatchEvent(new Event('change', { bubbles: true }));
         } else {
-          el.textContent = ${JSON.stringify(arg)};
-          el.dispatchEvent(new InputEvent('input', { bubbles: true, data: ${JSON.stringify(arg)}, inputType: 'insertText' }));
+          el.textContent = ${JSON.stringify(msg)};
+          el.dispatchEvent(new InputEvent('input', { bubbles: true, data: ${JSON.stringify(msg)}, inputType: 'insertText' }));
         }
         return 'TYPED';
       })()`;
+
       const typed = await send('Runtime.evaluate', { expression: script, returnByValue: true });
-      const typedVal = typed && typed.result ? typed.result.value : JSON.stringify(typed);
+      let typedVal = typed && typed.result ? typed.result.value : 'NO_COMPOSER';
+
+      // Fallback via CDP DOM.focus + Input.insertText for shadow/Lexical/ProseMirror editors
+      if (typedVal !== 'TYPED') {
+        const doc = await send('DOM.getDocument', { depth: 0 }, 60000);
+        const sels = ['[role="textbox"]', 'div[contenteditable="true"]', 'div[contenteditable]', 'textarea', 'input[type="text"]'];
+        for (const sel of sels) {
+          try {
+            const q = await send('DOM.querySelector', { nodeId: doc.root.nodeId, selector: sel }, 20000);
+            if (q && q.nodeId) {
+              await send('DOM.focus', { nodeId: q.nodeId }, 20000);
+              await send('Input.insertText', { text: msg }, 30000);
+              typedVal = 'TYPED';
+              break;
+            }
+          } catch { /* try next selector */ }
+        }
+      }
+
       console.log(`TYPE: ${typedVal}`);
-      if (typedVal !== 'TYPED') process.exitCode = 1;
-      else {
+      if (typedVal !== 'TYPED') {
+        process.exitCode = 1;
+      } else {
         await send('Input.dispatchKeyEvent', { type: 'rawKeyDown', windowsVirtualKeyCode: 13, code: 'Enter', key: 'Enter' });
         await send('Input.dispatchKeyEvent', { type: 'char', windowsVirtualKeyCode: 13, text: '\r' });
         await send('Input.dispatchKeyEvent', { type: 'keyUp', windowsVirtualKeyCode: 13, code: 'Enter', key: 'Enter' });

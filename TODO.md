@@ -1,11 +1,23 @@
 # TODO.md
 
+### v0.63.7 completed & active items (2026-11-12)
+- [x] Execute full Executive Protocol repo sync across `RealEstateCRMLLC/RealEstateCRM` + all 8 submodules (`git submodule sync --recursive`, `git fetch --all --tags`, 23 feature branches audited & reverse-synced to `main`, 0 conflict markers).
+- [x] Archive duplicate CDP variants & one-off root scratch scripts nondestructively into `scripts/archive/` & `archive/backups/`, track non-sensitive `data/*.json` & `.tormentnexus/` state, and normalize legacy CP1252 docs to UTF-8.
+- [x] Upgrade `build-all.ps1` (10 targets), `start-all.ps1` / `start-all.bat` (12 services at `BelowNormal`), `scripts/watch-services.ps1` (12 services, 400ms async TCP probes), `push-all.ps1` (`-AllBranches`), and `scripts/system-tray.ps1` (single-pass `netstat`, `[ON]`/`[OFF]` labels, Win32 `DestroyIcon` GDI leak fix, surgical `Quit All Servers and Exit`).
+- [x] Consolidate `/dashboard/settings` (`SettingsTabs.tsx`) to render all 10 configuration domains directly inline (`?tab=` synced, duplicate header removed).
+- [x] Consolidate `/dashboard/marketing` into a unified single-page tabbed hub (`Studio & 10 Channels`, `SMS Sign Riders & Text Codes`, `Trust Services & Public Funnels`) and keep `/dashboard/workflows` wizard launches inside the `/dashboard/workflows/*` shell.
+- [x] Redesign `CommandCenter.tsx` & `SidebarNav.tsx`: All-in-One single-page mode + Focused mode, instant tool search, 6-card live KPI strip (`/api/reporting` extended with `Task`, `SmartPlan`, `WorkflowSession`), TSF Master Bundle (`/trust-services`) + Live Portal (`/portal`) cards, server-side 12-service TCP health API (`/api/system/health`), and localhost-aware Sub-Project URLs.
+- [x] Fix runtime bugs caught during deep audit: `MyPlusImportModal.tsx` missing `importCsvAction` import, `/api/posts` querying `published` instead of `isPublished`, `myPlusLeadsIntegration.findUnique` -> `findFirst` in `integrations.ts` & `/api/sync-history`, duplicate React key in `SidebarNav.tsx`, and `tsconfig.json` `apps` exclusion.
+- [ ] **Owner / Prod Gate:** Wire nginx reverse-proxy mounts on Hetzner for `/aicrm/` (`:3216`), `/leadcaller/` (`:3217`), and `/prototype/` (`:3218`) + deploy `v0.63.7` main CRM build when ready.
+- [ ] **Owner Keys / Monetization:** Stripe Checkout keys for `/trust-services` ($997 / $1,497) & `/trust-course` ($497), pilot agent RESO MLS token + Member ID, dedicated Twilio SMS phone number, and SendGrid/Resend verified production sender.
+- [ ] **Local Optional Infra:** Local PostgreSQL + PostGIS on `:5432` (for `legacyleads` `/listings` local queries; returns clean structured status when absent) and local Redis on `:6379` (for `live-audio-server` & `media-workflow` pub/sub; degrades gracefully when absent).
+
 ### v0.63.1 follow-ups (2026-11-12)
 - [x] PUSH HOLD released by Robert in-session 2026-11-12: pushed c1e865b + v0.63.1 (main 3cc22f4..5ccb815) + 5 reverse-synced feature branches to RealEstateCRMLLC/RealEstateCRM.
 - [x] start-all/check-status/tray entries for aicrm (3007), leadcaller (3008), prototype (3009) wired v0.63.2; 12/12 services verified.
 - [ ] Wire nginx mounts for /aicrm/, /leadcaller/, /prototype/ on Hetzner (CommandCenter cards live, prod mounts pending; needs deploy go).
 - [x] ci.yml foreclosure parser job added directly in v0.63.3 (App Workflows permission bypassed via owner token); watch first Actions run.
-- [ ] Decide disposition of untracked root clutter: .tormentnexus/, data/, catalog.db.bak-*, fix_leadg_*.cjs (archive vs track; nondestructive, owner call).
+- [x] Decide disposition of untracked root clutter: archived `fix_leadg_*.cjs`, `scratch_check.js`, `-w`, and `catalog.db.bak-*` nondestructively into `scripts/archive/` & `archive/backups/`; tracked non-sensitive `.tormentnexus/` & `data/*.json`.
 
 ## Short-Term Tasks & Backlog
 
@@ -85,11 +97,11 @@
 
 ### Repository Synchronization
 - [x] Fetch all remotes + tags across root and submodules
-- [x] Verify upstream fork parent (none — repo is not a fork)
+- [x] Verify upstream fork parent (none â€” repo is not a fork)
 - [x] Recursive submodule init/update to pinned tracking commits
 - [x] Forward-merge audit: all feature branches already fully merged (0 unique commits)
 - [x] Reverse-merge: 14 stale feature branches fast-forwarded to main and pushed
-- [x] Version sync 0.47.0 → 0.53.0 across VERSION.md / package.json / package-lock.json / CHANGELOG.md
+- [x] Version sync 0.47.0 â†’ 0.53.0 across VERSION.md / package.json / package-lock.json / CHANGELOG.md
 - [x] Un-ignore databases (dev.db, prisma/dev.db, metamcp.db, data/, audit*.jsonl) per retention policy
 - [x] Regenerate submodule structural map in docs/LIBRARIES.md
 - [x] Update ROADMAP.md with completed Phase 2-12 features
@@ -99,9 +111,9 @@
 - [x] Learning and memory controls
 - [x] SEO / Schema.org / Dynamic Sitemap
 - [x] Social Media Open Graph + share widgets
-- [x] Load testing (scripts/load-test.js — 350/350 pass, p95 < 170ms)
+- [x] Load testing (scripts/load-test.js â€” 350/350 pass, p95 < 170ms)
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, BS&A, HubSpot, Salesforce)
-- [x] E2E integration tests (scripts/e2e-smoke.js — 21 checks)
+- [x] E2E integration tests (scripts/e2e-smoke.js â€” 21 checks)
 - [ ] Production deploy (see DEPLOY.md)
 
 ## Repository Sync Tasks (v0.55.0)
@@ -139,15 +151,15 @@
 - [x] CI/CD pipeline for automated builds and testing
 
 ### Bug Fixes Found & Applied (2026-10-06, v0.57.9)
-- [x] FK validation on `deal-stakeholders` POST (dealId → 404)
-- [x] FK validation on `deal-requirements` POST (dealId → 404)
-- [x] FK validation on `search-alerts` POST (leadId → 404)
+- [x] FK validation on `deal-stakeholders` POST (dealId â†’ 404)
+- [x] FK validation on `deal-requirements` POST (dealId â†’ 404)
+- [x] FK validation on `search-alerts` POST (leadId â†’ 404)
 - [x] P2025 guard + FK validation on `workflow-sessions` POST (update + workspaceId/userId/leadId/dealId)
 - [x] Malformed JSON guard on `ai/memory-settings` POST
-- [x] FK validation on `voice-settings` PUT (workspaceId → 404)
+- [x] FK validation on `voice-settings` PUT (workspaceId â†’ 404)
 - [x] FK validation + P2025 guard on `websites` POST/PATCH
 - [x] Partner field names in `partner-permissions` GET (companyName/contactName not name/company)
-- [x] Avatar speak validation (text required → 400 not 500)
+- [x] Avatar speak validation (text required â†’ 400 not 500)
 
 ### UI Condensation (2026-10-06, v0.58.0)
 - [x] Condensed `marketing/text-codes` into `/dashboard/marketing` (extracted `TextCodes` component)
@@ -164,14 +176,14 @@
 - [x] Template literal bug in websites/builder/page.tsx (single-quoted fetch URL)
 - [x] Help Center expanded from 4 to 10 topics covering all major features
 - [x] Analytics Studio consolidated into Reporting (unified tab)
-- [x] Full codebase scan for template literal bugs — 0 remaining
-- [x] Dashboard layout `requireWorkspaceAccess` uncaught — wrapped in try/catch (root cause of 404s)
+- [x] Full codebase scan for template literal bugs â€” 0 remaining
+- [x] Dashboard layout `requireWorkspaceAccess` uncaught â€” wrapped in try/catch (root cause of 404s)
 - [x] Added marketing/page.tsx + websites/page.tsx parent hub pages (sidebar links resolved)
 - [x] Added 28 error.tsx + loading.tsx files for 14 dashboard directories missing them
 - [x] AICRM contacts list page (search, quick-create, detail navigation)
 - [x] MediaWorkflow webhook/crm graceful degradation (202 when Redis unavailable)
 - [x] Pagination param clamping for 7 routes (page/limit/offset bounds)
-- [x] P2025 update→404 pattern for 6 CRUD handlers (listings/offers/partners/referrals/webhooks/leads)
+- [x] P2025 updateâ†’404 pattern for 6 CRUD handlers (listings/offers/partners/referrals/webhooks/leads)
 - [x] FK validation for child records (notes/relatives/tasks/documents/tags/properties/tasks)
 - [x] 94/94 UI pages GREEN across all 6 services
 - [x] 8 new dashboard pages (vault/contracts/chat/client-portal/imports/avatar/canva/objections/property-data)
@@ -182,7 +194,7 @@
 - [ ] Redis/Memurai for media-workflow (gracefully degrades without it)
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
 - [ ] Archive deprecated GitHub repos (manual GitHub UI action)
-- [x] Multi-channel A/B testing in leadG (email/SMS variants) — wired 2026-10-06
+- [x] Multi-channel A/B testing in leadG (email/SMS variants) â€” wired 2026-10-06
 - [x] CI/CD pipeline for automated builds and testing
 - [x] Live audio WebSocket monitor UI panel in dashboard
 
@@ -190,14 +202,14 @@
 - [x] Fetch all remotes + tags (root + 5 submodules; no nested submodules)
 - [x] Fast-forward submodule mains to origin/main (foreclosureworkflow +2, legacyleads +1, media-workflow +3)
 - [x] leadg gitlink advanced 2 commits to origin/main (1e14cca)
-- [x] Verified all 10 feature branches fully merged (zero unique commits) — no cherry-pick needed
+- [x] Verified all 10 feature branches fully merged (zero unique commits) â€” no cherry-pick needed
 - [x] Commit submodule launchers (start-3002, start-3004) + gitignore transient logs
-- [x] Fix start-all.ps1 media-workflow path (dist/index.js → dist/src/index.js)
-- [x] Version bump → 0.58.43 (VERSION.md / package.json / package-lock.json / CHANGELOG)
+- [x] Fix start-all.ps1 media-workflow path (dist/index.js â†’ dist/src/index.js)
+- [x] Version bump â†’ 0.58.43 (VERSION.md / package.json / package-lock.json / CHANGELOG)
 - [x] Regenerate docs/SUBMODULE_MAP.md + docs/LIBRARIES.md
 
 ### Follow-ups for next session
-- [x] Decide on uncommitted submodule dependency bumps (lucide-react ^1.16→^1.52 in foreclosureworkflow; lucide-react ^1.25→^1.52 + @next/swc-win32-x64-msvc in legacyleads/frontend) — committed v0.58.45
+- [x] Decide on uncommitted submodule dependency bumps (lucide-react ^1.16â†’^1.52 in foreclosureworkflow; lucide-react ^1.25â†’^1.52 + @next/swc-win32-x64-msvc in legacyleads/frontend) â€” committed v0.58.45
 - [x] Archive the 10 redundant remote feature branches (fast-forwarded to origin/main v0.58.46)
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
 
@@ -222,16 +234,16 @@
 - [ ] Deploy 8 sub-services to Hetzner
 - [ ] Google Maps API key (`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`)
 - [ ] HubSpot OAuth for `/api/lead-gen/social`
-- [ ] Legacyleads `/listings` to real data: no local Postgres on 5432 (no binaries/docker); `migrations/01_initial_schema.sql` creates `properties` but the route queries a `listings` table ("StandardStatus"/"ListPrice"/"PostalCode"/geom) that no migration defines — needs a `listings` table migration + MLS ingestion gateway before this can go green (endpoint now fails honestly with message + code, covered by DB-down regression test)
+- [ ] Legacyleads `/listings` to real data: no local Postgres on 5432 (no binaries/docker); `migrations/01_initial_schema.sql` creates `properties` but the route queries a `listings` table ("StandardStatus"/"ListPrice"/"PostalCode"/geom) that no migration defines â€” needs a `listings` table migration + MLS ingestion gateway before this can go green (endpoint now fails honestly with message + code, covered by DB-down regression test)
 - [ ] Redis/Memurai for media-workflow MessageBroker
 
 ### Repository Sync (2026-10-17, v0.58.51)
 - [x] Fetch all remotes + tags (root + 5 submodules; no nested submodules)
-- [x] Upstream robertpelloni/realestatecrm == origin/main (6d6d1f3) — no merge needed
+- [x] Upstream robertpelloni/realestatecrm == origin/main (6d6d1f3) â€” no merge needed
 - [x] All 5 submodules verified at origin/main with clean working trees
-- [x] All 10 feature branches re-verified fully merged (zero unique commits) — no cherry-pick needed
+- [x] All 10 feature branches re-verified fully merged (zero unique commits) â€” no cherry-pick needed
 - [x] Reconciled start-all.ps1 to canonical 9-service list (ContentPlanner API 3031 + standalone server paths)
-- [x] Version bump → 0.58.51 (fixed package.json/package-lock drift from 0.58.43)
+- [x] Version bump â†’ 0.58.51 (fixed package.json/package-lock drift from 0.58.43)
 - [x] Regenerate docs/SUBMODULE_MAP.md + docs/LIBRARIES.md
 
 ### Follow-ups for next session
@@ -239,22 +251,22 @@
 - [ ] Wire real API keys (Stripe, Twilio, SendGrid, Mapbox, etc.)
 - [ ] Deploy 8 sub-services to Hetzner
 
-### Codebase Analysis (2026-10-21) — verified findings
-- [x] Test suites repaired: media-workflow 0→60 passing (TS5107 fix + spec-aligned error messages), contentplanner 24→35 (jest Haste collision), leadg 9, legacyleads 11 — **115 tests passing across 4 submodules**
+### Codebase Analysis (2026-10-21) â€” verified findings
+- [x] Test suites repaired: media-workflow 0â†’60 passing (TS5107 fix + spec-aligned error messages), contentplanner 24â†’35 (jest Haste collision), leadg 9, legacyleads 11 â€” **115 tests passing across 4 submodules**
 - [x] Untracked 470MB deploy tarballs + build logs (gitignored)
-- [x] Prisma model audit: 40 models, only `VerificationToken` unreferenced (NextAuth artifact — expected)
+- [x] Prisma model audit: 40 models, only `VerificationToken` unreferenced (NextAuth artifact â€” expected)
 
 #### Real gaps found (ordered by impact)
-- [ ] **5 API routes still return mock data**: `skip-trace` (whitepages/public-records mocks), `property-data` (source='mock'), `avatar`, `agents/handshake`, `cron/mls-scrub` — these need real provider keys or honest "demo mode" labeling in UI
-- [ ] **Root e2e tests need a running server** (node:test against localhost:3000) — not wired into CI; add a CI job with a service container or convert to Playwright
-- [ ] **foreclosureworkflow has 0 tests** — the only subproject with none; parser logic (LLMNoticeParser) is the riskiest untested code
-- [ ] **legacyleads `/listings` mock data** → real MLS/property-data
-- [ ] **main CRM `tsconfig.json` has `ignoreBuildErrors: true`** — type errors ship silently; tighten gradually
+- [ ] **5 API routes still return mock data**: `skip-trace` (whitepages/public-records mocks), `property-data` (source='mock'), `avatar`, `agents/handshake`, `cron/mls-scrub` â€” these need real provider keys or honest "demo mode" labeling in UI
+- [ ] **Root e2e tests need a running server** (node:test against localhost:3000) â€” not wired into CI; add a CI job with a service container or convert to Playwright
+- [ ] **foreclosureworkflow has 0 tests** â€” the only subproject with none; parser logic (LLMNoticeParser) is the riskiest untested code
+- [ ] **legacyleads `/listings` mock data** â†’ real MLS/property-data
+- [ ] **main CRM `tsconfig.json` has `ignoreBuildErrors: true`** â€” type errors ship silently; tighten gradually
 - [ ] **API keys still unwired**: Twilio, SendGrid/Resend, Stripe, Google Maps, HubSpot OAuth, BS&A, Magnific, OpenAI (embeddings/voice)
 - [ ] 10 redundant remote feature branches safe to delete (`git push origin --delete <branch>`)
 
 ### Cross-Service Integration Gap (2026-10-22, found during UI click-through)
-- [x] **Workspace mapping between main CRM and ContentPlanner** — DONE (v0.58.58): CRM proxy syncs the active workspace into ContentPlanner (same id) and signs it into the service JWT; API reads scope to the JWT workspace claim.
+- [x] **Workspace mapping between main CRM and ContentPlanner** â€” DONE (v0.58.58): CRM proxy syncs the active workspace into ContentPlanner (same id) and signs it into the service JWT; API reads scope to the JWT workspace claim.
 - [ ] OAuth client keys for social publishing: TWITTER_CLIENT_ID/SECRET, LINKEDIN_CLIENT_ID/SECRET, META_CLIENT_ID/SECRET (auth-url currently returns an honest 503)
 - [ ] Wire remaining provider keys per HANDOFF v0.58.55 list (Twilio lookup, Whitepages/PDL, BS&A, Canva, Magnific, Tavily, NewsAPI, HeyGen/D-ID, AGENT_SECRET, BROWSERLESS_WS_ENDPOINT)
 
@@ -278,6 +290,6 @@
 
 
 - [x] v0.63.0 TSF Master Bundle shipped (course, branded docs, gated lead magnet).
-- [ ] Stripe checkout for TSF Bundle ($1,497/$997) � currently invoice-intent lead capture.
+- [ ] Stripe checkout for TSF Bundle ($1,497/$997) — currently invoice-intent lead capture.
 - [ ] Server-side hard gate for /trust-docs downloads (signed URL after lead capture).
 - [ ] Social/word-of-mouth TSF launch kit (posts, referral cards).

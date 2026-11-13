@@ -16,8 +16,8 @@ export async function saveMyPlusLeadsCredentialsAction(data: {
     throw new Error('Unauthorized');
   }
 
-  // Determine if it exists
-  const existing = await prisma.myPlusLeadsIntegration.findUnique({
+  // Determine if it exists (unique constraint is workspaceId_email, so query by workspaceId via findFirst)
+  const existing = await prisma.myPlusLeadsIntegration.findFirst({
     where: { workspaceId: data.workspaceId },
   });
 

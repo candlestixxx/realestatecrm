@@ -1,20 +1,22 @@
 "use client";
 
 /**
- * CommandCenter — unified single-page dashboard surface.
+ * CommandCenter — unified single-page executive console for Excel Legacy Realty Group.
  *
- * Why: the product previously scattered 26+ route groups across nested
- * sidebar flyouts. Operators lost context switching pages and high-value
- * tools (reporting, audit, listings, partners, leaderboard) were not even
- * in the nav. This component is the single source of truth: every feature
- * in the product is represented here, ordered by business value, with
- * inline stats where cheap and a deep-link for the full workspace.
- *
- * Structure: a value-ordered section rail (left) + a section body (right).
- * Sections collapse into a horizontal scroll rail on small viewports.
+ * Why: operators previously had to hunt across 30+ nested routes, fragmented
+ * settings stubs, and unlinked public funnels (/trust-services). Every single
+ * capability, public funnel, settings domain, and 8-submodule service is now
+ * represented here in strict business-value order with:
+ *   1. An Executive KPI Strip (live Leads, Open Tasks, Deal Value, Listings,
+ *      Contacts, and Active Smart Plans from `/api/reporting`).
+ *   2. Instant keyword filter across all features, descriptions, and tooltips.
+ *   3. Toggleable **All-in-One Single-Page Console** (default: renders every
+ *      value-ordered hub on one scrollable page) vs. **Focused Section View**.
+ *   4. Localhost-aware Sub-Project links (`http://localhost:3001..3009` locally,
+ *      nginx `/leadg/`..`/prototype/` paths in production) + 12-Service Health.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import {
   Tooltip,
@@ -32,12 +34,12 @@ import ServiceHealthGrid from '@/components/ServiceHealthGrid';
 
 type SectionId =
   | 'overview'
-  | 'pipeline'
   | 'comms'
   | 'marketing'
+  | 'pipeline'
   | 'properties'
-  | 'intelligence'
   | 'automation'
+  | 'intelligence'
   | 'platform'
   | 'subprojects';
 
@@ -46,26 +48,29 @@ type HubId = 'money' | 'marketing' | 'operations' | 'system';
 interface Hub {
   id: HubId;
   label: string;
+  summary: string;
 }
 
 const HUBS: Hub[] = [
-  { id: 'money', label: 'Money Now' },
-  { id: 'marketing', label: 'Marketing' },
-  { id: 'operations', label: 'Operations' },
-  { id: 'system', label: 'System' },
+  { id: 'money', label: '1. Money Now', summary: 'Immediate revenue: leads, follow-ups, deals, co-pilot, and flagship funnels' },
+  { id: 'marketing', label: '2. Outreach & Marketing', summary: 'Omnichannel communication, drip plans, AI studio, and public lead magnets' },
+  { id: 'operations', label: '3. Operations & Intelligence', summary: 'Listings, calculators, guided wizards, AI agents, analytics, and compliance' },
+  { id: 'system', label: '4. Platform & Sub-Services', summary: 'Unified settings, websites, client portal, and 12-service ecosystem' },
 ];
-// HUBS groups SECTIONS in the rail by business value; rail grouping follows.
 
 interface FeatureCard {
   label: string;
   description: string;
   href: string;
+  /** Optional localhost port so sub-projects open cleanly without nginx in local dev. */
+  localPort?: number;
+  external?: boolean;
   icon: string;
   /** Tooltip shown on the info badge — explains when/why to use this tool. */
   tooltip: string;
   /** Priority within the section: 0 = most prominent. */
   priority?: number;
-  /** Optional live stat fetched from an API endpoint. */
+  /** Optional live stat fetched from `/api/reporting`. */
   statKey?: string;
   badge?: string;
 }
@@ -79,7 +84,7 @@ interface Section {
 }
 
 // ---------------------------------------------------------------------------
-// Feature catalogue — every dashboard capability, value-ordered
+// Feature catalogue — every capability in the platform, ordered by value
 // ---------------------------------------------------------------------------
 
 const SECTIONS: Section[] = [
@@ -87,65 +92,85 @@ const SECTIONS: Section[] = [
     id: 'overview',
     hub: 'money',
     title: 'Money Now',
-    tagline: "Today's revenue actions - intake, tasks, pipeline, inbox, and map",
+    tagline: "Today's highest-ROI actions — work inbound leads, clear tasks, advance deals, and share flagship funnels",
     features: [
       {
         label: 'Lead Intake & Routing',
-        description: 'Capture, score, and auto-assign incoming leads round-robin or by rule.',
+        description: 'Capture, AI-score, and auto-assign incoming leads round-robin or by source rule.',
         href: '/dashboard/leads',
         icon: '⚡',
         tooltip:
-          'New leads land here first. AI qualification scores intent; routing rules assign owners. Open this when you need to work today\'s queue.',
+          'New leads land here first. AI qualification grades intent (A-F); routing rules assign owners automatically. Start every morning here.',
         priority: 0,
         statKey: 'leads',
       },
       {
-        label: 'Today\'s Tasks',
-        description: 'Follow-ups, deadlines, and assignments sorted by urgency.',
+        label: "Today's Tasks",
+        description: 'Open follow-ups, call reminders, and closing deadlines sorted by urgency.',
         href: '/dashboard/tasks',
         icon: '✅',
         tooltip:
-          'Everything with a due date or open status. Clear this list daily to keep deals moving.',
+          'Shows open tasks (non-DONE) out of total workspace tasks. Clear overdue and due-today items daily to protect deal velocity.',
         priority: 1,
         statKey: 'tasks',
       },
       {
         label: 'Deal Pipeline',
-        description: 'Stage-tracked deals with value forecasting and workflow sessions.',
+        description: 'Stage-tracked transactions with dollar volume forecasting, offers, and e-sign packets.',
         href: '/dashboard/deals',
         icon: '💰',
         tooltip:
-          'Your revenue engine. Track deal value across stages; open any deal for documents, offers, and workflows.',
+          'Your revenue engine. Displays cumulative active deal value; click any deal to launch Offer Draft, upload disclosures, or share to the Client Portal.',
         priority: 2,
         statKey: 'pipeline',
       },
       {
-        label: 'AI Co-Pilot',
-        description: 'Agentic assistant with tool-calling — creates leads, tasks, segments from chat.',
-        href: '/dashboard/agentcore',
-        icon: '🤖',
+        label: 'TSF Master Bundle ($997 / $1,497)',
+        description: 'Flagship Personal Property Trust kit, 8-module course, and Done-With-You trust assembly funnel.',
+        href: '/trust-services',
+        external: true,
+        icon: '🏛️',
         tooltip:
-          'DeepSeek-powered co-pilot that can execute CRM actions directly. Ask it to "create a task" or "segment leads from last week" and it will do it.',
+          'High-ticket public conversion funnel at /trust-services ($0 Free Branded 3-Doc Kit, $997 Done-With-You Assembly, $1,497 Master Bundle). Every signup lands directly in Leads with Trust source tags.',
         priority: 3,
-        badge: 'AI',
+        badge: 'FLAGSHIP',
       },
       {
         label: 'Unified Inbox',
-        description: 'Email, SMS, social DMs, and call recordings in one thread per contact.',
+        description: 'Email, SMS, social DMs, and voice call logs threaded per contact.',
         href: '/dashboard/inbox',
         icon: '📬',
         tooltip:
-          'All conversations for a contact unified here. Reply across channels without leaving the thread.',
+          'Reply across SMS, email, and social channels from one unified conversation timeline without switching tabs.',
         priority: 4,
       },
       {
-        label: 'Lead Map',
-        description: 'Geographic view with geofence drawing, clustering, and TCPA timezone checks.',
+        label: 'AI Co-Pilot & Console',
+        description: 'Tool-calling assistant that creates leads, tasks, segments, and workflows from chat or voice.',
+        href: '/dashboard/agentcore',
+        icon: '🤖',
+        tooltip:
+          'Ask the co-pilot in plain English to segment leads, schedule follow-ups, or build an automation flow — it executes real CRM actions.',
+        priority: 5,
+        badge: 'AI',
+      },
+      {
+        label: 'Investment & Net-Sheet Calculators',
+        description: 'Live buyer affordability, investor DSCR/cap-rate/CoC verdicts, and seller net sheets.',
+        href: '/dashboard/calculators',
+        icon: '🧮',
+        tooltip:
+          'Interactive client presentation tool: shows monthly PITI, cash-to-close, investor pass/fail verdict, and seller net proceeds side-by-side.',
+        priority: 6,
+      },
+      {
+        label: 'Lead Map & Geofencing',
+        description: 'Clustered property/lead map with polygon farm drawing and TCPA calling-hour checks.',
         href: '/dashboard/map',
         icon: '🗺️',
         tooltip:
-          'Mapbox-powered. Draw geofences to build farm areas; Supercluster keeps dense metro areas readable. TCPA lookup tells you legal calling hours.',
-        priority: 5,
+          'Draw custom neighborhood farm polygons, inspect clustered leads, and verify local timezone TCPA quiet hours before dialing.',
+        priority: 7,
       },
     ],
   },
@@ -153,77 +178,73 @@ const SECTIONS: Section[] = [
     id: 'comms',
     hub: 'marketing',
     title: 'Communications & Outreach',
-    tagline: 'Every channel your clients use, wired to the CRM timeline',
+    tagline: 'Every outbound and inbound client channel wired directly to the CRM timeline',
     features: [
       {
-        label: 'Unified Inbox',
-        description: 'Multi-channel message aggregation with per-contact threading.',
-        href: '/dashboard/inbox',
-        icon: '📬',
-        tooltip: 'Email (SendGrid), SMS (Twilio), social DMs, and voice notes all land here.',
-      },
-      {
-        label: 'Drip Campaigns',
-        description: 'AI-led SMS/Email sequences with due-task auto-processing.',
+        label: 'Smart Plans & Drip Campaigns',
+        description: 'Automated multi-day SMS, email, and call-task sequences with A/B step variants.',
         href: '/dashboard/campaigns',
         icon: '📈',
         tooltip:
-          'Build multi-step sequences. The layout auto-processes due steps every request. A/B variant picker with weighted selection is available per step.',
+          'Enroll individual leads or entire segments into automated follow-up sequences that pause automatically on reply.',
+        priority: 0,
+        statKey: 'campaigns',
       },
       {
-        label: 'SMS Text Codes',
-        description: 'Keyword-based auto-responses and lead capture via short codes.',
-        href: '/dashboard/marketing',
+        label: 'SMS Sign Riders & Text Codes',
+        description: 'Yard-sign keyword auto-responders (e.g. 8485SHERMAN) that capture mobile leads 24/7.',
+        href: '/dashboard/marketing?tab=text-codes',
         icon: '💬',
         tooltip:
-          'Prospects text a keyword to your number; the system auto-creates a lead and enrolls them in a campaign.',
+          'Opens the inline SMS Text Codes tab in the Marketing Hub. Prospects text your keyword and immediately receive listing photos + portal link.',
+        priority: 1,
       },
       {
-        label: 'Trust Funding Course',
-        description: 'Free mini-course + $497 1-on-1 package. Share the link; course leads land in your pipeline.',
+        label: 'Trust Funding 101 Funnel ($0 / $497)',
+        description: 'Educational mini-course + $497 1-on-1 trust funding package that feeds inbound leads.',
         href: '/trust-course',
+        external: true,
         icon: '🎓',
         tooltip:
-          'Public lead magnet at /trust-course. Free, Full Package, and Consultation signups arrive as leads with Trust sources - work them like any inbound lead.',
-        badge: 'New',
+          'Public educational lead magnet at /trust-course. Captures homeowner and investor prospects into the CRM with tier attribution.',
+        priority: 2,
+        badge: 'FUNNEL',
       },
       {
-        label: 'Mass Outreach',
-        description: 'Bulk SMS/Email to any segment with compliance guardrails.',
-        href: '/dashboard/leads',
+        label: 'Mass Segment Outreach',
+        description: 'Compliant bulk SMS and email broadcasts to filtered lead segments.',
+        href: '/dashboard/leads?broadcast=1',
         icon: '📣',
         tooltip:
-          'Select leads in the table and launch a blast. TCPA quiet-hours enforcement is built in.',
+          'Select filtered leads and send personalized broadcasts with built-in TCPA quiet-hours and opt-out enforcement.',
+        priority: 3,
       },
       {
-        label: 'Voice Calling',
-        description: 'Click-to-call, live audio monitoring, accent morphing, voice commands.',
-        href: '/dashboard/settings/voice',
+        label: 'Voice Calling & Accent Morphing',
+        description: 'WebRTC calling, OpenAI/ElevenLabs TTS/STT, and regional accent matching.',
+        href: '/dashboard/settings?tab=voice',
         icon: '📞',
         tooltip:
-          'WebRTC calling with live waveform monitoring. Voice sessions write back to the CRM timeline automatically.',
+          'Configure VoiceForge providers and test area-code accent morphing inline in the Unified Settings Console.',
+        priority: 4,
       },
       {
-        label: 'Lead Alerts',
-        description: 'Real-time browser notifications when hot leads arrive.',
-        href: '/dashboard/settings/integrations',
-        icon: '🔔',
+        label: 'Objection Handling Playbooks',
+        description: 'Battle-tested scripts and AI rebuttals for price, rate, timing, and commission objections.',
+        href: '/dashboard/objections',
+        icon: '🛡️',
         tooltip:
-          'Server-Sent Events push new-lead alerts to your browser. Configure thresholds in integrations.',
+          'Keep open during live calls to get instant scripts and tailored AI responses to common buyer and seller pushback.',
+        priority: 5,
       },
       {
         label: 'Team Chat',
-        description: 'Real-time workspace messaging with rooms and threading.',
+        description: 'Private direct messages and deal-specific group rooms for internal brokerage coordination.',
         href: '/dashboard/chat',
         icon: '💭',
-        tooltip: 'Internal team communication. Create rooms per deal, team, or topic. Messages sync across the workspace.',
-      },
-      {
-        label: 'Objection Handling',
-        description: 'AI-powered responses to common buyer/seller objections.',
-        href: '/dashboard/objections',
-        icon: '🛡️',
-        tooltip: 'Pre-built scripts for price, timing, and condition concerns. AI suggests responses based on objection type.',
+        tooltip:
+          'Workspace-scoped internal chat so agents, transaction coordinators, and brokers stay aligned per deal.',
+        priority: 6,
       },
     ],
   },
@@ -231,546 +252,562 @@ const SECTIONS: Section[] = [
     id: 'marketing',
     hub: 'marketing',
     title: 'Marketing & Content Studio',
-    tagline: 'Generate, brand, schedule, and publish across every channel',
+    tagline: 'Generate, brand, schedule, and publish listing & brand content across 10 channels',
     features: [
       {
-        label: 'Marketing Hub',
-        description: 'Campaigns, text codes, and channel tools in one tabbed surface.',
+        label: 'Unified Marketing & Funnels Hub',
+        description: 'All-in-one tabbed hub combining 10-channel Studio, SMS Text Codes, and Public Funnels.',
         href: '/dashboard/marketing',
-        icon: '📣',
+        icon: '🚀',
         tooltip:
-          'Canonical marketing home. Houses the TextCodes component plus links to campaigns and the studio.',
+          'Canonical marketing home (/dashboard/marketing) uniting ContentPlanner metrics, creative tools, SMS sign riders, and Trust funnels.',
+        priority: 0,
       },
       {
-        label: 'Marketing Studio',
-        description: 'Hub for 10 marketing channels — email, social, print, video, ads.',
-        href: '/dashboard/marketing-studio',
-        icon: '🎨',
-        tooltip:
-          'One tool hub for all outbound creative. Channel-specific templates with brand kit injection.',
-      },
-      {
-        label: 'Publishing Calendar',
-        description: 'Monthly content calendar with drag-schedule and platform previews.',
-        href: '/dashboard/calendar',
-        icon: '📅',
-        tooltip:
-          'See every scheduled post across platforms. Drag to reschedule; conflicts are flagged.',
-      },
-      {
-        label: 'Social Connections',
-        description: 'OAuth account management for Facebook, Instagram, X, LinkedIn, YouTube, TikTok.',
-        href: '/dashboard/social',
-        icon: '🔗',
-        tooltip: 'Connect or refresh social tokens here. Publishing fails if a token expires.',
-      },
-      {
-        label: 'INSTA GEN (AI)',
-        description: 'One-click AI generation of full listing marketing packages.',
+        label: 'INSTA GEN AI Package Creator',
+        description: 'One-click AI generation of property landing pages, captions, hashtags, and social kits.',
         href: '/dashboard/agent-websites?tab=ai-creator',
         icon: '✨',
         tooltip:
-          'Feed it a listing; it generates captions, hashtags, images, and a landing page in one pass.',
-        badge: 'NEW',
+          'Prompt a listing address or valuation offer and publish a shareable /portal/site/<slug> page plus social copy in seconds.',
+        priority: 1,
+        badge: 'AI',
+      },
+      {
+        label: 'Publishing Calendar',
+        description: 'Monthly cross-platform schedule with conflict detection and post previews.',
+        href: '/dashboard/calendar',
+        icon: '📅',
+        tooltip:
+          'Visualize and reschedule upcoming Facebook, Instagram, LinkedIn, X, TikTok, and YouTube posts on one calendar.',
+        priority: 2,
+      },
+      {
+        label: 'Media Studio (Photo → Video)',
+        description: 'Turn listing photos into storyboards, branded reels, and FFmpeg promo videos.',
+        href: '/dashboard/workflows/marketing-media',
+        icon: '🎬',
+        tooltip:
+          'Guided media workflow inside the dashboard shell that generates video assets with brokerage brand overlays.',
+        priority: 3,
+      },
+      {
+        label: 'AI Avatar Presenter Videos',
+        description: 'Generate virtual spokesperson listing walkthroughs via HeyGen integration.',
+        href: '/dashboard/avatar',
+        icon: '🧑‍💼',
+        tooltip:
+          'Create presenter-led listing videos from property scripts (uses HEYGEN_API_KEY when configured).',
+        priority: 4,
+        badge: 'AI',
       },
       {
         label: 'SEO & Blog Creator',
-        description: 'AI blog posts with schema.org markup and localized keyword targeting.',
+        description: 'Localized hyper-local real-estate articles with schema.org structured data.',
         href: '/dashboard/agent-websites?tab=seo-blog',
         icon: '✍️',
-        tooltip: 'Generates SEO-optimized blog posts for agent websites with auto internal linking.',
+        tooltip:
+          'Drafts neighborhood guides and market-update blog posts optimized for organic search lead capture.',
+        priority: 5,
       },
       {
-        label: 'Social Studio',
-        description: 'Platform-specific post generator with fair-housing compliance checks.',
+        label: 'Social Studio & Fair-Housing Check',
+        description: 'Platform-tailored social posts screened automatically for Fair Housing compliance.',
         href: '/dashboard/agent-websites?tab=social-agent',
         icon: '📱',
-        tooltip: 'AI brand compliance reviews every post for Fair Housing and FTC violations before publish.',
+        tooltip:
+          'Generates platform-native copy and flags Fair Housing / MLS compliance issues prior to publishing.',
+        priority: 6,
       },
       {
-        label: 'Landing Page Builder',
-        description: 'Traditional drag-drop landing pages for agent and property sites.',
-        href: '/dashboard/agent-websites?tab=traditional',
-        icon: '🏗️',
-        tooltip: 'Pre-built responsive templates for agent sites, single-property sites, and neighborhood guides.',
+        label: 'Canva Design Studio',
+        description: 'Launch flyers, postcards, open-house sheets, and social graphics with Canva templates.',
+        href: '/dashboard/canva',
+        icon: '🎨',
+        tooltip:
+          'Connect Canva to pull listing photos and brand colors into print and digital templates.',
+        priority: 7,
       },
       {
-        label: 'Media Studio',
-        description: 'Photo import, storyboard generation, AI promo videos, FFmpeg export.',
-        href: '/dashboard/workflows/marketing-media',
-        icon: '🎬',
-        tooltip: 'Property photo → storyboard → rendered promo video pipeline with brand overlay.',
+        label: 'Social Account Connections',
+        description: 'Manage OAuth tokens for Facebook, Instagram, LinkedIn, X, YouTube, and TikTok.',
+        href: '/dashboard/social',
+        icon: '🔗',
+        tooltip:
+          'Connect social profiles and inspect per-platform engagement metrics.',
+        priority: 8,
       },
     ],
   },
   {
     id: 'pipeline',
     hub: 'operations',
-    title: 'Pipeline & Relationships',
-    tagline: 'Contacts, segmentation, and the deals that move revenue',
+    title: 'Pipeline, Contacts & Contracts',
+    tagline: 'Structured CRM records, dynamic segments, contracts, and secure document storage',
     features: [
       {
-        label: 'Leads & Contacts',
-        description: 'Full CRM records with multi-phone/email, tags, intelligence tabs, quick-edit.',
+        label: 'Leads & Contacts Directory',
+        description: 'Complete contact records with multi-phone validation, co-owners, tags, and timelines.',
         href: '/dashboard/leads',
         icon: '👥',
         tooltip:
-          'Primary record store. Each lead has a detail view with social scrapes, public records, campaign enrollment, and activity timeline.',
-        statKey: 'leads',
+          'Full CRM table with bulk actions, AI qualification, skip-tracing, Smart Plan enrollment, and quick inline editing.',
+        priority: 0,
+        statKey: 'contacts',
       },
       {
-        label: 'Filtered Segments',
-        description: 'Saved dynamic lists for targeting, campaigns, and bulk actions.',
+        label: 'Dynamic Segments',
+        description: 'Saved filter audiences that power drip campaigns, broadcasts, and CSV exports.',
         href: '/dashboard/segments',
         icon: '🎯',
         tooltip:
-          'Build a filter once, reuse it everywhere. Segments power drip enrollment, mass outreach, and exports.',
+          'Create reusable audience slices (e.g. Macomb County High-Equity Sellers, Trust Course Signups) updated dynamically.',
+        priority: 1,
       },
       {
-        label: 'Deals Pipeline',
-        description: 'Kanban-style stages, offer tracking, disclosure e-sign, portal sharing.',
-        href: '/dashboard/deals',
-        icon: '💼',
+        label: 'Contracts & E-Signature',
+        description: 'Purchase agreements, earnest-money receipts, leases, and tokenized `/sign/[token]` routing.',
+        href: '/dashboard/contracts',
+        icon: '📄',
         tooltip:
-          'Each deal links to workflows, offers, and the client portal. Stage changes can trigger automations.',
-        statKey: 'pipeline',
+          'Draft and track transaction contracts and send tamper-evident e-signing links to buyers and sellers.',
+        priority: 2,
       },
       {
-        label: 'Task Checklist',
-        description: 'Personal and team tasks with deadlines, assignment, and priority.',
-        href: '/dashboard/tasks',
-        icon: '📋',
+        label: 'Document Vault',
+        description: 'Encrypted transaction storage with magic-byte auto-classification across 8 file formats.',
+        href: '/dashboard/vault',
+        icon: '🔒',
         tooltip:
-          'Tasks can be created by AI, workflows, or manually. Filter by assignee or due date.',
-        statKey: 'tasks',
+          'Centralized repository for signed disclosures, title commitments, inspection reports, and trust packets.',
+        priority: 3,
       },
       {
-        label: 'Workspace Segments',
-        description: 'Workspace-as-segment model for multi-tenant list isolation.',
-        href: '/dashboard/segments',
-        icon: '📊',
+        label: 'Referral Partners Network',
+        description: 'Lenders, title companies, attorneys, and inspectors with granular deal permissions.',
+        href: '/dashboard/partners',
+        icon: '🤝',
         tooltip:
-          'Workspaces double as top-level segments. Switch workspaces in the header to change your visible lead pool.',
+          'Track inbound/outbound partner referrals and control exactly which deal fields external partners can view.',
+        priority: 4,
       },
     ],
   },
   {
     id: 'properties',
     hub: 'operations',
-    title: 'Properties & Data',
-    tagline: 'Listings, MLS feeds, foreclosures, and data hygiene',
+    title: 'Properties, MLS & Distressed Data',
+    tagline: 'Active listings, RESO MLS enrichment, county foreclosures, bulk imports, and data hygiene',
     features: [
       {
-        label: 'Listings',
-        description: 'MLS listings with photos, offers, and status tracking.',
+        label: 'Listings Inventory',
+        description: 'Active, pending, and sold listings with photo galleries, comps, and offer tracking.',
         href: '/dashboard/listings',
         icon: '🏠',
-        tooltip: 'Listings synced from MLS/IDX. Each listing tracks offers and can generate marketing packages.',
+        tooltip:
+          'Manage brokerage listings, review comparable sales, track incoming offers, and trigger 1-click marketing kits.',
+        priority: 0,
         statKey: 'listings',
       },
       {
-        label: 'Investment Calculators',
-        description: 'Buyer affordability plus investor metrics and seller net sheets with client verdict.',
-        href: '/dashboard/calculators',
-        icon: "🧮",
-        tooltip: 'Buyer monthly cost, cash to close, DSCR cap-rate cash-on-cash verdict; seller net proceeds and ROI. Built for live client presentations.',
-      },
-      {
-        label: 'IDX Search Widget',
-        description: 'Embeddable RESO-powered search for agent websites.',
-        href: '/dashboard/agent-websites',
-        icon: '🔍',
-        tooltip: 'Public-facing IDX search that captures leads into the CRM on inquiry.',
-      },
-      {
-        label: 'Foreclosure Pipeline',
-        description: 'Macomb/Bay County foreclosure monitoring with tax-assessor prefill.',
+        label: 'Foreclosure Intake Pipeline',
+        description: 'Macomb & Bay County legal-notice parser with BS&A tax-assessor equity prefill.',
         href: '/dashboard/workflows/foreclosure-intake',
         icon: '⚖️',
         tooltip:
-          'Automated daily intake from legal news + BS&A/Realcomp tax data. Watchlist with equity and auction-date scoring.',
+          'Converts weekly county foreclosure notices into enriched, scored CRM leads with auction & redemption tracking.',
+        priority: 1,
       },
       {
-        label: 'Data Quality',
-        description: 'Field completeness scoring with prioritized fix recommendations.',
+        label: 'Property Data & RESO Lookup',
+        description: 'Tax records, ownership history, valuation estimates, and live MLS property search.',
+        href: '/dashboard/property-data',
+        icon: '🔎',
+        tooltip:
+          'Look up any parcel or address to inspect tax assessment, prior sales, and comparable properties.',
+        priority: 2,
+      },
+      {
+        label: 'Data Quality & Hygiene',
+        description: 'Contact completeness scoring with prioritized missing-phone/email fix queues.',
         href: '/dashboard/data-quality',
         icon: '🧹',
-        tooltip: 'Scores each contact record for completeness. Fix high-severity gaps first for best outreach results.',
+        tooltip:
+          'Identifies incomplete or duplicate records so skip-tracing and outreach hit rates stay high.',
+        priority: 3,
       },
       {
-        label: 'Skip Tracing',
-        description: 'Batch contact enrichment with provider fallback chain.',
-        href: '/dashboard/leads',
-        icon: '🕵️',
-        tooltip: 'Enrich leads with phone/email/addresses. Multiple providers with automatic fallback.',
-      },
-      {
-        label: 'Document Uploads',
-        description: 'S3 presigned uploads with magic-byte folder detection (8 formats).',
-        href: '/dashboard/deals',
-        icon: '📁',
-        tooltip: 'Drop PDFs, DOCX, XLSX, images, ZIPs — auto-classified into the right deal folder.',
-      },
-    ],
-  },
-  {
-    id: 'intelligence',
-    hub: 'operations',
-    title: 'Intelligence & Compliance',
-    tagline: 'Reporting, gamification, and full audit provenance',
-    features: [
-      {
-        label: 'Reporting & Analytics',
-        description: 'Lead/deal/listing/partner analytics with stage-value breakdowns.',
-        href: '/dashboard/reporting',
-        icon: '📊',
-        tooltip: 'Live aggregates across every entity. Export-ready charts for broker reviews.',
-      },
-      
-      {
-        label: 'Lead Scoring',
-        description: 'Predictive scoring with recency, engagement, and deal-size features.',
-        href: '/dashboard/leads',
-        icon: '🧠',
-        tooltip: 'Weighted model with confidence intervals. Score updates on every activity event.',
-      },
-      {
-        label: 'Leaderboard',
-        description: 'Gamified points, streaks, and achievement badges per agent.',
-        href: '/dashboard/leaderboard',
-        icon: '🏆',
-        tooltip: 'Activity-based points with badge unlocks. Drives healthy competition across the team.',
-      },
-      {
-        label: 'Audit Trail',
-        description: 'Immutable create/update/delete log with IP and user attribution.',
-        href: '/dashboard/audit',
-        icon: '📜',
-        tooltip: 'Every entity mutation is recorded. Required for compliance reviews and dispute resolution.',
-      },
-      {
-        label: 'Cross-Tenant Syndication',
-        description: 'Anonymized market trends across brokerages (min 5-sample privacy).',
-        href: '/dashboard/reporting',
-        icon: '🌐',
-        tooltip: 'Share anonymized market heat data with partner brokerages. Privacy threshold prevents identifying individual agents.',
+        label: 'Bulk CSV / Excel Imports',
+        description: 'Column-mapped batch import for leads, contacts, and property lists with deduplication.',
+        href: '/dashboard/imports',
+        icon: '📥',
+        tooltip:
+          'Upload spreadsheets from title reps, absentee-owner lists, or legacy CRMs with automatic field mapping.',
+        priority: 4,
       },
     ],
   },
   {
     id: 'automation',
     hub: 'operations',
-    title: 'Automation & Agents',
-    tagline: 'Workflows, AI agents, and approval gates',
+    title: 'Workflows, AI Agents & Approvals',
+    tagline: 'Resumable transaction wizards, autonomous agent personas, and human compliance gates',
     features: [
       {
-        label: 'Workflows (Wizards)',
-        description: 'State-machine workflows for deals, foreclosures, listing entry, offers.',
+        label: 'Guided Workflows Hub',
+        description: 'State-machine wizards for Foreclosure Intake, Offer Draft, Listing Entry, and Media.',
         href: '/dashboard/workflows',
         icon: '⚙️',
-        tooltip: 'Guided multi-step processes with persistence. Each workflow session tracks progress and approvals.',
+        tooltip:
+          'Launch new guided workflows or resume saved draft sessions right where you left off.',
+        priority: 0,
+        statKey: 'workflows',
       },
       {
-        label: 'Listing Entry Wizard',
-        description: 'Step-by-step MLS listing creation with photo upload and status tracking.',
+        label: 'MLS Listing Entry Wizard',
+        description: 'Validated step-by-step property onboarding with photo ordering and AI remarks.',
         href: '/dashboard/workflows/listing-entry',
-        icon: 'L',
-        tooltip: 'Guided listing entry with field validation, photo management, and MLS-ready output.',
+        icon: '🏡',
+        tooltip:
+          'Walks agents through complete MLS data capture and syncs directly to the Listings board.',
+        priority: 1,
       },
       {
         label: 'Offer Draft Wizard',
-        description: 'Generate purchase agreements with e-sign and compliance checks.',
+        description: 'Guided purchase agreement builder with earnest money, contingencies, and e-sign.',
         href: '/dashboard/workflows/offer-draft',
-        icon: 'O',
-        tooltip: 'Draft offers with auto-filled terms, disclosure attachments, and e-signature routing.',
+        icon: '📝',
+        tooltip:
+          'Generates clean offer packets from Deal/Lead context and routes for broker review or client signature.',
+        priority: 2,
       },
       {
         label: 'Agent Studio',
-        description: 'Configure AI agents with tools, memory, and deployment targets.',
+        description: 'Create specialized AI agents with custom prompts, MCP tools, memory, and triggers.',
         href: '/dashboard/agent-studio',
-        icon: '🤖',
-        tooltip: 'Define agent personas with specific tool access. Agents can run on schedules or event triggers.',
+        icon: '🧠',
+        tooltip:
+          'Configure autonomous agent personas for lead qualification, listing copywriting, or research.',
+        priority: 3,
+        badge: 'AI',
       },
       {
-        label: 'AgentCore Console',
-        description: 'Live agent command console + visual workflow builder.',
-        href: '/dashboard/agentcore',
-        icon: '🖥️',
-        tooltip: 'Watch agents execute in real time. The workflow builder wires agent steps into pipelines.',
-      },
-      {
-        label: 'Approvals',
-        description: 'Human-in-the-loop gates for offers, listings, and marketing content.',
+        label: 'Human-in-the-Loop Approvals',
+        description: 'Compliance review queue for AI-drafted offers, listings, and outbound campaigns.',
         href: '/dashboard/approvals',
         icon: '✋',
-        tooltip: 'Anything flagged by compliance or policy lands here for review before it goes live.',
+        tooltip:
+          'Broker/manager gate ensuring sensitive documents and broadcasts are approved before execution.',
+        priority: 4,
+      },
+    ],
+  },
+  {
+    id: 'intelligence',
+    hub: 'operations',
+    title: 'Analytics, Gamification & Audit',
+    tagline: 'Executive reporting, cross-brokerage benchmarks, team leaderboards, and immutable audit logs',
+    features: [
+      {
+        label: 'Reporting & Market Trends',
+        description: 'Funnel conversion, stage values, CSV exports, and anonymized cross-tenant benchmarks.',
+        href: '/dashboard/reporting',
+        icon: '📊',
+        tooltip:
+          'Consolidated Reporting + Analytics studio with pipeline breakdowns, partner ROI, and 1-click CSV export.',
+        priority: 0,
       },
       {
-        label: 'Lead Automations',
-        description: 'Rule-based triggers: status change → task, tag → campaign, etc.',
-        href: '/dashboard/workflows',
-        icon: '🔁',
-        tooltip: 'If-this-then-that rules scoped per workspace. Automations run server-side on every mutation.',
+        label: 'Team Leaderboard & Badges',
+        description: 'Gamified agent points, daily streaks, and milestone badges across calls and closings.',
+        href: '/dashboard/leaderboard',
+        icon: '🏆',
+        tooltip:
+          'Tracks agent activity velocity and awards streaks and badges to keep team momentum high.',
+        priority: 1,
+      },
+      {
+        label: 'Immutable Audit Trail',
+        description: 'Tamper-evident create/update/delete log with user, timestamp, and IP provenance.',
+        href: '/dashboard/audit',
+        icon: '📜',
+        tooltip:
+          'Full compliance history across every CRM mutation for brokerage oversight and dispute resolution.',
+        priority: 2,
+      },
+      {
+        label: 'Outbound Sync Queue',
+        description: 'Webhook, RAG vector outbox, and external CRM sync job monitor with retry controls.',
+        href: '/dashboard/sync-queue',
+        icon: '🔄',
+        tooltip:
+          'Inspect pending or failed background sync jobs and requeue failed deliveries.',
+        priority: 3,
       },
     ],
   },
   {
     id: 'platform',
     hub: 'system',
-    title: 'Platform & Settings',
-    tagline: 'Websites, partners, integrations, and system configuration',
+    title: 'Websites, Portals & Unified Settings',
+    tagline: 'IDX websites, client transaction portal, inline settings console, and operator training',
     features: [
       {
-        label: 'Agent Websites',
-        description: 'Multi-tenant site builder with IDX, chat widget, and lead capture.',
-        href: '/dashboard/agent-websites',
-        icon: '🌐',
-        tooltip: 'Full website infrastructure per agent. RESO Web API sync, SSR/ISR property pages, embedded AI chat.',
-      },
-      {
-        label: 'Website Builder',
-        description: 'Drag-and-drop WYSIWYG for pages, templates, and landing funnels.',
-        href: '/dashboard/websites',
-        icon: '🧱',
-        tooltip: 'Visual builder replicating Lofty.com parity. Pre-built templates for agents, properties, neighborhoods.',
-      },
-      {
-        label: 'Partners',
-        description: 'Mortgage/title/insurance partner network with referral tracking.',
-        href: '/dashboard/partners',
-        icon: '🤝',
-        tooltip: 'Partner permissions control what each vendor can see. Referrals flow into the deal pipeline.',
-      },
-      {
-        label: 'Lead Integrations',
-        description: 'MyPlusLeads, HubSpot, Salesforce, Lofty sync configuration.',
-        href: '/dashboard/settings/integrations',
-        icon: '🔌',
-        tooltip: 'Wire external lead sources. MyPlusLeads cron sync runs hourly with high-frequency morning window.',
-      },
-      {
-        label: 'Email Settings',
-        description: 'SendGrid/SMTP configuration, templates, and sender identity.',
-        href: '/dashboard/settings/email',
-        icon: '📧',
-        tooltip: 'Configure sending domains and templates. Magic-link auth emails use these settings.',
-      },
-      {
-        label: 'Voice Settings',
-        description: 'Speech provider selection (OpenAI / ElevenLabs) and accent profiles.',
-        href: '/dashboard/settings/voice',
-        icon: '🎙️',
-        tooltip: 'Pick TTS/STT providers and configure accent morphing profiles for outbound calls.',
-      },
-      {
-        label: 'AI Model Keys',
-        description: 'Provider API keys for Gemini, OpenAI, and other model endpoints.',
-        href: '/dashboard/settings/ai-models',
-        icon: '🔑',
-        tooltip: 'Keys for the AI layer. The co-pilot defaults to DeepSeek V4 (flash); override per-agent if needed.',
-      },
-      {
-        label: 'MCP Server',
-        description: 'Model Context Protocol server config for external agent tool access.',
-        href: '/dashboard/settings/mcp',
-        icon: '🧩',
-        tooltip: 'Expose CRM tools to external MCP-compatible agents (Claude, Cursor, etc.).',
-      },
-      {
-        label: 'Settings Hub',
-        description: 'All configuration in one tabbed surface — AI, brand, team, voice, email.',
+        label: 'Unified Settings Console (All 10 Tabs)',
+        description: 'Inline Integrations, AI Keys, Voice, Email, Branding, Team, Routing, Memory, MCP & Folders.',
         href: '/dashboard/settings',
         icon: '⚙️',
-        tooltip: 'Canonical settings home. Every settings subpage lives here as a tab.',
+        tooltip:
+          'Single-page settings console rendering every configuration form directly inline without page hops.',
+        priority: 0,
       },
       {
-        label: 'AI Memory',
-        description: 'Long-term memory controls and learning preferences for the co-pilot.',
-        href: '/dashboard/settings/ai-memory',
-        icon: '🧠',
-        tooltip: 'What the co-pilot remembers across sessions. Review and prune stored facts.',
-      },
-      {
-        label: 'Branding',
-        description: 'Workspace identity — logo, colors, portal slug, email footer.',
-        href: '/dashboard/settings/branding',
-        icon: '🎨',
-        tooltip: 'White-label identity. Live client-portal preview as you edit colors and logo.',
-      },
-      {
-        label: 'Team',
-        description: 'Members, roles, invites, and password resets.',
-        href: '/dashboard/settings/team',
-        icon: '👥',
-        tooltip: 'RBAC via the permission matrix. Invites use one-time temp passwords; last-OWNER is protected.',
-      },
-      {
-        label: 'Sync Queue Log',
-        description: 'Outbound sync job history with retry status and error traces.',
-        href: '/dashboard/sync-queue',
-        icon: '📋',
-        tooltip: 'Every outbound webhook and sync job is logged here. Failed jobs can be requeued.',
-      },
-      {
-        label: 'Help Center',
-        description: 'In-app manual, tooltips index, and contextual guidance.',
-        href: '/dashboard/help-center',
-        icon: '❓',
-        tooltip: 'Searchable help articles. Every feature in this console links here for deep guidance.',
-      },
-      {
-        label: 'Document Vault',
-        description: 'Secure storage for contracts, disclosures, and client documents.',
-        href: '/dashboard/vault',
-        icon: '🔒',
-        tooltip: 'Encrypted document storage with access controls. Upload, organize, and share transaction documents.',
-      },
-      {
-        label: 'Contracts',
-        description: 'Generate, deploy, and track real-estate contracts.',
-        href: '/dashboard/contracts',
-        icon: '📋',
-        tooltip: 'Lease, earnest money, and purchase agreement templates. Deploy on-chain or via e-signature.',
-      },
-      {
-        label: 'Client Portal',
-        description: 'External-facing dashboard for clients to track their transaction.',
-        href: '/dashboard/client-portal',
+        label: 'Agent IDX Websites',
+        description: 'Multi-tenant agent sites with RESO IDX search, AI chat capture, and blog publishing.',
+        href: '/dashboard/agent-websites',
         icon: '🌐',
-        tooltip: 'Branded portal where clients view listings, documents, and messages. Real-time transaction tracking.',
+        tooltip:
+          'Manage agent microsites, IDX widgets, and AI-generated neighborhood landing pages.',
+        priority: 1,
       },
       {
-        label: 'Data Imports',
-        description: 'Bulk import leads, contacts, and listings from CSV/Excel.',
-        href: '/dashboard/imports',
-        icon: '📥',
-        tooltip: 'Upload CSV or XLSX files to bulk-import records. Auto-detects columns and validates data.',
+        label: 'WYSIWYG Website Canvas Builder',
+        description: 'Drag-and-drop visual page builder and template library for custom funnels.',
+        href: '/dashboard/websites',
+        icon: '🧱',
+        tooltip:
+          'Customize multi-block pages and launch `/dashboard/websites/builder` for pixel-level layout editing.',
+        priority: 2,
       },
       {
-        label: 'AI Avatar',
-        description: 'Generate AI presenter videos for listings (HeyGen).',
-        href: '/dashboard/avatar',
-        icon: '🎬',
-        tooltip: 'AI-generated listing videos with virtual presenters. Requires HEYGEN_API_KEY.',
+        label: 'Client Portal Management',
+        description: 'Configure shared listings, milestone trackers, and documents visible to clients.',
+        href: '/dashboard/client-portal',
+        icon: '🔑',
+        tooltip:
+          'Admin view for curating what buyers and sellers see inside their branded transaction portal.',
+        priority: 3,
       },
       {
-        label: 'Canva Designs',
-        description: 'Design marketing materials with Canva templates.',
-        href: '/dashboard/canva',
-        icon: '🎨',
-        tooltip: 'Flyers, social posts, and listing sheets via Canva integration. Connect your Canva account.',
+        label: 'Live Client Portal Preview',
+        description: 'Open the external white-label client portal (`/portal`) exactly as clients experience it.',
+        href: '/portal',
+        external: true,
+        icon: '✨',
+        tooltip:
+          'Opens the live client-facing portal rendered with your workspace Branding colors and logo.',
+        priority: 4,
       },
       {
-        label: 'Property Data',
-        description: 'MLS/RESO property data lookup and enrichment.',
-        href: '/dashboard/property-data',
-        icon: '🏠',
-        tooltip: 'Tax records, comps, and ownership history. RESO Web API integration for live MLS data.',
+        label: 'Lead & MLS Integrations',
+        description: 'Jump straight to MyPlusLeads cron sync, RESO MLS credentials, and alert preferences.',
+        href: '/dashboard/settings?tab=integrations',
+        icon: '🔌',
+        tooltip:
+          'Opens the Lead & MLS Integrations tab inside the Unified Settings Console.',
+        priority: 5,
+      },
+      {
+        label: 'Team, Roles & Branding',
+        description: 'Invite agents, set RBAC hierarchy roles, and customize white-label portal colors.',
+        href: '/dashboard/settings?tab=team',
+        icon: '👥',
+        tooltip:
+          'Opens Team & Roles in the Unified Settings Console (Branding is right beside it).',
+        priority: 6,
+      },
+      {
+        label: 'Help Center & Interactive Manuals',
+        description: 'Step-by-step operator guides and live console simulations for every platform feature.',
+        href: '/dashboard/help-center',
+        icon: '📖',
+        tooltip:
+          'Interactive training portal covering Leads, Smart Plans, Trust Funnels, Calculators, Voice, and System Tray.',
+        priority: 7,
       },
     ],
   },
   {
     id: 'subprojects',
     hub: 'system',
-    title: 'Sub-Projects',
-    tagline: 'Independent services that power the Excel Legacy Realty platform',
+    title: '8 Integrated Sub-Projects',
+    tagline: 'Independent specialized services under RealEstateCRMLLC powering voice, legal intake, media, and skip-tracing',
     features: [
       {
         label: 'LeadG — Voice & Lead Engine',
-        description: 'AI voice campaigns, lead generation, and outbound calling with accent morphing.',
+        description: 'VoiceForge AI outbound calling campaigns, accent morphing, and lead qualification.',
         href: '/leadg/',
+        localPort: 3001,
+        external: true,
         icon: '📞',
-        tooltip: 'VoiceForge AI-powered outbound calling, lead scoring, and campaign management. Runs as an independent Next.js app on port 3211.',
-        badge: 'LIVE',
+        tooltip:
+          'Submodule apps/leadg (RealEstateCRMLLC/leadg). Local port 3001; production nginx /leadg/ (port 3211).',
+        priority: 0,
+        badge: ':3001',
       },
       {
         label: 'Foreclosure Workflow',
-        description: 'Automated foreclosure notice monitoring, legal intake, and distressed-property pipelines.',
+        description: 'Dedicated distressed-property monitor, county legal-notice parser, and auction tracker.',
         href: '/foreclosure/',
+        localPort: 3002,
+        external: true,
         icon: '⚖️',
-        tooltip: 'Macomb/Bay County foreclosure monitoring with tax-assessor prefill. Parses legal notices into CRM leads. Runs as an independent Next.js app on port 3212.',
-        badge: 'LIVE',
+        tooltip:
+          'Submodule apps/foreclosureworkflow (RealEstateCRMLLC/foreclosureworkflow). Local port 3002; production /foreclosure/ (port 3212).',
+        priority: 1,
+        badge: ':3002',
       },
       {
         label: 'Content Planner',
-        description: 'Social media content creation, scheduling, brand kits, and campaign analytics.',
+        description: 'Turborepo social studio, brand-voice kits, video/podcast pipelines, and analytics.',
         href: '/contentplanner/',
+        localPort: 3003,
+        external: true,
         icon: '📝',
-        tooltip: 'Turbo monorepo with web UI + API. Create posts, manage campaigns, configure brand voice. Runs as an independent Next.js app on port 3213.',
-        badge: 'LIVE',
+        tooltip:
+          'Submodule apps/contentplanner (RealEstateCRMLLC/contentplanner). Web on local port 3003 (prod 3213) + API on port 3031.',
+        priority: 2,
+        badge: ':3003',
       },
       {
         label: 'Media Workflow',
-        description: 'Photo import, storyboard generation, AI promo videos, and FFmpeg export pipeline.',
+        description: 'Property photo import, AI storyboard builder, and FFmpeg video rendering studio.',
         href: '/media-workflow/',
+        localPort: 3004,
+        external: true,
         icon: '🎬',
-        tooltip: 'Property photo → storyboard → rendered promo video pipeline with brand overlay. Web UI + Express API on port 3214.',
-        badge: 'LIVE',
+        tooltip:
+          'Submodule apps/media-workflow (RealEstateCRMLLC/re-agent-workflow-media-1). Unified Express + Vite studio on local port 3004 (prod 3214).',
+        priority: 3,
+        badge: ':3004',
       },
       {
         label: 'LegacyLeads',
-        description: 'Property data, skip tracing, compliance checks, and lead enrichment.',
+        description: 'Property lookup, batch skip-tracing, TCPA/DNC compliance, and credit ledger.',
         href: '/legacyleads/',
+        localPort: 3005,
+        external: true,
         icon: '🔍',
-        tooltip: 'Lead generation and skip-tracing service for property data, TCPA compliance, and credit management. Frontend + backend on port 3215.',
-        badge: 'LIVE',
+        tooltip:
+          'Submodule apps/legacyleads (RealEstateCRMLLC/legacyleads). Vite frontend on local port 3005 (prod 3215) + Express API on port 3006.',
+        priority: 4,
+        badge: ':3005',
       },
       {
         label: 'AI CRM',
-        description: 'Standalone AI-first CRM with contacts, pipelines, funnels, and HyperNexus kernel chat.',
+        description: 'Standalone AI-first CRM with funnels, pipelines, and HyperNexus kernel chat.',
         href: '/aicrm/',
+        localPort: 3007,
+        external: true,
         icon: '🤖',
-        tooltip: 'Registered as a submodule in v0.63.1 (RealEstateCRMLLC/aicrm). Local dev: cd apps/aicrm && npm run dev (port 3001). Production nginx mount pending.',
-        badge: 'NEW',
+        tooltip:
+          'Submodule apps/aicrm (RealEstateCRMLLC/aicrm). Runs on local port 3007 (prod 3216) with tracked SQLite dev.db.',
+        priority: 5,
+        badge: ':3007',
       },
       {
         label: 'Lead Caller',
-        description: 'AI real-estate concierge and outbound lead-calling workflows (Twilio/Vapi/SendGrid webhooks).',
+        description: 'Autonomous real-estate concierge and Twilio/Vapi/SendGrid outbound calling workflows.',
         href: '/leadcaller/',
+        localPort: 3008,
+        external: true,
         icon: '☎️',
-        tooltip: 'Registered as a submodule in v0.63.1 (RealEstateCRMLLC/realestateleadcaller). Local dev: cd apps/leadcaller && npm run dev. Production nginx mount pending.',
-        badge: 'NEW',
+        tooltip:
+          'Submodule apps/leadcaller (RealEstateCRMLLC/realestateleadcaller). Runs on local port 3008 (prod 3217).',
+        priority: 6,
+        badge: ':3008',
       },
       {
-        label: 'Prototype',
-        description: 'Universal business-tool UI prototype (Next.js client + Express server, rapid feature sandbox).',
+        label: 'Prototype Sandbox',
+        description: 'Universal business-tool rapid feature sandbox (Express API + client workspace).',
         href: '/prototype/',
+        localPort: 3009,
+        external: true,
         icon: '🧪',
-        tooltip: 'Registered as a submodule in v0.63.1 (RealEstateCRMLLC/realestateprototype). Local dev: cd apps/prototype && npm run dev. Sandbox only; production nginx mount pending.',
-        badge: 'NEW',
+        tooltip:
+          'Submodule apps/prototype (RealEstateCRMLLC/realestateprototype). API runs on local port 3009.',
+        priority: 7,
+        badge: ':3009',
       },
     ],
-  }
+  },
 ];
 
 // ---------------------------------------------------------------------------
-// Inline stat hooks — lightweight, non-blocking
+// Live KPI & inline stat hook
 // ---------------------------------------------------------------------------
 
+interface KpiSnapshot {
+  leads: string;
+  tasks: string;
+  openTasks: string;
+  pipeline: string;
+  dealsCount: string;
+  listings: string;
+  contacts: string;
+  campaigns: string;
+  workflows: string;
+}
+
+const EMPTY_KPIS: KpiSnapshot = {
+  leads: '—',
+  tasks: '—',
+  openTasks: '—',
+  pipeline: '—',
+  dealsCount: '—',
+  listings: '—',
+  contacts: '—',
+  campaigns: '—',
+  workflows: '—',
+};
+
 function useDashboardStats() {
-  const [dataLoading, setDataLoading] = useState(true);
   const [stats, setStats] = useState<Record<string, string>>({});
+  const [kpis, setKpis] = useState<KpiSnapshot>(EMPTY_KPIS);
   const [loaded, setLoaded] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
-      // Single consolidated endpoint keeps the console fast.
       const res = await fetch('/api/reporting?workspaceId=' + getClientWorkspaceSlug());
       if (!res.ok) throw new Error('reporting fetch failed');
       const data = await res.json();
-      const next: Record<string, string> = {};
-      if (data.leads) next.leads = String(data.leads.total ?? 0);
-      if (data.deals) {
-        next.pipeline = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          maximumFractionDigits: 0,
-        }).format(data.deals.totalValue ?? 0);
-      }
-      if (data.listings) next.listings = String(data.listings.total ?? 0);
-      setStats(next);
+
+      const leadsTotal = String(data.leads?.total ?? 0);
+      const contactsTotal = String(data.contacts?.total ?? 0);
+      const listingsTotal = String(data.listings?.total ?? 0);
+      const dealsTotal = String(data.deals?.total ?? 0);
+      const pipelineFormatted = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
+      }).format(data.deals?.totalValue ?? 0);
+      const openTasks = String(data.tasks?.open ?? 0);
+      const totalTasks = String(data.tasks?.total ?? 0);
+      const activeCampaigns = String(data.campaigns?.active ?? 0);
+      const activeWorkflows = String(data.workflows?.active ?? 0);
+
+      setStats({
+        leads: `${leadsTotal} leads`,
+        tasks: `${openTasks} open`,
+        pipeline: pipelineFormatted,
+        listings: `${listingsTotal} active`,
+        contacts: `${contactsTotal} contacts`,
+        campaigns: `${activeCampaigns} active`,
+        workflows: `${activeWorkflows} sessions`,
+      });
+
+      setKpis({
+        leads: leadsTotal,
+        tasks: `${openTasks} / ${totalTasks}`,
+        openTasks,
+        pipeline: pipelineFormatted,
+        dealsCount: dealsTotal,
+        listings: listingsTotal,
+        contacts: contactsTotal,
+        campaigns: activeCampaigns,
+        workflows: activeWorkflows,
+      });
     } catch {
-      // Stats are progressive enhancement — never block the console.
       setStats({});
     } finally {
       setLoaded(true);
@@ -781,7 +818,7 @@ function useDashboardStats() {
     refresh();
   }, [refresh]);
 
-  return { stats, loaded, refresh };
+  return { stats, kpis, loaded, refresh };
 }
 
 // ---------------------------------------------------------------------------
@@ -795,7 +832,8 @@ function InfoBadge({ text }: { text: string }) {
         <button
           type="button"
           aria-label="More information"
-          className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] font-bold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          onClick={(e) => e.preventDefault()}
+          className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] font-bold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0"
         >
           i
         </button>
@@ -807,22 +845,31 @@ function InfoBadge({ text }: { text: string }) {
   );
 }
 
-function FeatureTile({ card, stat }: { card: FeatureCard; stat?: string }) {
-  return (
-    <Link
-      href={card.href}
-      className="group relative flex flex-col gap-2 rounded-xl border border-border bg-background p-4 hover:border-primary/40 hover:shadow-md transition-all"
-    >
+function FeatureTile({
+  card,
+  stat,
+  isLocalhost,
+}: {
+  card: FeatureCard;
+  stat?: string;
+  isLocalhost: boolean;
+}) {
+  const resolvedHref =
+    isLocalhost && card.localPort ? `http://localhost:${card.localPort}` : card.href;
+  const openNewTab = card.external || Boolean(isLocalhost && card.localPort);
+
+  const content = (
+    <>
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-xl leading-none" aria-hidden>
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-xl leading-none shrink-0" aria-hidden>
             {card.icon}
           </span>
-          <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+          <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
             {card.label}
           </h4>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 shrink-0">
           {card.badge && (
             <span className="rounded-full bg-indigo-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-indigo-500">
               {card.badge}
@@ -833,32 +880,54 @@ function FeatureTile({ card, stat }: { card: FeatureCard; stat?: string }) {
       </div>
       <p className="text-xs leading-relaxed text-muted-foreground">{card.description}</p>
       {stat !== undefined && (
-        <div className="mt-auto pt-2 border-t border-border/40">
-          <span className="text-lg font-black text-primary">{stat}</span>
+        <div className="mt-auto pt-2 border-t border-border/40 flex items-center justify-between">
+          <span className="text-sm font-black text-primary">{stat}</span>
+          <span className="text-[10px] font-semibold text-muted-foreground group-hover:text-primary">
+            Open →
+          </span>
         </div>
       )}
+    </>
+  );
+
+  const tileClass =
+    'group relative flex flex-col gap-2 rounded-xl border border-border bg-background p-4 hover:border-primary/40 hover:shadow-md transition-all';
+
+  if (openNewTab) {
+    return (
+      <a href={resolvedHref} target="_blank" rel="noopener noreferrer" className={tileClass}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={resolvedHref} className={tileClass}>
+      {content}
     </Link>
   );
 }
 
 function SectionRail({
   active,
+  viewMode,
   onSelect,
 }: {
   active: SectionId;
+  viewMode: 'all' | 'focused';
   onSelect: (id: SectionId) => void;
 }) {
   return (
     <nav
       aria-label="Command center sections"
-      className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 md:w-52 shrink-0"
+      className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 md:w-56 shrink-0 md:sticky md:top-4 md:self-start"
     >
       {HUBS.map((hub) => {
         const items = SECTIONS.filter((s) => s.hub === hub.id);
         if (items.length === 0) return null;
         return (
           <div key={hub.id} className="space-y-1">
-            <p className="hidden md:block px-3 pt-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+            <p className="hidden md:block px-3 pt-2.5 text-[10px] font-black uppercase tracking-wider text-muted-foreground/70">
               {hub.label}
             </p>
             {items.map((s) => {
@@ -869,18 +938,26 @@ function SectionRail({
                   type="button"
                   onClick={() => onSelect(s.id)}
                   className={
-                    "flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-bold transition-all whitespace-nowrap " +
-                    (isActive
-                      ? "bg-primary/15 text-primary border border-primary/30"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground border border-transparent")
+                    'w-full flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-xs font-bold transition-all whitespace-nowrap cursor-pointer ' +
+                    (isActive && viewMode === 'focused'
+                      ? 'bg-primary/15 text-primary border border-primary/30'
+                      : isActive
+                      ? 'bg-muted text-foreground border border-border/60'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground border border-transparent')
                   }
                 >
-                  <span
-                    className={
-                      "h-1.5 w-1.5 rounded-full " + (isActive ? "bg-primary" : "bg-muted-foreground/30")
-                    }
-                  />
-                  {s.title}
+                  <span className="flex items-center gap-2 truncate">
+                    <span
+                      className={
+                        'h-1.5 w-1.5 rounded-full shrink-0 ' +
+                        (isActive ? 'bg-primary' : 'bg-muted-foreground/30')
+                      }
+                    />
+                    <span className="truncate">{s.title}</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-muted-foreground/70">
+                    {s.features.length}
+                  </span>
                 </button>
               );
             })}
@@ -897,142 +974,289 @@ function SectionRail({
 
 export default function CommandCenter() {
   const [active, setActive] = useState<SectionId>('overview');
-  const { stats, refresh } = useDashboardStats();
-  const section = SECTIONS.find((s) => s.id === active) ?? SECTIONS[0];
+  const [viewMode, setViewMode] = useState<'all' | 'focused'>('all');
+  const [query, setQuery] = useState('');
+  const [isLocalhost, setIsLocalhost] = useState(false);
+  const { stats, kpis, refresh } = useDashboardStats();
 
-  // Sort cards by priority so the highest-value tools sit top-left.
-  const cards = [...section.features].sort(
-    (a, b) => (a.priority ?? 99) - (b.priority ?? 99),
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const h = window.location.hostname;
+      setIsLocalhost(h === 'localhost' || h === '127.0.0.1');
+    }
+  }, []);
+
+  const totalFeatureCount = useMemo(
+    () => SECTIONS.reduce((sum, s) => sum + s.features.length, 0),
+    [],
   );
+
+  const filteredSections = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return SECTIONS.map((s) => {
+      const sorted = [...s.features].sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
+      if (!q) return { ...s, features: sorted };
+      return {
+        ...s,
+        features: sorted.filter(
+          (f) =>
+            f.label.toLowerCase().includes(q) ||
+            f.description.toLowerCase().includes(q) ||
+            f.tooltip.toLowerCase().includes(q) ||
+            s.title.toLowerCase().includes(q),
+        ),
+      };
+    }).filter((s) => s.features.length > 0);
+  }, [query]);
+
+  const handleRailSelect = (id: SectionId) => {
+    setActive(id);
+    if (viewMode === 'all' && typeof document !== 'undefined') {
+      const el = document.getElementById(`cc-section-${id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
+  const visibleSections =
+    query.trim().length > 0 || viewMode === 'all'
+      ? filteredSections
+      : filteredSections.filter((s) => s.id === active);
+
+  const kpiCards = [
+    {
+      label: 'Active Leads',
+      value: kpis.leads,
+      href: '/dashboard/leads',
+      tooltip: 'Total leads in the current workspace. Click to work, score, and route your queue.',
+    },
+    {
+      label: 'Open Tasks',
+      value: kpis.openTasks,
+      sub: `of ${kpis.tasks.split('/')[1]?.trim() || '0'} total`,
+      href: '/dashboard/tasks',
+      tooltip: 'Tasks not yet marked DONE. Clear open follow-ups daily to keep conversion velocity high.',
+    },
+    {
+      label: 'Deal Pipeline',
+      value: kpis.pipeline,
+      sub: `${kpis.dealsCount} deals`,
+      href: '/dashboard/deals',
+      tooltip: 'Cumulative dollar value across all workspace deals. Click to manage stages and offers.',
+    },
+    {
+      label: 'Active Listings',
+      value: kpis.listings,
+      href: '/dashboard/listings',
+      tooltip: 'MLS and brokerage listings tracked in this workspace.',
+    },
+    {
+      label: 'CRM Contacts',
+      value: kpis.contacts,
+      href: '/dashboard/leads',
+      tooltip: 'Verified contact profiles including co-owners, buyers, sellers, and sphere.',
+    },
+    {
+      label: 'Smart Plans',
+      value: kpis.campaigns,
+      href: '/dashboard/campaigns',
+      tooltip: 'Active automated SMS/email drip plans ready for lead enrollment.',
+    },
+  ];
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="space-y-6 max-w-[1400px] mx-auto">
-        {/* Page header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+      <div className="space-y-6 max-w-[1440px] mx-auto">
+        {/* Page header + controls */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Command Center</h1>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-3xl font-bold tracking-tight">Command Center</h1>
+              <span className="rounded-full bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 text-[11px] font-bold">
+                {totalFeatureCount} tools · 12 services
+              </span>
+            </div>
             <p className="text-muted-foreground text-sm mt-1">
-              Every feature in one place — organized by business value. Hover the{' '}
+              Single-page executive console ordered by business value. Hover any{' '}
               <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-[9px] font-bold align-middle">
                 i
               </span>{' '}
-              badges for guidance on when and why to use each tool.
+              badge for guidance on when and why to use each workflow.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={refresh}
-            className="self-start sm:self-auto rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          >
-            ↻ Refresh stats
-          </button>
-        </div>
 
-        {/* Mission statement */}
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl leading-none mt-0.5" aria-hidden>🏢</span>
-            <div>
-              <h2 className="text-sm font-bold text-foreground">Excel Legacy Realty Group — Unified Platform</h2>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                This dashboard is the central command center for the Excel Legacy Realty Group real-estate operations platform.
-                It integrates <strong className="text-foreground">8 independent sub-services</strong> — LeadG (voice &amp; lead engine),
-                Foreclosure Workflow (legal intake &amp; monitoring), Content Planner (social media &amp; campaigns),
-                Media Workflow (photo/video pipeline), LegacyLeads (property data &amp; skip tracing), AI CRM,
-                Lead Caller, and Prototype — into a single
-                operator experience. Use the <strong className="text-foreground">Sub-Projects</strong> section below to
-                access each service directly, or work within the CRM tools organized by business value.
-              </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative">
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Filter all tools (e.g. trust, MLS, voice)..."
+                aria-label="Filter Command Center tools"
+                className="w-64 sm:w-72 rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+              />
             </div>
-            <InfoBadge text="Each sub-service runs as an independent application but is linked here for unified access. The CRM (this dashboard) is the primary interface; sub-projects handle specialized workflows." />
+
+            <div
+              className="inline-flex rounded-lg border border-border bg-muted/40 p-0.5"
+              role="group"
+              aria-label="Console layout mode"
+            >
+              <button
+                type="button"
+                onClick={() => setViewMode('all')}
+                title="Show every feature across all 9 sections on one unified scrollable page"
+                className={
+                  'rounded-md px-2.5 py-1 text-xs font-bold transition-colors cursor-pointer ' +
+                  (viewMode === 'all'
+                    ? 'bg-primary text-primary-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground')
+                }
+              >
+                All-in-One Page
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('focused')}
+                title="Show only the currently selected section from the left rail"
+                className={
+                  'rounded-md px-2.5 py-1 text-xs font-bold transition-colors cursor-pointer ' +
+                  (viewMode === 'focused'
+                    ? 'bg-primary text-primary-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground')
+                }
+              >
+                Focused Section
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={refresh}
+              className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+              title="Refresh live KPI counts from /api/reporting"
+            >
+              ↻ Refresh
+            </button>
           </div>
         </div>
 
-        {/* Body: section rail + cards */}
+        {/* Executive KPI Strip */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
+          {kpiCards.map((k) => (
+            <Link
+              key={k.label}
+              href={k.href}
+              className="rounded-xl border border-border bg-card p-3.5 hover:border-primary/40 hover:shadow-xs transition-all group"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground group-hover:text-primary transition-colors">
+                  {k.label}
+                </span>
+                <InfoBadge text={k.tooltip} />
+              </div>
+              <div className="text-xl font-black text-foreground mt-1 truncate">{k.value}</div>
+              {k.sub && <div className="text-[10px] text-muted-foreground mt-0.5">{k.sub}</div>}
+            </Link>
+          ))}
+        </div>
+
+        {/* High-frequency Quick Action Bar */}
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-lg" aria-hidden>⚡</span>
+            <span className="text-xs font-extrabold uppercase tracking-wider text-foreground">
+              Quick Launch
+            </span>
+            <InfoBadge text="One-click shortcuts to your highest-frequency revenue and marketing actions." />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: '+ New Lead', href: '/dashboard/leads?new=1' },
+              { label: '+ New Deal', href: '/dashboard/deals?new=1' },
+              { label: '+ New Task', href: '/dashboard/tasks?new=1' },
+              { label: '🏛️ TSF Trust Funnel', href: '/trust-services', external: true },
+              { label: '🧮 Calculators', href: '/dashboard/calculators' },
+              { label: '✨ AI Content Gen', href: '/dashboard/agent-websites?tab=ai-creator' },
+              { label: '⚙️ Inline Settings', href: '/dashboard/settings' },
+            ].map((a) =>
+              a.external ? (
+                <a
+                  key={a.label}
+                  href={a.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-lg bg-background border border-border px-3 py-1.5 text-xs font-semibold hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                >
+                  {a.label}
+                </a>
+              ) : (
+                <Link
+                  key={a.label}
+                  href={a.href}
+                  className="rounded-lg bg-background border border-border px-3 py-1.5 text-xs font-semibold hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                >
+                  {a.label}
+                </Link>
+              ),
+            )}
+          </div>
+        </div>
+
+        {/* Main Body: Sticky Value Rail + Section Cards */}
         <div className="flex flex-col md:flex-row gap-6">
-          <SectionRail active={active} onSelect={setActive} />
+          <SectionRail active={active} viewMode={viewMode} onSelect={handleRailSelect} />
 
-          <div className="flex-1 space-y-4">
-            <div>
-              <h2 className="text-lg font-bold text-foreground">{section.title}</h2>
-              <p className="text-xs text-muted-foreground">{section.tagline}</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-              {cards.map((card) => (
-                <FeatureTile
-                  key={card.label}
-                  card={card}
-                  stat={card.statKey ? stats[card.statKey] : undefined}
-                />
-              ))}
-            </div>
-
-            {/* Section-level quick actions */}
-            {section.id === 'overview' && (
-              <div className="rounded-xl border border-border bg-muted/30 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold">Quick Actions</h3>
-                  <InfoBadge text="High-frequency actions. These open the relevant form or page directly so you can act without hunting through menus." />
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { label: '+ New Lead', href: '/dashboard/leads?new=1' },
-                    { label: '+ New Deal', href: '/dashboard/deals?new=1' },
-                    { label: '+ New Task', href: '/dashboard/tasks?new=1' },
-                    { label: 'Send Broadcast', href: '/dashboard/leads?broadcast=1' },
-                    { label: 'Generate Content', href: '/dashboard/agent-websites?tab=ai-creator' },
-                    { label: 'Open Reports', href: '/dashboard/reporting' },
-                  ].map((a) => (
-                    <Link
-                      key={a.label}
-                      href={a.href}
-                      className="rounded-lg bg-background border border-border px-3 py-2 text-xs font-semibold hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
-                    >
-                      {a.label}
-                    </Link>
-                  ))}
-                </div>
+          <div className="flex-1 space-y-8 min-w-0">
+            {visibleSections.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+                No tools matched <strong>&ldquo;{query}&rdquo;</strong>.{' '}
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  className="text-primary font-semibold hover:underline ml-1"
+                >
+                  Clear filter
+                </button>
               </div>
-            )}
+            ) : (
+              visibleSections.map((section) => (
+                <section
+                  key={section.id}
+                  id={`cc-section-${section.id}`}
+                  className="space-y-3 scroll-mt-6"
+                >
+                  <div className="border-b border-border/60 pb-2">
+                    <h2 className="text-lg font-bold text-foreground">{section.title}</h2>
+                    <p className="text-xs text-muted-foreground">{section.tagline}</p>
+                  </div>
 
-            {/* System status strip */}
-            {section.id === 'platform' && (
-              <div className="rounded-xl border border-border bg-muted/30 p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-bold">System Status</h3>
-                  <InfoBadge text="Runtime health for background services. If any indicator is red, check the Sync Queue Log and server logs." />
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  {[
-                    { label: 'Sync Scheduler', ok: true },
-                    { label: 'Campaign Processor', ok: true },
-                    { label: 'Lead Alerts (SSE)', ok: true },
-                    { label: 'Vector RAG', ok: true },
-                  ].map((s) => (
-                    <div
-                      key={s.label}
-                      className="flex items-center gap-2 rounded-lg bg-background border border-border px-3 py-2"
-                    >
-                      <span
-                        className={
-                          'h-2 w-2 rounded-full ' + (s.ok ? 'bg-green-500' : 'bg-red-500')
-                        }
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                    {section.features.map((card) => (
+                      <FeatureTile
+                        key={`${section.id}-${card.label}`}
+                        card={card}
+                        stat={card.statKey ? stats[card.statKey] : undefined}
+                        isLocalhost={isLocalhost}
                       />
-                      <span className="font-semibold">{s.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                    ))}
+                  </div>
 
-            {/* Live Audio WebSocket monitor — only shown on Platform section */}
-            {section.id === 'platform' && (
-              <div className="mt-3 space-y-3">
-                <ServiceHealthGrid />
-                <LiveAudioMonitor />
-              </div>
+                  {section.id === 'subprojects' && (
+                    <div className="pt-2">
+                      <ServiceHealthGrid />
+                    </div>
+                  )}
+
+                  {section.id === 'platform' && (
+                    <div className="pt-2 space-y-3">
+                      {viewMode === 'focused' && <ServiceHealthGrid />}
+                      <LiveAudioMonitor />
+                    </div>
+                  )}
+                </section>
+              ))
             )}
           </div>
         </div>

@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     logs = [];
   }
 
-  const integration = await prisma.myPlusLeadsIntegration.findUnique({
+  const integration = await prisma.myPlusLeadsIntegration.findFirst({
     where: { workspaceId },
     select: {
       isActive: true,

@@ -294,6 +294,78 @@ const VIDEOS: VideoTopic[] = [
     ]
   },
   {
+    id: 'command-center',
+    title: 'Unified Command Center & Inline Settings',
+    category: 'Platform',
+    description: 'Navigate every CRM tool, live KPI, public funnel, and all 10 workspace settings panels from one single-page console without hunting across menus.',
+    steps: [
+      'Open Command Center (/dashboard) in All-in-One Page mode to see all 9 value-ordered sections on a single page, or switch to Focused Section.',
+      'Use the top instant filter bar to find any tool, public funnel, or sub-project in milliseconds.',
+      'Hover any "i" badge for contextual guidance explaining when and why to use that tool.',
+      'Open Settings (/dashboard/settings) to configure Integrations, AI Keys, Voice, Email, Branding, Team, Routing, Memory, MCP, and Watch Folders inline.'
+    ],
+    simulationLogs: [
+      '⚡ [Console] Loaded Executive KPI Strip: Leads, Open Tasks, Deal Value, Listings, Contacts, Smart Plans.',
+      '🔍 [Filter] Filtered 58 platform tools by keyword "trust" in 4ms.',
+      '⚙️ [Settings] Switched inline tab to Voice & Speech — masked provider keys ready.',
+      '✅ [Health] Polled /api/system/health — 12/12 local platform services online.'
+    ]
+  },
+  {
+    id: 'trust-funnels',
+    title: 'TSF Master Bundle & Trust Funding Funnels',
+    category: 'Marketing & Funnels',
+    description: 'Capture high-intent homeowner and investor leads with the public Personal Property Trust Services (/trust-services) and Trust Funding 101 (/trust-course) funnels.',
+    steps: [
+      'Open Marketing Hub > Trust Services & Public Funnels (/dashboard/marketing?tab=funnels) and click Copy URL.',
+      'Share /trust-services for the Free 3-Document Branded Trust Kit, $997 Done-With-You Trust Assembly, or $1,497 TSF Master Bundle.',
+      'Share /trust-course for the free Trust Funding 101 mini-course and $497 1-on-1 guided package.',
+      'Work incoming signups directly in Leads — each submission arrives tagged with its exact Trust tier and source.'
+    ],
+    simulationLogs: [
+      '🏛️ [Funnel] Prospect visited /trust-services and requested the $997 Done-With-You Trust Assembly.',
+      '👤 [Lead Intake] Created CRM Lead with source "Trust Services — $997 Assembly" and routed to broker.',
+      '📄 [Kit] Dispatched branded Declaration, Appointment of Trustee, and Affidavit & Certificate packet.',
+      '⚖️ [Compliance] Attached mandatory licensed-attorney review checklist before execution.'
+    ]
+  },
+  {
+    id: 'calculators',
+    title: 'Buyer, Investor & Seller Net-Sheet Calculators',
+    category: 'Sales Pipeline',
+    description: 'Run live interactive numbers with buyers, investors, and sellers including PITI, cash-to-close, DSCR, cap rate, cash-on-cash ROI, and seller net proceeds.',
+    steps: [
+      'Open Investment Calculators (/dashboard/calculators) during a client consultation or listing presentation.',
+      'Enter purchase price, down payment, interest rate, taxes, insurance, and projected rent on the Buyer / Investor tab.',
+      'Review the instant Pass/Caution/Pass-On investment verdict across DSCR, Cap Rate, and Cash-on-Cash return.',
+      'Switch to the Seller Net Sheet tab to model sale price, mortgage payoff, commission, and estimated net proceeds.'
+    ],
+    simulationLogs: [
+      '🧮 [Calculator] Modeled $285,000 purchase at 20% down, $2,450/mo market rent.',
+      '📈 [Metrics] Computed Cap Rate: 7.4% | DSCR: 1.28x | Cash-on-Cash: 9.6%.',
+      '✅ [Verdict] Client Investment Verdict: STRONG BUY (meets cash-flow & DSCR thresholds).',
+      '💰 [Seller Net] Modeled Seller Net Proceeds: $194,320 after payoff and closing costs.'
+    ]
+  },
+  {
+    id: 'system-tray',
+    title: '12-Service Health & Windows System Tray',
+    category: 'Platform',
+    description: 'Monitor and control Main CRM, Live Audio WS, and all 8 submodule services from the dashboard Service Health Grid or the Windows System Tray controller.',
+    steps: [
+      'Check the 12-Service Platform Health card in Command Center > Sub-Projects to see live TCP status across ports 3000-3009, 3031, and 8090.',
+      'On Windows, launch start-all.bat or scripts/system-tray.ps1 to place the Excel Legacy CRM icon in your system tray.',
+      'Right-click the tray icon to Start, Stop, Restart, or Open any individual service in your browser.',
+      'Choose "Quit All Servers and Exit" for a clean surgical shutdown of only verified CRM listener PIDs.'
+    ],
+    simulationLogs: [
+      '🟢 [Tray] System tray icon online: 12/12 platform services running at BelowNormal CPU priority.',
+      '🔄 [Watchdog] Probed ports 3000, 8090, 3001-3009, 3031 via single-pass netstat listener map.',
+      '🌐 [Browser] Opened LeadG Engine at http://localhost:3001 from tray menu.',
+      '✅ [Health] Zero UI thread blocking; logs streaming to server.log & server-err.log.'
+    ]
+  },
+  {
     id: 'folders-and-comps',
     title: 'Folder Monitoring & Comparable Sales',
     category: 'Automation',
