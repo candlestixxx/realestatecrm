@@ -27,7 +27,7 @@ mkdir -p prisma
 [ -f prisma/schema.prisma ] || cp "$BK/prisma/schema.prisma" prisma/ 2>/dev/null || true
 
 cat > .env << ENVEOF
-DATABASE_URL="file:./prisma/dev.db"
+DATABASE_URL="postgresql://foreclosure:$(cat /root/.foreclosure-pgpass 2>/dev/null)@127.0.0.1:5432/foreclosure"
 NEXTAUTH_SECRET="excel-legacy-foreclosure-secret-2026"
 NEXTAUTH_URL="https://excellegacyrealtygroup.site/foreclosure"
 PORT=3212

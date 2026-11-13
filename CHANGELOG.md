@@ -1,3 +1,10 @@
+## v0.64.2 (2026-11-12)
+
+### Hetzner DBs provisioned + 3 new public mounts (owner decisions)
+- DATABASE_URL set to Hetzner Postgres for leadg + foreclosure (schemas are postgresql; .env pointed at a sqlite file): provisioned leadg/foreclosure roles+DBs (passwords /root/.leadg-pgpass, /root/.foreclosure-pgpass 600), prisma db push (full schemas verified), PM2 restarted, logins 200. Deploy scripts now read the pgpass URL so deploys cannot revert it.
+- Public nginx mounts added (full-prefix forward, basePath pattern): /aicrm/ (aicrm 01e9b56, PM2 :3218, sqlite pushed at /var/www/aicrm/prisma/dev.db), /leadcaller/ (leadcaller b84fb2b, PM2 :3219, sqlite at /var/www/leadcaller/prisma/dev.db), /prototype/ (prototype 1e760fd, client PM2 :3221 + Express API :3012 via client rewrite; /prototype/api/health 200 publicly). All login pages verified 200.
+- Owner decisions relayed to Bobbi (muse.ai): pilot = pilot fee (not salary), Rob Lykins excluded from the proposal.
+
 ## v0.64.1 (2026-11-12)
 
 ### Prod fix: /leadg/ and /foreclosure/ mounts (basePath)

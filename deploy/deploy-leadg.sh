@@ -37,7 +37,7 @@ mkdir -p prisma
 
 # Write .env (re-append preserved DeepSeek config)
 cat > .env << ENVEOF
-DATABASE_URL="file:./prisma/dev.db"
+DATABASE_URL="postgresql://leadg:$(cat /root/.leadg-pgpass 2>/dev/null)@127.0.0.1:5432/leadg"
 NEXTAUTH_SECRET="excel-legacy-leadg-secret-2026"
 NEXTAUTH_URL="https://excellegacyrealtygroup.site/leadg"
 PORT=3211
