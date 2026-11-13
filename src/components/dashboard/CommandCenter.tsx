@@ -255,6 +255,15 @@ const SECTIONS: Section[] = [
     tagline: 'Generate, brand, schedule, and publish listing & brand content across 10 channels',
     features: [
       {
+        label: 'Marketing Studio',
+        description: 'Tool launcher for AI content, social scheduling, branding, and campaign creative.',
+        href: '/dashboard/marketing-studio',
+        icon: '🎨',
+        tooltip:
+          'Standalone studio page (/dashboard/marketing-studio) linking the AI Content Studio, Social Studio, and brand tools with live ContentPlanner metrics.',
+        priority: 0,
+      },
+      {
         label: 'Unified Marketing & Funnels Hub',
         description: 'All-in-one tabbed hub combining 10-channel Studio, SMS Text Codes, and Public Funnels.',
         href: '/dashboard/marketing',

@@ -1,3 +1,10 @@
+## v0.64.7 (2026-11-13)
+
+### Dashboard coverage + rate-limit hardening
+- CommandCenter: restored Marketing Studio card (other lanes consolidation had dropped /dashboard/marketing-studio - coverage back to 36/36 pages, 65/65 cards with tooltips).
+- contentplanner (4c724d9): express trust proxy=1 behind nginx (ERR_ERL_UNEXPECTED_X_FORWARDED_FOR hardening; deployed to Hetzner contentplanner-api, verified 401 auth + 200 health through the proxy).
+- Prod log audit triage: stale Server Action warnings (post-deploy browsers), legacyleads-api Oct crash log (process healthy), media-workflow Redis socket (1 restart/21d, graceful) - no live errors remain.
+
 ## v0.64.6 (2026-11-13)
 
 ### MCP real data + prod DB seeding fixes
