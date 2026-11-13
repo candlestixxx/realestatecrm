@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
     { url: baseUrl + '/portal', lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: baseUrl + '/universal', lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: baseUrl + '/trust-services', lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: baseUrl + '/trust-course', lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: baseUrl + '/auth/signin', lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },

@@ -1,19 +1,8 @@
-## v0.63.7 — Full Executive Protocol Sync, Single-Page UI Consolidation & 12-Service Local Runtime (2026-11-12, Gemini 4 Carbon in Antigravity)
-- **Git & Submodule Reconciliation (`RealEstateCRMLLC/*`):**
-  - Synced cached submodule URLs (`git submodule sync --recursive`) and fetched `--all --tags` across root + all 8 submodules. Verified `robertpelloni/realestatecrm`, `candlestixxx/realestatecrm`, and `RealEstateCRMLLC/RealEstateCRM` share identical commit history.
-  - Audited all 23 remote feature branches across all 9 repos (`0` unique commits ahead of `main`). Reverse-merged `main` into all 17 submodule feature branches and all 6 root feature branches (`dashboard-newest`, `gate1/foreclosure-parser-tests`, `2x jules-*`, `2x rag-consolidation-*`), repointed tracking upstreams to `origin/*`, and pushed to `RealEstateCRMLLC/*`.
-  - Cleaned residual conflict markers and pushed submodule updates: `apps/aicrm` -> `0054988` (`v0.13.1`, `dev.db` tracked, port `3007`), `apps/leadcaller` -> `12f988b` (`v0.6.1`, `prisma/dev.db` tracked, port `3008`), `apps/media-workflow` -> `3e5603c` (`v2.16.1`). Left `apps/leadg/.env.production.local` untouched/untracked per secret hygiene.
-- **Dashboard Consolidation & Bug Fixes:**
-  - `CommandCenter.tsx` now defaults to **All-in-One Page** mode (every section and tool visible on one page ordered by business value, toggleable to **Focused Section** mode) with instant search, a live 6-KPI Executive Strip (`/api/reporting` now returns `tasks`, `campaigns`, `workflows`), **TSF Master Bundle (`/trust-services`)**, **Live Client Portal (`/portal`)**, and localhost-aware Sub-Project links (`http://localhost:3001..3009`).
-  - `SettingsTabs.tsx` + `/dashboard/settings/page.tsx` now render **all 10 settings domains inline** (`?tab=` synced, duplicate `<h1>` removed).
-  - `/dashboard/marketing/page.tsx` now unifies `MarketingStudioPage`, `<TextCodes />`, and Public Funnels (`/trust-services`, `/trust-course`, `/portal`) in one tabbed hub.
-  - `/api/system/health` + `ServiceHealthGrid.tsx` probe all 12 TCP ports server-side (fixing false-positive 404 `'up'` checks on localhost).
-  - Caught & fixed 4 latent runtime bugs: `MyPlusImportModal.tsx` missing `importCsvAction` import, `/api/posts` `BlogPost.isPublished` mismatch, `myPlusLeadsIntegration.findFirst` unique-input bug in `integrations.ts` & `/api/sync-history`, and `SidebarNav.tsx` duplicate React key; excluded `apps/` in root `tsconfig.json`; normalized `TODO.md`, `CHANGELOG.md`, `HANDOFF.md`, `docs/LIBRARIES.md`, and `scripts/README.md` to clean UTF-8.
-- **Scripts, Tray, & Runtime Notes:**
-  - Nondestructively archived 8 `scripts/muse-cdp-*.js` variants + root scratch scripts under `scripts/archive/` and `archive/backups/`.
-  - Upgraded `build-all.ps1` (10 targets), `start-all.ps1` / `start-all.bat` (12 services at `BelowNormal`), `scripts/watch-services.ps1` (12 services), `push-all.ps1` (`-AllBranches`), `scripts/muse-cdp.js` (`--list`, `--read`, `--inspect`, `--nav`, `--tab`), and `scripts/system-tray.ps1` (strict ASCII, single-pass `netstat -ano`, `DestroyIcon` GDI fix, surgical PID-by-port `Quit All Servers and Exit`).
-  - **Still waiting on owner inputs for external live cutovers:** Hetzner deploy go-ahead + nginx mounts for `/aicrm/` (`:3216`), `/leadcaller/` (`:3217`), `/prototype/` (`:3218`); Stripe keys for TSF ($997/$1,497) & Trust Course ($497); pilot agent RESO MLS token + Member ID; dedicated Twilio SMS number + SendGrid/Resend production sender.
+## v0.64.0 � Universal CRM foundation (2026-11-10)
 
+Sector-pack architecture live: src/lib/universal/sectors.ts (8 packs, validated), platform.ts (16 languages, add-ons by United Beats LLC Bob & Lum), /universal page, design in docs/UNIVERSAL_CRM.md, tests/universal.test.mts 4/4. Next: tenant provisioning (workspace -> pack -> brand -> language), Stripe add-on billing, first non-real-estate pilot.
+
+---
 ## v0.63.6 DEPLOYED to Hetzner (2026-11-12, Muse Code lane)
 Robert direct order: no local servers, deploy live only. Stopped all session-started local services surgically (verified PIDs/start times; pre-existing legacyleads 3005 left). Built below-normal, packaged deploy/package-v3.py (113.3 MB, 3987 files), scp to hetzner:/tmp/deploy-v3.tar.gz - first upload MD5 mismatched (caught, re-uploaded, verified a50548b7e8e01c6895c7487bd4e256f8). Backup-and-swap single-quoted per DEPLOY.md; PM2 excellegacyrealtygroup restarted --update-env, now v0.63.6 on :3210 (was 0.63.0; other lane v0.63.2 tarball never swapped, superseded). Verified: site 200, /api/auth/session 200, /api/listings 200 incl. EXL-1001 (prod DB preserved), /trust-services 200, PM2 logs Ready clean. Bobbi notified via CDP; Codex lane stood down.
 
@@ -26,68 +15,68 @@ Root rebuilt below-normal (next build OK; /dashboard/settings/team Dynamic-serve
 ## v0.63.1 - Org transfer to RealEstateCRMLLC + Executive Protocol sync (2026-11-12, Muse Code lane)
 Caught up from repo docs only: no prior Muse session exists for this cwd (only current 01a1d1b1) and Pi never ran with cwd=realestatecrm (no --C--Users-hyper-workspace-realestatecrm-- pi dir); HANDOFF v0.63.0 was source of truth. New GitHub org verified live: RealEstateCRMLLC/RealEstateCRM (HEAD 3cc22f4) + forclosureworkflow, leadG, socialmediacontentplanner, re-agent-workflow-media-1, LegacyLeads, aicrm, realestateleadcaller, realestateprototype - all ls-remote OK. Repointed every origin to RealEstateCRMLLC/* (old kept as legacy; origin/main == legacy/main everywhere). Fetch --all --tags; all 9 mains fast-forwarded to origin/main (root v0.63.0 TSF Master Bundle + Command Center value-ordered hubs included). Branch audit: zero unique commits on every feature branch except root gate1/foreclosure-parser-tests (+5). Forward-merged gate1 LOCALLY as c1e865b (47/47 foreclosure unittest pass after pip tzdata); HELD FROM PUSH: Bobbi (muse.ai, Edge CDP 9222 tab 25C83F10) replied in-thread that gate1 merge/pushes to main need Robert's word in main chat (she authorized branch push only; ci.yml still blocked by App Workflows permission, 5/6 files on GitHub at 4d6fca8). This lane holds c1e865b + v0.63.1 commit local-only until Robert confirms here or in main chat. Reverse sync done locally: all local feature branches force-updated to main tip (no push). Registered apps/aicrm (c719013), apps/leadcaller (d42a4a2), apps/prototype (6990db1) as submodules 6-8 (.gitmodules + absorbgitdirs); CommandCenter Sub-Projects now lists 8 services (3 new cards badge NEW, nginx mounts pending). muse-cdp.js timeouts lengthened (30s/30s/60s/120s). Dashboard audit: 36/36 dashboard dirs already covered by CommandCenter hubs (Money Now first). Tray exists: scripts/system-tray.ps1 with per-service Start/Stop/Restart, Start All/Stop All, Quit All Servers and Exit (surgical PID-by-port). Dirty left alone: leadg .env.production.local (sensitive, stashed+popped, never commit), prototype database.sqlite runtime churn. Waiting on owner: push authorization (above), pilot MLS Member ID / broker RESO feed, Twilio number, Resend, OPENAI_API_KEY.
 
-## v0.63.0 — TSF Master Bundle + Executive Protocol sync (2026-11-10)
+## v0.63.0 � TSF Master Bundle + Executive Protocol sync (2026-11-10)
 
-**Shipped:** Trust, Security & Future (TSF) Master Bundle at /trust-services — 8-module/24-lesson course any Excel Legacy realtor can teach (instructor guide + student workbook), 3 newly revised branded trust docs (logo, PDF+DOCX, public/trust-docs/), lead-magnet gate requiring name/email/validated phone/property address into the CRM, pricing $1,497 standalone / $997 client add-on / concierge +$500. Circular EL logo cropped from team flyer to public/brand/. Homepage services lead with Trust Services. Deployed to Hetzner (BUILD_ID IAA03uLbQG0duZqK8SM0otsf, PM2 excellegacyrealtygroup).
+**Shipped:** Trust, Security & Future (TSF) Master Bundle at /trust-services � 8-module/24-lesson course any Excel Legacy realtor can teach (instructor guide + student workbook), 3 newly revised branded trust docs (logo, PDF+DOCX, public/trust-docs/), lead-magnet gate requiring name/email/validated phone/property address into the CRM, pricing $1,497 standalone / $997 client add-on / concierge +$500. Circular EL logo cropped from team flyer to public/brand/. Homepage services lead with Trust Services. Deployed to Hetzner (BUILD_ID IAA03uLbQG0duZqK8SM0otsf, PM2 excellegacyrealtygroup).
 
-**Protocol audit:** git fetch --all --tags on root + all 5 submodules (no nested submodules). Root has no upstream fork parent (origin=candlestixxx only); local main == origin/main (b7cdec5) plus this release. Every root branch (dashboard-newest, 2x jules, master, 2x rag-consolidation) and every submodule remote feature branch: **0 unique commits vs main** — forward merge set is empty, reverse merge already satisfied by ancestry. Nothing dropped, no conflicts. Submodules initialized, clean, at origin/main gitlinks (contentplanner 10b09e5, foreclosure 357b3eb, leadg c6f2825, legacyleads a8c4e3f, media-workflow 8746bec).
+**Protocol audit:** git fetch --all --tags on root + all 5 submodules (no nested submodules). Root has no upstream fork parent (origin=candlestixxx only); local main == origin/main (b7cdec5) plus this release. Every root branch (dashboard-newest, 2x jules, master, 2x rag-consolidation) and every submodule remote feature branch: **0 unique commits vs main** � forward merge set is empty, reverse merge already satisfied by ancestry. Nothing dropped, no conflicts. Submodules initialized, clean, at origin/main gitlinks (contentplanner 10b09e5, foreclosure 357b3eb, leadg c6f2825, legacyleads a8c4e3f, media-workflow 8746bec).
 
 **Not committed (owner files, unexplained by this release):** .hypercode/, data/, metamcp.db, prisma/*.bak|tmp|snapshot, scripts/LOFTY/, audit-*.jsonl. Memory/session/docs were NOT gitignored.
 
 **Next:** Stripe checkout for TSF, server-side download gate, social launch kit. Attorney-review disclaimer remains on every trust surface (realtors do not practice law).
 
 ---
-## v0.62.4 â€” Executive Protocol repository sync (2026-11-07)
-Fetch-all (root + 5 submodules, tags). Root is not a GitHub fork (no upstream parent). Branch audit proved every submodule feature branch has **zero unique commits vs main in both directions** (identical to main) â€” v0.62.3 reconciliation holds, so no forward/reverse merges or cherry-picks were needed and nothing was at risk of loss. .gitignore retention verified (DBs intentionally tracked). Scripts validated in place. SUBMODULE_MAP.md regenerated (v0.62.4). Waiting on owner: pilot MLS Member ID / broker RESO feed, Twilio number, Resend, OPENAI_API_KEY.
+## v0.62.4 — Executive Protocol repository sync (2026-11-07)
+Fetch-all (root + 5 submodules, tags). Root is not a GitHub fork (no upstream parent). Branch audit proved every submodule feature branch has **zero unique commits vs main in both directions** (identical to main) — v0.62.3 reconciliation holds, so no forward/reverse merges or cherry-picks were needed and nothing was at risk of loss. .gitignore retention verified (DBs intentionally tracked). Scripts validated in place. SUBMODULE_MAP.md regenerated (v0.62.4). Waiting on owner: pilot MLS Member ID / broker RESO feed, Twilio number, Resend, OPENAI_API_KEY.
 
-## v0.62.3 â€” Executive Protocol repository sync (2026-11-06)
+## v0.62.3 — Executive Protocol repository sync (2026-11-06)
 Fetch-all (root + 5 submodules recursive, tags). Root is not a GitHub fork (no upstream parent). Branch audit proved every submodule feature branch had **zero unique commits vs main**, so no forward merges/cherry-picks were needed and nothing was at risk of loss. Reverse merge done by fast-forward: all 10 branches pushed to main (contentplanner 2, foreclosureworkflow 3, leadg 1, legacyleads 1, media-workflow 3). Scripts validated in place. SUBMODULE_MAP.md regenerated. v0.62.1/v0.62.2 (encryption guard, prod-DB schema sync, unified credential secret) live on Hetzner. Waiting on owner: pilot MLS Member ID / broker RESO feed, Twilio number, Resend, OPENAI_API_KEY.
 
 **Deployed 2026-11-05 (v0.62.0, merge 4c0d732):** merged with concurrent lane v0.61.11/v0.61.12 (their calculator MlsCredential kept alongside MlsConnection; unify later). Hetzner backup-and-swap done (backup /tmp/ercm-backup-1793925168), prod DB restored (not overwritten) and upgraded additively (MlsConnection + MlsCredential tables, Listing commission columns). Prod DB had lost the 6 seeded homes in the v0.61.11/12 packaged-DB deploys, so they were re-seeded on the server (now 8 listings live). PM2 excellegacyrealtygroup reports 0.62.0, site 200, /api/listings 200 with commissionBps.
 
-## v0.62.0 â€” Per-agent MLS (RESO) + commission override (2026-11-05)
+## v0.62.0 — Per-agent MLS (RESO) + commission override (2026-11-05)
 
-Owner decisions (via Muse lane): commission option **b** (3% default + per-listing override), Hank pause **lifted** (owner to confirm in Muse main chat per Bobbi's rule). Built: `MlsConnection` per-agent MLS connections (RESO token / OAuth / Member-ID-only, encrypted secrets, no MLS passwords), RESO sync into dashboard `Listing` with broker-feed auto-assign by Member ID, `/api/mls/connections` + `/api/mls/sync`, Connect MLS form in Settings â†’ Integrations, per-listing commission/buyer-concession editing on `/dashboard/listings`. BSA stays a workspace-level key; Realist is SSO-only (deep-link, no token API). Step 1 verification: base build green (Gemini CI claim not reproduced), suite 22/27 with server up. Next: pilot agent (Member ID + RESO token), set broker feed env on Hetzner, deploy.
+Owner decisions (via Muse lane): commission option **b** (3% default + per-listing override), Hank pause **lifted** (owner to confirm in Muse main chat per Bobbi's rule). Built: `MlsConnection` per-agent MLS connections (RESO token / OAuth / Member-ID-only, encrypted secrets, no MLS passwords), RESO sync into dashboard `Listing` with broker-feed auto-assign by Member ID, `/api/mls/connections` + `/api/mls/sync`, Connect MLS form in Settings → Integrations, per-listing commission/buyer-concession editing on `/dashboard/listings`. BSA stays a workspace-level key; Realist is SSO-only (deep-link, no token API). Step 1 verification: base build green (Gemini CI claim not reproduced), suite 22/27 with server up. Next: pilot agent (Member ID + RESO token), set broker feed env on Hetzner, deploy.
 
-## v0.61.0 â€” Auth bypass fix, team/branding, fake-UI purge, CDP lane (2026-10-26 â†’ 2026-10-31)
+## v0.61.0 — Auth bypass fix, team/branding, fake-UI purge, CDP lane (2026-10-26 → 2026-10-31)
 
-**v0.59.0 â€” CRITICAL auth bypass fixed**: `CredentialsProvider.authorize()` verified email only, no password check â€” anyone with an agent's email could sign in as them. Now scrypt `passwordHash` enforced. Plus team management (`/api/team`, RBAC, invites, last-OWNER guard) and real e-sign contracts (fabricated "blockchain" API deleted).
-**v0.60.0 â€” White-label branding**: per-workspace logo/colors/portal slug/email footer; Settings â†’ Branding with live preview; client portal + e-sign pages render brokerage identity.
-**v0.61.0 â€” Fake-UI sweep**: 5 fabricated patterns killed (AddDealModal fake success toast, Campaigns folders/templates, IntegrationCenter fake toggles, AgentProfileModal browser-storage-as-server). Deal stage whitelist (`lib/deal-stages.ts`) + money-path tests 6/6.
-**CDP send lane (2026-10-31)**: `scripts/muse-cdp.js` hardened â€” stale hardcoded TAB_ID removed (URL-match pick), 8s list / 10s ws-open / 15s per-send / 30s overall timeouts (was: hang forever). Verified live against Edge 156: chat tab + visible composer found, lane-check delivered (`TYPE: TYPED`, Enter dispatched). Committed as d3e4faa via protocol loop.
+**v0.59.0 — CRITICAL auth bypass fixed**: `CredentialsProvider.authorize()` verified email only, no password check — anyone with an agent's email could sign in as them. Now scrypt `passwordHash` enforced. Plus team management (`/api/team`, RBAC, invites, last-OWNER guard) and real e-sign contracts (fabricated "blockchain" API deleted).
+**v0.60.0 — White-label branding**: per-workspace logo/colors/portal slug/email footer; Settings → Branding with live preview; client portal + e-sign pages render brokerage identity.
+**v0.61.0 — Fake-UI sweep**: 5 fabricated patterns killed (AddDealModal fake success toast, Campaigns folders/templates, IntegrationCenter fake toggles, AgentProfileModal browser-storage-as-server). Deal stage whitelist (`lib/deal-stages.ts`) + money-path tests 6/6.
+**CDP send lane (2026-10-31)**: `scripts/muse-cdp.js` hardened — stale hardcoded TAB_ID removed (URL-match pick), 8s list / 10s ws-open / 15s per-send / 30s overall timeouts (was: hang forever). Verified live against Edge 156: chat tab + visible composer found, lane-check delivered (`TYPE: TYPED`, Enter dispatched). Committed as d3e4faa via protocol loop.
 
-**Still key-blocked (unchanged)**: Twilio number purchase, SendGrid/Lob keys, Whitepages/PDL/BS&A/Tavily/NewsAPI/Canva/HeyGen/Browserless, SQLiteâ†’Turso/Postgres, Pinecone/OpenAI hosted.
+**Still key-blocked (unchanged)**: Twilio number purchase, SendGrid/Lob keys, Whitepages/PDL/BS&A/Tavily/NewsAPI/Canva/HeyGen/Browserless, SQLite→Turso/Postgres, Pinecone/OpenAI hosted.
 
-**2026-11-02 (v0.61.4 `52d3338`)**: legacyleads backend LIVE on Hetzner :3217 (PM2 `legacyleads-api`, nginx `/legacyleads-api/`); `02_listings` migration applied; table empty until MLS ingestion exists. Frontend rebuilt with prod API URL and redeployed. Prod tasks page verified serving (307 â†’ signin as expected).
+**2026-11-02 (v0.61.4 `52d3338`)**: legacyleads backend LIVE on Hetzner :3217 (PM2 `legacyleads-api`, nginx `/legacyleads-api/`); `02_listings` migration applied; table empty until MLS ingestion exists. Frontend rebuilt with prod API URL and redeployed. Prod tasks page verified serving (307 → signin as expected).
 
-**Autonomous session 2026-10-31 (v0.61.1 `9fad36f` + v0.61.2 `dbf5a76`, both pushed; legacyleads `1a450af` pushed)**: repo was clean at d3e4faa==origin/main, no feature branches, all submodules in sync â€” no merges needed. UI: Marketing/Settings/AI-Memory/Branding/Team hub cards added, canonical repoints, Geminiâ†’DeepSeek tooltip corrections. Tasks page: real Complete/Reopen toggle, dead Edit removed, duplicate type attr fixed. Scripts: check-status 9/9 (+3031, 10s timeout), e2e-smoke +ContentPlanner API, LeadG standalone drift fixed in watch-services, PORT=3004 fixed in start-all.ps1 + tray (media was EADDRINUSE-crashing; now HTTP 200). Services: 9/9 up. Tests: root 18/18, legacyleads backend 13/13 (new DB-down regression test), load-test 350/350 ALL PASS, e2e 21/22 (sole fail: /listings 500 â€” no local Postgres on 5432, now honestly reported; needs Postgres+PostGIS or prod env). ROADMAP Phase 7 closed. `prisma/dev.db` churn left uncommitted (runtime writes). Live-audio log: Redis ECONNREFUSED (graceful degradation, known). Foreclosure log: Turbopack workspace-root warning (cosmetic, pre-existing).
+**Autonomous session 2026-10-31 (v0.61.1 `9fad36f` + v0.61.2 `dbf5a76`, both pushed; legacyleads `1a450af` pushed)**: repo was clean at d3e4faa==origin/main, no feature branches, all submodules in sync — no merges needed. UI: Marketing/Settings/AI-Memory/Branding/Team hub cards added, canonical repoints, Gemini→DeepSeek tooltip corrections. Tasks page: real Complete/Reopen toggle, dead Edit removed, duplicate type attr fixed. Scripts: check-status 9/9 (+3031, 10s timeout), e2e-smoke +ContentPlanner API, LeadG standalone drift fixed in watch-services, PORT=3004 fixed in start-all.ps1 + tray (media was EADDRINUSE-crashing; now HTTP 200). Services: 9/9 up. Tests: root 18/18, legacyleads backend 13/13 (new DB-down regression test), load-test 350/350 ALL PASS, e2e 21/22 (sole fail: /listings 500 — no local Postgres on 5432, now honestly reported; needs Postgres+PostGIS or prod env). ROADMAP Phase 7 closed. `prisma/dev.db` churn left uncommitted (runtime writes). Live-audio log: Redis ECONNREFUSED (graceful degradation, known). Foreclosure log: Turbopack workspace-root warning (cosmetic, pre-existing).
 
 ---
 
-## v0.58.59 â€” Vapi + Twilio live (2026-10-22)
+## v0.58.59 — Vapi + Twilio live (2026-10-22)
 
 **Task:** Wire user-provided voice/telephony keys; continue.
 
 ### Live integrations
 - **Vapi**: private key `4d5f2a03-...` + public `0abbaebf-...`; assistant "Riley" `915f9d01-8385-44c1-883d-a43755ef11c5`; phone `+1 (586) 737-3387` id `7f1c7bc5-8471-4862-8fe7-580f4d490d90`. Assistant bound to the number (inbound works). LeadG adapters: env fallback added (`VAPI_API_KEY`/`VAPI_ASSISTANT_ID`/`VAPI_PHONE_NUMBER_ID`).
-- **Twilio**: SID `AC63ab4a...` + auth token â€” account ACTIVE. **Twilio Lookup (skip-trace provider A) verified live** (HTTP 200, number normalized) in the main CRM + LegacyLeads. LeadG SMS env fallback (`TWILIO_SID`/`TWILIO_TOKEN`/`TWILIO_FROM_NUMBER`).
+- **Twilio**: SID `AC63ab4a...` + auth token — account ACTIVE. **Twilio Lookup (skip-trace provider A) verified live** (HTTP 200, number normalized) in the main CRM + LegacyLeads. LeadG SMS env fallback (`TWILIO_SID`/`TWILIO_TOKEN`/`TWILIO_FROM_NUMBER`).
 - SendGrid + Lob env fallback added to LeadG (same pattern).
-- **Deploy scripts now preserve ALL integration env vars** â€” the four deploy-*.sh scripts only carried DEEPSEEK before; voice/messaging keys would have been wiped on redeploy.
+- **Deploy scripts now preserve ALL integration env vars** — the four deploy-*.sh scripts only carried DEEPSEEK before; voice/messaging keys would have been wiped on redeploy.
 
 ### Pending from user
-- **Twilio phone number purchase** â€” account has 0 numbers; SMS/WhatsApp dispatch + fallback messaging need one. (Vapi's +1 586 number is Vapi-managed and can't be the Twilio "from".)
+- **Twilio phone number purchase** — account has 0 numbers; SMS/WhatsApp dispatch + fallback messaging need one. (Vapi's +1 586 number is Vapi-managed and can't be the Twilio "from".)
 - SendGrid key + from-email, Lob key, Whitepages/PDL, BS&A, Tavily, NewsAPI, Canva/Magnific, HeyGen/D-ID, Browserless.
 
 ---
 
-## v0.58.58 â€” Cross-service workspace mapping (2026-10-22)
+## v0.58.58 — Cross-service workspace mapping (2026-10-22)
 
-**Task:** Continue â€” close the workspace scoping gap found in the click-through.
+**Task:** Continue — close the workspace scoping gap found in the click-through.
 
 ### Design & implementation
-- **Shared workspace ids** (no mapping table): the CRM proxy resolves the caller's active workspace via `resolveWorkspaceAccess(session)` and upserts it into ContentPlanner's Workspace table with the SAME id (`POST /workspace/sync` â€” idempotent).
+- **Shared workspace ids** (no mapping table): the CRM proxy resolves the caller's active workspace via `resolveWorkspaceAccess(session)` and upserts it into ContentPlanner's Workspace table with the SAME id (`POST /workspace/sync` — idempotent).
 - **Service JWT workspace claim**: the proxy signs `workspaceId` into the HS256 service token (5-min exp). ContentPlanner's `requireAuth` reads the claim into `req.workspaceId`; notifications + social/accounts reads default their scope to it (explicit query param wins).
-- Panels now see only the caller's active workspace data â€” the cross-service gap is closed without duplicating workspace state.
+- Panels now see only the caller's active workspace data — the cross-service gap is closed without duplicating workspace state.
 
 ### Verified on Hetzner
 - `POST /workspace/sync` persists (`{id: crm-ws-demo-1, name: demo-workspace, businessType: real_estate}`)
@@ -96,15 +85,15 @@ Owner decisions (via Muse lane): commission option **b** (3% default + per-listi
 
 ---
 
-## v0.58.57 â€” UI panel click-through + cross-service auth (2026-10-22)
+## v0.58.57 — UI panel click-through + cross-service auth (2026-10-22)
 
 **Task:** UI click-through of newly-wired panels; add/commit/push all.
 
 ### Click-through findings & fixes
-1. **All 7 panel endpoints 401'd in the browser** â€” the ContentPlanner API requires a Bearer JWT the browser can't hold. Added `/api/contentplanner/[...path]` proxy in the main CRM: session-auth (NextAuth) â†’ signs a short-lived service JWT (`CONTENTPLANNER_SERVICE_SECRET`, 5-min exp) â†’ forwards to the internal API (`CONTENT_SERVICE_URL=http://127.0.0.1:3216`). `contentPlannerApiUrl()` now points at the proxy.
-2. **OAuth endpoints were behind the API auth** â€” provider redirects carry no token. Split `social.ts` into `socialOAuthRouter` (auth-url + callback, public, PKCE-secured) + protected accounts router.
-3. **Deploy scripts kept wiping runtime config** â€” `deploy-contentplanner.sh` reverted DATABASE_URL to SQLite; `deploy-contentplanner-api.sh` dropped AUTH_JWT_SECRET. Both now preserve DATABASE_URL/DEEPSEEK/AUTH_JWT_SECRET.
-4. Notifications + social accounts GETs tolerate missing workspaceId (cross-service workspace mapping between CRM â†” ContentPlanner workspace models is a real gap â€” noted in TODO.md).
+1. **All 7 panel endpoints 401'd in the browser** — the ContentPlanner API requires a Bearer JWT the browser can't hold. Added `/api/contentplanner/[...path]` proxy in the main CRM: session-auth (NextAuth) → signs a short-lived service JWT (`CONTENTPLANNER_SERVICE_SECRET`, 5-min exp) → forwards to the internal API (`CONTENT_SERVICE_URL=http://127.0.0.1:3216`). `contentPlannerApiUrl()` now points at the proxy.
+2. **OAuth endpoints were behind the API auth** — provider redirects carry no token. Split `social.ts` into `socialOAuthRouter` (auth-url + callback, public, PKCE-secured) + protected accounts router.
+3. **Deploy scripts kept wiping runtime config** — `deploy-contentplanner.sh` reverted DATABASE_URL to SQLite; `deploy-contentplanner-api.sh` dropped AUTH_JWT_SECRET. Both now preserve DATABASE_URL/DEEPSEEK/AUTH_JWT_SECRET.
+4. Notifications + social accounts GETs tolerate missing workspaceId (cross-service workspace mapping between CRM ↔ ContentPlanner workspace models is a real gap — noted in TODO.md).
 
 ### Verified on Hetzner
 - 7/7 panel endpoints 200 with service JWTs (real empty data, no mocks)
@@ -114,12 +103,12 @@ Owner decisions (via Muse lane): commission option **b** (3% default + per-listi
 - Tests: 116 passing (35+60+9+12)
 
 ### Secrets on server
-- `/root/.contentplanner-svc-secret` â€” service JWT secret (main CRM signs, API verifies)
-- `/root/.contentplanner-pgpass` â€” Postgres password for contentplanner DB
+- `/root/.contentplanner-svc-secret` — service JWT secret (main CRM signs, API verifies)
+- `/root/.contentplanner-pgpass` — Postgres password for contentplanner DB
 
 ---
 
-## v0.58.56 â€” Full deployment + Prisma engine + API discovery (2026-10-22)
+## v0.58.56 — Full deployment + Prisma engine + API discovery (2026-10-22)
 
 **Task:** Deploy all to Hetzner, commit/push all.
 
@@ -137,50 +126,50 @@ All 7 services green on https://excellegacyrealtygroup.site (PM2):
 
 ### Real bugs found during deployment
 1. **PrismaClientInitializationError on Hetzner** (contentplanner/leadg): Windows builds only packaged `query_engine-windows.dll`. Fix: `binaryTargets = [native, windows, debian-openssl-3.0.x]` in all 3 non-main schemas (main already had it). Verified: error log clean after redeploy.
-2. **ContentPlanner Express API was never deployed** â€” the dashboard's marketing-studio/social pages fetched `http://localhost:3031` (hardcoded â€” fails in every browser) from an API that didn't exist in production. Fixed BOTH sides: new PM2 service + nginx `/contentplanner-api/` proxy (WS support), and `contentPlannerApiUrl()` helper replacing 9 hardcoded URLs.
-3. **contentplanner schema/URL mismatch** â€” schema is postgresql but .env had `file:./prisma/dev.db`. Provisioned a real Postgres DB on Hetzner (`contentplanner` user + database; password in `/root/.contentplanner-pgpass`) and wired web + API to it. Tables created via `prisma db push`.
-4. **Undeclared deps** â€” `dotenv`/`tsx` worked locally only via hoisting; fresh server installs failed. `@next/swc-win32-x64-msvc` in dependencies caused EBADPLATFORM on Linux (moved to optionalDependencies).
+2. **ContentPlanner Express API was never deployed** — the dashboard's marketing-studio/social pages fetched `http://localhost:3031` (hardcoded — fails in every browser) from an API that didn't exist in production. Fixed BOTH sides: new PM2 service + nginx `/contentplanner-api/` proxy (WS support), and `contentPlannerApiUrl()` helper replacing 9 hardcoded URLs.
+3. **contentplanner schema/URL mismatch** — schema is postgresql but .env had `file:./prisma/dev.db`. Provisioned a real Postgres DB on Hetzner (`contentplanner` user + database; password in `/root/.contentplanner-pgpass`) and wired web + API to it. Tables created via `prisma db push`.
+4. **Undeclared deps** — `dotenv`/`tsx` worked locally only via hoisting; fresh server installs failed. `@next/swc-win32-x64-msvc` in dependencies caused EBADPLATFORM on Linux (moved to optionalDependencies).
 
 ### New deploy artifacts
-- `deploy/package-contentplanner-api.py` â€” packages ALL workspace packages (api imports @contentcommand/billing etc.)
-- `deploy/deploy-contentplanner-api.sh` â€” source-based deploy (npm install on server fetches Linux engines; prisma generate + db push; preserves DeepSeek env)
+- `deploy/package-contentplanner-api.py` — packages ALL workspace packages (api imports @contentcommand/billing etc.)
+- `deploy/deploy-contentplanner-api.sh` — source-based deploy (npm install on server fetches Linux engines; prisma generate + db push; preserves DeepSeek env)
 
 ### Ops knowledge
 - Postgres on Hetzner: accessible via `su postgres -c "psql ..."` (switching from root is sufficient; no elevated rights needed). contentplanner password in `/root/.contentplanner-pgpass`.
-- pm2 logs accumulate across restarts â€” `pm2 flush <svc>` before verifying fixes.
+- pm2 logs accumulate across restarts — `pm2 flush <svc>` before verifying fixes.
 
 ---
 
-## v0.58.55 â€” Mock/Placeholder Data Purge (2026-10-21)
+## v0.58.55 — Mock/Placeholder Data Purge (2026-10-21)
 
 **Task:** Remove all placeholder/mock data across main CRM + 5 submodules; wire everything for production live data.
 
 ### What was found and fixed (13 clusters)
 
 **Fabricated data returned as real:**
-1. main `property-data` â€” invented full parcel records (assessed values, owner "Smith, John & Jane") when keys missing â†’ now 503 with explicit config error
-2. main `skip-trace` â€” 2 fake providers â†’ real Twilio Lookup + Whitepages Pro
-3. main `avatar` â€” fake `wss://mock-avatar-stream.example.com` â†’ 503
-4. main `mls-scrub` â€” invented MLS numbers/prices into activity log â†’ real listings only, dry-run mode
-5. legacyleads `/listings` + `/augmentpropertyrecord` â€” MOCK-123/John Doe/555-0100 â†’ real PostGIS + live skip-trace (Twilio/Whitepages/PDL)
-6. legacyleads skiptrace â€” 3 mock providers â†’ live providers with credit tiers preserved
-7. media-workflow â€” fake `mock_canva_export_*.jpg`/`mock_magnific_buffer_*` paths treated as real assets downstream â†’ throw when unconfigured
-8. media-workflow SocialPublishing â€” posts marked **Published** with `mock_facebook_url_*` (fake engagement) â†’ marks Failed without tokens
-9. contentplanner notifications/videos/podcasts â€” in-memory stores with fabricated "campaign ends in 2 days" data â†’ real Prisma tables
-10. contentplanner research â€” MockSearchProvider etc. returned fake articles â†’ real Tavily/NewsAPI/RSS/URL providers (mocks kept as TEST-ONLY)
-11. contentplanner social â€” `MOCK_TW_CLIENT_ID` + fake connected accounts â†’ real OAuth codeâ†’token exchange + SocialAccount persistence
-12. leadg adapters â€” ALL providers (Vapi/SendGrid/Twilio/Lob/GCal) silently fell back to Mock*Provider returning `true` (fake success) â†’ explicit failures
-13. main `crm-records`/`crm-view-model` â€” workflow forms pre-filled "Jordan Smith"/"412 Lakeview Dr"/$385,000 â†’ empty fields; demo seed opt-in `DEMO_SEED=true`
+1. main `property-data` — invented full parcel records (assessed values, owner "Smith, John & Jane") when keys missing → now 503 with explicit config error
+2. main `skip-trace` — 2 fake providers → real Twilio Lookup + Whitepages Pro
+3. main `avatar` — fake `wss://mock-avatar-stream.example.com` → 503
+4. main `mls-scrub` — invented MLS numbers/prices into activity log → real listings only, dry-run mode
+5. legacyleads `/listings` + `/augmentpropertyrecord` — MOCK-123/John Doe/555-0100 → real PostGIS + live skip-trace (Twilio/Whitepages/PDL)
+6. legacyleads skiptrace — 3 mock providers → live providers with credit tiers preserved
+7. media-workflow — fake `mock_canva_export_*.jpg`/`mock_magnific_buffer_*` paths treated as real assets downstream → throw when unconfigured
+8. media-workflow SocialPublishing — posts marked **Published** with `mock_facebook_url_*` (fake engagement) → marks Failed without tokens
+9. contentplanner notifications/videos/podcasts — in-memory stores with fabricated "campaign ends in 2 days" data → real Prisma tables
+10. contentplanner research — MockSearchProvider etc. returned fake articles → real Tavily/NewsAPI/RSS/URL providers (mocks kept as TEST-ONLY)
+11. contentplanner social — `MOCK_TW_CLIENT_ID` + fake connected accounts → real OAuth code→token exchange + SocialAccount persistence
+12. leadg adapters — ALL providers (Vapi/SendGrid/Twilio/Lob/GCal) silently fell back to Mock*Provider returning `true` (fake success) → explicit failures
+13. main `crm-records`/`crm-view-model` — workflow forms pre-filled "Jordan Smith"/"412 Lakeview Dr"/$385,000 → empty fields; demo seed opt-in `DEMO_SEED=true`
 
 **Security fixes (same purge):**
-- contentplanner `requireAuth` attached `{ id: 'mock_user_id', role: 'OWNER' }` to EVERY request (any caller had owner access) â†’ real HS256 JWT verification via node:crypto (dependency-free)
-- main `agents/handshake` accepted any token when AGENT_SECRET unset â†’ now required
-- contentplanner WebSocket broadcast random fake queue numbers every 5s â†’ real Prisma counts
+- contentplanner `requireAuth` attached `{ id: 'mock_user_id', role: 'OWNER' }` to EVERY request (any caller had owner access) → real HS256 JWT verification via node:crypto (dependency-free)
+- main `agents/handshake` accepted any token when AGENT_SECRET unset → now required
+- contentplanner WebSocket broadcast random fake queue numbers every 5s → real Prisma counts
 
 **LLM-powered replacements:** leadg appointment dates extracted via `extractAppointmentDate()` (was hardcoded "tomorrow"); video scripts get real structured generation (was hardcoded hook/cta wrapper).
 
 ### Verified
-- Tests: **116 passing** (contentplanner 35, media-workflow 60, leadg 9, legacyleads 12) â€” rewritten against live-provider contracts with network mocked at SDK boundary
+- Tests: **116 passing** (contentplanner 35, media-workflow 60, leadg 9, legacyleads 12) — rewritten against live-provider contracts with network mocked at SDK boundary
 - Root build green; media-workflow build green
 
 ### Env keys now required for full function (documented per service)
@@ -188,7 +177,7 @@ All 7 services green on https://excellegacyrealtygroup.site (PM2):
 
 ---
 
-## v0.58.54 â€” Full DeepSeek V4 rollout + prod fixes (2026-10-21)
+## v0.58.54 — Full DeepSeek V4 rollout + prod fixes (2026-10-21)
 
 **Task:** Deploy DeepSeek everywhere, fix login redirect, probe DeepSeek endpoints.
 
@@ -196,52 +185,52 @@ All 7 services green on https://excellegacyrealtygroup.site (PM2):
 - **All 5 sub-services rebuilt + redeployed** on Hetzner with DeepSeek code (LeadG 3211, Foreclosure 3212, ContentPlanner 3213, MediaWorkflow 3214, LegacyLeads 3215). Live test from server: `SUBSERVICE LIVE` via `deepseek-v4-flash`.
 - **Login redirect bug FIXED**: middleware `callbackUrl` was `req.url` = internal `http://0.0.0.0:3210/...` behind nginx. Now relative path. Prod-verified: `callbackUrl=%2Fdashboard`.
 - **Deploy scripts bug FIXED**: `deploy-*.sh` heredocs wiped `DEEPSEEK_API_KEY` on every deploy. Now preserve `DEEPSEEK*` lines; old builds moved to `/tmp/<svc>-backup-<ts>` (nondestructive).
-- **DeepSeek endpoint probe**: `/v1/embeddings` â†’ 404, `/v1/audio/speech` â†’ 404. RAG embeddings (`src/lib/rag.ts`) + voice (`src/lib/voice.ts`) stay on OpenAI â€” confirmed correct.
+- **DeepSeek endpoint probe**: `/v1/embeddings` → 404, `/v1/audio/speech` → 404. RAG embeddings (`src/lib/rag.ts`) + voice (`src/lib/voice.ts`) stay on OpenAI — confirmed correct.
 - PM2 error scan: 0 new errors from fresh traffic. ("Failed to find Server Action" x14 + "InvariantError" x4 are stale-browser-tab artifacts from the redeploy; they don't accumulate.)
 
 ### Production state (2026-10-21)
-All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. All LLM calls â†’ DeepSeek V4 (flash default / pro via DEEPSEEK_MODEL).
+All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. All LLM calls → DeepSeek V4 (flash default / pro via DEEPSEEK_MODEL).
 
 ### Remaining
 - Old tabs show Server Action errors until refreshed (inherent to Next.js redeploys).
-- `deploy-v3.tar.gz` etc. are tracked build artifacts â€” candidate for .gitignore.
+- `deploy-v3.tar.gz` etc. are tracked build artifacts — candidate for .gitignore.
 - Real API keys still missing for: Twilio, SendGrid/Resend, Stripe, Mapbox, HubSpot OAuth, OpenAI (embeddings/voice fallback path).
 
 ---
 
-## v0.58.53 â€” DeepSeek V4 LLM integration (2026-10-21)
+## v0.58.53 — DeepSeek V4 LLM integration (2026-10-21)
 
 **Task:** Consolidate all LLM calls onto DeepSeek V4 across main CRM + 4 submodules; deploy.
 
 ### Key findings (verified LIVE against api.deepseek.com)
-- The DeepSeek key lives in **`C:\Users\hyper\.pi\agent\auth.json`** (pi agent config) â€” NOT on Hetzner. Now copied to local `.env` + all 6 Hetzner service `.env` files.
+- The DeepSeek key lives in **`C:\Users\hyper\.pi\agent\auth.json`** (pi agent config) — NOT on Hetzner. Now copied to local `.env` + all 6 Hetzner service `.env` files.
 - Model IDs: `/v1/models` lists `deepseek-flash` + `deepseek-v4-pro`. `deepseek-v4-flash` works as an alias and resolves server-side to `deepseek-flash`. Default in code: `deepseek-v4-flash`; override with `DEEPSEEK_MODEL=deepseek-v4-pro`.
 - **V4 models are REASONING models**: `reasoning_content` is emitted before `content` and counts against `max_tokens`. Small budgets (1024) returned EMPTY content with `finish_reason: "length"`. Default raised to 4096.
-- **`response_format: json_schema` is REJECTED** ("This response_format type is unavailable now") â†’ `generateObject` must pass `mode: 'json'` (json_object). This was a real runtime bug caught by live testing.
+- **`response_format: json_schema` is REJECTED** ("This response_format type is unavailable now") → `generateObject` must pass `mode: 'json'` (json_object). This was a real runtime bug caught by live testing.
 - `response_format: json_object` and **tool calling both work** on V4.
 
 ### What changed
 - Main CRM: `src/lib/ai/deepseek.ts` (new central provider), chat route, ai-parse route (mode:'json'), agentcore, qualify, social-copy.
 - LeadG `llm.ts` + sentiment/conversation/reflection/twilio; ContentPlanner `OpenAIProvider`; Foreclosure `LLMNoticeParser`; MediaWorkflow `SocialCopyService`.
 - Deployed to Hetzner: main CRM v0.58.53 + all 6 services restarted with `DEEPSEEK_API_KEY` in env. Live test returned `DEEPSEEK LIVE`.
-- RAG embeddings + voice TTS/STT remain on OpenAI (DeepSeek V4 embeddings/audio endpoints unverified â€” probe later).
+- RAG embeddings + voice TTS/STT remain on OpenAI (DeepSeek V4 embeddings/audio endpoints unverified — probe later).
 
 ---
 
-## v0.58.52 â€” Continuous Execution: service smoke test + fixes (2026-10-17)
+## v0.58.52 — Continuous Execution: service smoke test + fixes (2026-10-17)
 
 **Task:** Run every component, watch logs, clean up scripts, fix issues, report gaps.
 
 ### Completed
 - **Full-service smoke test**: started all 9 services and verified port binding + HTTP responses:
-  - âœ… main-crm (3000) HTTP 200, live-audio (8090), leadg (3001), foreclosure (3002), contentplanner web (3003) + API (3031), media-workflow (3004), legacyleads frontend (3005) + API (3006).
-- **Fixed â€” LeadG auth bug**: standalone server command lacked `NEXTAUTH_SECRET`, causing `/api/auth/error?error=Configuration`. Added `NEXTAUTH_SECRET` + `NEXTAUTH_URL` to `system-tray.ps1`, `start-all.bat`, `start-all.ps1`. Verified redirect now goes to `/login?callbackUrl=%2F`.
+  - ✅ main-crm (3000) HTTP 200, live-audio (8090), leadg (3001), foreclosure (3002), contentplanner web (3003) + API (3031), media-workflow (3004), legacyleads frontend (3005) + API (3006).
+- **Fixed — LeadG auth bug**: standalone server command lacked `NEXTAUTH_SECRET`, causing `/api/auth/error?error=Configuration`. Added `NEXTAUTH_SECRET` + `NEXTAUTH_URL` to `system-tray.ps1`, `start-all.bat`, `start-all.ps1`. Verified redirect now goes to `/login?callbackUrl=%2F`.
 - **Script cleanup (nondestructive)**: archived 8 one-off diagnostic `.py` scripts into `scripts/archive/`; `scripts/` root now holds only reusable utilities.
-- Version bump **0.58.51 â†’ 0.58.52** + CHANGELOG.
+- Version bump **0.58.51 → 0.58.52** + CHANGELOG.
 
 ### Known non-fatal warnings (documented, not blockers)
-1. `next start` emits `âš  "next start" does not work with "output: standalone"` for main-crm, contentplanner, foreclosure, legacyleads-frontend. They still serve correctly (`next start` auto-loads `.env`; the standalone output is used by Hetzner `deploy.sh` which copies static assets into `.next/standalone/`).
-2. `media-workflow` + `legacyleads-api` log Redis `ECONNREFUSED` on 6379 â€” graceful degradation (no Redis/Memurai installed).
+1. `next start` emits `⚠ "next start" does not work with "output: standalone"` for main-crm, contentplanner, foreclosure, legacyleads-frontend. They still serve correctly (`next start` auto-loads `.env`; the standalone output is used by Hetzner `deploy.sh` which copies static assets into `.next/standalone/`).
+2. `media-workflow` + `legacyleads-api` log Redis `ECONNREFUSED` on 6379 — graceful degradation (no Redis/Memurai installed).
 
 ### Recommendations for next session
 - Install Redis/Memurai (or Wire Redis) to activate the media-workflow message broker + legacyleads queue.
@@ -250,23 +239,23 @@ All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. 
 
 ---
 
-## v0.58.51 â€” Repository Synchronization & Intelligent Merge (2026-10-17)
+## v0.58.51 — Repository Synchronization & Intelligent Merge (2026-10-17)
 
-**Task:** EXECUTIVE PROTOCOL â€” comprehensive local/remote repo refresh, recursive submodule sync, dual-direction branch reconciliation, version bump, docs, push, build.
+**Task:** EXECUTIVE PROTOCOL — comprehensive local/remote repo refresh, recursive submodule sync, dual-direction branch reconciliation, version bump, docs, push, build.
 
 ### Completed
 
-**STEP 1 â€” Upstream tracking & submodule sanitization**
+**STEP 1 — Upstream tracking & submodule sanitization**
 - Fetched all remotes + tags on root and all 5 submodules (no nested submodules exist).
-- Upstream: `robertpelloni/realestatecrm` and `candlestixxx/realestatecrm` resolve to the **identical** `main` HEAD (`6d6d1f3`) â€” no divergent upstream to merge.
-- All 5 submodules already at `origin/main` with clean working trees â€” no fast-forward required this pass.
+- Upstream: `robertpelloni/realestatecrm` and `candlestixxx/realestatecrm` resolve to the **identical** `main` HEAD (`6d6d1f3`) — no divergent upstream to merge.
+- All 5 submodules already at `origin/main` with clean working trees — no fast-forward required this pass.
 
-**STEP 2 â€” Dual-direction intelligent merge engine**
-- Re-interrogated **all 10 feature branches** (local + remote) across submodules. **Result: zero unique commits** â€” every one is an ancestor of `main` (ahead=0). No forward-merge, cherry-pick, or reverse-merge necessary. Full table in `docs/SUBMODULE_MAP.md`.
+**STEP 2 — Dual-direction intelligent merge engine**
+- Re-interrogated **all 10 feature branches** (local + remote) across submodules. **Result: zero unique commits** — every one is an ancestor of `main` (ahead=0). No forward-merge, cherry-pick, or reverse-merge necessary. Full table in `docs/SUBMODULE_MAP.md`.
 
-**STEP 3 â€” Cleanup, docs, version, push, build**
+**STEP 3 — Cleanup, docs, version, push, build**
 - Reconciled `start-all.ps1` with the canonical 9-service definitions in `scripts/system-tray.ps1`/`start-all.bat`: added ContentPlanner API (3031), switched LeadG to standalone server (`node .next\standalone\server.js`), corrected contentplanner/legacyleads start paths.
-- Version bump **0.58.50 â†’ 0.58.51** across `VERSION.md`, `package.json`, `package-lock.json` (fixed drift â€” package files were still at 0.58.43), + new CHANGELOG entry.
+- Version bump **0.58.50 → 0.58.51** across `VERSION.md`, `package.json`, `package-lock.json` (fixed drift — package files were still at 0.58.43), + new CHANGELOG entry.
 - Regenerated `docs/SUBMODULE_MAP.md` + updated `docs/LIBRARIES.md`; added Phase 15 to `ROADMAP.md`; updated `TODO.md`.
 
 ### NOT done / left for next agent (deliberately)
@@ -278,42 +267,42 @@ All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. 
 
 ---
 
-## v0.58.43 â€” Repository Synchronization & Intelligent Merge (2026-10-09)
+## v0.58.43 — Repository Synchronization & Intelligent Merge (2026-10-09)
 
-**Task:** EXECUTIVE PROTOCOL â€” comprehensive local/remote repo refresh, recursive submodule sync, dual-direction branch reconciliation, version bump, docs, push, build.
+**Task:** EXECUTIVE PROTOCOL — comprehensive local/remote repo refresh, recursive submodule sync, dual-direction branch reconciliation, version bump, docs, push, build.
 
 ### Completed
 
-**STEP 1 â€” Upstream tracking & submodule sanitization**
+**STEP 1 — Upstream tracking & submodule sanitization**
 - Fetched all remotes + tags on root and all 5 submodules (no nested submodules exist).
-- Upstream: `robertpelloni/realestatecrm` and `candlestixxx/realestatecrm` resolve to the **identical** `main` HEAD (`62fbdc6`) â€” no divergent upstream to merge. (Prior note in `docs/LIBRARIES.md` saying "Not a fork â€” no upstream parent" confirmed.)
+- Upstream: `robertpelloni/realestatecrm` and `candlestixxx/realestatecrm` resolve to the **identical** `main` HEAD (`62fbdc6`) — no divergent upstream to merge. (Prior note in `docs/LIBRARIES.md` saying "Not a fork — no upstream parent" confirmed.)
 - Fast-forwarded submodule `main` branches to `origin/main`:
-  - `foreclosureworkflow` `04699e0` â†’ `b890e53` (+2: P2025 `updateMany` email/sms fix)
-  - `legacyleads` `d2c49c5` â†’ `ec79893` (+1: JSON error for malformed bodies)
-  - `media-workflow` `3559d64` â†’ `a37c7e9` (+3: Redis graceful degradation, JSON errors, log cleanup)
-  - `leadg` gitlink pin advanced `2e9feb0` â†’ `1e14cca` (2 commits to `origin/main`)
-  - `contentplanner` already at `origin/main` (`271ee93`) â€” no change.
+  - `foreclosureworkflow` `04699e0` → `b890e53` (+2: P2025 `updateMany` email/sms fix)
+  - `legacyleads` `d2c49c5` → `ec79893` (+1: JSON error for malformed bodies)
+  - `media-workflow` `3559d64` → `a37c7e9` (+3: Redis graceful degradation, JSON errors, log cleanup)
+  - `leadg` gitlink pin advanced `2e9feb0` → `1e14cca` (2 commits to `origin/main`)
+  - `contentplanner` already at `origin/main` (`271ee93`) — no change.
 
-**STEP 2 â€” Dual-direction intelligent merge engine**
-- Interrogated **all 10 feature branches** across submodules. **Result: zero unique commits** â€” every one is an ancestor of `main` (ahead=0), i.e. already fully merged. No forward-merge, cherry-pick, or reverse-merge was necessary. Full table in `docs/SUBMODULE_MAP.md`.
+**STEP 2 — Dual-direction intelligent merge engine**
+- Interrogated **all 10 feature branches** across submodules. **Result: zero unique commits** — every one is an ancestor of `main` (ahead=0), i.e. already fully merged. No forward-merge, cherry-pick, or reverse-merge was necessary. Full table in `docs/SUBMODULE_MAP.md`.
 
-**STEP 3 â€” Cleanup, docs, version, push**
+**STEP 3 — Cleanup, docs, version, push**
 - Committed submodule launchers: `foreclosureworkflow/start-3002.js|.bat`, `media-workflow/start-3004.bat`.
 - Gitignored transient `*.log` in `foreclosureworkflow`, `media-workflow`, `legacyleads`.
-- Fixed `start-all.ps1` media-workflow path (`dist/index.js` â†’ `dist/src/index.js`).
-- Version bump **0.54.0 â†’ 0.58.43** in `VERSION.md`, `package.json`, `package-lock.json`; new CHANGELOG entry.
+- Fixed `start-all.ps1` media-workflow path (`dist/index.js` → `dist/src/index.js`).
+- Version bump **0.54.0 → 0.58.43** in `VERSION.md`, `package.json`, `package-lock.json`; new CHANGELOG entry.
 - Regenerated `docs/SUBMODULE_MAP.md` + updated `docs/LIBRARIES.md`; updated `ROADMAP.md` (Phase 14) + `TODO.md`.
 - Untracked build artifact `tsconfig.tsbuildinfo` (now gitignored); added `build-out.txt` etc. to `.gitignore`.
 - Retention: committed `.hypernexus` session/audit/log changes, `catalog.db`, `hypernexus.db`, `scripts/archive/*.py` diagnostics, `scripts/system-tray.ps1` contentplanner path fix.
 
 ### NOT done / left for next agent (deliberately)
-- **Uncommitted submodule dependency bumps** (pre-existing, from prior `npm install` runs â€” left in working tree, NOT committed to avoid polluting shared submodule repos):
-  - `foreclosureworkflow`: `lucide-react ^1.16.0 â†’ ^1.52.0` (package.json + lock)
-  - `legacyleads/frontend`: `lucide-react ^1.25.0 â†’ ^1.52.0` + added `@next/swc-win32-x64-msvc ^16.3.8` (package.json + lock)
+- **Uncommitted submodule dependency bumps** (pre-existing, from prior `npm install` runs — left in working tree, NOT committed to avoid polluting shared submodule repos):
+  - `foreclosureworkflow`: `lucide-react ^1.16.0 → ^1.52.0` (package.json + lock)
+  - `legacyleads/frontend`: `lucide-react ^1.25.0 → ^1.52.0` + added `@next/swc-win32-x64-msvc ^16.3.8` (package.json + lock)
   - `contentplanner`: package-lock only (optional `@next/swc-*` platform binaries auto-added)
   - Decide next session whether these are legit (commit) or should be reverted.
 - **10 redundant remote feature branches** NOT deleted (verified safe to delete; left intact to honor retention-first policy).
-- **Build phase**: COMPLETED â€” all 6 components built GREEN (root CRM, leadg, contentplanner, foreclosureworkflow, media-workflow, legacyleads frontend). No services were running beforehand, so nothing needed restarting/killing.
+- **Build phase**: COMPLETED — all 6 components built GREEN (root CRM, leadg, contentplanner, foreclosureworkflow, media-workflow, legacyleads frontend). No services were running beforehand, so nothing needed restarting/killing.
 
 ### Push status
 - Submodule commits pushed: `foreclosureworkflow` (29b2985), `media-workflow` (21c39b5), `legacyleads` (30d7028).
@@ -328,7 +317,7 @@ All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. 
 - Website template picker in WebsiteBuilder (fetches from /api/websites/templates)
 - Error handling: try/catch for all unguarded fetch calls (AI memory, TeamChat, chat send, website save)
 - Empty states: 10+ data lists (DealDetail, LeadDetail, AgentCore, CommandPalette)
-- Help-center: 2 new topics (AI Qualification, Lead Routing Rules) â€” now 14 topics
+- Help-center: 2 new topics (AI Qualification, Lead Routing Rules) — now 14 topics
 - ARIA: 7 icon-only buttons given aria-labels (SegmentsClient, AgentProfileModal, CampaignEditor, EditLeadModal, AIChat)
 - CI matrix: expanded to all 5 submodules (contentplanner, foreclosureworkflow, legacyleads/frontend)
 - Settings save race condition fix (setSaving before await)
@@ -344,14 +333,14 @@ All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. 
 - Workflows subpages are redirect wrappers to `/workflows/*`
 
 **FK/P2025 fixes (9 routes)**: All now return 400/404 instead of 500:
-- `deal-stakeholders` POST â€” dealId FK â†’ 404 on missing Deal
-- `deal-requirements` POST â€” dealId FK â†’ 404 on missing Deal
-- `search-alerts` POST â€” leadId FK â†’ 404 on missing Lead
-- `workflow-sessions` POST â€” P2025 guard on update + workspaceId/userId/leadId/dealId FK validation
-- `ai/memory-settings` POST â€” malformed JSON guard â†’ 400
-- `voice-settings` PUT â€” workspaceId FK â†’ 404 on upsert create path
-- `websites` POST â€” workspaceId FK â†’ 404 on missing Workspace
-- `websites` PATCH â€” P2025 guard â†’ 404 on missing id
+- `deal-stakeholders` POST — dealId FK → 404 on missing Deal
+- `deal-requirements` POST — dealId FK → 404 on missing Deal
+- `search-alerts` POST — leadId FK → 404 on missing Lead
+- `workflow-sessions` POST — P2025 guard on update + workspaceId/userId/leadId/dealId FK validation
+- `ai/memory-settings` POST — malformed JSON guard → 400
+- `voice-settings` PUT — workspaceId FK → 404 on upsert create path
+- `websites` POST — workspaceId FK → 404 on missing Workspace
+- `websites` PATCH — P2025 guard → 404 on missing id
 
 **CommandCenter completeness**: All 57 API routes represented in `src/components/dashboard/CommandCenter.tsx` with tooltips. 8 new feature cards added for vault, contracts, chat, client-portal, imports, avatar, canva, objections, property-data.
 
@@ -359,7 +348,7 @@ All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. 
 
 ## v0.57.6 - UI Page Completion + Error Boundaries + Layout Hardening
 
-**Root cause of dashboard 404s (RESOLVED)**: `requireWorkspaceAccess` in `src/app/dashboard/layout.tsx` was uncaught â€” threw WorkspaceAccessError which crashed the layout. Pages with `error.tsx` recovered (200 with error UI); pages without returned 404. Fix: wrapped in try/catch so layout never crashes from access errors.
+**Root cause of dashboard 404s (RESOLVED)**: `requireWorkspaceAccess` in `src/app/dashboard/layout.tsx` was uncaught — threw WorkspaceAccessError which crashed the layout. Pages with `error.tsx` recovered (200 with error UI); pages without returned 404. Fix: wrapped in try/catch so layout never crashes from access errors.
 
 **UI pages completed**:
 - Added `marketing/page.tsx` + `websites/page.tsx` parent hub pages (sidebar links resolved)
@@ -375,7 +364,7 @@ All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. 
 - POST write paths: websites 201, gamification 200, others 401 (auth required)
 
 **Route structure discoveries**:
-- LG/LC webhooks are subdirectory routes (no root route.ts) â€” `/api/webhooks` 404 is correct
+- LG/LC webhooks are subdirectory routes (no root route.ts) — `/api/webhooks` 404 is correct
 - LG twilio has 7 subroutes: status/gather/token/voice/incoming/voicemail/transfer-complete
 - Root API has 50+ route directories, many with nested subroutes
 - `direct-mail` and `notification-settings` are UI-only (no API routes)
@@ -395,13 +384,13 @@ All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. 
 ## v0.55.2 Build Process Improvements
 
 ### New Root Scripts
-- **build-all.ps1** â€” Builds all 6 components (main CRM + 5 submodules) with pass/fail summary
-- **start-all.ps1** â€” Starts all 8 services with correct ports and env vars (NEXTAUTH_SECRET, etc.)
-- **check-status.ps1** â€” Quick health check of all 8 services (port + HTTP status)
+- **build-all.ps1** — Builds all 6 components (main CRM + 5 submodules) with pass/fail summary
+- **start-all.ps1** — Starts all 8 services with correct ports and env vars (NEXTAUTH_SECRET, etc.)
+- **check-status.ps1** — Quick health check of all 8 services (port + HTTP status)
 
 ### Known Infrastructure Gaps
-1. **Redis not installed** â€” media-workflow MessageBroker gracefully degrades (drops payloads). Install Memurai or Redis for full inter-service messaging.
-2. **url.parse() deprecation** â€” foreclosure server.js uses legacy URL parsing (minor, no security impact in MVP).
+1. **Redis not installed** — media-workflow MessageBroker gracefully degrades (drops payloads). Install Memurai or Redis for full inter-service messaging.
+2. **url.parse() deprecation** — foreclosure server.js uses legacy URL parsing (minor, no security impact in MVP).
 3. **Live Audio WS** health endpoint works (/health returns JSON) but root returns 404 (expected for WS).
 # HANDOFF v0.55.1 - 2026-06-10
 
@@ -434,34 +423,34 @@ All 6 services green on https://excellegacyrealtygroup.site. Main CRM v0.58.54. 
 - legacyleads: CLEAN (needs tsx global, SWC reinstall, lucide-react)
 
 ### What Isnt Working / Could Be Better
-1. ~~contentplanner/legacyleads/foreclosure submodule builds not yet run in CI~~ â€” CI matrix expanded to all 5 submodules (v0.58.14)
-2. ~~System tray untested with running services~~ â€” tested, Start/Stop/Restart/Quit all verified (v0.58.x)
-3. ~~Live Audio WebSocket no HTTP health endpoint~~ â€” `/health` endpoint returns `{"status":"ok","activeCalls":N}` (verified 200)
+1. ~~contentplanner/legacyleads/foreclosure submodule builds not yet run in CI~~ — CI matrix expanded to all 5 submodules (v0.58.14)
+2. ~~System tray untested with running services~~ — tested, Start/Stop/Restart/Quit all verified (v0.58.x)
+3. ~~Live Audio WebSocket no HTTP health endpoint~~ — `/health` endpoint returns `{"status":"ok","activeCalls":N}` (verified 200)
 4. **Marketing/media workflows** at /workflows/* are outside /dashboard/* routes - not in unified CommandCenter section rail
 5. **3 deprecated GitHub repos** still need manual archiving (aicrm, realestateleadcaller, realestateprototype)
 
 ### Next Steps
-1. ~~Test system tray against running services~~ â€” DONE (v0.58.x)
-2. ~~Add health check endpoint to live-audio-server~~ â€” DONE (`/health` verified)
-3. ~~Move /workflows/* pages into dashboard routes or add to CommandCenter~~ â€” DONE (redirect wrappers + CommandCenter)
-4. ~~Set up CI builds for all submodules~~ â€” DONE (all 5 in matrix, v0.58.14)
+1. ~~Test system tray against running services~~ — DONE (v0.58.x)
+2. ~~Add health check endpoint to live-audio-server~~ — DONE (`/health` verified)
+3. ~~Move /workflows/* pages into dashboard routes or add to CommandCenter~~ — DONE (redirect wrappers + CommandCenter)
+4. ~~Set up CI builds for all submodules~~ — DONE (all 5 in matrix, v0.58.14)
 5. Wire contentplanner/legacyleads APIs to main CRM for unified data
 6. Wire real API keys (needs user input)
 7. Production deploy (see DEPLOY.md)
 8. Archive deprecated GitHub repos (manual GitHub UI action)
 
 ---
-ï»¿# HANDOFF.md â€” Multi-Agent Session Handoff
+﻿# HANDOFF.md — Multi-Agent Session Handoff
 
-> **Current state: v0.55.0 â€” All repos synced, all feature branches reconciled, all docs updated.**
+> **Current state: v0.55.0 — All repos synced, all feature branches reconciled, all docs updated.**
 > See `SESSION_HANDOFF_2026-06-10.md` and `docs/SUBMODULE_MAP.md` for full details.
 
-## Last Session Summary (2026-06-10 â€” Repository Synchronization)
+## Last Session Summary (2026-06-10 — Repository Synchronization)
 
 ### Completed
 1. **Full fetch + sync**: All remotes fetched, main + 5 submodules fast-forwarded to latest `origin/main`
-2. **Feature branch reconciliation**: 10 feature branches analyzed â€” all already merged (0 unique commits). All reverse-merged with main + pushed.
-3. **Version bump**: 0.54.0 â†’ 0.55.0
+2. **Feature branch reconciliation**: 10 feature branches analyzed — all already merged (0 unique commits). All reverse-merged with main + pushed.
+3. **Version bump**: 0.54.0 → 0.55.0
 4. **Documentation sync**: CHANGELOG.md, SUBMODULE_MAP.md, HANDOFF.md, ROADMAP.md, TODO.md updated
 
 ### Discovered Remote Changes (integrated via fast-forward)
@@ -507,20 +496,20 @@ All 10 feature branches across 5 submodules have been reverse-merged with latest
 - **GPT**: Architecture, systemic debugging, type enforcement
 
 
-## Session 2026-10-06 v0.57.5 â€” Continuous Autonomous Execution
+## Session 2026-10-06 v0.57.5 — Continuous Autonomous Execution
 
 ### Done
 - Analytics Studio consolidated into Reporting (removed separate route, unified tab)
 - Template literal bugs fixed in 3 files: data-quality, leaderboard, websites/builder
   (single-quoted fetch URLs with dollar-brace expressions were NOT interpolating)
 - Help Center expanded from 4 to 10 topics: deals, workflows, reporting, voice, social, foreclosure
-- Marketing Studio hub verified â€” links all marketing tools including SMS Text Codes and Website Builder
+- Marketing Studio hub verified — links all marketing tools including SMS Text Codes and Website Builder
 - Settings already consolidated via SettingsTabs (5 subpages tabbed into one surface)
 
 ### Key Lesson
 - Single-quoted strings NEVER interpolate dollar-brace expressions in JS/TS.
   fetch('/api/x?id=' + var) is correct; fetch('/api/x?id=${var}') is a bug.
-  This pattern appeared in 4 separate files â€” always scan after Write tool usage.
+  This pattern appeared in 4 separate files — always scan after Write tool usage.
 
 ### Remaining
 - Redis for media-workflow (gracefully degrades without it)
@@ -530,7 +519,7 @@ All 10 feature branches across 5 submodules have been reverse-merged with latest
 ## Session 2026-10-06 (continued)
 
 ### Completed
-- AI Learning & Memory controls (settings/ai-memory) â€” component, API, settings tab, loading/error states
+- AI Learning & Memory controls (settings/ai-memory) — component, API, settings tab, loading/error states
 - A/B variant email/SMS content override UI in leadG campaign setup (was engine-only, now has UI fields)
 - CI/CD expanded to build all 5 submodules (leadG, contentplanner, foreclosureworkflow, media-workflow, legacyleads)
 - SEO infrastructure: sitemap.ts, robots.ts, Open Graph metadata on root layout
@@ -546,7 +535,7 @@ All 10 feature branches across 5 submodules have been reverse-merged with latest
 - Archive deprecated GitHub repos (aicrm, realestateleadcaller, realestateprototype)
 - Cross-service API integration (contentplanner/legacyleads to main CRM)
 
-## Session 2026-10-06 (continued â€” tick 3)
+## Session 2026-10-06 (continued — tick 3)
 
 ### Completed
 - Deal Requirements + Stakeholders tabs in deal detail (wired to /api/deal-requirements and /api/deal-stakeholders)
@@ -576,15 +565,15 @@ Comprehensive local/remote repository refresh executed under the Executive Proto
 3. **Forward Merge Audit:** All 5 AI-generated feature branches verified ancestors of `main` (each 0 unique commits vs `main`): `dashboard-newest`, `jules-4619064495533350109-142a2060`, `jules-ai-drip-execution-12255780436860473735`, `rag-consolidation-cleanup`, `rag-consolidation-cleanup-17409520208133646924`. Nothing to merge; no progress dropped.
 4. **Reverse Merge (Catch-Up):** Local copies of all 5 branches fast-forwarded to `e07aa1d` so they carry the latest `main` (including `e07aa1d`) and cannot drift.
 5. **Submodules:** None. No `.gitmodules`; `git submodule status --recursive` is empty. Recursive update = no-op. No submodule map to regenerate.
-6. **Batch Script Validation:** No `*.bat` files exist in repo root. Execution surface is `package.json` scripts (`dev`/`build`/`start` on port 3000, Prisma db scripts, `sync:myplus`) â€” all paths remain valid against the current layout; no changes needed.
+6. **Batch Script Validation:** No `*.bat` files exist in repo root. Execution surface is `package.json` scripts (`dev`/`build`/`start` on port 3000, Prisma db scripts, `sync:myplus`) — all paths remain valid against the current layout; no changes needed.
 7. **Version Governance:** `0.47.0 -> 0.48.0` in `VERSION.md` (single source of truth), `package.json`, `package-lock.json`; documented in `CHANGELOG.md` under `[0.48.0]`.
 8. **Documentation Sync:** `CHANGELOG.md`, `ROADMAP.md` (Phase 5 sync milestone), `TODO.md` (sync follow-ups) updated. Structural map: single repo, remote `origin = github.com/candlestixxx/realestatecrm`, `main @ e07aa1d + v0.48.0 bump`, 5 feature branches @ `e07aa1d` locally.
 9. **Gitignore Governance:** Removed `.hypernexus` session-file exclusions (`.hypernexus/`, `.hypernexus-session.json`, `.hypernexus_startup_marker`) so memory/session documentation stays tracked, per directive. Sensitive ignores (`.env*`, `node_modules/`, `dev.db`) intentionally retained.
 
 ## Blockers / Risks for Successor Models
-- **PUSH BLOCKED â€” credentials:** `git push` fails with `schannel: SEC_E_NO_CREDENTIALS (0x8009030e)`. No GitHub credentials available in this environment. On the user's authenticated machine run:
+- **PUSH BLOCKED — credentials:** `git push` fails with `schannel: SEC_E_NO_CREDENTIALS (0x8009030e)`. No GitHub credentials available in this environment. On the user's authenticated machine run:
   `git push origin main dashboard-newest jules-4619064495533350109-142a2060 jules-ai-drip-execution-12255780436860473735 rag-consolidation-cleanup rag-consolidation-cleanup-17409520208133646924`
-- **BUILD BLOCKED â€” disk full:** `C:` drive has ~0 GB free (first fast-forward attempt failed with `No space left on device`; ~2.5 GB npm-cache was partially cleared to recover). A full `npm install` + `next build` needs several GB. Free space on `C:` first. Built binaries were NOT cleaned, per instruction.
+- **BUILD BLOCKED — disk full:** `C:` drive has ~0 GB free (first fast-forward attempt failed with `No space left on device`; ~2.5 GB npm-cache was partially cleared to recover). A full `npm install` + `next build` needs several GB. Free space on `C:` first. Built binaries were NOT cleaned, per instruction.
 - **Prisma migration note (carried over):** Do not run `prisma db push`. Migration history was rebuilt as a single unified baseline; deploy with `prisma migrate deploy`.
 
 ## State at Handoff
@@ -592,7 +581,7 @@ Comprehensive local/remote repository refresh executed under the Executive Proto
 - All local branches converged at the same tip; working tree clean after commit.
 - Next steps: restore push credentials + free disk, push all branches, then run `npm run build` to validate the `aa79bbf` sync payload end-to-end (VoiceForge v0.47.0 features + new website-builder tabs + sync-queue routes).
 
-## 2026-11-04 â€” 0.61.6 shared campaign defaults
+## 2026-11-04 — 0.61.6 shared campaign defaults
 User requested buyer/seller default drip plans for brokerage/company/all agents. Interpreted as campaign templates, not fabricated contacts. Four plans seed idempotently per workspace, preserving edits. Defaults require manual enrollment. Calendar delays are sequential in UTC. New server instrumentation dispatches every minute independent of visits. Task status IN_PROGRESS claims avoid overlapping dispatch, ERROR requires review/reopen after provider fixes. No schema migration. Hetzner root@5.161.250.43 uses ~/.ssh/id_ed25519; hetzner_key failed to load. Production service excellegacyrealtygroup on port 3210, /var/www/excellegacyrealtygroup. Build/test only on Hetzner by user instruction. Merge preserved both local and upstream notes.
 
 Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPANY defaults verified in excel-legacy-team (14 memberships), rerun loader idempotent, zero enrolled leads. Full tsc has pre-existing archived ContactTableClient syntax errors. Excluding archive revealed an existing CampaignsListClient useEffect import omission, fixed in 0.61.7. Rollback runtime archive /opt/crm-releases/backups/runtime-before-0.61.6.tar.
@@ -600,7 +589,6 @@ Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPA
 0.61.7 deployed and verified authenticated Campaigns SSR for OWNER and REALTOR_AGENT. Four defaults visible, campaign-specific tsc diagnostics clear after excluding pre-existing broken archive. User follow-up 0.61.8 moves LeadDetailLayoutClient's three-dot menu to a fixed body portal to escape clipped/stacked left columns.
 
 0.61.8 LIVE on Hetzner, PM2 excellegacyrealtygroup healthy and public auth endpoint HTTP 200. Server-only Playwright passed body portal, sidebar overlap hit-testing, viewport bounds at 1280/900/768/640 widths, Escape focus restoration, Smart Plans navigation, and outside-click dismissal. No contact mutations during UI tests. Backup /opt/crm-releases/backups/runtime-before-0.61.8.tar. Source build directory remains /opt/crm-releases/0.61.6 with final package version 0.61.8. Existing unrelated duplicate type attribute in lead phone editor still appears in tsc, and archived ContactTableClient still has syntax errors. Production build and menu browser checks pass.
-=======
 ## Session 2026-11-04 (v0.61.5 90ae412, pushed + live on Hetzner)
 
 ### Completed
@@ -618,7 +606,7 @@ Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPA
 - Real API keys still key-blocked (Twilio, SendGrid, Whitepages/PDL, etc.)
 - Consider prettier --write pass (repo-wide style drift, untouched files warn too)
 
-## v0.61.9 (2026-11-05) â€” listings are money
+## v0.61.9 (2026-11-05) — listings are money
 - Seeded 6 Michigan homes (EXL-1001..1006, ACTIVE/PENDING/SOLD) + 6 matching Deals via idempotent `prisma/seed-listings.mjs` (upsert by mlsNumber, deals by title; never wipes)
 - `/dashboard/listings` money strip: Active inventory / Pending / Closed volume / Est. commission 3% / Open offers
 - Live verified: main 200, `/api/listings?workspaceId=excel-legacy-team` = 8 homes (6 seeded + 2 pre-existing), ACTIVE $1,049,000 / PENDING $1,185,000 / SOLD $395,000, offers 0
