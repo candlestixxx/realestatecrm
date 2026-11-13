@@ -1,7 +1,7 @@
 # start-all.ps1 — Start all realestatecrm services with correct ports and env
 #
 # Why: each service needs specific PORT env vars and some need NEXTAUTH_SECRET.
-# This script starts all 9 services with the correct configuration.
+# This script starts all 12 services with the correct configuration.
 # Canonical service definitions live in scripts/system-tray.ps1 (tray UI) and
 # start-all.bat (plain cmd launcher); keep all three in sync.
 #
@@ -53,13 +53,22 @@ Start-Service "legacyleads" 3005 "set NEXTAUTH_SECRET=dev_secret_change_me && se
 # Port 3006 — LegacyLeads API
 Start-Service "legacyleads-api" 3006 "set PORT=3006 && npx tsx src/index.ts" "apps\legacyleads\backend"
 
+# Port 3007 - AI CRM (registered submodule v0.63.1)
+Start-Service "aicrm" 3007 "node node_modules\next\dist\bin\next start -p 3007" "apps\aicrm"
+
+# Port 3008 - Lead Caller (registered submodule v0.63.1)
+Start-Service "leadcaller" 3008 "node node_modules\next\dist\bin\next start -p 3008" "apps\leadcaller"
+
+# Port 3009 - Prototype API (registered submodule v0.63.1; client-next on demand)
+Start-Service "prototype" 3009 "set PORT=3009 && node dist\index.js" "apps\prototype\server"
+
 # Wait and verify
 Write-Host ""
 Write-Host "Waiting for services to start..." -ForegroundColor Yellow
 Start-Sleep -Seconds 15
 
 Write-Host "=== Service Status ===" -ForegroundColor Green
-foreach ($port in @(3000,3001,3002,3003,3031,3004,3005,3006,8090)) {
+foreach ($port in @(3000,3001,3002,3003,3031,3004,3005,3006,3007,3008,3009,8090)) {
     $listening = netstat -ano | Select-String ":$port\s.*LISTENING"
     if ($listening) {
         Write-Host "  Port ${port}: RUNNING" -ForegroundColor Green

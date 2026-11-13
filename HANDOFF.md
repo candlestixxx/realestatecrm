@@ -3,6 +3,17 @@
 Sector-pack architecture live: src/lib/universal/sectors.ts (8 packs, validated), platform.ts (16 languages, add-ons by United Beats LLC Bob & Lum), /universal page, design in docs/UNIVERSAL_CRM.md, tests/universal.test.mts 4/4. Next: tenant provisioning (workspace -> pack -> brand -> language), Stripe add-on billing, first non-real-estate pilot.
 
 ---
+## v0.63.6 DEPLOYED to Hetzner (2026-11-12, Muse Code lane)
+Robert direct order: no local servers, deploy live only. Stopped all session-started local services surgically (verified PIDs/start times; pre-existing legacyleads 3005 left). Built below-normal, packaged deploy/package-v3.py (113.3 MB, 3987 files), scp to hetzner:/tmp/deploy-v3.tar.gz - first upload MD5 mismatched (caught, re-uploaded, verified a50548b7e8e01c6895c7487bd4e256f8). Backup-and-swap single-quoted per DEPLOY.md; PM2 excellegacyrealtygroup restarted --update-env, now v0.63.6 on :3210 (was 0.63.0; other lane v0.63.2 tarball never swapped, superseded). Verified: site 200, /api/auth/session 200, /api/listings 200 incl. EXL-1001 (prod DB preserved), /trust-services 200, PM2 logs Ready clean. Bobbi notified via CDP; Codex lane stood down.
+
+## v0.63.2 - Launchers wired for 8 submodules, push released (2026-11-12, Muse Code lane)
+Robert released Bobbi's push hold in this session ('proceed as you recommend'): pushed RealEstateCRMLLC/RealEstateCRM main 3cc22f4..5ccb815 (Gate 1 merge c1e865b, v0.63.1 869869a, addendum 5ccb815) + 5 reverse-synced root feature branches. Notified Bobbi via CDP before pushing; Codex lane warned by Bobbi not to duplicate the retarget (869869a canonical). start-all.ps1/.bat, check-status.ps1, system-tray.ps1 now cover 12 services (added aicrm 3007, leadcaller 3008, prototype API 3009; prototype health /api/health). aicrm production build built below-normal (dev-only .next was why 3007 was DOWN). check-status: 12/12 responding. kill-port.js health gate confirmed working as designed (skips healthy servers; KILL_PORT_FORCE=1 overrides) - v0.63.1 'script reliability gap' note retracted. Still open: prod deploy of 0.63.x to Hetzner needs Robert's word (Bobbi flagged demo timing), ci.yml Workflows permission, nginx mounts for /aicrm/ /leadcaller/ /prototype/, key-blocked list (Twilio/Resend/MLS RESO/Stripe). Servers from this session stop at session end; tray/start-all are the persistent path.
+
+## v0.63.1 addendum - build/test/run verified (2026-11-12, same lane)
+Root rebuilt below-normal (next build OK; /dashboard/settings/team Dynamic-server-usage notice is pre-existing). Fixed stale-Prisma-client 500s (team invite/esign/branding) by stopping server, prisma generate (db push: already in sync), restart: npm test now 40/40 pass with server up (was 34/6 on stale client+stale server). All 9 services running via start-all.ps1 below-normal: 3000/3001/3003/3004/3006/3031/8090 HTTP 200, foreclosure 3002 HTTP 308 (signin redirect), legacyleads web 3005 HTTP 404 on / (known; API 3006 200). NOTE: kill-port.js failed to kill a stale next start (PID 20124 verified own, killed surgically) - script reliability gap logged in TODO. Servers started in this session stop when the session ends; use npm run tray or start-all.ps1 to run persistently.
+
+## v0.63.1 - Org transfer to RealEstateCRMLLC + Executive Protocol sync (2026-11-12, Muse Code lane)
+Caught up from repo docs only: no prior Muse session exists for this cwd (only current 01a1d1b1) and Pi never ran with cwd=realestatecrm (no --C--Users-hyper-workspace-realestatecrm-- pi dir); HANDOFF v0.63.0 was source of truth. New GitHub org verified live: RealEstateCRMLLC/RealEstateCRM (HEAD 3cc22f4) + forclosureworkflow, leadG, socialmediacontentplanner, re-agent-workflow-media-1, LegacyLeads, aicrm, realestateleadcaller, realestateprototype - all ls-remote OK. Repointed every origin to RealEstateCRMLLC/* (old kept as legacy; origin/main == legacy/main everywhere). Fetch --all --tags; all 9 mains fast-forwarded to origin/main (root v0.63.0 TSF Master Bundle + Command Center value-ordered hubs included). Branch audit: zero unique commits on every feature branch except root gate1/foreclosure-parser-tests (+5). Forward-merged gate1 LOCALLY as c1e865b (47/47 foreclosure unittest pass after pip tzdata); HELD FROM PUSH: Bobbi (muse.ai, Edge CDP 9222 tab 25C83F10) replied in-thread that gate1 merge/pushes to main need Robert's word in main chat (she authorized branch push only; ci.yml still blocked by App Workflows permission, 5/6 files on GitHub at 4d6fca8). This lane holds c1e865b + v0.63.1 commit local-only until Robert confirms here or in main chat. Reverse sync done locally: all local feature branches force-updated to main tip (no push). Registered apps/aicrm (c719013), apps/leadcaller (d42a4a2), apps/prototype (6990db1) as submodules 6-8 (.gitmodules + absorbgitdirs); CommandCenter Sub-Projects now lists 8 services (3 new cards badge NEW, nginx mounts pending). muse-cdp.js timeouts lengthened (30s/30s/60s/120s). Dashboard audit: 36/36 dashboard dirs already covered by CommandCenter hubs (Money Now first). Tray exists: scripts/system-tray.ps1 with per-service Start/Stop/Restart, Start All/Stop All, Quit All Servers and Exit (surgical PID-by-port). Dirty left alone: leadg .env.production.local (sensitive, stashed+popped, never commit), prototype database.sqlite runtime churn. Waiting on owner: push authorization (above), pilot MLS Member ID / broker RESO feed, Twilio number, Resend, OPENAI_API_KEY.
 
 ## v0.63.0 — TSF Master Bundle + Executive Protocol sync (2026-11-10)
 
@@ -578,7 +589,6 @@ Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPA
 0.61.7 deployed and verified authenticated Campaigns SSR for OWNER and REALTOR_AGENT. Four defaults visible, campaign-specific tsc diagnostics clear after excluding pre-existing broken archive. User follow-up 0.61.8 moves LeadDetailLayoutClient's three-dot menu to a fixed body portal to escape clipped/stacked left columns.
 
 0.61.8 LIVE on Hetzner, PM2 excellegacyrealtygroup healthy and public auth endpoint HTTP 200. Server-only Playwright passed body portal, sidebar overlap hit-testing, viewport bounds at 1280/900/768/640 widths, Escape focus restoration, Smart Plans navigation, and outside-click dismissal. No contact mutations during UI tests. Backup /opt/crm-releases/backups/runtime-before-0.61.8.tar. Source build directory remains /opt/crm-releases/0.61.6 with final package version 0.61.8. Existing unrelated duplicate type attribute in lead phone editor still appears in tsc, and archived ContactTableClient still has syntax errors. Production build and menu browser checks pass.
-=======
 ## Session 2026-11-04 (v0.61.5 90ae412, pushed + live on Hetzner)
 
 ### Completed
@@ -608,3 +618,29 @@ Hetzner validation: 0.61.6 build passed, three campaign tests passed, four COMPA
 - INCIDENT: package-v3.py shipped local prisma/dev.db and the swap overwrote prod db (API showed 2 local test rows). Restored 8 homes from /opt/crm-releases/backups/runtime-before-0.62.5 (verified EXL-1001..1006 in backup first). Fixed package-v3.py to skip .db/.db-journal/.db-wal/.db-shm (f94a92f).
 - Hetzner excellegacyrealtygroup v0.62.5 online; main 200, /trust-course 200 public, listings 8 homes live, Twilio SID/auth/API-key pair intact in prod .env. Still need TWILIO_PHONE_NUMBER (upgrade-blocked) for live SMS; Resend and MLS feed still open.
 
+
+## v0.62.5b (2026-11-10) - second deploy shipped + verified
+- Tarball deploy-v3.tar.gz (87,596,213 bytes) scanned SAFE: zero sqlite files.
+- MD5 match local==remote 36a77fe879123724357b03e7a6f41e89; scp err log empty.
+- Hetzner swap: backup runtime-before-0.62.5b, in-place extract, post-deploy.sh
+  (Prisma symlink + DATABASE_URL fixed), pm2 restart excellegacyrealtygroup v0.62.5 online.
+- Verified: main 200, /trust-course 200, 8 listings live (EXL-1001..1006 + 2 test rows),
+  6 TWILIO lines in prod .env, server-err.log empty.
+
+## Coordination sweep (2026-11-10) - all-session sync
+- Live Edge tabs via CDP :9222 (read-only, nothing typed): ChatGPT Hard Truths Ahead, Gemini Multi-Platform Perf Monitoring, Muse Chat-Bobbi, Gmail, Copilot. Operator pastes AI_SHARED_CONTEXT.md into each tab as bootstrap.
+- HyperNexus kernel :7778 HEALTHY v1.0.30 (uptime ~18.5h); MCP bridge on local inventory (upstream unavailable). Capsule file remains fallback source of truth.
+- No opencode/Muse CLI process running now; opencode lane edit to workflow-sessions integrated: auth + workspace scoping on GET/POST/DELETE + safeData, formatted, plus missing POST-update workspace guard added by Codex.
+- $HOME/.pi exists (pi harness sessions live there) but deep listing exceeds 10s exec cap - pi lane: pull this repo state before editing.
+- Pending: commit route hardening + capsule (this commit), push on authenticated machine, Command Center regroup, tooltips, key-blocked API keys from owner.
+
+## Re-verify (2026-11-11) - prod healthy
+- pm2 excellegacyrealtygroup v0.62.5 online, uptime 23h (56 restarts all from deploy churn, stable since). Main / 200, /trust-course 200, /api/listings returns EXL-1001 Sterling Heights ACTIVE $425,000. server-err.log 0 bytes. Local main 4 ahead of origin - push still needs authenticated machine.
+
+## 2026-11-11 CDP send SUCCESS (Codex desktop)
+- Default Edge on CDP :9222 via explicit --user-data-dir=<User Data> --profile-directory=Default (bare --remote-debugging-port never binds on Default; temp profiles bind fine).
+- Created https://muse.ai/ tab, sent coord-msg.txt (821 chars) with scripts/muse-cdp.js, verified message visible in chat DOM (HASMSG:true). Temp verify script + C:/Temp copies removed.
+
+## 2026-11-11 retry: sent to REAL Bobbi thread (Codex desktop)
+- First send had gone to a fresh blank Muse tab (auto-picked, titles not loaded yet). Retried with MUSE_CDP_TAB_ID=C0C0A204... (Chat-Bobbi) via wide-timeout sender (60s/120s).
+- Receipt TYPE:TYPED + SENT; full-page DOM search hit v0.62.5b at 22109. Temp helpers/logs removed.

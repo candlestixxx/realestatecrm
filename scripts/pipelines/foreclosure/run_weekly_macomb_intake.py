@@ -214,7 +214,7 @@ def parse_sale_amount_and_date(raw_notice_text: str) -> Tuple[str, str]:
     m = re.search(r'Sale Date[^\n]*[:\-]\s*([^\n|]+)', raw_notice_text, re.I)
     if m:
         sale_date = m.group(1).strip()
-    m = re.search(r'Amount Claimed Due[^\n]*[:\-]\s*\*\*?\$?([\d,]+(?:\.\d{2})?)', raw_notice_text, re.I)
+    m = re.search(r'Amount Claimed Due[^\n]*[:\-]\s*\*{0,2}\$?([\d,]+(?:\.\d{2})?)', raw_notice_text, re.I)
     if m:
         amount = '$' + m.group(1)
     return sale_date, amount

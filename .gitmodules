@@ -1,15 +1,24 @@
 [submodule "apps/foreclosureworkflow"]
 	path = apps/foreclosureworkflow
-	url = https://github.com/candlestixxx/forclosureworkflow.git
+	url = https://github.com/RealEstateCRMLLC/forclosureworkflow.git
 [submodule "apps/leadg"]
 	path = apps/leadg
-	url = https://github.com/candlestixxx/leadG.git
+	url = https://github.com/RealEstateCRMLLC/leadG.git
 [submodule "apps/contentplanner"]
 	path = apps/contentplanner
-	url = https://github.com/candlestixxx/socialmediacontentplanner.git
+	url = https://github.com/RealEstateCRMLLC/socialmediacontentplanner.git
 [submodule "apps/media-workflow"]
 	path = apps/media-workflow
-	url = https://github.com/candlestixxx/re-agent-workflow-media-1.git
+	url = https://github.com/RealEstateCRMLLC/re-agent-workflow-media-1.git
 [submodule "apps/legacyleads"]
 	path = apps/legacyleads
-	url = https://github.com/candlestixxx/LegacyLeads.git
+	url = https://github.com/RealEstateCRMLLC/LegacyLeads.git
+[submodule "apps/aicrm"]
+	path = apps/aicrm
+	url = https://github.com/RealEstateCRMLLC/aicrm.git
+[submodule "apps/leadcaller"]
+	path = apps/leadcaller
+	url = https://github.com/RealEstateCRMLLC/realestateleadcaller.git
+[submodule "apps/prototype"]
+	path = apps/prototype
+	url = https://github.com/RealEstateCRMLLC/realestateprototype.git

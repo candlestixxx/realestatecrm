@@ -1404,7 +1404,7 @@ export function LeadTableClient({
                 {displayLeads.length === 0 && (
                   <tr>
                     <td colSpan={8} className="px-6 py-12 text-center text-muted-foreground font-semibold text-xs">
-                      No leads match the active filters. Open "Filters" or choose a different tab view.
+                      No leads match the active filters. Open &quot;Filters&quot; or choose a different tab view.
                     </td>
                   </tr>
                 )}

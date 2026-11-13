@@ -307,7 +307,7 @@ export default function WebsitesClient({
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" /> INSTA GEN "NEW"
+              <Sparkles className="w-3.5 h-3.5" /> INSTA GEN &quot;NEW&quot;
             </button>
             <button type="button"
               onClick={() => {
@@ -609,7 +609,7 @@ export default function WebsitesClient({
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
-                <button type="button"
+                <button
                   type="button"
                   onClick={() => setIsCreating(false)}
                   className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-md transition-colors"

@@ -12,7 +12,7 @@
 
 `ash
 # Clone with submodules
-git clone --recurse-submodules https://github.com/candlestixxx/realestatecrm.git
+git clone --recurse-submodules https://github.com/RealEstateCRMLLC/RealEstateCRM.git
 cd realestatecrm
 
 # If already cloned without submodules:

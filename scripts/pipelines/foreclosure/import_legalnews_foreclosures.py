@@ -93,7 +93,7 @@ def split_name(full_name: str) -> Tuple[str, Optional[str]]:
 
 def extract_amount_due_text(description: str) -> Optional[str]:
     patterns = [
-        r"Amount claimed to be due at the date hereof:\s*([^.\n]+(?:\([^\)]*\))?)",
+        r"Amount claimed to be due at the date hereof:\s*(\$[0-9,]+(?:\.[0-9]{2})?\s*(?:\([^\)]*\))?)",
         r"amount due.*?\$[0-9,]+(?:\.[0-9]{2})?",
         r"on which Mortgage there is claimed to be due at the date hereof the sum of\s*\$[0-9,]+(?:\.[0-9]{2})?",
         r"on the date of notice:\s*\$[0-9,]+(?:\.[0-9]{2})?",

@@ -21,7 +21,19 @@ const eslintConfig = defineConfig([
       "react-hooks/purity": "off",
       "react-hooks/set-state-in-effect": "off"
     }
-  }
+  },
+  {
+    // Node maintenance/deploy scripts are CommonJS by design (run directly
+    // with `node scripts/...`, no bundler/ESM loader). require() is correct
+    // there; the TS rule targets typed source, not ops scripts.
+    files: ['scripts/**/*.js', 'deploy/**/*.js', '**/*.cjs'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  // Submodule working trees (incl. their .next build output) lint in their
+  // own repos; the root config must not crawl them.
+  globalIgnores(['apps/**']),
 ]);
 
 export default eslintConfig;

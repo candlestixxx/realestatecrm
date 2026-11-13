@@ -17,6 +17,8 @@ export default function LiveAudioMonitor() {
   const [lastMessage, setLastMessage] = useState<string>('');
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Ref indirection for the reconnect timer: onclose must schedule the *latest* connect without the useCallback closing over itself (react-hooks/immutability).
+  const connectRef = useRef<(() => void) | null>(null);
 
   const connect = useCallback(() => {
     // Close any existing socket before reconnecting to avoid leaks
@@ -43,7 +45,7 @@ export default function LiveAudioMonitor() {
       ws.onclose = () => {
         setStatus('disconnected');
         // Auto-reconnect every 10 seconds — the WS server may restart
-        reconnectTimer.current = setTimeout(connect, 10_000);
+        reconnectTimer.current = setTimeout(() => connectRef.current?.(), 10_000);
       };
 
       ws.onerror = () => {
@@ -54,6 +56,10 @@ export default function LiveAudioMonitor() {
       setStatus('disconnected');
     }
   }, []);
+
+  useEffect(() => {
+    connectRef.current = connect;
+  });
 
   useEffect(() => {
     connect();

@@ -122,6 +122,33 @@ $Services = [ordered]@{
         Log = 'server.log'
         ErrLog = 'server-err.log'
     }
+    'aicrm' = @{
+        Label = 'AI CRM'
+        Port = 3007
+        Cmd = 'node node_modules\next\dist\bin\next start -p 3007'
+        WorkDir = (Join-Path $Root 'apps\aicrm')
+        HealthPath = '/'
+        Log = 'server.log'
+        ErrLog = 'server-err.log'
+    }
+    'leadcaller' = @{
+        Label = 'Lead Caller'
+        Port = 3008
+        Cmd = 'node node_modules\next\dist\bin\next start -p 3008'
+        WorkDir = (Join-Path $Root 'apps\leadcaller')
+        HealthPath = '/'
+        Log = 'server.log'
+        ErrLog = 'server-err.log'
+    }
+    'prototype' = @{
+        Label = 'Prototype (API)'
+        Port = 3009
+        Cmd = 'set PORT=3009 && node dist\index.js'
+        WorkDir = (Join-Path $Root 'apps\prototype\server')
+        HealthPath = '/api/health'
+        Log = 'server.log'
+        ErrLog = 'server-err.log'
+    }
 }
 
 # ---------------------------------------------------------------------------

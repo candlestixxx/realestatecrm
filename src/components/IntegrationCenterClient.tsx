@@ -264,7 +264,7 @@ export default function IntegrationCenterClient({
             </h3>
           </div>
           <p className="text-xs text-muted-foreground font-semibold leading-relaxed">
-            When a lead's property is detected as back on the market (ACTIVE on MLS), configure how you want to be notified. Drip campaigns will always be paused automatically.
+            When a lead&apos;s property is detected as back on the market (ACTIVE on MLS), configure how you want to be notified. Drip campaigns will always be paused automatically.
           </p>
           <div className="grid md:grid-cols-2 gap-4 pt-2">
             <div className="flex items-center justify-between p-3 bg-muted/20 border border-border/60 rounded-xl">
@@ -288,7 +288,7 @@ export default function IntegrationCenterClient({
             <div className="flex items-center justify-between p-3 bg-muted/20 border border-border/60 rounded-xl">
               <div className="flex flex-col min-w-0 pr-2">
                 <span className="text-xs font-bold text-foreground">SMS Notifications (Charges Apply)</span>
-                <span className="text-[10px] text-muted-foreground font-semibold leading-normal">Send text alerts to agent's cell phone</span>
+                <span className="text-[10px] text-muted-foreground font-semibold leading-normal">Send text alerts to agent&apos;s cell phone</span>
               </div>
               <button type="button"
                 onClick={() => handleUpdatePrefs(!smsAlerts, emailAlerts)}
