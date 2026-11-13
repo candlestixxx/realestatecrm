@@ -1,3 +1,9 @@
+## v0.64.8 (2026-11-13)
+
+### Deploy-script DB safety net
+- deploy-aicrm.sh / deploy-leadcaller.sh: after db push, restore the previous dev.db from backup if push produced a 0-byte file (Prisma .env-precedence pitfall found in v0.64.6) instead of shipping an empty database.
+- Owner: United Beats LLC Mercury account confirmed open (proposal bank blocker resolved, relayed to Bobbi).
+
 ## v0.64.7 (2026-11-13)
 
 ### Dashboard coverage + rate-limit hardening

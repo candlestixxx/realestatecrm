@@ -34,7 +34,15 @@ ENVEOF
 
 # Create/update the sqlite schema at the absolute deploy path (never ships
 # a local dev.db; the file is created/pushed in place on the server).
+# Pitfall (learned v0.64.6): Prisma CLI .env precedence can make db push
+# silently no-op and leave a 0-byte dev.db. Verify tables landed; if the
+# file is empty, restore the previous DB from the backup instead of
+# shipping an empty database.
 DATABASE_URL="file:/var/www/aicrm/prisma/dev.db" npx prisma db push --skip-generate --schema prisma/schema.prisma 2>&1 | tail -2 || true
+if [ ! -s prisma/dev.db ] && [ -s "$BK/prisma/dev.db" ]; then
+  echo "WARNING: db push produced no database - restoring previous dev.db from $BK"
+  cp "$BK/prisma/dev.db" prisma/dev.db
+fi
 
 pm2 delete aicrm 2>/dev/null || true
 PORT=3218 pm2 start server.js --name aicrm --cwd "$DEPLOY_DIR"
