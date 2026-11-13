@@ -1,3 +1,8 @@
+## v0.64.0 (2026-11-10)
+
+### Universal CRM — sector packs on HyperNexus
+- Core split into sector packs (src/lib/universal/): 8 launch sectors with vocabulary/stages/templates/compliance; Real Estate is Pack #1. 16 languages (incl. RTL Arabic) via 	(); United Beats LLC (Bob & Lum) add-on registry. /universal showcase + docs/UNIVERSAL_CRM.md + tests 4/4.
+
 ## v0.63.0 (2026-11-10)
 
 ### TSF Master Bundle — Trust, Security & Future

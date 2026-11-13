@@ -1,3 +1,9 @@
+## v0.64.0 — Universal CRM foundation (2026-11-10)
+
+Sector-pack architecture live: src/lib/universal/sectors.ts (8 packs, validated), platform.ts (16 languages, add-ons by United Beats LLC Bob & Lum), /universal page, design in docs/UNIVERSAL_CRM.md, tests/universal.test.mts 4/4. Next: tenant provisioning (workspace -> pack -> brand -> language), Stripe add-on billing, first non-real-estate pilot.
+
+---
+
 ## v0.63.0 — TSF Master Bundle + Executive Protocol sync (2026-11-10)
 
 **Shipped:** Trust, Security & Future (TSF) Master Bundle at /trust-services — 8-module/24-lesson course any Excel Legacy realtor can teach (instructor guide + student workbook), 3 newly revised branded trust docs (logo, PDF+DOCX, public/trust-docs/), lead-magnet gate requiring name/email/validated phone/property address into the CRM, pricing $1,497 standalone / $997 client add-on / concierge +$500. Circular EL logo cropped from team flyer to public/brand/. Homepage services lead with Trust Services. Deployed to Hetzner (BUILD_ID IAA03uLbQG0duZqK8SM0otsf, PM2 excellegacyrealtygroup).
