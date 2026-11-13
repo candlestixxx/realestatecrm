@@ -1,3 +1,10 @@
+## v0.64.5 (2026-11-13)
+
+### LeadCaller MCP 500 fixed (live on Hetzner)
+- Two stacked defects: (1) standalone tarball dropped .next/node_modules hashed externals (fixed packager v0.64.4), (2) src/pages/api/mcp.ts connected a module-level singleton MCP Server to every SSE transport - second connect threw Already connected to a transport. Now a fresh Server per connection (leadcaller 8f658bb), message endpoint derived from NEXTAUTH_URL so it carries the /leadcaller prefix.
+- Verified live on Hetzner: SSE endpoint event with prefixed session URL, MCP initialize 202, tools/list returns query_mls_inventory + check_agent_availability. Log audit also fixed foreclosure @prisma/client-<hash> symlink live.
+- Known follow-up (pre-existing, flagged): query_mls_inventory returns hardcoded mock listings - replace with real MLS/DB query or label as demo (fake-data purge precedent).
+
 ## v0.64.4 (2026-11-13)
 
 ### Fix: standalone packager dropped Turbopack hashed externals (LeadCaller MCP 500)
