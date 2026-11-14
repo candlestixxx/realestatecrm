@@ -1,3 +1,10 @@
+## v0.64.12 (2026-11-13)
+
+### Autonomous steady-state loop
+- Sync verified: root + 8 submodules 0/0, CI streak green (gh CLI token expired on this machine - git credentials unaffected; owner to re-auth gh).
+- Dashboard re-verified: 36/36 pages covered (UNCOVERED none), 65/65 cards with tooltips; tray Quit All Servers verified in code.
+- Prod: 14 PM2 online, only stale Server Action browser noise in logs; disk 80%. Docs-only release; prod app build remains v0.64.11.
+
 ## v0.64.11 (2026-11-13)
 
 ### System health prod ports corrected
