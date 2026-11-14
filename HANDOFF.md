@@ -1,3 +1,6 @@
+## v0.64.14 - Rebuild verification (2026-11-14, Muse Code lane)
+BelowNormal: lint 0 err, build OK 31.6s, tests 36/9 (ECONNREFUSED only). Push via keyring after unsetting stale GITHUB_TOKEN (gh CLI still needs re-auth). Bobbi notified via CDP. Open: proposal wording, Tier-1 keys.
+
 ## v0.64.13 - Verification pass (2026-11-14, Muse Code lane)
 Root 0/0 c91d9b2. Prod all mounts 200, health 11/12 (Live Audio local-only). Headless prod pass: Command Center + Leads screenshots verified, 36/36 coverage in code (CommandCenter hrefs == dashboard dirs). CDP 9222 live (14 tabs) but muse-cdp found 0 muse.ai candidates this pass; Bobbi chat visible in shared Edge (delivery unconfirmed). Open: gh auth login, proposal wording, Tier-1 keys. Prod app v0.64.11.
 

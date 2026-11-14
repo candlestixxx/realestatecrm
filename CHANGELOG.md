@@ -1,3 +1,9 @@
+## v0.64.14 (2026-11-14)
+
+### Below-normal rebuild verification (docs)
+- Lint 0 errors (16 warnings); next build compiled successfully in 31.6s (Dynamic-server-usage notices pre-existing). Tests 36 pass / 9 fail, all 9 ECONNREFUSED :3000 (server-dependent; local servers off per owner rule - 40/40 with server up per v0.63.1).
+- Dashboard consolidation re-verified in code: 36/36 routes linked, 74 card hrefs, 61 descriptions, 85 tooltip refs, Money Now first. Prod app remains v0.64.11; docs-only bump.
+
 ## v0.64.13 (2026-11-14)
 
 ### Steady-state verification + headless browser pass

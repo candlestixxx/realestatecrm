@@ -1,3 +1,6 @@
+## v0.64.14 status (2026-11-14)
+Rebuild verified green. Frontier unchanged: owner-gated keys/signature only.
+
 ## v0.64.13 status (2026-11-14)
 Steady state holds. Remaining frontier is owner-gated only: Hank pilot signature + proposal wording, RESO MLS token/Member ID, Stripe/Twilio/Resend keys, gh re-auth. No structural gaps: dashboard single-page consolidated (36/36), CI green streak, all mounts public.
 
